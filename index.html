@@ -3,24 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#030303" />
     <title>Otodor | Under Construction</title>
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon.png" />
+    <link rel="apple-touch-icon" href="favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        color-scheme: light;
-        --bg: #000000;
-        --panel: rgba(255, 255, 255, 0.02);
-        --panel-border: rgba(255, 255, 255, 0.12);
+        color-scheme: dark;
+        --bg: #030303;
+        --panel: rgba(12, 12, 12, 0.86);
+        --panel-border: rgba(255, 255, 255, 0.14);
         --text: #ffffff;
-        --muted: rgba(255, 255, 255, 0.7);
-        --line: rgba(255, 255, 255, 0.06);
-        --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+        --muted: rgba(255, 255, 255, 0.68);
+        --soft: rgba(255, 255, 255, 0.09);
+        --line: rgba(255, 255, 255, 0.055);
+        --accent: #e9f7ff;
+        --shadow: 0 28px 110px rgba(0, 0, 0, 0.66);
       }
 
       * {
@@ -36,86 +40,107 @@
       body {
         font-family: "Inter", sans-serif;
         color: var(--text);
-        background: var(--bg);
+        background:
+          linear-gradient(115deg, rgba(255, 255, 255, 0.055), transparent 26%),
+          radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.1), transparent 34%),
+          var(--bg);
         overflow: hidden;
       }
 
-      body::before,
-      body::after {
+      body::before {
         content: "";
         position: fixed;
         inset: 0;
         pointer-events: none;
-      }
-
-      body::before {
         background-image:
           linear-gradient(var(--line) 1px, transparent 1px),
           linear-gradient(90deg, var(--line) 1px, transparent 1px);
-        background-size: 42px 42px;
-        mask-image: radial-gradient(circle at center, black 34%, transparent 86%);
-        opacity: 0.55;
-      }
-
-      body::after {
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 58%);
-        filter: blur(70px);
-        width: 20rem;
-        height: 20rem;
-        left: 50%;
-        top: 14%;
-        transform: translateX(-50%);
-        opacity: 0.08;
-        animation: drift 14s ease-in-out infinite alternate;
+        background-size: 52px 52px;
+        mask-image: radial-gradient(circle at center, black 38%, transparent 84%);
+        opacity: 0.72;
       }
 
       .page {
         min-height: 100vh;
         display: grid;
         place-items: center;
-        padding: 24px;
+        padding: clamp(18px, 4vw, 42px);
       }
 
       .card {
-        width: min(980px, 100%);
-        padding: clamp(28px, 6vw, 64px);
+        width: min(1080px, 100%);
+        min-height: min(760px, calc(100vh - 48px));
+        padding: clamp(26px, 5vw, 72px);
         border: 1px solid var(--panel-border);
-        border-radius: 32px;
-        background: var(--panel);
-        backdrop-filter: blur(24px);
-        box-shadow: var(--shadow);
+        border-radius: clamp(26px, 4vw, 40px);
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.075), transparent 30%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.032), transparent 58%),
+          var(--panel);
+        box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         position: relative;
         overflow: hidden;
         display: grid;
-        gap: 24px;
+        align-content: space-between;
+        gap: clamp(28px, 5vw, 58px);
+      }
+
+      .card::before,
+      .card::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .card::before {
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.72), transparent 46%);
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+        animation: borderSweep 7s linear infinite;
+        opacity: 0.5;
+      }
+
+      .card::after {
+        width: 42%;
+        height: 1px;
+        top: 0;
+        left: 29%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+      }
+
+      .hero {
+        display: grid;
+        justify-items: center;
+        text-align: center;
+        gap: 22px;
       }
 
       .brand {
         margin: 0;
-        font-size: clamp(3.2rem, 11vw, 7.2rem);
-        line-height: 0.92;
-        letter-spacing: -0.08em;
-        font-weight: 700;
-        text-wrap: balance;
+        width: min(780px, 100%);
+        position: relative;
+        isolation: isolate;
       }
 
-      .brand small {
-        display: block;
-        margin-top: 10px;
-        font-size: clamp(0.85rem, 1.5vw, 1rem);
-        line-height: 1.2;
-        letter-spacing: 0.16em;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.64);
-        text-transform: uppercase;
-      }
-
-      .card::before {
+      .brand::before {
         content: "";
         position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 28%, transparent 72%, rgba(255, 255, 255, 0.03));
-        pointer-events: none;
+        inset: 12% 8%;
+        z-index: -1;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        filter: blur(42px);
+        opacity: 0.42;
+      }
+
+      .brand-logo {
+        display: block;
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 24px 42px rgba(0, 0, 0, 0.72));
       }
 
       .badge {
@@ -123,14 +148,15 @@
         align-items: center;
         gap: 10px;
         width: fit-content;
-        padding: 10px 16px;
+        padding: 11px 18px;
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.055);
         color: var(--text);
-        letter-spacing: 0.14em;
+        letter-spacing: 0.16em;
         text-transform: uppercase;
-        font: 600 11px/1 "Inter", sans-serif;
+        font: 800 11px/1 "Inter", sans-serif;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
       }
 
       .badge span {
@@ -138,38 +164,60 @@
         height: 8px;
         border-radius: 50%;
         background: #ffffff;
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.24);
         animation: pulse 1.8s ease-out infinite;
       }
 
       .copy {
-        max-width: 42ch;
-        font-size: clamp(1rem, 2vw, 1.15rem);
+        max-width: 54ch;
+        font-size: clamp(1.04rem, 2vw, 1.24rem);
         line-height: 1.7;
         color: var(--muted);
         margin: 0;
       }
 
-      .meta {
-        margin-top: 6px;
+      .actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 14px;
+        justify-content: center;
+        gap: 12px;
       }
 
-      .pill {
-        padding: 12px 16px;
+      .action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 20px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(255, 255, 255, 0.04);
-        color: rgba(255, 255, 255, 0.84);
-        font: 500 14px/1.1 "Inter", sans-serif;
+        background: rgba(255, 255, 255, 0.94);
+        color: #050505;
+        text-decoration: none;
+        font: 800 14px/1 "Inter", sans-serif;
+        box-shadow: 0 14px 34px rgba(255, 255, 255, 0.08);
+        transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      }
+
+      .action.secondary {
+        background: rgba(255, 255, 255, 0.055);
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 44px rgba(255, 255, 255, 0.12);
+      }
+
+      .system {
+        display: grid;
+        gap: 22px;
       }
 
       .loader {
-        margin-top: 12px;
         position: relative;
-        height: 22px;
+        height: 28px;
+        overflow: hidden;
       }
 
       .loader::before {
@@ -180,7 +228,7 @@
         top: 50%;
         height: 1px;
         transform: translateY(-50%);
-        background: rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.15);
       }
 
       .loader::after {
@@ -188,43 +236,53 @@
         position: absolute;
         top: 50%;
         left: 0;
-        width: 28%;
+        width: 30%;
         height: 1px;
         transform: translateY(-50%);
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
-        animation: sweep 2.4s ease-in-out infinite;
+        animation: sweep 2.6s ease-in-out infinite;
+      }
+
+      .meta {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.035);
+        overflow: hidden;
+      }
+
+      .metric {
+        padding: 18px;
+        border-right: 1px solid rgba(255, 255, 255, 0.09);
+      }
+
+      .metric:last-child {
+        border-right: 0;
+      }
+
+      .metric b {
+        display: block;
+        margin-bottom: 6px;
+        font-size: clamp(1.05rem, 2vw, 1.45rem);
+        line-height: 1;
+      }
+
+      .metric span {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
       }
 
       .footer {
-        margin-top: 8px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 16px;
-        color: rgba(255, 255, 255, 0.56);
-        font: 500 13px/1.3 "Inter", sans-serif;
-      }
-
-      .contact {
-        text-align: right;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .contact-line {
-        font-size: 16px;
-        color: rgba(255,255,255,0.88);
-        letter-spacing: 0.02em;
-        font-weight: 700;
-      }
-
-      .contact-line a {
-        color: rgba(255,255,255,0.88);
-        text-decoration: none;
-        border-bottom: 1px solid rgba(255,255,255,0.04);
-        padding-bottom: 2px;
-        margin: 0 6px;
+        gap: 18px;
+        color: rgba(255, 255, 255, 0.58);
+        font: 600 13px/1.35 "Inter", sans-serif;
       }
 
       .status {
@@ -239,12 +297,31 @@
         height: 10px;
         border-radius: 50%;
         background: #ffffff;
-        box-shadow: 0 0 18px rgba(255, 255, 255, 0.22);
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.28);
+      }
+
+      .contact {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .contact-line {
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+      }
+
+      .contact-line a {
+        color: inherit;
+        text-decoration: none;
       }
 
       @keyframes pulse {
         0% {
-          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.22);
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.24);
         }
         70% {
           box-shadow: 0 0 0 14px rgba(255, 255, 255, 0);
@@ -257,31 +334,49 @@
       @keyframes sweep {
         0%,
         100% {
-          transform: translate3d(-10%, -50%, 0);
+          transform: translate3d(-12%, -50%, 0);
           opacity: 0.6;
         }
         50% {
-          transform: translate3d(260%, -50%, 0);
+          transform: translate3d(290%, -50%, 0);
           opacity: 1;
         }
       }
 
-      @keyframes drift {
-        from {
-          transform: translateX(-50%) translateY(-8px) scale(0.92);
+      @keyframes borderSweep {
+        0% {
+          filter: hue-rotate(0deg);
+          opacity: 0.34;
         }
-        to {
-          transform: translateX(-50%) translateY(18px) scale(1.04);
+        50% {
+          opacity: 0.7;
+        }
+        100% {
+          filter: hue-rotate(360deg);
+          opacity: 0.34;
         }
       }
 
-      @media (max-width: 640px) {
+      @media (max-width: 760px) {
         body {
           overflow: auto;
         }
 
         .card {
-          border-radius: 24px;
+          min-height: auto;
+        }
+
+        .meta {
+          grid-template-columns: 1fr;
+        }
+
+        .metric {
+          border-right: 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+        .metric:last-child {
+          border-bottom: 0;
         }
 
         .footer {
@@ -292,25 +387,52 @@
         .contact {
           text-align: left;
         }
+
+        .actions {
+          justify-content: flex-start;
+        }
       }
     </style>
   </head>
   <body>
     <main class="page">
       <section class="card" aria-labelledby="headline">
-        <h1 class="brand" id="headline">Otodor <small>Locks and Motors</small></h1>
-        <div class="badge"><span></span> under construction</div>
-        <p class="copy">
-          For orders & enquiries, please contact us through the line below.
-        </p>
-        <div class="meta" aria-label="page status">
-          <div class="pill">coming soon</div>
+        <div class="hero">
+          <h1 class="brand" id="headline">
+            <img class="brand-logo" src="brand-logo.png" alt="Otodor Locks and Motors" width="1800" height="420" />
+          </h1>
+          <div class="badge"><span></span> under construction</div>
+          <p class="copy">
+            Smart locks, motors, and access solutions are getting a sharper home online. For orders and enquiries, reach us directly below.
+          </p>
+          <div class="actions" aria-label="contact actions">
+            <a class="action" href="tel:+917206895607">Call +91-72068 95607</a>
+            <a class="action secondary" href="mailto:info@otodorlocks.com">info@otodorlocks.com</a>
+          </div>
         </div>
-        <div class="loader" aria-hidden="true"></div>
+
+        <div class="system">
+          <div class="loader" aria-hidden="true"></div>
+          <div class="meta" aria-label="page status">
+            <div class="metric">
+              <b>2026</b>
+              <span>launch window</span>
+            </div>
+            <div class="metric">
+              <b>24/7</b>
+              <span>enquiry line</span>
+            </div>
+            <div class="metric">
+              <b>soon</b>
+              <span>catalog access</span>
+            </div>
+          </div>
+        </div>
+
         <div class="footer">
-          <div class="status">Site Development in motion</div>
+          <div class="status">Site development in motion</div>
           <div class="contact">
-            <div class="contact-line"><a href="tel:+917206895607">+91-72068 95607</a> · <a href="mailto:info@otodorlocks.com">info@otodorlocks.com</a></div>
+            <div class="contact-line"><a href="tel:+917206895607">+91-72068 95607</a> &middot; <a href="mailto:info@otodorlocks.com">info@otodorlocks.com</a></div>
             <div>&copy; 2026 Otodor</div>
           </div>
         </div>
