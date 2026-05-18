@@ -44,7 +44,8 @@
           linear-gradient(115deg, rgba(255, 255, 255, 0.055), transparent 26%),
           radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.1), transparent 34%),
           var(--bg);
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
 
       body::before {
@@ -65,6 +66,7 @@
         display: grid;
         place-items: center;
         padding: clamp(18px, 4vw, 42px);
+        padding-bottom: clamp(64px, 10vh, 120px);
       }
 
       .card {
