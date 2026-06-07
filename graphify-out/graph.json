@@ -5440,226 +5440,10 @@
       "norm_label": "image"
     },
     {
-      "label": "otodor_comparison",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L213",
-      "id": "templates_index_sections_otodor_comparison",
-      "community": 7,
-      "norm_label": "otodor_comparison"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L214",
-      "id": "templates_index_otodor_comparison_type",
-      "community": 7,
-      "norm_label": "type"
-    },
-    {
-      "label": "blocks",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L215",
-      "id": "templates_index_otodor_comparison_blocks",
-      "community": 15,
-      "norm_label": "blocks"
-    },
-    {
-      "label": "comp_1",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L216",
-      "id": "templates_index_blocks_comp_1",
-      "community": 15,
-      "norm_label": "comp_1"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L217",
-      "id": "templates_index_comp_1_type",
-      "community": 15,
-      "norm_label": "type"
-    },
-    {
-      "label": "settings",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L218",
-      "id": "templates_index_comp_1_settings",
-      "community": 15,
-      "norm_label": "settings"
-    },
-    {
-      "label": "fingerprint",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L220",
-      "id": "templates_index_settings_fingerprint",
-      "community": 15,
-      "norm_label": "fingerprint"
-    },
-    {
-      "label": "pin_access",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L221",
-      "id": "templates_index_settings_pin_access",
-      "community": 15,
-      "norm_label": "pin_access"
-    },
-    {
-      "label": "rfid_access",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L222",
-      "id": "templates_index_settings_rfid_access",
-      "community": 15,
-      "norm_label": "rfid_access"
-    },
-    {
-      "label": "app_control",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L223",
-      "id": "templates_index_settings_app_control",
-      "community": 15,
-      "norm_label": "app_control"
-    },
-    {
-      "label": "auto_lock",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L224",
-      "id": "templates_index_settings_auto_lock",
-      "community": 15,
-      "norm_label": "auto_lock"
-    },
-    {
-      "label": "audit_log",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L225",
-      "id": "templates_index_settings_audit_log",
-      "community": 15,
-      "norm_label": "audit_log"
-    },
-    {
-      "label": "warranty",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L226",
-      "id": "templates_index_settings_warranty",
-      "community": 15,
-      "norm_label": "warranty"
-    },
-    {
-      "label": "comp_2",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L229",
-      "id": "templates_index_blocks_comp_2",
-      "community": 15,
-      "norm_label": "comp_2"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L230",
-      "id": "templates_index_comp_2_type",
-      "community": 15,
-      "norm_label": "type"
-    },
-    {
-      "label": "settings",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L231",
-      "id": "templates_index_comp_2_settings",
-      "community": 15,
-      "norm_label": "settings"
-    },
-    {
-      "label": "comp_3",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L242",
-      "id": "templates_index_blocks_comp_3",
-      "community": 15,
-      "norm_label": "comp_3"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L243",
-      "id": "templates_index_comp_3_type",
-      "community": 15,
-      "norm_label": "type"
-    },
-    {
-      "label": "settings",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L244",
-      "id": "templates_index_comp_3_settings",
-      "community": 15,
-      "norm_label": "settings"
-    },
-    {
-      "label": "comp_4",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L255",
-      "id": "templates_index_blocks_comp_4",
-      "community": 15,
-      "norm_label": "comp_4"
-    },
-    {
-      "label": "type",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L256",
-      "id": "templates_index_comp_4_type",
-      "community": 15,
-      "norm_label": "type"
-    },
-    {
-      "label": "settings",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L257",
-      "id": "templates_index_comp_4_settings",
-      "community": 15,
-      "norm_label": "settings"
-    },
-    {
-      "label": "block_order",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L269",
-      "id": "templates_index_otodor_comparison_block_order",
-      "community": 7,
-      "norm_label": "block_order"
-    },
-    {
-      "label": "settings",
-      "file_type": "code",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L275",
-      "id": "templates_index_otodor_comparison_settings",
-      "community": 7,
-      "norm_label": "settings"
-    },
-    {
       "label": "otodor_process",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L281",
+      "source_location": "L213",
       "id": "templates_index_sections_otodor_process",
       "community": 7,
       "norm_label": "otodor_process"
@@ -5668,7 +5452,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L282",
+      "source_location": "L214",
       "id": "templates_index_otodor_process_type",
       "community": 7,
       "norm_label": "type"
@@ -5677,7 +5461,7 @@
       "label": "blocks",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L283",
+      "source_location": "L215",
       "id": "templates_index_otodor_process_blocks",
       "community": 105,
       "norm_label": "blocks"
@@ -5686,7 +5470,7 @@
       "label": "step_1",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L284",
+      "source_location": "L216",
       "id": "templates_index_blocks_step_1",
       "community": 105,
       "norm_label": "step_1"
@@ -5695,7 +5479,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L285",
+      "source_location": "L217",
       "id": "templates_index_step_1_type",
       "community": 105,
       "norm_label": "type"
@@ -5704,7 +5488,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L286",
+      "source_location": "L218",
       "id": "templates_index_step_1_settings",
       "community": 105,
       "norm_label": "settings"
@@ -5713,7 +5497,7 @@
       "label": "step_2",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L291",
+      "source_location": "L223",
       "id": "templates_index_blocks_step_2",
       "community": 105,
       "norm_label": "step_2"
@@ -5722,7 +5506,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L292",
+      "source_location": "L224",
       "id": "templates_index_step_2_type",
       "community": 105,
       "norm_label": "type"
@@ -5731,7 +5515,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L293",
+      "source_location": "L225",
       "id": "templates_index_step_2_settings",
       "community": 105,
       "norm_label": "settings"
@@ -5740,7 +5524,7 @@
       "label": "step_3",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L298",
+      "source_location": "L230",
       "id": "templates_index_blocks_step_3",
       "community": 105,
       "norm_label": "step_3"
@@ -5749,7 +5533,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L299",
+      "source_location": "L231",
       "id": "templates_index_step_3_type",
       "community": 105,
       "norm_label": "type"
@@ -5758,7 +5542,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L300",
+      "source_location": "L232",
       "id": "templates_index_step_3_settings",
       "community": 105,
       "norm_label": "settings"
@@ -5767,7 +5551,7 @@
       "label": "block_order",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L306",
+      "source_location": "L238",
       "id": "templates_index_otodor_process_block_order",
       "community": 7,
       "norm_label": "block_order"
@@ -5776,7 +5560,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L311",
+      "source_location": "L243",
       "id": "templates_index_otodor_process_settings",
       "community": 7,
       "norm_label": "settings"
@@ -5785,7 +5569,7 @@
       "label": "otodor_testimonials",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L317",
+      "source_location": "L249",
       "id": "templates_index_sections_otodor_testimonials",
       "community": 7,
       "norm_label": "otodor_testimonials"
@@ -5794,7 +5578,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L318",
+      "source_location": "L250",
       "id": "templates_index_otodor_testimonials_type",
       "community": 7,
       "norm_label": "type"
@@ -5803,7 +5587,7 @@
       "label": "blocks",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L319",
+      "source_location": "L251",
       "id": "templates_index_otodor_testimonials_blocks",
       "community": 106,
       "norm_label": "blocks"
@@ -5812,7 +5596,7 @@
       "label": "review_1",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L320",
+      "source_location": "L252",
       "id": "templates_index_blocks_review_1",
       "community": 106,
       "norm_label": "review_1"
@@ -5821,7 +5605,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L321",
+      "source_location": "L253",
       "id": "templates_index_review_1_type",
       "community": 106,
       "norm_label": "type"
@@ -5830,7 +5614,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L322",
+      "source_location": "L254",
       "id": "templates_index_review_1_settings",
       "community": 106,
       "norm_label": "settings"
@@ -5839,7 +5623,7 @@
       "label": "quote",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L323",
+      "source_location": "L255",
       "id": "templates_index_settings_quote",
       "community": 106,
       "norm_label": "quote"
@@ -5848,7 +5632,7 @@
       "label": "rating",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L324",
+      "source_location": "L256",
       "id": "templates_index_settings_rating",
       "community": 106,
       "norm_label": "rating"
@@ -5857,7 +5641,7 @@
       "label": "author",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L325",
+      "source_location": "L257",
       "id": "templates_index_settings_author",
       "community": 106,
       "norm_label": "author"
@@ -5866,7 +5650,7 @@
       "label": "role",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L326",
+      "source_location": "L258",
       "id": "templates_index_settings_role",
       "community": 106,
       "norm_label": "role"
@@ -5875,7 +5659,7 @@
       "label": "review_2",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L329",
+      "source_location": "L261",
       "id": "templates_index_blocks_review_2",
       "community": 106,
       "norm_label": "review_2"
@@ -5884,7 +5668,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L330",
+      "source_location": "L262",
       "id": "templates_index_review_2_type",
       "community": 106,
       "norm_label": "type"
@@ -5893,7 +5677,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L331",
+      "source_location": "L263",
       "id": "templates_index_review_2_settings",
       "community": 106,
       "norm_label": "settings"
@@ -5902,7 +5686,7 @@
       "label": "review_3",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L338",
+      "source_location": "L270",
       "id": "templates_index_blocks_review_3",
       "community": 106,
       "norm_label": "review_3"
@@ -5911,7 +5695,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L339",
+      "source_location": "L271",
       "id": "templates_index_review_3_type",
       "community": 106,
       "norm_label": "type"
@@ -5920,7 +5704,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L340",
+      "source_location": "L272",
       "id": "templates_index_review_3_settings",
       "community": 106,
       "norm_label": "settings"
@@ -5929,7 +5713,7 @@
       "label": "block_order",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L348",
+      "source_location": "L280",
       "id": "templates_index_otodor_testimonials_block_order",
       "community": 7,
       "norm_label": "block_order"
@@ -5938,7 +5722,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L353",
+      "source_location": "L285",
       "id": "templates_index_otodor_testimonials_settings",
       "community": 7,
       "norm_label": "settings"
@@ -5947,7 +5731,7 @@
       "label": "otodor_cta_banner",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L359",
+      "source_location": "L291",
       "id": "templates_index_sections_otodor_cta_banner",
       "community": 7,
       "norm_label": "otodor_cta_banner"
@@ -5956,7 +5740,7 @@
       "label": "type",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L360",
+      "source_location": "L292",
       "id": "templates_index_otodor_cta_banner_type",
       "community": 7,
       "norm_label": "type"
@@ -5965,7 +5749,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L361",
+      "source_location": "L293",
       "id": "templates_index_otodor_cta_banner_settings",
       "community": 7,
       "norm_label": "settings"
@@ -5974,7 +5758,7 @@
       "label": "order",
       "file_type": "code",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L372",
+      "source_location": "L304",
       "id": "templates_index_order",
       "community": 7,
       "norm_label": "order"
@@ -6194,6 +5978,222 @@
       "id": "project_future_vision",
       "community": 12,
       "norm_label": "future vision"
+    },
+    {
+      "label": "otodor_comparison",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L213",
+      "community": 7,
+      "norm_label": "otodor_comparison",
+      "id": "templates_index_sections_otodor_comparison"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L214",
+      "community": 7,
+      "norm_label": "type",
+      "id": "templates_index_otodor_comparison_type"
+    },
+    {
+      "label": "blocks",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L215",
+      "community": 15,
+      "norm_label": "blocks",
+      "id": "templates_index_otodor_comparison_blocks"
+    },
+    {
+      "label": "comp_1",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L216",
+      "community": 15,
+      "norm_label": "comp_1",
+      "id": "templates_index_blocks_comp_1"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L217",
+      "community": 15,
+      "norm_label": "type",
+      "id": "templates_index_comp_1_type"
+    },
+    {
+      "label": "settings",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L218",
+      "community": 15,
+      "norm_label": "settings",
+      "id": "templates_index_comp_1_settings"
+    },
+    {
+      "label": "fingerprint",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L220",
+      "community": 15,
+      "norm_label": "fingerprint",
+      "id": "templates_index_settings_fingerprint"
+    },
+    {
+      "label": "pin_access",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L221",
+      "community": 15,
+      "norm_label": "pin_access",
+      "id": "templates_index_settings_pin_access"
+    },
+    {
+      "label": "rfid_access",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L222",
+      "community": 15,
+      "norm_label": "rfid_access",
+      "id": "templates_index_settings_rfid_access"
+    },
+    {
+      "label": "app_control",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L223",
+      "community": 15,
+      "norm_label": "app_control",
+      "id": "templates_index_settings_app_control"
+    },
+    {
+      "label": "auto_lock",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L224",
+      "community": 15,
+      "norm_label": "auto_lock",
+      "id": "templates_index_settings_auto_lock"
+    },
+    {
+      "label": "audit_log",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L225",
+      "community": 15,
+      "norm_label": "audit_log",
+      "id": "templates_index_settings_audit_log"
+    },
+    {
+      "label": "warranty",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L226",
+      "community": 15,
+      "norm_label": "warranty",
+      "id": "templates_index_settings_warranty"
+    },
+    {
+      "label": "comp_2",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L229",
+      "community": 15,
+      "norm_label": "comp_2",
+      "id": "templates_index_blocks_comp_2"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L230",
+      "community": 15,
+      "norm_label": "type",
+      "id": "templates_index_comp_2_type"
+    },
+    {
+      "label": "settings",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L231",
+      "community": 15,
+      "norm_label": "settings",
+      "id": "templates_index_comp_2_settings"
+    },
+    {
+      "label": "comp_3",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L242",
+      "community": 15,
+      "norm_label": "comp_3",
+      "id": "templates_index_blocks_comp_3"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L243",
+      "community": 15,
+      "norm_label": "type",
+      "id": "templates_index_comp_3_type"
+    },
+    {
+      "label": "settings",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L244",
+      "community": 15,
+      "norm_label": "settings",
+      "id": "templates_index_comp_3_settings"
+    },
+    {
+      "label": "comp_4",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L255",
+      "community": 15,
+      "norm_label": "comp_4",
+      "id": "templates_index_blocks_comp_4"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L256",
+      "community": 15,
+      "norm_label": "type",
+      "id": "templates_index_comp_4_type"
+    },
+    {
+      "label": "settings",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L257",
+      "community": 15,
+      "norm_label": "settings",
+      "id": "templates_index_comp_4_settings"
+    },
+    {
+      "label": "block_order",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L269",
+      "community": 7,
+      "norm_label": "block_order",
+      "id": "templates_index_otodor_comparison_block_order"
+    },
+    {
+      "label": "settings",
+      "file_type": "code",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L275",
+      "community": 7,
+      "norm_label": "settings",
+      "id": "templates_index_otodor_comparison_settings"
     },
     {
       "label": "otodor_products",
@@ -14888,446 +14888,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L255",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_sections_otodor_comparison",
-      "target": "templates_index_otodor_comparison_block_order"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L201",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_sections_otodor_comparison",
-      "target": "templates_index_otodor_comparison_blocks"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L40",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_sections_otodor_comparison",
-      "target": "templates_index_otodor_comparison_settings"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L39",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_sections_otodor_comparison",
-      "target": "templates_index_otodor_comparison_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L202",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_otodor_comparison_blocks",
-      "target": "templates_index_blocks_comp_1"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L215",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_otodor_comparison_blocks",
-      "target": "templates_index_blocks_comp_2"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L228",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_otodor_comparison_blocks",
-      "target": "templates_index_blocks_comp_3"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L241",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_otodor_comparison_blocks",
-      "target": "templates_index_blocks_comp_4"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L204",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_blocks_comp_1",
-      "target": "templates_index_comp_1_settings"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L203",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_blocks_comp_1",
-      "target": "templates_index_comp_1_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L209",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_1_settings",
-      "target": "templates_index_settings_app_control"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L211",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_1_settings",
-      "target": "templates_index_settings_audit_log"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L210",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_1_settings",
-      "target": "templates_index_settings_auto_lock"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L206",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_1_settings",
-      "target": "templates_index_settings_fingerprint"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L207",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_1_settings",
-      "target": "templates_index_settings_pin_access"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L208",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_1_settings",
-      "target": "templates_index_settings_rfid_access"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L212",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_1_settings",
-      "target": "templates_index_settings_warranty"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L219",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_2_settings",
-      "target": "templates_index_settings_fingerprint"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L232",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_3_settings",
-      "target": "templates_index_settings_fingerprint"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L245",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_4_settings",
-      "target": "templates_index_settings_fingerprint"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L220",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_2_settings",
-      "target": "templates_index_settings_pin_access"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L233",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_3_settings",
-      "target": "templates_index_settings_pin_access"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L246",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_4_settings",
-      "target": "templates_index_settings_pin_access"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L221",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_2_settings",
-      "target": "templates_index_settings_rfid_access"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L234",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_3_settings",
-      "target": "templates_index_settings_rfid_access"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L247",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_4_settings",
-      "target": "templates_index_settings_rfid_access"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L222",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_2_settings",
-      "target": "templates_index_settings_app_control"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L235",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_3_settings",
-      "target": "templates_index_settings_app_control"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L248",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_4_settings",
-      "target": "templates_index_settings_app_control"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L223",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_2_settings",
-      "target": "templates_index_settings_auto_lock"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L236",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_3_settings",
-      "target": "templates_index_settings_auto_lock"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L249",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_4_settings",
-      "target": "templates_index_settings_auto_lock"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L224",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_2_settings",
-      "target": "templates_index_settings_audit_log"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L237",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_3_settings",
-      "target": "templates_index_settings_audit_log"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L250",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_4_settings",
-      "target": "templates_index_settings_audit_log"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L225",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_2_settings",
-      "target": "templates_index_settings_warranty"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L238",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_3_settings",
-      "target": "templates_index_settings_warranty"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L251",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_comp_4_settings",
-      "target": "templates_index_settings_warranty"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L217",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_blocks_comp_2",
-      "target": "templates_index_comp_2_settings"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L216",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_blocks_comp_2",
-      "target": "templates_index_comp_2_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L230",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_blocks_comp_3",
-      "target": "templates_index_comp_3_settings"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L229",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_blocks_comp_3",
-      "target": "templates_index_comp_3_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L243",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_blocks_comp_4",
-      "target": "templates_index_comp_4_settings"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
-      "source_location": "L242",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "templates_index_blocks_comp_4",
-      "target": "templates_index_comp_4_type"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "otodor-shopify/templates/index.json",
       "source_location": "L292",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -15888,6 +15448,446 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L255",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_sections_otodor_comparison",
+      "target": "templates_index_otodor_comparison_block_order"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L201",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_sections_otodor_comparison",
+      "target": "templates_index_otodor_comparison_blocks"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_sections_otodor_comparison",
+      "target": "templates_index_otodor_comparison_settings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_sections_otodor_comparison",
+      "target": "templates_index_otodor_comparison_type"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L202",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_otodor_comparison_blocks",
+      "target": "templates_index_blocks_comp_1"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L215",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_otodor_comparison_blocks",
+      "target": "templates_index_blocks_comp_2"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L228",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_otodor_comparison_blocks",
+      "target": "templates_index_blocks_comp_3"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L241",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_otodor_comparison_blocks",
+      "target": "templates_index_blocks_comp_4"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L204",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_blocks_comp_1",
+      "target": "templates_index_comp_1_settings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L203",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_blocks_comp_1",
+      "target": "templates_index_comp_1_type"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L209",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_1_settings",
+      "target": "templates_index_settings_app_control"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L211",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_1_settings",
+      "target": "templates_index_settings_audit_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L210",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_1_settings",
+      "target": "templates_index_settings_auto_lock"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L206",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_1_settings",
+      "target": "templates_index_settings_fingerprint"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L207",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_1_settings",
+      "target": "templates_index_settings_pin_access"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L208",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_1_settings",
+      "target": "templates_index_settings_rfid_access"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L212",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_1_settings",
+      "target": "templates_index_settings_warranty"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L219",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_2_settings",
+      "target": "templates_index_settings_fingerprint"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L232",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_3_settings",
+      "target": "templates_index_settings_fingerprint"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L245",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_4_settings",
+      "target": "templates_index_settings_fingerprint"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L220",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_2_settings",
+      "target": "templates_index_settings_pin_access"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L233",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_3_settings",
+      "target": "templates_index_settings_pin_access"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L246",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_4_settings",
+      "target": "templates_index_settings_pin_access"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L221",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_2_settings",
+      "target": "templates_index_settings_rfid_access"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L234",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_3_settings",
+      "target": "templates_index_settings_rfid_access"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L247",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_4_settings",
+      "target": "templates_index_settings_rfid_access"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L222",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_2_settings",
+      "target": "templates_index_settings_app_control"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L235",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_3_settings",
+      "target": "templates_index_settings_app_control"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L248",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_4_settings",
+      "target": "templates_index_settings_app_control"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L223",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_2_settings",
+      "target": "templates_index_settings_auto_lock"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L236",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_3_settings",
+      "target": "templates_index_settings_auto_lock"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L249",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_4_settings",
+      "target": "templates_index_settings_auto_lock"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L224",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_2_settings",
+      "target": "templates_index_settings_audit_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L237",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_3_settings",
+      "target": "templates_index_settings_audit_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L250",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_4_settings",
+      "target": "templates_index_settings_audit_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L225",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_2_settings",
+      "target": "templates_index_settings_warranty"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L238",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_3_settings",
+      "target": "templates_index_settings_warranty"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L251",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_comp_4_settings",
+      "target": "templates_index_settings_warranty"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L217",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_blocks_comp_2",
+      "target": "templates_index_comp_2_settings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L216",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_blocks_comp_2",
+      "target": "templates_index_comp_2_type"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L230",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_blocks_comp_3",
+      "target": "templates_index_comp_3_settings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L229",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_blocks_comp_3",
+      "target": "templates_index_comp_3_type"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L243",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_blocks_comp_4",
+      "target": "templates_index_comp_4_settings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
+      "source_location": "L242",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "templates_index_blocks_comp_4",
+      "target": "templates_index_comp_4_type"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "otodor-shopify/templates/index.json",
       "source_location": "L106",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -16166,5 +16166,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3d91f348594bed3357593e5fbedd86c164cff346"
+  "built_at_commit": "be746cb6b33daea0a724f4dbfe257a01b68f6f43"
 }

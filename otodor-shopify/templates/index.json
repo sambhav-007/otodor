@@ -16,7 +16,10 @@
         "overlay_opacity": 65,
         "show_scroll_indicator": true,
         "padding_top": 0,
-        "padding_bottom": 0
+        "padding_bottom": 0,
+        "p1_image": "shopify://shop_images/zion_B_front_45.png",
+        "p3_image": "shopify://shop_images/armour_front_2.png",
+        "p4_image": "shopify://shop_images/Sliding_gate_motor_45.png"
       }
     },
     "otodor_trust_bar": {
@@ -210,74 +213,6 @@
         "image": "shopify://shop_images/zion_B_front_45.png"
       }
     },
-    "otodor_comparison": {
-      "type": "otodor-comparison",
-      "blocks": {
-        "comp_1": {
-          "type": "product_column",
-          "settings": {
-            "title": "ONYX",
-            "fingerprint": true,
-            "pin_access": true,
-            "rfid_access": true,
-            "app_control": false,
-            "auto_lock": true,
-            "audit_log": false,
-            "warranty": "1 Year"
-          }
-        },
-        "comp_2": {
-          "type": "product_column",
-          "settings": {
-            "title": "SENTRY",
-            "fingerprint": true,
-            "pin_access": true,
-            "rfid_access": true,
-            "app_control": true,
-            "auto_lock": true,
-            "audit_log": true,
-            "warranty": "1 Year"
-          }
-        },
-        "comp_3": {
-          "type": "product_column",
-          "settings": {
-            "title": "NEXUS",
-            "fingerprint": true,
-            "pin_access": true,
-            "rfid_access": true,
-            "app_control": true,
-            "auto_lock": true,
-            "audit_log": true,
-            "warranty": "2 Years"
-          }
-        },
-        "comp_4": {
-          "type": "product_column",
-          "settings": {
-            "title": "ZION+",
-            "fingerprint": true,
-            "pin_access": true,
-            "rfid_access": true,
-            "app_control": true,
-            "auto_lock": true,
-            "audit_log": true,
-            "warranty": "3 Years"
-          }
-        }
-      },
-      "block_order": [
-        "comp_1",
-        "comp_2",
-        "comp_3",
-        "comp_4"
-      ],
-      "settings": {
-        "eyebrow": "Compare Models",
-        "heading": "Choose the right fit for your ",
-        "heading_accent": "door."
-      }
-    },
     "otodor_process": {
       "type": "otodor-process",
       "blocks": {
@@ -375,7 +310,6 @@
     "otodor_trust_bar",
     "otodor_features",
     "otodor_smart_living",
-    "otodor_comparison",
     "otodor_process",
     "otodor_testimonials",
     "otodor_cta_banner"

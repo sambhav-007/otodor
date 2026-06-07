@@ -84,6 +84,12 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+
+    /* 3D transforms configuration */
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(0);
+    will-change: transform;
+
     transition:
       transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
       box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -92,11 +98,15 @@
 
   /* Hover State */
   .otodor-category-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(30, 144, 255, 0.4);
+    /* Fast transform tracking under cursor, reset slowly on leave */
+    transition:
+      transform 120ms ease-out,
+      box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 500ms cubic-bezier(0.16, 1, 0.3, 1);
+    border-color: rgba(77, 166, 255, 0.4);
     box-shadow:
-      0 0 30px rgba(30, 144, 255, 0.25),
-      0 20px 40px rgba(0, 0, 0, 0.6),
+      0 0 35px rgba(77, 166, 255, 0.18),
+      0 20px 40px rgba(0, 0, 0, 0.65),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
@@ -113,11 +123,14 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+    /* Apply depth offset parallax values */
+    transform: scale(1.05) translate(var(--bx, 0), var(--by, 0));
+    transition: transform 150ms ease-out;
   }
 
   .otodor-category-card:hover .otodor-category-card__bg img {
-    transform: scale(1.08);
+    /* Scaled up state plus parallax shift */
+    transform: scale(1.10) translate(var(--bx, 0), var(--by, 0));
   }
 
   /* Dark luxury overlay gradient */
@@ -138,7 +151,7 @@
     position: absolute;
     inset: 0;
     z-index: 3;
-    background: radial-gradient(ellipse at 50% 100%, rgba(30, 144, 255, 0.15) 0%, transparent 65%);
+    background: radial-gradient(ellipse at 50% 100%, rgba(77, 166, 255, 0.15) 0%, transparent 65%);
     opacity: 0;
     transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
@@ -163,6 +176,48 @@
     pointer-events: none;
   }
 
+  /* Dynamic reflection sheen sweep on card hover */
+  .otodor-category-card__sheen {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background: linear-gradient(
+      125deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.08) 48%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0.08) 52%,
+      rgba(255, 255, 255, 0) 70%
+    );
+    transform: translate(-100%, -100%) rotate(45deg);
+    transition: transform 0s;
+    pointer-events: none;
+  }
+
+  .otodor-category-card:hover .otodor-category-card__sheen {
+    transform: translate(100%, 100%) rotate(45deg);
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Dynamic cursor-tracking radial highlight */
+  .otodor-category-card__highlight {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background: radial-gradient(
+      circle 250px at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0) 80%
+    );
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+  }
+
+  .otodor-category-card:hover .otodor-category-card__highlight {
+    opacity: 1;
+  }
+
   /* Content Overlay (bottom-left aligned) */
   .otodor-category-card__content {
     position: relative;
@@ -176,6 +231,8 @@
     pointer-events: none;
     width: 100%;
     box-sizing: border-box;
+    transform: translate(var(--tx, 0), var(--ty, 0));
+    transition: transform 150ms ease-out;
   }
 
   .otodor-category-card__meta-top {
@@ -433,6 +490,8 @@
             <div class="otodor-category-card__overlay" aria-hidden="true"></div>
             <div class="otodor-category-card__glow" aria-hidden="true"></div>
             <div class="otodor-category-card__mesh" aria-hidden="true"></div>
+            <div class="otodor-category-card__sheen" aria-hidden="true"></div>
+            <div class="otodor-category-card__highlight" aria-hidden="true"></div>
 
             {%- comment -%} Bottom-anchored Netflix-style content block {%- endcomment -%}
             <div class="otodor-category-card__content">
@@ -464,6 +523,78 @@
     </div>
   </div>
 </section>
+
+<script>
+(function() {
+  'use strict';
+  
+  function initCategoryTilts() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    
+    // Only apply on desktop / pointer-accurate devices
+    var isDesktop = window.matchMedia('(min-width: 1025px)').matches;
+    if (!isDesktop) return;
+
+    var cards = document.querySelectorAll('#otodor-categories-{{ section.id }} .otodor-category-card');
+    cards.forEach(function(card) {
+      card.addEventListener('mousemove', function(e) {
+        var rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        var w = rect.width;
+        var h = rect.height;
+        
+        // Calculate tilt angles (max 5 degrees)
+        var rx = -((y - h/2) / (h/2)) * 5;
+        var ry = ((x - w/2) / (w/2)) * 5;
+        
+        card.style.setProperty('--rx', rx + 'deg');
+        card.style.setProperty('--ry', ry + 'deg');
+        
+        // Calculate sheen position (percentage)
+        var mx = (x / w) * 100;
+        var my = (y / h) * 100;
+        card.style.setProperty('--mx', mx + '%');
+        card.style.setProperty('--my', my + '%');
+
+        // Dynamic 2D shift variables for inner depth parallax
+        var bx = -((x - w/2) / (w/2)) * 8;
+        var by = -((y - h/2) / (h/2)) * 8;
+        var tx = ((x - w/2) / (w/2)) * 5;
+        var ty = ((y - h/2) / (h/2)) * 5;
+
+        card.style.setProperty('--bx', bx + 'px');
+        card.style.setProperty('--by', by + 'px');
+        card.style.setProperty('--tx', tx + 'px');
+        card.style.setProperty('--ty', ty + 'px');
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+        card.style.setProperty('--mx', '50%');
+        card.style.setProperty('--my', '50%');
+        card.style.setProperty('--bx', '0px');
+        card.style.setProperty('--by', '0px');
+        card.style.setProperty('--tx', '0px');
+        card.style.setProperty('--ty', '0px');
+      });
+    });
+  }
+
+  if (document.readyState === 'complete') {
+    initCategoryTilts();
+  } else {
+    window.addEventListener('load', initCategoryTilts, { once: true });
+  }
+
+  document.addEventListener('shopify:section:load', function(e) {
+    if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+      initCategoryTilts();
+    }
+  });
+})();
+</script>
 
 {% schema %}
 {
