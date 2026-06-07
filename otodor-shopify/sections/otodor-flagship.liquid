@@ -1,0 +1,584 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Flagship Showcase
+     Sticky-split product tour with moving hotspot.
+     Desktop (>=1024px): pinned, product holds while spec
+     chapters step through and a hotspot tracks the product.
+     Mobile / reduced-motion: clean stacked layout.
+  ───────────────────────────────────────────────────────── */
+
+  #shopify-section-{{ section.id }} {
+    background-color: #0B0B0B;
+  }
+
+  .otodor-flagship {
+    background-color: #0B0B0B;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    padding: 5rem 1.5rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  .otodor-flagship__inner {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    z-index: 1;
+  }
+
+  /* Single soft ambient bloom behind the product */
+  .otodor-flagship__bloom {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(80vw, 640px);
+    height: min(60vh, 560px);
+    background: radial-gradient(ellipse at center, rgba(77, 166, 255, 0.10) 0%, transparent 68%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─ Product stage ─────────────────────────────────────────── */
+  .otodor-flagship__stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .otodor-flagship__visual {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 26px rgba(77, 166, 255, 0.08));
+  }
+
+  .otodor-flagship__visual .flagship-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .otodor-flagship__visual .flagship-img--alt {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  /* Moving hotspot (desktop only) */
+  .otodor-flagship__hotspot {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(77, 166, 255, 0.7);
+    border-radius: 50%;
+    box-shadow: 0 0 14px rgba(77, 166, 255, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .otodor-flagship__hotspot::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: #4DA6FF;
+    box-shadow: 0 0 10px rgba(77, 166, 255, 0.9);
+  }
+
+  .otodor-flagship__hotspot.is-on {
+    animation: flagship-hotspot-pulse 2.1s ease-in-out infinite;
+  }
+
+  @keyframes flagship-hotspot-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(77, 166, 255, 0.35); }
+    50% { box-shadow: 0 0 22px rgba(77, 166, 255, 0.65); }
+  }
+
+  /* ─ Content column ────────────────────────────────────────── */
+  .otodor-flagship__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .otodor-flagship__eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #4DA6FF;
+  }
+
+  .otodor-flagship__name {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: clamp(2rem, 7vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0.4rem 0 0;
+  }
+
+  .otodor-flagship__tagline {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.58);
+    margin: 0.75rem 0 0;
+    max-width: 46ch;
+  }
+
+  .flagship-spec {
+    border-left: 2px solid rgba(77, 166, 255, 0.5);
+    padding-left: 1rem;
+  }
+
+  .flagship-spec__label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #4DA6FF;
+  }
+
+  .flagship-spec__title {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0.2rem 0 0;
+  }
+
+  .flagship-spec__desc {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.58);
+    margin: 0.3rem 0 0;
+  }
+
+  .otodor-flagship__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.8rem;
+    border-radius: 99px;
+    background: #ffffff;
+    color: #0b0b0b;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    align-self: flex-start;
+    transition: transform 200ms ease, background-color 200ms ease;
+  }
+
+  .otodor-flagship__cta:hover {
+    background: #eaeaea;
+    transform: scale(1.04);
+  }
+
+  /* Final frame's duplicate name/eyebrow only matter on desktop */
+  .flagship-frame--final .otodor-flagship__eyebrow,
+  .flagship-frame--final .otodor-flagship__name {
+    display: none;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     Desktop — pinned sticky-split (>=1024px)
+     ───────────────────────────────────────────────────────── */
+  @media (min-width: 1024px) {
+    .otodor-flagship.js-animated {
+      height: 100vh;
+      padding: 0 clamp(2rem, 5vw, 5rem);
+    }
+
+    .otodor-flagship.js-animated .otodor-flagship__inner {
+      height: 100%;
+      max-width: 1360px;
+      flex-direction: row;
+      align-items: center;
+      gap: 0;
+    }
+
+    .otodor-flagship.js-animated .otodor-flagship__stage {
+      width: 54%;
+      height: 100%;
+      perspective: 1200px;
+    }
+
+    .otodor-flagship.js-animated .otodor-flagship__visual {
+      max-width: min(40vw, 540px);
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+    }
+
+    .otodor-flagship.js-animated .otodor-flagship__content {
+      width: 46%;
+      height: 100%;
+      display: block;
+    }
+
+    .otodor-flagship.js-animated .flagship-frame {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      width: min(34vw, 460px);
+      padding-right: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    .otodor-flagship.js-animated .flagship-frame--intro {
+      opacity: 1;
+    }
+
+    .otodor-flagship.js-animated .flagship-spec {
+      border-left: none;
+      padding-left: 0;
+    }
+
+    .otodor-flagship.js-animated .flagship-spec__title {
+      font-size: 1.7rem;
+    }
+
+    .otodor-flagship.js-animated .flagship-spec__desc {
+      font-size: 1.02rem;
+    }
+
+    .otodor-flagship.js-animated .flagship-frame--final {
+      pointer-events: auto;
+    }
+
+    .otodor-flagship.js-animated .flagship-frame--final .otodor-flagship__eyebrow,
+    .otodor-flagship.js-animated .flagship-frame--final .otodor-flagship__name {
+      display: block;
+    }
+  }
+
+  /* ─ Reduced motion — static stack ─────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .otodor-flagship.js-animated {
+      height: auto !important;
+      padding: 5rem 1.5rem !important;
+    }
+    .otodor-flagship.js-animated .otodor-flagship__inner {
+      flex-direction: column !important;
+      height: auto !important;
+    }
+    .otodor-flagship.js-animated .flagship-frame {
+      position: static !important;
+      opacity: 1 !important;
+      transform: none !important;
+      width: auto !important;
+    }
+    .otodor-flagship.js-animated .otodor-flagship__hotspot {
+      display: none !important;
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-flagship-{{ section.id }}"
+  class="otodor-flagship"
+  data-otodor-section="flagship"
+>
+  <div class="otodor-flagship__bloom" aria-hidden="true"></div>
+
+  <div class="otodor-flagship__inner">
+
+    <!-- Product stage -->
+    <div class="otodor-flagship__stage">
+      <div class="otodor-flagship__visual" data-3d-slot="flagship">
+        {%- if section.settings.product_image != blank -%}
+          {{ section.settings.product_image | image_url: width: 1000 | image_tag: loading: 'lazy', class: 'flagship-img flagship-img--main', alt: section.settings.flagship_name, widths: '400,600,800,1000,1200' }}
+        {%- else -%}
+          <img class="flagship-img flagship-img--main" src="{{ 'Sliding_gate_motor_45.png' | file_img_url: '1000x' }}" alt="{{ section.settings.flagship_name | escape }}" loading="lazy" width="1000" height="1000">
+        {%- endif -%}
+
+        {%- if section.settings.product_image_alt != blank -%}
+          {{ section.settings.product_image_alt | image_url: width: 1000 | image_tag: loading: 'lazy', class: 'flagship-img flagship-img--alt', alt: section.settings.flagship_name, widths: '400,600,800,1000,1200' }}
+        {%- endif -%}
+
+        <div class="otodor-flagship__hotspot" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- Content column: intro → specs → final -->
+    <div class="otodor-flagship__content">
+
+      <div class="flagship-frame flagship-frame--intro">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-flagship__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        <h2 class="otodor-flagship__name">{{ section.settings.flagship_name | escape }}</h2>
+        {%- if section.settings.tagline != blank -%}
+          <p class="otodor-flagship__tagline">{{ section.settings.tagline | escape }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'spec' -%}
+          <div
+            class="flagship-frame flagship-spec"
+            data-hx="{{ block.settings.hotspot_x }}"
+            data-hy="{{ block.settings.hotspot_y }}"
+            {{ block.shopify_attributes }}
+          >
+            {%- if block.settings.label != blank -%}
+              <span class="flagship-spec__label">{{ block.settings.label | escape }}</span>
+            {%- endif -%}
+            <h3 class="flagship-spec__title">{{ block.settings.title | escape }}</h3>
+            {%- if block.settings.description != blank -%}
+              <p class="flagship-spec__desc">{{ block.settings.description | escape }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      <div class="flagship-frame flagship-frame--final">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-flagship__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        <h2 class="otodor-flagship__name">{{ section.settings.flagship_name | escape }}</h2>
+        {%- if section.settings.cta_label != blank -%}
+          <a href="{{ section.settings.cta_link | default: '#' }}" class="otodor-flagship__cta">
+            {{- section.settings.cta_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  var section = document.getElementById('otodor-flagship-{{ section.id }}');
+  if (!section) return;
+
+  function initFlagship() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      console.warn('[OTODOR] GSAP/ScrollTrigger not loaded — flagship uses static layout.');
+      return;
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.matchMedia('(min-width: 1024px)').matches) return; // mobile stays static
+
+    section.classList.add('js-animated');
+
+    var visual = section.querySelector('.otodor-flagship__visual');
+    var imgMain = section.querySelector('.flagship-img--main');
+    var imgAlt = section.querySelector('.flagship-img--alt');
+    var bloom = section.querySelector('.otodor-flagship__bloom');
+    var hotspot = section.querySelector('.otodor-flagship__hotspot');
+    var intro = section.querySelector('.flagship-frame--intro');
+    var finalFrame = section.querySelector('.flagship-frame--final');
+    var specs = Array.prototype.slice.call(section.querySelectorAll('.flagship-spec'));
+
+    // ── Initial state ─────────────────────────────────────────
+    gsap.set(visual, { opacity: 0, scale: 0.92, rotationY: -6 });
+    gsap.set(bloom, { opacity: 0, scale: 0.9 });
+    gsap.set(intro, { opacity: 1, y: 0 });
+    gsap.set(specs, { opacity: 0, y: 24 });
+    gsap.set(finalFrame, { opacity: 0, y: 24 });
+    gsap.set(hotspot, { opacity: 0, left: '50%', top: '50%' });
+
+    var tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: '+=250%',
+        scrub: 1,
+        pin: true,
+        anticipatePin: 1
+      }
+    });
+
+    // ── Phase 1: Reveal ───────────────────────────────────────
+    tl.to(bloom, { opacity: 1, scale: 1, duration: 1.0, ease: 'power3.out' }, 0);
+    tl.to(visual, { opacity: 1, scale: 1, rotationY: 0, duration: 1.2, ease: 'power4.out' }, 0);
+
+    // ── Phase 2: Tour ─────────────────────────────────────────
+    var introOut = 1.6;
+    tl.to(intro, { opacity: 0, y: -20, duration: 0.6, ease: 'power2.inOut' }, introOut);
+    tl.to(hotspot, { opacity: 1, duration: 0.4, ease: 'power2.out' }, introOut);
+    tl.call(function () { if (hotspot) hotspot.classList.add('is-on'); }, null, introOut);
+
+    var specStart = introOut + 0.4;
+    var specDur = 1.4;
+    var altSwapIndex = imgAlt ? Math.floor(specs.length / 2) : -1;
+
+    specs.forEach(function (spec, i) {
+      var st = specStart + i * specDur;
+      var hx = parseFloat(spec.getAttribute('data-hx'));
+      var hy = parseFloat(spec.getAttribute('data-hy'));
+
+      tl.to(spec, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, st);
+
+      if (hotspot && !isNaN(hx) && !isNaN(hy)) {
+        tl.to(hotspot, { left: hx + '%', top: hy + '%', duration: 0.7, ease: 'power3.inOut' }, st);
+      }
+
+      // Subtle product micro-rotation per chapter
+      tl.to(visual, { rotationY: (i % 2 === 0 ? 4 : -4), duration: 0.9, ease: 'sine.inOut' }, st);
+
+      // Optional angle cross-fade at the midpoint
+      if (i === altSwapIndex) {
+        tl.to(imgMain, { opacity: 0, duration: 0.6, ease: 'sine.inOut' }, st);
+        tl.to(imgAlt, { opacity: 1, duration: 0.6, ease: 'sine.inOut' }, st);
+      }
+
+      // Fade this chapter out before the next (except the last)
+      if (i < specs.length - 1) {
+        tl.to(spec, { opacity: 0, y: -20, duration: 0.5, ease: 'power2.inOut' }, st + specDur - 0.35);
+      }
+    });
+
+    // ── Phase 3: Close ────────────────────────────────────────
+    var tEnd = specStart + specs.length * specDur;
+    if (specs.length) {
+      tl.to(specs[specs.length - 1], { opacity: 0, y: -20, duration: 0.5, ease: 'power2.inOut' }, tEnd - 0.2);
+    }
+    tl.to(hotspot, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, tEnd - 0.2);
+    tl.call(function () { if (hotspot) hotspot.classList.remove('is-on'); }, null, tEnd);
+    tl.to(visual, { rotationY: 0, scale: 1.02, duration: 0.9, ease: 'power3.out' }, tEnd);
+    tl.to(finalFrame, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, tEnd + 0.15);
+  }
+
+  if (document.readyState === 'complete') {
+    initFlagship();
+  } else {
+    window.addEventListener('load', initFlagship, { once: true });
+  }
+
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+      initFlagship();
+    }
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "OTODOR Flagship",
+  "tag": "section",
+  "class": "shopify-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "The Flagship"
+    },
+    {
+      "type": "text",
+      "id": "flagship_name",
+      "label": "Flagship Name",
+      "default": "Sliding Gate Motor"
+    },
+    {
+      "type": "textarea",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Effortless automation for heavy sliding gates — engineered to open the way before you arrive."
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "Product Image (primary)",
+      "info": "Transparent PNG render works best."
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image_alt",
+      "label": "Product Image (alternate angle)",
+      "info": "Optional. Cross-fades in during the tour for a sense of dimension."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA Label",
+      "default": "Explore Gate Automation"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "spec",
+      "name": "Spec",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Feature"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Spec title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "range",
+          "id": "hotspot_x",
+          "label": "Hotspot X (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "hotspot_y",
+          "label": "Hotspot Y (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "max_blocks": 5,
+  "presets": [
+    {
+      "name": "OTODOR Flagship",
+      "blocks": [
+        { "type": "spec" },
+        { "type": "spec" },
+        { "type": "spec" },
+        { "type": "spec" }
+      ]
+    }
+  ]
+}
+{% endschema %}
