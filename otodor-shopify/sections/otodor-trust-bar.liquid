@@ -1,7 +1,9 @@
 {%- style -%}
   /* ─────────────────────────────────────────────────────────
-     OTODOR Trust Bar Section
-     Premium technological trust strip using glassmorphism cards.
+     OTODOR Trust Bar — Seamless infinite marquee ribbon.
+     Full-bleed strip, continuous right-to-left loop, edge-faded.
+     Pure-CSS transform animation (no JS). Duplicated track for a
+     seamless loop; reduced-motion falls back to a static row.
   ───────────────────────────────────────────────────────── */
 
   #shopify-section-{{ section.id }} {
@@ -10,97 +12,143 @@
     background-color: transparent;
   }
 
-  .otodor-trust-bar {
-    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  .otodor-trust-marquee {
+    position: relative;
+    padding-block: clamp(1.1rem, 2.2vw, 1.6rem);
+    border-block: 1px solid rgba(255, 255, 255, 0.07);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, transparent 100%);
+    overflow: hidden;
   }
 
-  .otodor-trust-bar__grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--otodor-space-lg);
+  .otodor-trust-marquee__viewport {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
   }
 
-  .otodor-trust-bar__card {
-    padding: var(--otodor-space-lg);
+  .otodor-trust-marquee__track {
     display: flex;
-    flex-direction: column;
-    gap: var(--otodor-space-md);
-    min-height: 180px;
-    height: 100%;
+    width: max-content;
+    will-change: transform;
+    animation: otodor-marquee-scroll {{ section.settings.speed | default: 55 }}s linear infinite;
   }
 
-  .otodor-trust-bar__icon-title {
+  {%- if section.settings.pause_on_hover -%}
+  .otodor-trust-marquee:hover .otodor-trust-marquee__track {
+    animation-play-state: paused;
+  }
+  {%- endif -%}
+
+  .otodor-trust-marquee__group {
     display: flex;
     align-items: center;
-    gap: var(--otodor-space-md);
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .otodor-trust-bar__icon {
-    color: var(--otodor-blue);
+  .otodor-trust-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0 clamp(1.4rem, 2.6vw, 2.4rem);
+    white-space: nowrap;
+  }
+
+  .otodor-trust-marquee__icon {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--otodor-blue, #4DA6FF);
+    flex: 0 0 auto;
   }
 
-  .otodor-trust-bar__title {
-    font-family: var(--otodor-font-display);
-    font-size: var(--otodor-text-md);
-    font-weight: 700;
-    line-height: var(--otodor-leading-tight);
-    letter-spacing: var(--otodor-tracking-tight);
-    color: var(--otodor-white);
-    margin: 0;
+  .otodor-trust-marquee__icon svg {
+    width: 20px;
+    height: 20px;
   }
 
-  .otodor-trust-bar__desc {
-    font-family: var(--otodor-font-body);
-    font-size: var(--otodor-text-sm);
-    line-height: var(--otodor-leading-base);
-    color: var(--otodor-muted);
-    margin: 0;
+  .otodor-trust-marquee__label {
+    font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
+    font-size: clamp(0.85rem, 1.3vw, 1rem);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.74);
   }
 
-  /* ─ Mobile responsiveness ───────────────────────────────── */
-  @media (max-width: 1024px) {
-    .otodor-trust-bar__grid {
-      grid-template-columns: repeat(2, 1fr);
+  .otodor-trust-marquee__sep {
+    flex: 0 0 auto;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--otodor-blue, #4DA6FF);
+    opacity: 0.45;
+  }
+
+  @keyframes otodor-marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ─ Reduced motion — static, centered, no clone ───────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .otodor-trust-marquee__viewport {
+      -webkit-mask-image: none;
+              mask-image: none;
     }
-  }
-
-  @media (max-width: 599px) {
-    .otodor-trust-bar__grid {
-      grid-template-columns: 1fr;
-      gap: var(--otodor-space-md);
+    .otodor-trust-marquee__track {
+      animation: none;
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-    .otodor-trust-bar__card {
-      min-height: auto;
-      padding: var(--otodor-space-md) var(--otodor-space-lg);
+    .otodor-trust-marquee__group {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .otodor-trust-marquee__group--clone {
+      display: none;
     }
   }
 {%- endstyle -%}
 
 <section
   id="otodor-trust-bar-{{ section.id }}"
-  class="otodor-trust-bar otodor-border-top-blue"
+  class="otodor-trust-marquee"
   data-otodor-section="trust-bar"
-  aria-label="Trust indicators"
+  aria-label="{{ section.settings.aria_label | default: 'Why choose OTODOR' | escape }}"
 >
-  <div class="otodor-container">
-    <div class="otodor-trust-bar__grid" data-otodor-stagger>
-      {%- for block in section.blocks -%}
-        <div
-          class="otodor-trust-bar__card otodor-glass-card"
-          {{ block.shopify_attributes }}
-        >
-          <div class="otodor-trust-bar__icon-title">
-            <div class="otodor-icon-wrap otodor-trust-bar__icon">
-              {% render 'otodor-icon', name: block.settings.icon %}
-            </div>
-            <h3 class="otodor-trust-bar__title">{{ block.settings.title | escape }}</h3>
-          </div>
-          <p class="otodor-trust-bar__desc">{{ block.settings.description | escape }}</p>
-        </div>
-      {%- endfor -%}
+  <div class="otodor-trust-marquee__viewport">
+    <div class="otodor-trust-marquee__track">
+
+      {%- comment -%} Group 1 — readable {%- endcomment -%}
+      <ul class="otodor-trust-marquee__group">
+        {%- for block in section.blocks -%}
+          <li class="otodor-trust-marquee__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != blank -%}
+              <span class="otodor-trust-marquee__icon">{% render 'otodor-icon', name: block.settings.icon %}</span>
+            {%- endif -%}
+            <span class="otodor-trust-marquee__label">{{ block.settings.title | escape }}</span>
+          </li>
+          <li class="otodor-trust-marquee__sep" aria-hidden="true"></li>
+        {%- endfor -%}
+      </ul>
+
+      {%- comment -%} Group 2 — seamless clone, hidden from a11y {%- endcomment -%}
+      <ul class="otodor-trust-marquee__group otodor-trust-marquee__group--clone" aria-hidden="true">
+        {%- for block in section.blocks -%}
+          <li class="otodor-trust-marquee__item">
+            {%- if block.settings.icon != blank -%}
+              <span class="otodor-trust-marquee__icon">{% render 'otodor-icon', name: block.settings.icon %}</span>
+            {%- endif -%}
+            <span class="otodor-trust-marquee__label">{{ block.settings.title | escape }}</span>
+          </li>
+          <li class="otodor-trust-marquee__sep" aria-hidden="true"></li>
+        {%- endfor -%}
+      </ul>
+
     </div>
   </div>
 </section>
@@ -110,12 +158,36 @@
   "name": "OTODOR Trust Bar",
   "tag": "section",
   "class": "shopify-section",
-  "max_blocks": 4,
-  "settings": [],
+  "max_blocks": 16,
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll speed",
+      "info": "Seconds per full loop. Higher = slower / calmer.",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "default": 55
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Accessibility label",
+      "default": "Why choose OTODOR"
+    }
+  ],
   "blocks": [
     {
       "type": "pillar",
-      "name": "Trust Pillar",
+      "name": "Trust Item",
       "settings": [
         {
           "type": "select",
@@ -129,20 +201,23 @@
             { "value": "key", "label": "Key / Access" },
             { "value": "fingerprint", "label": "Fingerprint" },
             { "value": "wifi", "label": "WiFi / Remote" },
-            { "value": "clock", "label": "Clock / Logs" }
+            { "value": "tag", "label": "RFID / Tag" },
+            { "value": "keypad", "label": "PIN / Keypad" },
+            { "value": "clock", "label": "Clock / Logs" },
+            { "value": "star", "label": "Star / Rating" }
           ]
         },
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "Label",
           "default": "Free Installation"
         },
         {
           "type": "textarea",
           "id": "description",
-          "label": "Description",
-          "default": "Free professional home installation across India."
+          "label": "Description (not shown in ribbon)",
+          "info": "Optional. Retained for reference; the ribbon shows the label only."
         }
       ]
     }
@@ -151,38 +226,14 @@
     {
       "name": "OTODOR Trust Bar",
       "blocks": [
-        {
-          "type": "pillar",
-          "settings": {
-            "icon": "wrench",
-            "title": "Free Installation",
-            "description": "Free professional home installation across India."
-          }
-        },
-        {
-          "type": "pillar",
-          "settings": {
-            "icon": "shield",
-            "title": "1-Year Warranty",
-            "description": "Complete peace of mind with a 1-year brand warranty."
-          }
-        },
-        {
-          "type": "pillar",
-          "settings": {
-            "icon": "mobile",
-            "title": "App Connectivity",
-            "description": "Control access, view activity logs, and manage keys via app."
-          }
-        },
-        {
-          "type": "pillar",
-          "settings": {
-            "icon": "key",
-            "title": "Smart Access",
-            "description": "Unlock via fingerprint, PIN, RFID card, physical key, or mobile app."
-          }
-        }
+        { "type": "pillar", "settings": { "icon": "wrench", "title": "Free Professional Installation" } },
+        { "type": "pillar", "settings": { "icon": "shield", "title": "1-Year Brand Warranty" } },
+        { "type": "pillar", "settings": { "icon": "fingerprint", "title": "Fingerprint & PIN Access" } },
+        { "type": "pillar", "settings": { "icon": "mobile", "title": "Mobile App Control" } },
+        { "type": "pillar", "settings": { "icon": "wifi", "title": "Remote Access Anywhere" } },
+        { "type": "pillar", "settings": { "icon": "tag", "title": "RFID Keycard Entry" } },
+        { "type": "pillar", "settings": { "icon": "clock", "title": "Real-Time Audit Logs" } },
+        { "type": "pillar", "settings": { "icon": "star", "title": "Rated 4.9 by 500+ Homes" } }
       ]
     }
   ]

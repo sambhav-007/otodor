@@ -27,44 +27,52 @@
       "blocks": {
         "pillar_1": {
           "type": "pillar",
-          "settings": {
-            "icon": "wrench",
-            "title": "Free Installation",
-            "description": "Free professional home installation across India."
-          }
+          "settings": { "icon": "wrench", "title": "Free Professional Installation" }
         },
         "pillar_2": {
           "type": "pillar",
-          "settings": {
-            "icon": "shield",
-            "title": "1-Year Warranty",
-            "description": "Complete peace of mind with a 1-year brand warranty."
-          }
+          "settings": { "icon": "shield", "title": "1-Year Brand Warranty" }
         },
         "pillar_3": {
           "type": "pillar",
-          "settings": {
-            "icon": "mobile",
-            "title": "App Connectivity",
-            "description": "Control access, view activity logs, and manage keys via app."
-          }
+          "settings": { "icon": "fingerprint", "title": "Fingerprint & PIN Access" }
         },
         "pillar_4": {
           "type": "pillar",
-          "settings": {
-            "icon": "key",
-            "title": "Smart Access",
-            "description": "Unlock via fingerprint, PIN, RFID card, physical key, or mobile app."
-          }
+          "settings": { "icon": "mobile", "title": "Mobile App Control" }
+        },
+        "pillar_5": {
+          "type": "pillar",
+          "settings": { "icon": "wifi", "title": "Remote Access Anywhere" }
+        },
+        "pillar_6": {
+          "type": "pillar",
+          "settings": { "icon": "tag", "title": "RFID Keycard Entry" }
+        },
+        "pillar_7": {
+          "type": "pillar",
+          "settings": { "icon": "clock", "title": "Real-Time Audit Logs" }
+        },
+        "pillar_8": {
+          "type": "pillar",
+          "settings": { "icon": "star", "title": "Rated 4.9 by 500+ Homes" }
         }
       },
       "block_order": [
         "pillar_1",
         "pillar_2",
         "pillar_3",
-        "pillar_4"
+        "pillar_4",
+        "pillar_5",
+        "pillar_6",
+        "pillar_7",
+        "pillar_8"
       ],
-      "settings": {}
+      "settings": {
+        "speed": 55,
+        "pause_on_hover": true,
+        "aria_label": "Why choose OTODOR"
+      }
     },
     "otodor_categories": {
       "type": "otodor-categories",
