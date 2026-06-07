@@ -6,13 +6,13 @@
 
   #shopify-section-{{ section.id }} {
     display: block;
-    background-color: #0b0b0b;
+    background-color: #0c0f11;
     overflow: hidden;
   }
 
   /* ─ Base layout: Mobile First ──────────────────────────────── */
   .otodor-hero {
-    background-color: #0b0b0b;
+    background-color: #0c0f11;
     color: #ffffff;
     padding: 5rem 1.5rem 4rem;
     position: relative;
@@ -46,7 +46,7 @@
     transform: translateX(-50%);
     width: 100%;
     height: 50%;
-    background: radial-gradient(ellipse, rgba(77, 166, 255, 0.09) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(77, 166, 255, 0.115) 0%, transparent 70%);
   }
 
   .otodor-hero__glow-bottom {
@@ -56,7 +56,7 @@
     transform: translateX(-50%);
     width: 90%;
     height: 50%;
-    background: radial-gradient(ellipse, rgba(77, 166, 255, 0.05) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(77, 166, 255, 0.07) 0%, transparent 70%);
   }
 
   .otodor-hero__glow-core {
@@ -66,7 +66,7 @@
     transform: translate(-50%, -50%);
     width: 380px;
     height: 380px;
-    background: radial-gradient(circle, rgba(77, 166, 255, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(77, 166, 255, 0.07) 0%, transparent 70%);
     filter: blur(45px);
     pointer-events: none;
     z-index: 1;
@@ -85,7 +85,7 @@
   .otodor-hero__fog-cloud--back {
     width: 150%;
     height: 150%;
-    background: radial-gradient(ellipse at center, rgba(77, 166, 255, 0.04) 0%, transparent 65%);
+    background: radial-gradient(ellipse at center, rgba(77, 166, 255, 0.055) 0%, transparent 65%);
     animation: fog-drift-back 35s ease-in-out infinite alternate;
     z-index: 1;
   }
@@ -93,7 +93,7 @@
   .otodor-hero__fog-cloud--front {
     width: 120%;
     height: 120%;
-    background: radial-gradient(ellipse at center, rgba(77, 166, 255, 0.02) 0%, transparent 55%);
+    background: radial-gradient(ellipse at center, rgba(77, 166, 255, 0.028) 0%, transparent 55%);
     animation: fog-drift-front 24s ease-in-out infinite alternate;
     z-index: 3;
   }
@@ -108,13 +108,65 @@
     100% { transform: translate(-53%, -47%) scale(1.05); }
   }
 
+  @keyframes product-premium-float {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -7px, 0); }
+  }
+
+  @keyframes product-reflective-pass {
+    0%, 72%, 100% {
+      opacity: 0;
+      transform: translate3d(-62%, 18%, 0) rotate(18deg);
+    }
+    82% {
+      opacity: 0.16;
+    }
+    92% {
+      opacity: 0;
+      transform: translate3d(62%, -18%, 0) rotate(18deg);
+    }
+  }
+
+  @keyframes core-energy-drift {
+    0%, 100% {
+      opacity: 0.18;
+      transform: translate3d(0, 9%, 0) scaleY(0.82);
+    }
+    50% {
+      opacity: 0.34;
+      transform: translate3d(0, -9%, 0) scaleY(1);
+    }
+  }
+
+  @keyframes core-seam-breathe {
+    0%, 100% {
+      opacity: 0.18;
+      filter: blur(0.5px);
+    }
+    46%, 58% {
+      opacity: 0.72;
+      filter: blur(1.2px);
+    }
+  }
+
+  @keyframes core-ambient-pulse {
+    0%, 82%, 100% {
+      opacity: 0;
+      transform: translateZ(20px) scale(0.94);
+    }
+    90% {
+      opacity: 0.16;
+      transform: translateZ(20px) scale(1.04);
+    }
+  }
+
   /* Volumetric light rays */
   .otodor-hero__light-ray {
     position: absolute;
     top: -50%;
     width: 450px;
     height: 200%;
-    background: linear-gradient(105deg, rgba(77, 166, 255, 0.05) 0%, transparent 60%);
+    background: linear-gradient(105deg, rgba(77, 166, 255, 0.065) 0%, transparent 60%);
     transform: rotate(-15deg);
     filter: blur(45px);
     pointer-events: none;
@@ -129,7 +181,7 @@
   .ray--2 {
     left: 58%;
     width: 380px;
-    background: linear-gradient(105deg, rgba(77, 166, 255, 0.03) 0%, transparent 50%);
+    background: linear-gradient(105deg, rgba(77, 166, 255, 0.042) 0%, transparent 50%);
     transform: rotate(-12deg);
   }
 
@@ -715,88 +767,130 @@
       position: absolute;
       inset: 0;
       z-index: 6;
+      transform-origin: 50% 46%;
+      will-change: transform;
     }
 
     .otodor-hero.js-animated .otodor-hero__vault-pedestal {
       display: block;
       position: absolute;
-      top: 40%;
+      top: 46%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: min(38vw, 420px);
-      height: min(48vh, 520px);
-      background: radial-gradient(ellipse 50% 48% at 50% 55%, rgba(77, 166, 255, 0.14) 0%, rgba(77, 166, 255, 0.05) 38%, transparent 72%);
+      width: min(32vw, 360px);
+      height: min(38vh, 420px);
+      background: radial-gradient(ellipse 50% 48% at 50% 55%, rgba(77, 166, 255, 0.11) 0%, rgba(77, 166, 255, 0.04) 38%, transparent 72%);
       pointer-events: none;
       z-index: 4;
       will-change: transform, opacity;
     }
 
-    /* Vault — 50–60% of visual composition */
+    /* Security core supports the ecosystem without owning the viewport */
     .otodor-hero.js-animated .otodor-hero__core-container {
       position: absolute;
-      top: 40%;
+      top: 46%;
       left: 50%;
       transform: translate(-50%, -50%);
       margin: 0;
-      width: min(52vw, 620px);
-      height: min(68vh, 780px);
+      width: min(40vw, 450px);
+      height: min(54vh, 560px);
       z-index: 12;
     }
 
+    .otodor-hero.js-animated .centerpiece-obelisk::after {
+      content: '';
+      position: absolute;
+      inset: 8% 18%;
+      border-radius: 999px;
+      border: 1px solid rgba(77, 166, 255, 0.18);
+      box-shadow: 0 0 28px rgba(77, 166, 255, 0.12);
+      transform: translateZ(20px) scale(0.94);
+      animation: core-ambient-pulse 9s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 7;
+    }
+
     .otodor-hero.js-animated .obelisk-pillar--center {
-      width: 120px;
-      height: 650px;
+      width: 84px;
+      height: 455px;
     }
 
     .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--right,
     .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--left {
-      width: 46px;
+      width: 32px;
     }
 
     .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--top {
-      height: 46px;
+      height: 32px;
     }
 
     .otodor-hero.js-animated .pillar-logo-container {
-      width: 72px;
-      height: 72px;
+      width: 52px;
+      height: 52px;
+    }
+
+    .otodor-hero.js-animated .pillar-logo-icon {
+      filter: drop-shadow(0 0 6px rgba(77, 166, 255, 0.36)) brightness(1.08);
     }
 
     .otodor-hero.js-animated .obelisk-pillar--left-wing {
-      width: 54px;
-      height: 520px;
-      transform: translate(-50%, -50%) translateX(-177px) translateZ(-36px);
+      width: 38px;
+      height: 365px;
+      transform: translate(-50%, -50%) translateX(-124px) translateZ(-26px);
     }
 
     .otodor-hero.js-animated .obelisk-pillar--left-wing .pillar-face--right,
     .otodor-hero.js-animated .obelisk-pillar--left-wing .pillar-face--left,
     .otodor-hero.js-animated .obelisk-pillar--right-wing .pillar-face--right,
     .otodor-hero.js-animated .obelisk-pillar--right-wing .pillar-face--left {
-      width: 36px;
+      width: 25px;
     }
 
     .otodor-hero.js-animated .obelisk-pillar--right-wing {
-      width: 54px;
-      height: 520px;
-      transform: translate(-50%, -50%) translateX(177px) translateZ(-36px);
+      width: 38px;
+      height: 365px;
+      transform: translate(-50%, -50%) translateX(124px) translateZ(-26px);
     }
 
     .otodor-hero.js-animated .centerpiece-internal-glow {
-      width: 415px;
-      height: 572px;
-      opacity: 0.55;
+      width: 300px;
+      height: 410px;
+      opacity: 0.45;
+    }
+
+    .otodor-hero.js-animated .centerpiece-internal-glow::before {
+      content: '';
+      position: absolute;
+      inset: 10% 32%;
+      border-radius: 999px;
+      background: linear-gradient(180deg, transparent 0%, rgba(77, 166, 255, 0.36) 38%, rgba(255, 255, 255, 0.22) 50%, rgba(77, 166, 255, 0.28) 62%, transparent 100%);
+      filter: blur(16px);
+      opacity: 0.22;
+      animation: core-energy-drift 8.8s ease-in-out infinite;
+    }
+
+    .otodor-hero.js-animated .pillar-seam::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 999px;
+      background: rgba(77, 166, 255, 0.42);
+      box-shadow: 0 0 14px rgba(77, 166, 255, 0.34);
+      opacity: 0.22;
+      animation: core-seam-breathe 8.8s ease-in-out infinite;
+      pointer-events: none;
     }
 
     .otodor-hero.js-animated .obsidian-monolith__shadow {
-      width: 440px;
-      height: 65px;
-      bottom: -45px;
+      width: 315px;
+      height: 48px;
+      bottom: -34px;
     }
 
     .otodor-hero.js-animated .otodor-hero__glow-core {
-      width: min(58vw, 680px);
-      height: min(70vh, 840px);
-      top: 40%;
+      width: min(44vw, 540px);
+      height: min(58vh, 660px);
+      top: 46%;
     }
 
     .otodor-hero.js-animated .otodor-hero__light-ray {
@@ -816,9 +910,9 @@
 
     .ecosystem-path {
       fill: none;
-      stroke: rgba(77, 166, 255, 0.08);
+      stroke: rgba(77, 166, 255, 0.12);
       stroke-width: 1.8;
-      transition: stroke 300ms ease;
+      transition: stroke 600ms ease, stroke-width 600ms ease;
     }
 
     .ecosystem-path-active {
@@ -844,11 +938,11 @@
     /* Product orbit — wide ring with monolith exclusion zone */
     .otodor-hero.js-animated .otodor-hero__products-grid {
       position: absolute;
-      top: 40%;
+      top: 46%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: min(85vw, 1280px);
-      height: min(80vh, 1000px);
+      width: min(94vw, 1360px);
+      height: min(86vh, 980px);
       max-width: none;
       display: block;
       margin: 0;
@@ -860,31 +954,31 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 110px;
+      width: clamp(280px, 23vw, 360px);
       pointer-events: auto;
       opacity: 0;
-      z-index: 20;
+      z-index: 26;
     }
 
-    /* Product sizing per node — scaled for presence */
+    /* Product sizing per node — primary visual objects in the ecosystem */
     .otodor-hero.js-animated .product-node--1 .product-card__visual {
-      width: 170px;
-      height: 170px;
+      width: clamp(260px, 22vw, 350px);
+      height: clamp(260px, 22vw, 350px);
     }
 
     .otodor-hero.js-animated .product-node--2 .product-card__visual {
-      width: 160px;
-      height: 160px;
+      width: clamp(250px, 21vw, 330px);
+      height: clamp(250px, 21vw, 330px);
     }
 
     .otodor-hero.js-animated .product-node--3 .product-card__visual {
-      width: 160px;
-      height: 160px;
+      width: clamp(245px, 20vw, 320px);
+      height: clamp(245px, 20vw, 320px);
     }
 
     .otodor-hero.js-animated .product-node--4 .product-card__visual {
-      width: 160px;
-      height: 160px;
+      width: clamp(260px, 22vw, 350px);
+      height: clamp(260px, 22vw, 350px);
     }
 
     .otodor-hero.js-animated .otodor-hero__product-card {
@@ -901,18 +995,83 @@
     }
 
     .otodor-hero.js-animated .product-card__visual {
-      width: 100px;
-      height: 100px;
+      width: clamp(245px, 20vw, 330px);
+      height: clamp(245px, 20vw, 330px);
       background: transparent;
       border: none;
       border-radius: 0;
       overflow: visible;
-      filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.6));
-      transition: filter 300ms ease;
+      position: relative;
+      filter: drop-shadow(0 24px 46px rgba(0, 0, 0, 0.72)) drop-shadow(0 0 22px rgba(77, 166, 255, 0.14));
+      animation: product-premium-float 8.5s ease-in-out infinite;
+      transition: filter 700ms ease, opacity 700ms ease;
+    }
+
+    .otodor-hero.js-animated .product-node--2 .product-card__visual {
+      animation-delay: -1.7s;
+    }
+
+    .otodor-hero.js-animated .product-node--3 .product-card__visual {
+      animation-delay: -3.1s;
+    }
+
+    .otodor-hero.js-animated .product-node--4 .product-card__visual {
+      animation-delay: -4.4s;
+    }
+
+    .otodor-hero.js-animated .product-card__visual::before,
+    .otodor-hero.js-animated .product-card__visual::after {
+      content: '';
+      position: absolute;
+      inset: 4%;
+      border-radius: 14px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .otodor-hero.js-animated .product-card__visual::before {
+      border: 1px solid rgba(77, 166, 255, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 12px 0 26px rgba(77, 166, 255, 0.07), inset -10px 0 20px rgba(255, 255, 255, 0.035);
+      opacity: 0.62;
+      transition: opacity 700ms ease, border-color 700ms ease, box-shadow 700ms ease;
+    }
+
+    .otodor-hero.js-animated .product-card__visual::after {
+      width: 34%;
+      height: 130%;
+      left: 33%;
+      top: -15%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      filter: blur(12px);
+      opacity: 0;
+      animation: product-reflective-pass 7.5s ease-in-out infinite;
+    }
+
+    .otodor-hero.js-animated .product-card__visual img {
+      filter: saturate(1.04) contrast(1.04);
+    }
+
+    .otodor-hero.js-animated .otodor-hero__product-node.is-ecosystem-active .product-card__visual,
+    .otodor-hero.js-animated .otodor-hero__product-node.is-spotlight .product-card__visual {
+      filter: drop-shadow(0 28px 52px rgba(0, 0, 0, 0.76)) drop-shadow(0 0 28px rgba(77, 166, 255, 0.2));
+    }
+
+    .otodor-hero.js-animated .otodor-hero__product-node.is-ecosystem-active .product-card__visual::before,
+    .otodor-hero.js-animated .otodor-hero__product-node.is-spotlight .product-card__visual::before {
+      opacity: 0.9;
+      border-color: rgba(77, 166, 255, 0.22);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 14px 0 28px rgba(77, 166, 255, 0.1), inset -10px 0 22px rgba(255, 255, 255, 0.05);
+    }
+
+    .otodor-hero.js-animated .product-card__visual svg.product-icon-svg {
+      width: 68%;
+      height: 68%;
+      color: rgba(255, 255, 255, 0.78);
+      filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 22px rgba(77, 166, 255, 0.16));
     }
 
     .otodor-hero.js-animated .otodor-hero__product-card:hover .product-card__visual {
-      filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.7));
+      filter: drop-shadow(0 30px 54px rgba(0, 0, 0, 0.78)) drop-shadow(0 0 30px rgba(77, 166, 255, 0.22));
     }
 
     .otodor-hero.js-animated .product-card__content {
@@ -926,48 +1085,56 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      width: 210px;
+      width: 260px;
       opacity: 0;
       will-change: transform, opacity;
       pointer-events: none;
       margin: 0;
+      z-index: 46;
     }
 
     .otodor-hero.js-animated .product-node--1 .product-reveal-caption {
       top: auto;
-      bottom: -12px;
+      bottom: 4px;
       left: 50%;
       transform: translate(-50%, 100%);
       text-align: center;
       align-items: center;
-      width: 240px;
+      width: 280px;
     }
 
     .otodor-hero.js-animated .product-node--2 .product-reveal-caption {
-      right: calc(100% + 18px);
-      left: auto;
-      text-align: right;
-      align-items: flex-end;
+      top: auto;
+      bottom: 4px;
+      left: 50%;
+      transform: translate(-50%, 100%);
+      text-align: center;
+      align-items: center;
+      width: 280px;
     }
 
     .otodor-hero.js-animated .product-node--3 .product-reveal-caption {
-      left: calc(100% + 18px);
-      text-align: left;
-      align-items: flex-start;
-    }
-
-    .otodor-hero.js-animated .product-node--4 .product-reveal-caption {
       top: auto;
-      bottom: calc(100% + 14px);
+      bottom: calc(100% + 8px);
       left: 50%;
       transform: translate(-50%, 0);
       text-align: center;
       align-items: center;
-      width: 240px;
+      width: 280px;
+    }
+
+    .otodor-hero.js-animated .product-node--4 .product-reveal-caption {
+      top: auto;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translate(-50%, 0);
+      text-align: center;
+      align-items: center;
+      width: 280px;
     }
 
     .product-reveal-caption__tag {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.14em;
@@ -976,18 +1143,18 @@
 
     .product-reveal-caption__title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.15rem;
+      font-size: 1.45rem;
       font-weight: 600;
       color: #ffffff;
-      margin: 4px 0 0;
+      margin: 5px 0 0;
       letter-spacing: -0.02em;
     }
 
     .product-reveal-caption__desc {
-      font-size: 0.78rem;
-      color: rgba(255, 255, 255, 0.45);
-      line-height: 1.45;
-      margin: 6px 0 0;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.58);
+      line-height: 1.4;
+      margin: 5px 0 0;
     }
 
     /* Intro text — top of frame, vault is hero */
@@ -1008,9 +1175,14 @@
     }
 
     .otodor-hero.js-animated .otodor-hero__text-container:last-of-type {
-      bottom: 5%;
+      bottom: 7%;
       top: auto;
       height: auto;
+      left: clamp(2rem, 6vw, 6rem);
+      right: auto;
+      transform: none;
+      max-width: min(36vw, 520px);
+      text-align: left;
     }
 
     .otodor-hero.js-animated .otodor-hero__text-frame {
@@ -1032,6 +1204,12 @@
 
     .otodor-hero.js-animated .frame--final {
       pointer-events: auto;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .otodor-hero.js-animated .frame--final .otodor-hero__actions {
+      justify-content: flex-start;
     }
 
     .otodor-hero.js-animated .otodor-hero__heading {
@@ -1171,14 +1349,14 @@
 
     <!-- Curved ecosystem connections -->
     <svg class="otodor-hero__connections-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
-      <path class="ecosystem-path path-1" d="M 500,455 C 500,380 500,280 500,175" />
-      <path class="ecosystem-path path-2" d="M 500,455 C 620,455 740,470 855,485" />
-      <path class="ecosystem-path path-3" d="M 500,455 C 380,455 260,470 145,485" />
-      <path class="ecosystem-path path-4" d="M 500,545 C 500,640 500,740 500,845" />
-      <path class="ecosystem-pulse pulse-1" d="M 500,455 C 500,380 500,280 500,175" />
-      <path class="ecosystem-pulse pulse-2" d="M 500,455 C 620,455 740,470 855,485" />
-      <path class="ecosystem-pulse pulse-3" d="M 500,455 C 380,455 260,470 145,485" />
-      <path class="ecosystem-pulse pulse-4" d="M 500,545 C 500,640 500,740 500,845" />
+      <path class="ecosystem-path path-1" d="M 500,455 C 430,390 350,300 245,185" />
+      <path class="ecosystem-path path-2" d="M 500,455 C 570,390 650,300 755,185" />
+      <path class="ecosystem-path path-3" d="M 500,545 C 430,575 350,620 245,685" />
+      <path class="ecosystem-path path-4" d="M 500,545 C 570,575 650,620 755,685" />
+      <path class="ecosystem-pulse pulse-1" d="M 500,455 C 430,390 350,300 245,185" />
+      <path class="ecosystem-pulse pulse-2" d="M 500,455 C 570,390 650,300 755,185" />
+      <path class="ecosystem-pulse pulse-3" d="M 500,545 C 430,575 350,620 245,685" />
+      <path class="ecosystem-pulse pulse-4" d="M 500,545 C 570,575 650,620 755,685" />
     </svg>
 
     <div class="otodor-hero__core-container" data-3d-slot="security-core">
@@ -1450,6 +1628,7 @@
     });
 
     var viewport = section.querySelector('.otodor-hero__viewport');
+    var stage = section.querySelector('.otodor-hero__stage');
     var centerpiece = section.querySelector('.centerpiece-obelisk');
     
     var centerPillar = section.querySelector('.obelisk-pillar--center');
@@ -1487,34 +1666,43 @@
     ];
     var pulses = section.querySelectorAll('.ecosystem-pulse');
 
-    // Wide orbit — expanded footprint with generous cardinal spacing
-    // node1: Digital Lock (top), node2: Gate Lock (right),
-    // node3: Padlock (left), node4: Gate Motor (bottom)
+    // Wide orbit — responsive footprint with a clean central exclusion zone
+    // node1/node2: upper diagonal, node3/node4: lower diagonal
+    var orbitX = Math.min(Math.max(window.innerWidth * 0.28, 360), 500);
+    var orbitY = Math.min(Math.max(window.innerHeight * 0.27, 250), 340);
     var finalSlots = [
-      { x: 0, y: -460 },
-      { x: 500, y: 40 },
-      { x: -500, y: 40 },
-      { x: 0, y: 460 }
+      { x: -orbitX, y: -orbitY },
+      { x: orbitX, y: -orbitY },
+      { x: -orbitX, y: orbitY * 0.42 },
+      { x: orbitX, y: orbitY * 0.42 }
     ];
     var entryVectors = [
-      { x: 0, y: -380, rotation: -10 },
-      { x: 380, y: 0, rotation: 12 },
-      { x: -380, y: 0, rotation: -12 },
-      { x: 0, y: 380, rotation: 8 }
+      { x: -170, y: -90, rotation: -10 },
+      { x: 170, y: -90, rotation: 12 },
+      { x: -170, y: 120, rotation: -12 },
+      { x: 170, y: 120, rotation: 8 }
     ];
-    var spotlightScale = 1.32;
-    var settledScale = 0.85;
-    var lineupScale = 1.0;
+    var spotlightScale = 1.24;
+    var settledScale = 1.0;
+    var lineupScale = spotlightScale;
 
     // ── Initial state ─────────────────────────────────────────
     gsap.set(centerPillar, { xPercent: -50, yPercent: -50, z: 0 });
-    gsap.set(leftWing, { xPercent: -50, yPercent: -50, x: -177, z: -36 });
-    gsap.set(rightWing, { xPercent: -50, yPercent: -50, x: 177, z: -36 });
+    gsap.set(leftWing, { xPercent: -50, yPercent: -50, x: -124, z: -26 });
+    gsap.set(rightWing, { xPercent: -50, yPercent: -50, x: 124, z: -26 });
     gsap.set(centerpiece, { transformOrigin: '50% 50%' });
-    gsap.set(nodes, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.7, rotation: 0 });
+    gsap.set(nodes, { xPercent: -50, yPercent: -50, opacity: 0.14, scale: 0.82, rotation: 0 });
     gsap.set(captions, { opacity: 0, x: 16 });
     gsap.set(productsGrid, { pointerEvents: 'none' });
-    if (connectionsSvg) gsap.set(connectionsSvg, { opacity: 0.85 });
+    if (connectionsSvg) gsap.set(connectionsSvg, { opacity: 0.95 });
+
+    if (stage) {
+      tl.fromTo(stage,
+        { scale: 1 },
+        { scale: 1.08, duration: 8.9, ease: 'sine.inOut' },
+        0
+      );
+    }
 
     if (ray1) {
       gsap.to(ray1, { opacity: 0.06, duration: 7, repeat: -1, yoyo: true, ease: 'sine.inOut' });
@@ -1539,9 +1727,17 @@
         x: startX,
         y: startY,
         rotation: entry.rotation,
-        opacity: 0,
-        scale: 0.72
+        opacity: 0.14,
+        scale: 0.84,
+        zIndex: 44
       });
+
+      tl.call(function () {
+        nodes.forEach(function (n) {
+          n.classList.remove('is-spotlight');
+        });
+        node.classList.add('is-spotlight');
+      }, null, time);
 
       tl.to(node, {
         opacity: 1,
@@ -1549,22 +1745,22 @@
         x: slot.x,
         y: slot.y,
         rotation: 0,
-        duration: 1.15,
-        ease: 'power3.out'
+        duration: 1.35,
+        ease: 'power4.out'
       }, time);
 
       tl.to(caption, {
         opacity: 1,
         x: 0,
-        duration: 0.75,
-        ease: 'power2.out'
+        duration: 0.95,
+        ease: 'power3.out'
       }, time + 0.45);
 
       if (paths[slotIndex]) {
         tl.to(paths[slotIndex], {
-          stroke: 'rgba(77, 166, 255, 0.38)',
-          duration: 0.6,
-          ease: 'power2.out'
+          stroke: 'rgba(77, 166, 255, 0.46)',
+          duration: 0.85,
+          ease: 'power3.out'
         }, time + 0.5);
         tl.call(function () {
           paths[slotIndex].classList.add('ecosystem-path-active');
@@ -1573,50 +1769,55 @@
     }
 
     function settleProduct(node, caption, time) {
+      tl.call(function () {
+        node.classList.remove('is-spotlight');
+      }, null, time);
+
       tl.to(node, {
-        opacity: 0.5,
+        opacity: 0.68,
         scale: settledScale,
-        duration: 0.55,
-        ease: 'power2.inOut'
+        zIndex: 28,
+        duration: 0.8,
+        ease: 'power3.inOut'
       }, time);
       tl.to(caption, {
         opacity: 0,
         x: 10,
-        duration: 0.4,
-        ease: 'power2.in'
+        duration: 0.55,
+        ease: 'power3.inOut'
       }, time);
     }
 
     // ── Scene 1: Vault only — anticipation ────────────────────
     tl.fromTo(vaultPedestal,
-      { opacity: 0, scale: 0.85 },
-      { opacity: 1, scale: 1, duration: 1.8, ease: 'power2.out' },
+      { opacity: 0.25, scale: 0.9 },
+      { opacity: 1, scale: 1, duration: 2.1, ease: 'power3.out' },
       0
     );
 
     tl.fromTo(centerpiece,
-      { scale: 0.45, opacity: 0, rotationY: -28, rotationX: 14 },
-      { scale: 1, opacity: 1, rotationY: -12, rotationX: 10, duration: 1.8, ease: 'power3.out' },
+      { scale: 0.72, opacity: 0.35, rotationY: -24, rotationX: 12 },
+      { scale: 1, opacity: 1, rotationY: -12, rotationX: 10, duration: 2.1, ease: 'power4.out' },
       0
     );
 
     if (internalGlow) {
       tl.fromTo(internalGlow,
-        { scale: 0.7, opacity: 0 },
-        { scale: 1, opacity: 0.35, duration: 1.5, ease: 'power2.out' },
+        { scale: 0.85, opacity: 0.18 },
+        { scale: 1, opacity: 0.42, duration: 2.0, ease: 'power3.out' },
         0.2
       );
     }
 
     tl.fromTo('.otodor-hero__glow-core',
-      { scale: 0.8, opacity: 0 },
-      { scale: 1, opacity: 0.5, duration: 1.8, ease: 'power2.out' },
+      { scale: 0.9, opacity: 0.22 },
+      { scale: 1, opacity: 0.55, duration: 2.1, ease: 'power3.out' },
       0
     );
 
     tl.fromTo(frameIntro,
       { opacity: 1, y: 0, pointerEvents: 'auto' },
-      { opacity: 0, y: -24, pointerEvents: 'none', duration: 0.8 },
+      { opacity: 0, y: -24, pointerEvents: 'none', duration: 1.0, ease: 'power2.inOut' },
       1.0
     );
 
@@ -1644,30 +1845,30 @@
     // ── Scene 6: Full ecosystem — illuminate, pulse, activate ─
     var s6 = 7.4;
 
-    tl.to(captions[3], { opacity: 0, x: 10, duration: 0.35, ease: 'power2.in' }, s6 - 0.15);
+    tl.to(captions[3], { opacity: 0, x: 10, duration: 0.55, ease: 'power3.inOut' }, s6 - 0.15);
 
     // Vault lifts and activates — orbit ring moves with core
-    tl.to(coreContainer, { y: -28, duration: 1.4, ease: 'power3.out' }, s6);
-    tl.to(vaultPedestal, { y: -28, duration: 1.4, ease: 'power3.out' }, s6);
-    tl.to(productsGrid, { y: -28, duration: 1.4, ease: 'power3.out' }, s6);
-    if (connectionsSvg) tl.to(connectionsSvg, { y: -28, duration: 1.4, ease: 'power3.out' }, s6);
+    tl.to(coreContainer, { y: -28, duration: 1.75, ease: 'power4.out' }, s6);
+    tl.to(vaultPedestal, { y: -28, duration: 1.75, ease: 'power4.out' }, s6);
+    tl.to(productsGrid, { y: -28, duration: 1.75, ease: 'power4.out' }, s6);
+    if (connectionsSvg) tl.to(connectionsSvg, { y: -28, duration: 1.75, ease: 'power4.out' }, s6);
     tl.to(centerpiece, {
       rotationY: 0,
       rotationX: 6,
-      scale: 1.04,
-      duration: 1.4,
-      ease: 'power3.out'
+      scale: 0.98,
+      duration: 1.75,
+      ease: 'power4.out'
     }, s6);
-    tl.to(leftWing, { x: -158, duration: 1.3, ease: 'power3.out' }, s6);
-    tl.to(rightWing, { x: 158, duration: 1.3, ease: 'power3.out' }, s6);
+    tl.to(leftWing, { x: -112, duration: 1.65, ease: 'power4.out' }, s6);
+    tl.to(rightWing, { x: 112, duration: 1.65, ease: 'power4.out' }, s6);
 
     if (internalGlow) {
       tl.to(internalGlow, {
-        scale: 1.25,
-        opacity: 0.8,
-        background: 'radial-gradient(circle, rgba(77, 166, 255, 0.75) 0%, transparent 70%)',
-        duration: 1.4,
-        ease: 'power3.out'
+        scale: 1.16,
+        opacity: 0.65,
+        background: 'radial-gradient(circle, rgba(77, 166, 255, 0.62) 0%, transparent 70%)',
+        duration: 1.7,
+        ease: 'power4.out'
       }, s6);
     }
 
@@ -1675,8 +1876,8 @@
       tl.to(plateGlows, {
         background: 'rgba(77, 166, 255, 0.7)',
         opacity: 0.85,
-        duration: 1.3,
-        ease: 'power2.out'
+        duration: 1.6,
+        ease: 'power3.out'
       }, s6);
     }
 
@@ -1684,8 +1885,8 @@
       tl.to(seams, {
         background: 'rgba(255, 255, 255, 0.95)',
         boxShadow: '0 0 10px rgba(77, 166, 255, 0.85)',
-        duration: 1.3,
-        ease: 'power2.out'
+        duration: 1.6,
+        ease: 'power3.out'
       }, s6);
     }
 
@@ -1694,21 +1895,28 @@
       tl.to(logoIcon, {
         filter: 'drop-shadow(0 0 8px rgba(77, 166, 255, 0.8)) brightness(1.15)',
         scale: 1.08,
-        duration: 1.3,
-        ease: 'power2.out'
+        duration: 1.6,
+        ease: 'power3.out'
       }, s6);
     }
 
-    tl.to(vaultPedestal, { opacity: 1, scale: 1.06, duration: 1.2, ease: 'power2.out' }, s6);
-    tl.to('.otodor-hero__glow-core', { opacity: 0.7, scale: 1.08, duration: 1.2, ease: 'power2.out' }, s6);
+    tl.to(vaultPedestal, { opacity: 0.86, scale: 1.0, duration: 1.55, ease: 'power3.out' }, s6);
+    tl.to('.otodor-hero__glow-core', { opacity: 0.55, scale: 1.02, duration: 1.55, ease: 'power3.out' }, s6);
+
+    tl.call(function () {
+      nodes.forEach(function (node) {
+        node.classList.remove('is-spotlight');
+        node.classList.add('is-ecosystem-active');
+      });
+    }, null, s6 + 0.18);
 
     // Network illuminates
     paths.forEach(function (path) {
       if (path) {
         tl.to(path, {
-          stroke: 'rgba(77, 166, 255, 0.6)',
-          duration: 1.0,
-          ease: 'power2.out'
+          stroke: 'rgba(77, 166, 255, 0.68)',
+          duration: 1.25,
+          ease: 'sine.inOut'
         }, s6);
         tl.call(function () {
           path.classList.add('ecosystem-path-illuminated');
@@ -1721,10 +1929,10 @@
       tl.set(pulses, { opacity: 1 }, s6 + 0.15);
       tl.fromTo(pulses,
         { strokeDashoffset: 0 },
-        { strokeDashoffset: -520, duration: 1.1, ease: 'power1.inOut' },
+        { strokeDashoffset: -560, duration: 1.3, ease: 'sine.inOut' },
         s6 + 0.15
       );
-      tl.to(pulses, { opacity: 0, duration: 0.35 }, s6 + 1.25);
+      tl.to(pulses, { opacity: 0, duration: 0.45, ease: 'sine.inOut' }, s6 + 1.35);
     }
 
     // All four products at full orbit presence
@@ -1735,8 +1943,9 @@
         x: finalSlots[i].x,
         y: finalSlots[i].y,
         rotation: 0,
-        duration: 1.0,
-        ease: 'power3.out'
+        zIndex: 34,
+        duration: 1.25,
+        ease: 'power4.out'
       }, s6 + 0.25 + i * 0.06);
     });
 
@@ -1745,8 +1954,8 @@
     // Final headline & CTAs — payoff moment
     tl.fromTo(frameFinal,
       { opacity: 0, y: 36, pointerEvents: 'none' },
-      { opacity: 1, y: 0, pointerEvents: 'auto', duration: 1.0, ease: 'power2.out' },
-      s6 + 0.9
+      { opacity: 1, y: 0, pointerEvents: 'auto', duration: 1.2, ease: 'power3.out' },
+      s6 + 1.55
     );
   }
 
