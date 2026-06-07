@@ -1,0 +1,1487 @@
+/* ============================================================
+   OTODOR — Brand Design System
+   Version: 1.0.0
+   Theme: Dark Luxury Technology
+   Compatible: Shopify Dawn, Chrome 90+, Safari 14+, Firefox 90+
+
+   Architecture:
+   ─────────────────────────────────────────────────────────────
+   1.  Design Tokens (Custom Properties)
+   2.  Dark Mode Baseline Override
+   3.  Typography System
+   4.  Layout Utilities
+   5.  Glass Morphism Components
+   6.  Button System
+   7.  Badge / Pill Components
+   8.  Icon Grid Utility
+   9.  Section Wrappers
+   10. Reveal Animation Base States
+   11. Keyframe Declarations
+   12. WhatsApp Floating Button
+   13. Accessibility & Reduced Motion
+   ============================================================ */
+
+
+/* ============================================================
+   1. DESIGN TOKENS
+   ============================================================ */
+
+:root {
+
+  /* ─── Brand Colors ──────────────────────────────────────── */
+  --otodor-black:          #0B0B0B;
+  --otodor-surface:        #121212;
+  --otodor-surface-2:      #1A1A1A;
+  --otodor-surface-3:      #222222;
+  --otodor-white:          #FFFFFF;
+  --otodor-blue:           #4DA6FF;
+  --otodor-blue-mid:       #3A96F2;
+  --otodor-blue-dark:      #2E8EEE;
+  --otodor-blue-deep:      #1A78D8;
+  --otodor-blue-glow:      rgba(77, 166, 255, 0.15);
+  --otodor-blue-glow-lg:   rgba(77, 166, 255, 0.30);
+  --otodor-neutral:        #EAEAEA;
+  --otodor-muted:          rgba(255, 255, 255, 0.55);
+  --otodor-faint:          rgba(255, 255, 255, 0.35);
+  --otodor-hairline:       rgba(255, 255, 255, 0.08);
+  --otodor-hairline-mid:   rgba(255, 255, 255, 0.12);
+  --otodor-success:        #00D26A;
+  --otodor-success-glow:   rgba(0, 210, 106, 0.20);
+
+  /* ─── Glass Morphism ────────────────────────────────────── */
+  --otodor-glass:          rgba(255, 255, 255, 0.04);
+  --otodor-glass-mid:      rgba(255, 255, 255, 0.06);
+  --otodor-glass-high:     rgba(255, 255, 255, 0.10);
+  --otodor-glass-border:   rgba(255, 255, 255, 0.09);
+  --otodor-glass-border-h: rgba(255, 255, 255, 0.16);
+
+  /* ─── Gradients ─────────────────────────────────────────── */
+  --otodor-gradient-hero:
+    radial-gradient(ellipse 100% 60% at 50% -5%, rgba(77, 166, 255, 0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 50%, rgba(77, 166, 255, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #0D0D0D 0%, #080808 100%);
+
+  --otodor-gradient-blue:
+    linear-gradient(135deg, #4DA6FF 0%, #2E8EEE 100%);
+
+  --otodor-gradient-blue-subtle:
+    linear-gradient(135deg, rgba(77, 166, 255, 0.15) 0%, rgba(46, 142, 238, 0.08) 100%);
+
+  --otodor-gradient-surface:
+    linear-gradient(180deg, #121212 0%, #0B0B0B 100%);
+
+  --otodor-gradient-cta:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(77, 166, 255, 0.10) 0%, transparent 55%),
+    linear-gradient(180deg, #0F0F0F 0%, #080808 100%);
+
+  --otodor-gradient-card:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, var(--otodor-surface) 0%, var(--otodor-black) 100%);
+
+  --otodor-gradient-noise-overlay:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+
+  /* ─── Typography ────────────────────────────────────────── */
+  --otodor-font-display:   'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --otodor-font-body:      'Inter', system-ui, -apple-system, sans-serif;
+
+  --otodor-text-xs:   clamp(0.7rem,  1.2vw, 0.75rem);
+  --otodor-text-sm:   clamp(0.8rem,  1.5vw, 0.875rem);
+  --otodor-text-base: clamp(0.9rem,  1.8vw, 1rem);
+  --otodor-text-md:   clamp(1rem,    2vw,   1.125rem);
+  --otodor-text-lg:   clamp(1.1rem,  2.2vw, 1.25rem);
+  --otodor-text-xl:   clamp(1.3rem,  2.8vw, 1.5rem);
+  --otodor-text-2xl:  clamp(1.6rem,  3.5vw, 2rem);
+  --otodor-text-3xl:  clamp(2rem,    5vw,   3rem);
+  --otodor-text-4xl:  clamp(2.5rem,  6.5vw, 4rem);
+  --otodor-text-5xl:  clamp(3rem,    8vw,   5.5rem);
+  --otodor-text-hero: clamp(3.2rem,  9vw,   6.5rem);
+
+  --otodor-leading-tight:  1.1;
+  --otodor-leading-snug:   1.3;
+  --otodor-leading-base:   1.6;
+  --otodor-leading-loose:  1.8;
+  --otodor-tracking-tight: -0.03em;
+  --otodor-tracking-base:  -0.01em;
+  --otodor-tracking-wide:   0.05em;
+  --otodor-tracking-wider:  0.12em;
+  --otodor-tracking-widest: 0.20em;
+
+  /* ─── Spacing Scale ─────────────────────────────────────── */
+  --otodor-space-2xs:  0.25rem;   /*  4px */
+  --otodor-space-xs:   0.5rem;    /*  8px */
+  --otodor-space-sm:   0.75rem;   /* 12px */
+  --otodor-space-md:   1rem;      /* 16px */
+  --otodor-space-lg:   1.5rem;    /* 24px */
+  --otodor-space-xl:   2.5rem;    /* 40px */
+  --otodor-space-2xl:  4rem;      /* 64px */
+  --otodor-space-3xl:  6rem;      /* 96px */
+  --otodor-space-4xl:  8rem;      /* 128px */
+  --otodor-space-5xl: 10rem;      /* 160px */
+
+  /* ─── Section Spacing ───────────────────────────────────── */
+  --otodor-section-py:     clamp(4rem, 10vw, 8rem);
+  --otodor-section-py-sm:  clamp(3rem, 7vw,  5rem);
+  --otodor-container:      min(1280px, calc(100% - 3rem));
+  --otodor-container-wide: min(1440px, calc(100% - 3rem));
+  --otodor-container-sm:   min(960px, calc(100% - 3rem));
+
+  /* ─── Border Radius ─────────────────────────────────────── */
+  --otodor-radius-xs:   4px;
+  --otodor-radius-sm:   8px;
+  --otodor-radius-md:   12px;
+  --otodor-radius-lg:   20px;
+  --otodor-radius-xl:   28px;
+  --otodor-radius-2xl:  40px;
+  --otodor-radius-pill: 999px;
+
+  /* ─── Shadows ────────────────────────────────────────────── */
+  --otodor-shadow-xs:  0 1px  6px rgba(0, 0, 0, 0.35);
+  --otodor-shadow-sm:  0 4px 16px rgba(0, 0, 0, 0.50);
+  --otodor-shadow-md:  0 8px 32px rgba(0, 0, 0, 0.65);
+  --otodor-shadow-lg:  0 20px 60px rgba(0, 0, 0, 0.80);
+  --otodor-shadow-xl:  0 40px 100px rgba(0, 0, 0, 0.90);
+
+  --otodor-shadow-blue-sm: 0 4px  20px rgba(77, 166, 255, 0.20);
+  --otodor-shadow-blue-md: 0 8px  40px rgba(77, 166, 255, 0.28);
+  --otodor-shadow-blue-lg: 0 16px 64px rgba(77, 166, 255, 0.35);
+
+  --otodor-shadow-inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* ─── Motion / Easing ───────────────────────────────────── */
+  --otodor-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --otodor-ease-out:    cubic-bezier(0.00, 0, 0.2, 1);
+  --otodor-ease-in:     cubic-bezier(0.55, 0, 1, 0.45);
+  --otodor-ease-inout:  cubic-bezier(0.4, 0, 0.2, 1);
+
+  --otodor-dur-instant:  80ms;
+  --otodor-dur-fast:    160ms;
+  --otodor-dur-base:    280ms;
+  --otodor-dur-slow:    500ms;
+  --otodor-dur-reveal:  800ms;
+  --otodor-dur-long:   1200ms;
+
+  /* ─── Z-Index Scale ─────────────────────────────────────── */
+  --otodor-z-below:     -1;
+  --otodor-z-base:       1;
+  --otodor-z-raised:    10;
+  --otodor-z-floating:  50;
+  --otodor-z-overlay:  100;
+  --otodor-z-modal:    200;
+  --otodor-z-toast:    300;
+  --otodor-z-whatsapp: 400;
+}
+
+
+/* ============================================================
+   2. DARK MODE BASELINE
+   Ensures OTODOR sections render correctly on the dark theme.
+   We scope overrides to .otodor-* classes to avoid conflicting
+   with Dawn's color scheme system.
+   ============================================================ */
+
+/* All OTODOR sections inherit the brand dark background */
+[data-otodor-section] {
+  background-color: transparent;
+  color: var(--otodor-white);
+}
+
+/* Prevent Dawn's color-scheme variables from bleeding into
+   custom sections — each section manages its own colors */
+[data-otodor-section] .color-scheme-1,
+[data-otodor-section] .color-scheme-2 {
+  background: transparent;
+}
+
+
+/* ============================================================
+   3. TYPOGRAPHY SYSTEM
+   ============================================================ */
+
+/* Display headings — Space Grotesk, tight tracking */
+.otodor-heading-hero {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-hero);
+  font-weight: 700;
+  line-height: var(--otodor-leading-tight);
+  letter-spacing: var(--otodor-tracking-tight);
+  color: var(--otodor-white);
+  margin: 0;
+}
+
+.otodor-heading-1 {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-5xl);
+  font-weight: 700;
+  line-height: var(--otodor-leading-tight);
+  letter-spacing: var(--otodor-tracking-tight);
+  color: var(--otodor-white);
+  margin: 0;
+}
+
+.otodor-heading-2 {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-4xl);
+  font-weight: 700;
+  line-height: var(--otodor-leading-snug);
+  letter-spacing: var(--otodor-tracking-tight);
+  color: var(--otodor-white);
+  margin: 0;
+}
+
+.otodor-heading-3 {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-3xl);
+  font-weight: 600;
+  line-height: var(--otodor-leading-snug);
+  letter-spacing: var(--otodor-tracking-tight);
+  color: var(--otodor-white);
+  margin: 0;
+}
+
+.otodor-heading-4 {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-2xl);
+  font-weight: 600;
+  line-height: var(--otodor-leading-snug);
+  letter-spacing: var(--otodor-tracking-base);
+  color: var(--otodor-white);
+  margin: 0;
+}
+
+/* Body copy */
+.otodor-body-lg {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-lg);
+  font-weight: 400;
+  line-height: var(--otodor-leading-loose);
+  color: var(--otodor-muted);
+  margin: 0;
+}
+
+.otodor-body {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-base);
+  font-weight: 400;
+  line-height: var(--otodor-leading-base);
+  color: var(--otodor-muted);
+  margin: 0;
+}
+
+.otodor-body-sm {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  font-weight: 400;
+  line-height: var(--otodor-leading-base);
+  color: var(--otodor-faint);
+  margin: 0;
+}
+
+/* Eyebrow / label */
+.otodor-eyebrow {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-xs);
+  font-weight: 700;
+  letter-spacing: var(--otodor-tracking-widest);
+  text-transform: uppercase;
+  color: var(--otodor-blue);
+  margin: 0;
+}
+
+/* Accent text highlight */
+.otodor-accent {
+  color: var(--otodor-blue);
+  background: var(--otodor-gradient-blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Pull quote */
+.otodor-quote {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-xl);
+  font-weight: 500;
+  line-height: var(--otodor-leading-snug);
+  color: var(--otodor-neutral);
+  font-style: italic;
+  border-left: 2px solid var(--otodor-blue);
+  padding-left: var(--otodor-space-lg);
+  margin: 0;
+}
+
+
+/* ============================================================
+   4. LAYOUT UTILITIES
+   ============================================================ */
+
+/* Container */
+.otodor-container {
+  width: var(--otodor-container);
+  margin-inline: auto;
+}
+
+.otodor-container--wide {
+  width: var(--otodor-container-wide);
+  margin-inline: auto;
+}
+
+.otodor-container--sm {
+  width: var(--otodor-container-sm);
+  margin-inline: auto;
+}
+
+/* Section padding */
+.otodor-section {
+  padding-block: var(--otodor-section-py);
+  position: relative;
+  overflow: hidden;
+}
+
+.otodor-section--sm {
+  padding-block: var(--otodor-section-py-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Flex utilities */
+.otodor-flex        { display: flex; }
+.otodor-flex-col    { display: flex; flex-direction: column; }
+.otodor-items-center { align-items: center; }
+.otodor-justify-center { justify-content: center; }
+.otodor-justify-between { justify-content: space-between; }
+.otodor-gap-sm      { gap: var(--otodor-space-sm); }
+.otodor-gap-md      { gap: var(--otodor-space-md); }
+.otodor-gap-lg      { gap: var(--otodor-space-lg); }
+.otodor-gap-xl      { gap: var(--otodor-space-xl); }
+
+/* Grid utilities */
+.otodor-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--otodor-space-lg);
+}
+
+.otodor-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--otodor-space-lg);
+}
+
+.otodor-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--otodor-space-lg);
+}
+
+@media (max-width: 1024px) {
+  .otodor-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .otodor-grid-2,
+  .otodor-grid-3,
+  .otodor-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Text alignment */
+.otodor-text-center { text-align: center; }
+.otodor-text-left   { text-align: left; }
+
+/* Stack (vertical flex with gap) */
+.otodor-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--otodor-space-lg);
+}
+
+.otodor-stack--sm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--otodor-space-md);
+}
+
+/* Section header block */
+.otodor-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--otodor-space-md);
+  max-width: 64ch;
+}
+
+.otodor-section-header--center {
+  align-items: center;
+  text-align: center;
+  margin-inline: auto;
+}
+
+/* Divider */
+.otodor-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--otodor-hairline);
+  border: none;
+  margin: 0;
+}
+
+.otodor-divider--blue {
+  background: linear-gradient(90deg, transparent 0%, var(--otodor-blue) 50%, transparent 100%);
+  opacity: 0.4;
+}
+
+
+/* ============================================================
+   5. GLASS MORPHISM COMPONENTS
+   ============================================================ */
+
+/* Base glass card */
+.otodor-glass-card {
+  background: var(--otodor-glass);
+  border: 1px solid var(--otodor-glass-border);
+  border-radius: var(--otodor-radius-xl);
+  box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition:
+    background var(--otodor-dur-base) var(--otodor-ease-out),
+    border-color var(--otodor-dur-base) var(--otodor-ease-out),
+    box-shadow var(--otodor-dur-base) var(--otodor-ease-out),
+    transform var(--otodor-dur-base) var(--otodor-ease-spring);
+}
+
+.otodor-glass-card:hover {
+  background: var(--otodor-glass-mid);
+  border-color: var(--otodor-glass-border-h);
+  box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-md), 0 0 0 1px var(--otodor-glass-border-h);
+}
+
+/* Glass card — top highlight shimmer (static for JS-free) */
+.otodor-glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Elevated glass card */
+.otodor-glass-card--raised {
+  background: var(--otodor-glass-mid);
+  border-color: var(--otodor-glass-border-h);
+  box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-md);
+}
+
+.otodor-glass-card--raised:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-lg), var(--otodor-shadow-blue-sm);
+  border-color: rgba(77, 166, 255, 0.20);
+}
+
+/* Blue-tinted glass card */
+.otodor-glass-card--blue {
+  background: rgba(77, 166, 255, 0.06);
+  border-color: rgba(77, 166, 255, 0.15);
+}
+
+.otodor-glass-card--blue:hover {
+  background: rgba(77, 166, 255, 0.10);
+  border-color: rgba(77, 166, 255, 0.25);
+  box-shadow: var(--otodor-shadow-blue-md);
+}
+
+/* Surface card (solid, not glass) */
+.otodor-surface-card {
+  background: var(--otodor-surface);
+  border: 1px solid var(--otodor-hairline);
+  border-radius: var(--otodor-radius-xl);
+  box-shadow: var(--otodor-shadow-sm);
+  transition:
+    border-color var(--otodor-dur-base) var(--otodor-ease-out),
+    box-shadow var(--otodor-dur-base) var(--otodor-ease-out),
+    transform var(--otodor-dur-base) var(--otodor-ease-spring);
+}
+
+.otodor-surface-card:hover {
+  border-color: var(--otodor-hairline-mid);
+  box-shadow: var(--otodor-shadow-md);
+  transform: translateY(-2px);
+}
+
+
+/* ============================================================
+   6. BUTTON SYSTEM
+   ============================================================ */
+
+/* Base button reset */
+.otodor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--otodor-space-xs);
+  font-family: var(--otodor-font-body);
+  font-weight: 600;
+  font-size: var(--otodor-text-sm);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: var(--otodor-radius-pill);
+  padding: 0.875rem 2rem;
+  min-height: 52px;
+  transition:
+    background var(--otodor-dur-fast) var(--otodor-ease-out),
+    border-color var(--otodor-dur-fast) var(--otodor-ease-out),
+    box-shadow var(--otodor-dur-fast) var(--otodor-ease-out),
+    transform var(--otodor-dur-fast) var(--otodor-ease-spring),
+    color var(--otodor-dur-fast) var(--otodor-ease-out);
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.otodor-btn:focus-visible {
+  outline: 2px solid var(--otodor-blue);
+  outline-offset: 3px;
+}
+
+/* Primary — solid blue */
+.otodor-btn--primary {
+  background: var(--otodor-gradient-blue);
+  color: var(--otodor-white);
+  box-shadow: var(--otodor-shadow-blue-sm);
+}
+
+.otodor-btn--primary:hover {
+  box-shadow: var(--otodor-shadow-blue-md);
+  transform: translateY(-2px);
+  color: var(--otodor-white);
+  text-decoration: none;
+}
+
+.otodor-btn--primary:active {
+  transform: translateY(0);
+  box-shadow: var(--otodor-shadow-blue-sm);
+}
+
+/* Shimmer animation on primary button */
+.otodor-btn--primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.20) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform var(--otodor-dur-slow) var(--otodor-ease-out);
+}
+
+.otodor-btn--primary:hover::after {
+  transform: translateX(100%);
+}
+
+/* Ghost — transparent with border */
+.otodor-btn--ghost {
+  background: transparent;
+  color: var(--otodor-white);
+  border: 1px solid var(--otodor-glass-border-h);
+  box-shadow: var(--otodor-shadow-inset-top);
+}
+
+.otodor-btn--ghost:hover {
+  background: var(--otodor-glass-mid);
+  border-color: var(--otodor-glass-border-h);
+  transform: translateY(-2px);
+  color: var(--otodor-white);
+  text-decoration: none;
+}
+
+/* Outline — blue border */
+.otodor-btn--outline {
+  background: transparent;
+  color: var(--otodor-blue);
+  border: 1px solid var(--otodor-blue);
+}
+
+.otodor-btn--outline:hover {
+  background: var(--otodor-blue-glow);
+  transform: translateY(-2px);
+  box-shadow: var(--otodor-shadow-blue-sm);
+  color: var(--otodor-blue);
+  text-decoration: none;
+}
+
+/* Sizes */
+.otodor-btn--sm {
+  font-size: var(--otodor-text-xs);
+  padding: 0.6rem 1.25rem;
+  min-height: 40px;
+}
+
+.otodor-btn--lg {
+  font-size: var(--otodor-text-md);
+  padding: 1.1rem 2.5rem;
+  min-height: 60px;
+}
+
+/* Icon inside button */
+.otodor-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  transition: transform var(--otodor-dur-fast) var(--otodor-ease-spring);
+}
+
+.otodor-btn:hover .otodor-btn__icon {
+  transform: translateX(3px);
+}
+
+/* Button group */
+.otodor-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--otodor-space-md);
+  align-items: center;
+}
+
+
+/* ============================================================
+   7. BADGE / PILL COMPONENTS
+   ============================================================ */
+
+/* Status badge — inline pill */
+.otodor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--otodor-radius-pill);
+  border: 1px solid var(--otodor-glass-border);
+  background: var(--otodor-glass);
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-xs);
+  font-weight: 700;
+  letter-spacing: var(--otodor-tracking-widest);
+  text-transform: uppercase;
+  color: var(--otodor-neutral);
+  width: fit-content;
+}
+
+/* Live / active indicator dot */
+.otodor-badge__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--otodor-success);
+  box-shadow: 0 0 0 0 var(--otodor-success-glow);
+  animation: otodor-pulse 2.2s ease-out infinite;
+  flex-shrink: 0;
+}
+
+/* Blue accent badge */
+.otodor-badge--blue {
+  background: rgba(77, 166, 255, 0.10);
+  border-color: rgba(77, 166, 255, 0.25);
+  color: var(--otodor-blue);
+}
+
+.otodor-badge--blue .otodor-badge__dot {
+  background: var(--otodor-blue);
+  animation: otodor-pulse-blue 2.2s ease-out infinite;
+}
+
+/* Product tag pill */
+.otodor-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--otodor-radius-pill);
+  background: var(--otodor-glass-mid);
+  border: 1px solid var(--otodor-glass-border);
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-xs);
+  font-weight: 600;
+  color: var(--otodor-faint);
+  letter-spacing: 0.04em;
+}
+
+/* Stat counter display */
+.otodor-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.otodor-stat__value {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-4xl);
+  font-weight: 700;
+  letter-spacing: var(--otodor-tracking-tight);
+  color: var(--otodor-white);
+  line-height: 1;
+}
+
+.otodor-stat__label {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  font-weight: 500;
+  color: var(--otodor-muted);
+  letter-spacing: var(--otodor-tracking-wide);
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   8. ICON GRID UTILITY
+   ============================================================ */
+
+/* Icon wrapper — used in feature tiles and trust bar */
+.otodor-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--otodor-radius-md);
+  background: var(--otodor-glass-mid);
+  border: 1px solid var(--otodor-glass-border);
+  flex-shrink: 0;
+  transition:
+    background var(--otodor-dur-base) var(--otodor-ease-out),
+    border-color var(--otodor-dur-base) var(--otodor-ease-out),
+    box-shadow var(--otodor-dur-base) var(--otodor-ease-out);
+}
+
+.otodor-icon-wrap svg,
+.otodor-icon-wrap img {
+  width: 24px;
+  height: 24px;
+}
+
+.otodor-icon-wrap--lg {
+  width: 64px;
+  height: 64px;
+}
+
+.otodor-icon-wrap--lg svg,
+.otodor-icon-wrap--lg img {
+  width: 32px;
+  height: 32px;
+}
+
+/* Feature tile hover: icon glows blue */
+.otodor-feature-tile:hover .otodor-icon-wrap {
+  background: rgba(77, 166, 255, 0.12);
+  border-color: rgba(77, 166, 255, 0.25);
+  box-shadow: var(--otodor-shadow-blue-sm);
+}
+
+
+/* ============================================================
+   9. SECTION WRAPPERS
+   ============================================================ */
+
+/* Noise texture overlay — applied on top of section backgrounds
+   for that premium subtle grain effect */
+.otodor-noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--otodor-gradient-noise-overlay);
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  pointer-events: none;
+  opacity: 0.6;
+  z-index: var(--otodor-z-base);
+}
+
+/* Gradient top border accent line */
+.otodor-border-top-blue {
+  position: relative;
+}
+
+.otodor-border-top-blue::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--otodor-blue), transparent);
+  opacity: 0.6;
+}
+
+/* Gradient glow behind section — decorative radial */
+.otodor-glow-top {
+  position: relative;
+}
+
+.otodor-glow-top::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(77, 166, 255, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: var(--otodor-z-below);
+}
+
+/* Dark mesh grid overlay (subtle, 3D-ready background) */
+.otodor-mesh-bg {
+  position: relative;
+}
+
+.otodor-mesh-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--otodor-hairline) 1px, transparent 1px),
+    linear-gradient(90deg, var(--otodor-hairline) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 10%, transparent 75%);
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: var(--otodor-z-below);
+}
+
+
+/* ============================================================
+   10. REVEAL ANIMATION BASE STATES
+   (No-JS default: all content visible)
+   (With-JS: GSAP will toggle .is-revealed via ScrollTrigger)
+   ============================================================ */
+
+/* When JS/GSAP is available, sections opt into reveal behavior
+   by adding data-otodor-reveal to the element.
+   Without JS, the element shows normally (no hidden state). */
+
+.js-loaded [data-otodor-reveal="fade-up"] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity var(--otodor-dur-reveal) var(--otodor-ease-out),
+    transform var(--otodor-dur-reveal) var(--otodor-ease-spring);
+}
+
+.js-loaded [data-otodor-reveal="fade-up"].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.js-loaded [data-otodor-reveal="fade-in"] {
+  opacity: 0;
+  transition: opacity var(--otodor-dur-reveal) var(--otodor-ease-out);
+}
+
+.js-loaded [data-otodor-reveal="fade-in"].is-revealed {
+  opacity: 1;
+}
+
+.js-loaded [data-otodor-reveal="scale-in"] {
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity var(--otodor-dur-reveal) var(--otodor-ease-out),
+    transform var(--otodor-dur-reveal) var(--otodor-ease-spring);
+}
+
+.js-loaded [data-otodor-reveal="scale-in"].is-revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger groups — children get delay via CSS custom property */
+.js-loaded [data-otodor-stagger] > * {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity var(--otodor-dur-reveal) var(--otodor-ease-out),
+    transform var(--otodor-dur-reveal) var(--otodor-ease-spring);
+}
+
+.js-loaded [data-otodor-stagger] > *.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ============================================================
+   11. KEYFRAME DECLARATIONS
+   ============================================================ */
+
+/* Dot pulse (trust/status indicators) */
+@keyframes otodor-pulse {
+  0%   { box-shadow: 0 0 0 0 var(--otodor-success-glow); }
+  70%  { box-shadow: 0 0 0 10px rgba(0, 210, 106, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 210, 106, 0); }
+}
+
+@keyframes otodor-pulse-blue {
+  0%   { box-shadow: 0 0 0 0 var(--otodor-blue-glow); }
+  70%  { box-shadow: 0 0 0 10px rgba(77, 166, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(77, 166, 255, 0); }
+}
+
+/* Shimmer sweep — loading states, button hover */
+@keyframes otodor-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Border sweep glow (glass cards, hero border) */
+@keyframes otodor-border-sweep {
+  0%   { background-position: 0% 50%; opacity: 0.4; }
+  50%  { background-position: 100% 50%; opacity: 0.8; }
+  100% { background-position: 0% 50%; opacity: 0.4; }
+}
+
+/* Floating / levitate (product images) */
+@keyframes otodor-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+/* Scroll indicator bounce */
+@keyframes otodor-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50%       { transform: translateY(8px); opacity: 0.5; }
+}
+
+/* Continuous slow rotation (logo reveal, 3D prep) */
+@keyframes otodor-spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Number counter (JS will handle actual value, CSS drives appearance) */
+@keyframes otodor-count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ============================================================
+   12. WHATSAPP FLOATING BUTTON
+   ============================================================ */
+
+.otodor-whatsapp-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: var(--otodor-z-whatsapp);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #25D366;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.40), 0 2px 8px rgba(0, 0, 0, 0.40);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition:
+    transform var(--otodor-dur-base) var(--otodor-ease-spring),
+    box-shadow var(--otodor-dur-base) var(--otodor-ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.otodor-whatsapp-btn:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 8px 32px rgba(37, 211, 102, 0.50), 0 4px 12px rgba(0, 0, 0, 0.50);
+}
+
+.otodor-whatsapp-btn:active {
+  transform: scale(0.96);
+}
+
+.otodor-whatsapp-btn:focus-visible {
+  outline: 3px solid #25D366;
+  outline-offset: 4px;
+}
+
+.otodor-whatsapp-btn svg {
+  width: 30px;
+  height: 30px;
+  fill: #FFFFFF;
+  display: block;
+}
+
+/* Tooltip label on hover */
+.otodor-whatsapp-btn::before {
+  content: attr(data-label);
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  background: var(--otodor-surface-2);
+  color: var(--otodor-white);
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--otodor-radius-sm);
+  border: 1px solid var(--otodor-hairline-mid);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--otodor-dur-fast) var(--otodor-ease-out),
+    transform var(--otodor-dur-fast) var(--otodor-ease-spring);
+}
+
+.otodor-whatsapp-btn:hover::before {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Pulse ring animation on the WhatsApp button */
+.otodor-whatsapp-btn::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(37, 211, 102, 0.5);
+  animation: otodor-whatsapp-ring 2.5s ease-out infinite;
+}
+
+@keyframes otodor-whatsapp-ring {
+  0%   { opacity: 1; transform: scale(1); }
+  80%  { opacity: 0; transform: scale(1.5); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* Mobile: smaller button, no tooltip */
+@media (max-width: 768px) {
+  .otodor-whatsapp-btn {
+    width: 52px;
+    height: 52px;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .otodor-whatsapp-btn svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .otodor-whatsapp-btn::before {
+    display: none;
+  }
+}
+
+
+/* ============================================================
+   13. ACCESSIBILITY & REDUCED MOTION
+   ============================================================ */
+
+/* Respect user motion preference — disable ALL animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Remove floating animation from product images */
+  [class*="otodor-float"] {
+    animation: none !important;
+  }
+
+  /* Keep reveals visible without animation */
+  .js-loaded [data-otodor-reveal],
+  .js-loaded [data-otodor-stagger] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Focus management — keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--otodor-blue);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Skip link (Dawn already has this, we enhance for dark theme) */
+.otodor-skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: var(--otodor-z-modal);
+  background: var(--otodor-blue);
+  color: var(--otodor-white);
+  padding: 8px 16px;
+  border-radius: var(--otodor-radius-sm);
+  font-family: var(--otodor-font-body);
+  font-weight: 600;
+  font-size: var(--otodor-text-sm);
+  text-decoration: none;
+}
+
+.otodor-skip-link:focus {
+  top: 16px;
+}
+
+/* Visually hidden — accessible but not visible */
+.otodor-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ============================================================
+   14. DAWN GLOBAL OVERRIDES — DARK BRAND THEME
+   Transforms Dawn's light defaults into OTODOR dark luxury.
+   Uses high-specificity selectors to win over Dawn's base.css.
+   ============================================================ */
+
+/* ── Announcement Bar: dark ─────────────────────────────────── */
+.shopify-section-group-header-group .announcement-bar {
+  background-color: #0B0B0B !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+.announcement-bar__message,
+.announcement-bar__message p,
+.announcement-bar__message a,
+.announcement-bar__message span {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.announcement-bar__message a:hover {
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-decoration: underline;
+}
+
+.announcement-bar .svg-wrapper svg path {
+  stroke: rgba(255, 255, 255, 0.5) !important;
+  fill: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ── Header Wrapper: dark glass ─────────────────────────────── */
+.shopify-section-group-header-group {
+  z-index: 300 !important;
+  position: relative;
+}
+
+sticky-header,
+.section-header,
+.section-header .header-wrapper {
+  background-color: rgba(11, 11, 11, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 24px rgba(0, 0, 0, 0.5) !important;
+  z-index: 300 !important;
+}
+
+/* On scroll: deepen the glass effect slightly */
+.section-header.shopify-section-header-sticky .header-wrapper,
+.scrolled-past-header .header-wrapper {
+  background-color: rgba(8, 8, 8, 0.98) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 40px rgba(0, 0, 0, 0.7) !important;
+  z-index: 300 !important;
+}
+
+/* ── Header text & links: white ─────────────────────────────── */
+/* Logo text (when no logo image set) */
+.section-header .header__heading .h2,
+.section-header .header__heading-link .h2 {
+  color: #ffffff !important;
+}
+
+/* Heading link (wraps logo) */
+.section-header .header__heading-link {
+  color: rgba(255, 255, 255, 0.90) !important;
+}
+
+/* Primary nav links */
+.section-header .header__menu-item,
+.section-header .header__menu-item > a,
+.section-header .list-menu__item--link {
+  color: rgba(255, 255, 255, 0.75) !important;
+  opacity: 1 !important;
+}
+
+.section-header .header__menu-item:hover > a,
+.section-header .header__menu-item > a:hover,
+.section-header .list-menu__item--link:hover {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  text-decoration: none !important;
+}
+
+/* Active nav link */
+.section-header .header__menu-item--active > a {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* Dropdown caret SVG */
+.section-header .header__menu-item .icon-caret path,
+.section-header .header__menu-item .icon-caret {
+  stroke: rgba(255, 255, 255, 0.6) !important;
+  fill: rgba(255, 255, 255, 0.6) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* ── Header icons (cart, search, account): white ────────────── */
+.section-header .header__icon {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.section-header .header__icon:hover {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* SVG paths inside icons */
+.section-header .header__icon svg path,
+.section-header .header__icon .svg-wrapper svg path,
+.section-header .header__icon .svg-wrapper svg circle,
+.section-header .header__icon .svg-wrapper svg rect {
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+/* Cart count bubble */
+.section-header .cart-count-bubble {
+  background: #4DA6FF !important;
+  color: #ffffff !important;
+}
+
+/* ── Mega menu / dropdown: dark surface ─────────────────────── */
+.section-header .mega-menu,
+.section-header .header__submenu,
+.section-header details-disclosure > .list-menu {
+  background-color: rgba(18, 18, 18, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Submenu links */
+.section-header .header__submenu .list-menu__item--link,
+.section-header .mega-menu .list-menu__item--link {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.section-header .header__submenu .list-menu__item--link:hover,
+.section-header .mega-menu .list-menu__item--link:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── Mobile drawer: dark ────────────────────────────────────── */
+.menu-drawer {
+  background-color: rgba(11, 11, 11, 0.98) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+.menu-drawer__inner-submenu {
+  background-color: #0B0B0B !important;
+}
+
+.menu-drawer .list-menu__item--link,
+.menu-drawer .disclosure__link,
+.menu-drawer .header__menu-item {
+  color: rgba(255, 255, 255, 0.75) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+.menu-drawer .list-menu__item--link:hover {
+  color: #ffffff !important;
+}
+
+/* Hamburger icon */
+.menu-drawer-container .header__icon svg path {
+  stroke: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* ── Page body: override Dawn's white background ────────────── */
+/* Only apply if the theme admin hasn't set a dark color scheme.
+   Scoped to avoid breaking the cart/checkout pages. */
+body.gradient:not(.template-cart):not(.template-customers) {
+  background: 
+    linear-gradient(115deg, rgba(77, 166, 255, 0.08), transparent 30%),
+    radial-gradient(circle at 50% 15%, rgba(77, 166, 255, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 80% 65%, rgba(77, 166, 255, 0.06) 0%, transparent 40%),
+    linear-gradient(180deg, #0B0B0B 0%, #060606 100%) !important;
+  background-attachment: fixed !important;
+  background-size: 100% 100% !important;
+}
+
+/* Prevent the white body flash on page load */
+html {
+  background-color: #0B0B0B;
+}
+
+
+/* ============================================================
+   15. DYNAMIC COLOR SCHEME & PRODUCT PAGE OVERRIDES
+   Ensures standard Dawn product, collection, and search pages
+   are seamlessly integrated into the dark technology aesthetic.
+   ============================================================ */
+
+/* Redefine Dawn's core color schemes to be dark and brand-aligned */
+:root,
+.color-scheme-1,
+.color-scheme-2,
+.color-scheme-3,
+.color-scheme-4,
+.color-scheme-5 {
+  --color-background: 11, 11, 11 !important;
+  --gradient-background: transparent !important;
+  --color-foreground: 255, 255, 255 !important;
+  --color-button: 77, 166, 255 !important;
+  --color-button-text: 11, 11, 11 !important; /* dark text on light blue button */
+  --color-secondary-button-text: 255, 255, 255 !important;
+  --color-link: 77, 166, 255 !important;
+  --color-badge-background: 18, 18, 18 !important;
+  --color-badge-foreground: 255, 255, 255 !important;
+  --color-badge-border: 255, 255, 255 !important;
+  --color-border: 255, 255, 255, 0.12 !important;
+  --color-border-opacity: 0.12 !important;
+}
+
+/* Standard product page layouts & typography */
+.product__title,
+.price,
+.price__container,
+.price-item,
+.product__description,
+.product__description p,
+.accordion__title,
+.accordion__content,
+.product__info-container .h2,
+.product__info-container .h3,
+.product__info-container div {
+  color: #FFFFFF !important;
+}
+
+/* Variant picker buttons (pills) */
+.product-form__input input[type="radio"] + label {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-radius: var(--otodor-radius-pill) !important;
+  padding: 8px 20px !important;
+  font-family: var(--otodor-font-body) !important;
+  font-weight: 500 !important;
+  transition: all var(--otodor-dur-fast) var(--otodor-ease-out) !important;
+}
+
+.product-form__input input[type="radio"] + label:hover {
+  border-color: rgba(77, 166, 255, 0.5) !important;
+  color: #FFFFFF !important;
+  background-color: rgba(77, 166, 255, 0.05) !important;
+}
+
+.product-form__input input[type="radio"]:checked + label {
+  background: var(--otodor-gradient-blue) !important;
+  border-color: var(--otodor-blue) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--otodor-shadow-blue-sm) !important;
+}
+
+/* Primary Checkout Buttons */
+.product-form__submit,
+.shopify-payment-button__button,
+.shopify-payment-button__button--unbranded {
+  background: var(--otodor-gradient-blue) !important;
+  color: #FFFFFF !important;
+  border-radius: var(--otodor-radius-pill) !important;
+  font-family: var(--otodor-font-body) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em !important;
+  min-height: 52px !important;
+  transition: all var(--otodor-dur-fast) var(--otodor-ease-spring) !important;
+}
+
+.product-form__submit:hover,
+.shopify-payment-button__button:hover,
+.shopify-payment-button__button--unbranded:hover {
+  box-shadow: var(--otodor-shadow-blue-md) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Remove Dawn's default rectangular outline border pseudo-elements */
+.product-form__submit::after,
+.shopify-payment-button__button::after,
+.shopify-payment-button__button--unbranded::after {
+  content: none !important;
+  box-shadow: none !important;
+  display: none !important;
+  border: none !important;
+}
+
+/* Quantity Selector */
+.quantity {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--otodor-radius-pill) !important;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  overflow: hidden !important;
+}
+
+.quantity__input,
+.quantity__button {
+  color: #FFFFFF !important;
+  background-color: transparent !important;
+}
+
+.quantity__button:hover {
+  color: var(--otodor-blue) !important;
+}
+
+/* Product Info Collapsible Tabs (Accordions) */
+.product__info-container .product__accordion,
+.product__info-container details {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.product__info-container details summary {
+  padding-block: var(--otodor-space-md) !important;
+}
+
+.product__info-container details summary .icon-accordion path {
+  fill: #FFFFFF !important;
+}
+
+.product__info-container details .accordion__content {
+  color: var(--otodor-muted) !important;
+  line-height: var(--otodor-leading-loose) !important;
+}
+
+/* Header Logo Tuning */
+.header__heading-logo {
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.header__heading-link:hover .header__heading-logo {
+  transform: scale(1.03);
+}

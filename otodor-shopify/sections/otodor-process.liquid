@@ -1,0 +1,240 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Process / Timeline Section
+     Horizontal timeline on desktop, vertical stack on mobile.
+  ───────────────────────────────────────────────────────── */
+
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    background-color: transparent;
+  }
+
+  .otodor-process {
+    padding-block: var(--otodor-section-py);
+  }
+
+  .otodor-process__header {
+    margin-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .otodor-process__timeline {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--otodor-space-xl);
+  }
+
+  /* Connecting timeline line (desktop only) */
+  .otodor-process__timeline::before {
+    content: '';
+    position: absolute;
+    top: 32px; /* Center of the badge */
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(77, 166, 255, 0.40) 20%,
+      rgba(77, 166, 255, 0.40) 80%,
+      transparent 100%
+    );
+    z-index: 1;
+  }
+
+  .otodor-process__step {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--otodor-space-md);
+  }
+
+  /* Number Badge */
+  .otodor-process__number {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--otodor-glass-mid);
+    border: 1px solid var(--otodor-glass-border-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-lg);
+    font-weight: 700;
+    color: var(--otodor-blue);
+    box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-sm);
+    transition:
+      border-color var(--otodor-dur-base) var(--otodor-ease-out),
+      box-shadow var(--otodor-dur-base) var(--otodor-ease-out),
+      transform var(--otodor-dur-base) var(--otodor-ease-spring);
+  }
+
+  .otodor-process__step:hover .otodor-process__number {
+    border-color: var(--otodor-blue);
+    box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-blue-sm);
+    transform: scale(1.08);
+  }
+
+  .otodor-process__title {
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-lg);
+    font-weight: 700;
+    line-height: var(--otodor-leading-tight);
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-white);
+    margin: 0;
+  }
+
+  .otodor-process__desc {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-sm);
+    line-height: var(--otodor-leading-base);
+    color: var(--otodor-muted);
+    margin: 0;
+    max-width: 28ch;
+  }
+
+  /* ─ Responsive overrides ────────────────────────────────── */
+  @media (max-width: 768px) {
+    .otodor-process__timeline {
+      flex-direction: column;
+      gap: var(--otodor-space-xl);
+      align-items: center;
+    }
+
+    .otodor-process__timeline::before {
+      display: none; /* Hide horizontal line */
+    }
+
+    .otodor-process__step {
+      flex-direction: row;
+      text-align: left;
+      align-items: flex-start;
+      max-width: 450px;
+      width: 100%;
+      gap: var(--otodor-space-lg);
+    }
+
+    .otodor-process__number {
+      flex-shrink: 0;
+    }
+
+    .otodor-process__info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--otodor-space-xs);
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-process-{{ section.id }}"
+  class="otodor-process"
+  data-otodor-section="process"
+  aria-labelledby="otodor-process-title-{{ section.id }}"
+>
+  <div class="otodor-container">
+    <div class="otodor-process__header otodor-section-header otodor-section-header--center">
+      <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+      <h2 class="otodor-heading-2" id="otodor-process-title-{{ section.id }}" data-otodor-reveal="fade-up">
+        {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
+      </h2>
+    </div>
+
+    <div class="otodor-process__timeline" data-otodor-stagger>
+      {%- for block in section.blocks -%}
+        <div class="otodor-process__step" {{ block.shopify_attributes }}>
+          <div class="otodor-process__number">
+            {{ forloop.index }}
+          </div>
+          <div class="otodor-process__info">
+            <h3 class="otodor-process__title">{{ block.settings.title | escape }}</h3>
+            <p class="otodor-process__desc">{{ block.settings.description | escape }}</p>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "OTODOR Process Timeline",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Installation"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading text",
+      "default": "Three steps to complete "
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading accented text",
+      "default": "security."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Process Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Step Title",
+          "default": "Choose Lock"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Step Description",
+          "default": "Select the flagship smart lock matching your door and home aesthetics."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Process Timeline",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "title": "Choose Product",
+            "description": "Select the flagship lock matching your home aesthetics."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Schedule Installation",
+            "description": "Select a convenient date and our certified experts will handle the fitment."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Secure Your Property",
+            "description": "Register fingerprints on the app and enjoy premium keyless smart access."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

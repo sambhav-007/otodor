@@ -1,0 +1,190 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Trust Bar Section
+     Premium technological trust strip using glassmorphism cards.
+  ───────────────────────────────────────────────────────── */
+
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 5;
+    background-color: transparent;
+  }
+
+  .otodor-trust-bar {
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .otodor-trust-bar__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--otodor-space-lg);
+  }
+
+  .otodor-trust-bar__card {
+    padding: var(--otodor-space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--otodor-space-md);
+    min-height: 180px;
+    height: 100%;
+  }
+
+  .otodor-trust-bar__icon-title {
+    display: flex;
+    align-items: center;
+    gap: var(--otodor-space-md);
+  }
+
+  .otodor-trust-bar__icon {
+    color: var(--otodor-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .otodor-trust-bar__title {
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-md);
+    font-weight: 700;
+    line-height: var(--otodor-leading-tight);
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-white);
+    margin: 0;
+  }
+
+  .otodor-trust-bar__desc {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-sm);
+    line-height: var(--otodor-leading-base);
+    color: var(--otodor-muted);
+    margin: 0;
+  }
+
+  /* ─ Mobile responsiveness ───────────────────────────────── */
+  @media (max-width: 1024px) {
+    .otodor-trust-bar__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .otodor-trust-bar__grid {
+      grid-template-columns: 1fr;
+      gap: var(--otodor-space-md);
+    }
+    .otodor-trust-bar__card {
+      min-height: auto;
+      padding: var(--otodor-space-md) var(--otodor-space-lg);
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-trust-bar-{{ section.id }}"
+  class="otodor-trust-bar otodor-border-top-blue"
+  data-otodor-section="trust-bar"
+  aria-label="Trust indicators"
+>
+  <div class="otodor-container">
+    <div class="otodor-trust-bar__grid" data-otodor-stagger>
+      {%- for block in section.blocks -%}
+        <div
+          class="otodor-trust-bar__card otodor-glass-card"
+          {{ block.shopify_attributes }}
+        >
+          <div class="otodor-trust-bar__icon-title">
+            <div class="otodor-icon-wrap otodor-trust-bar__icon">
+              {% render 'otodor-icon', name: block.settings.icon %}
+            </div>
+            <h3 class="otodor-trust-bar__title">{{ block.settings.title | escape }}</h3>
+          </div>
+          <p class="otodor-trust-bar__desc">{{ block.settings.description | escape }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "OTODOR Trust Bar",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 4,
+  "settings": [],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Trust Pillar",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "wrench",
+          "options": [
+            { "value": "wrench", "label": "Wrench / Installation" },
+            { "value": "shield", "label": "Shield / Warranty" },
+            { "value": "mobile", "label": "Mobile App" },
+            { "value": "key", "label": "Key / Access" },
+            { "value": "fingerprint", "label": "Fingerprint" },
+            { "value": "wifi", "label": "WiFi / Remote" },
+            { "value": "clock", "label": "Clock / Logs" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Free Installation"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Free professional home installation across India."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Trust Bar",
+      "blocks": [
+        {
+          "type": "pillar",
+          "settings": {
+            "icon": "wrench",
+            "title": "Free Installation",
+            "description": "Free professional home installation across India."
+          }
+        },
+        {
+          "type": "pillar",
+          "settings": {
+            "icon": "shield",
+            "title": "1-Year Warranty",
+            "description": "Complete peace of mind with a 1-year brand warranty."
+          }
+        },
+        {
+          "type": "pillar",
+          "settings": {
+            "icon": "mobile",
+            "title": "App Connectivity",
+            "description": "Control access, view activity logs, and manage keys via app."
+          }
+        },
+        {
+          "type": "pillar",
+          "settings": {
+            "icon": "key",
+            "title": "Smart Access",
+            "description": "Unlock via fingerprint, PIN, RFID card, physical key, or mobile app."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

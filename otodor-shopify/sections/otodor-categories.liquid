@@ -1,0 +1,636 @@
+{%- style -%}
+  #otodor-categories-{{ section.id }} {
+    padding-top: 120px;
+    padding-bottom: 120px;
+    background-color: #000000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Override standard container to max-width 1400px for this section */
+  #otodor-categories-{{ section.id }} .otodor-container {
+    max-width: 1400px;
+    width: calc(100% - 48px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .otodor-categories__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+    gap: var(--otodor-space-md);
+  }
+
+  .otodor-categories__grid-wrapper {
+    width: 100%;
+  }
+
+  /* Grid Layout (Desktop >= 1025px) */
+  .otodor-categories__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    width: 100%;
+  }
+
+  /* Desktop Grid Position Mapping */
+  @media (min-width: 1025px) {
+    .otodor-category-card:nth-child(1) {
+      grid-column: 1 / 3;
+      grid-row: 1 / 3;
+    }
+    .otodor-category-card:nth-child(2) {
+      grid-column: 3;
+      grid-row: 1;
+    }
+    .otodor-category-card:nth-child(3) {
+      grid-column: 4;
+      grid-row: 1;
+    }
+    .otodor-category-card:nth-child(4) {
+      grid-column: 3;
+      grid-row: 2;
+    }
+    .otodor-category-card:nth-child(5) {
+      grid-column: 4;
+      grid-row: 2;
+    }
+
+    .otodor-category-card {
+      aspect-ratio: 3 / 4;
+    }
+
+    .otodor-category-card:nth-child(1) {
+      aspect-ratio: auto; /* Fills the 2x2 grid area */
+    }
+  }
+
+  /* Card Base Styles */
+  .otodor-category-card {
+    position: relative;
+    border-radius: 28px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition:
+      transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Hover State */
+  .otodor-category-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(30, 144, 255, 0.4);
+    box-shadow:
+      0 0 30px rgba(30, 144, 255, 0.25),
+      0 20px 40px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Full-bleed background image */
+  .otodor-category-card__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .otodor-category-card__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .otodor-category-card:hover .otodor-category-card__bg img {
+    transform: scale(1.08);
+  }
+
+  /* Dark luxury overlay gradient */
+  .otodor-category-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.85),
+      rgba(0, 0, 0, 0.25)
+    );
+    pointer-events: none;
+  }
+
+  /* Blue ambient hover glow */
+  .otodor-category-card__glow {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: radial-gradient(ellipse at 50% 100%, rgba(30, 144, 255, 0.15) 0%, transparent 65%);
+    opacity: 0;
+    transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  .otodor-category-card:hover .otodor-category-card__glow {
+    opacity: 1;
+  }
+
+  /* Subtle technical grid mesh overlay */
+  .otodor-category-card__mesh {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse at center bottom, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center bottom, black 30%, transparent 75%);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  /* Content Overlay (bottom-left aligned) */
+  .otodor-category-card__content {
+    position: relative;
+    z-index: 5;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 12px;
+    pointer-events: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .otodor-category-card__meta-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  /* Number styling (small blue accent) */
+  .otodor-category-card__index {
+    font-family: var(--otodor-font-display);
+    font-size: 11px;
+    font-weight: 700;
+    color: #1E90FF;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  /* Badge styling */
+  .otodor-category-badge {
+    font-family: var(--otodor-font-body);
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 3px 9px;
+    border-radius: var(--otodor-radius-pill);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .otodor-category-badge--blue {
+    background: rgba(30, 144, 255, 0.1);
+    color: #1E90FF;
+    border-color: rgba(30, 144, 255, 0.25);
+  }
+
+  .otodor-category-badge--glass {
+    background: rgba(255, 255, 255, 0.06);
+    color: #FFFFFF;
+  }
+
+  .otodor-category-badge--green {
+    background: rgba(0, 210, 106, 0.1);
+    color: #00D26A;
+    border-color: rgba(0, 210, 106, 0.25);
+  }
+
+  /* Category title (large bold white) */
+  .otodor-category-card__title {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.4rem, 2vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: #FFFFFF;
+    margin: 0;
+  }
+
+  /* Hero card title is even larger */
+  .otodor-category-card:nth-child(1) .otodor-category-card__title {
+    font-size: clamp(2rem, 3.2vw, 2.6rem);
+  }
+
+  /* Description/Tagline (muted gray) */
+  .otodor-category-card__tagline {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-sm);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    max-width: 36ch;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* CTA (blue uppercase with arrow sliding right on hover) */
+  .otodor-category-card__link {
+    font-family: var(--otodor-font-body);
+    font-size: 11px;
+    font-weight: 700;
+    color: #1E90FF;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 8px;
+    transition: color 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .otodor-category-card__arrow {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .otodor-category-card__arrow svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .otodor-category-card:hover .otodor-category-card__arrow {
+    transform: translateX(6px);
+  }
+
+  /* Tablet Layout (2 columns, all cards remain portrait 3/4) */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    #otodor-categories-{{ section.id }} {
+      padding-top: 80px;
+      padding-bottom: 80px;
+    }
+
+    #otodor-categories-{{ section.id }} .otodor-container {
+      width: calc(100% - 40px);
+    }
+
+    .otodor-categories__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .otodor-category-card {
+      aspect-ratio: 3 / 4;
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+
+    /* Hero spans 2 columns on tablet */
+    .otodor-category-card:nth-child(1) {
+      grid-column: span 2;
+    }
+  }
+
+  /* Mobile Layout (1 column, all cards remain portrait 3/4) */
+  @media (max-width: 767px) {
+    #otodor-categories-{{ section.id }} {
+      padding-top: 60px;
+      padding-bottom: 60px;
+    }
+
+    #otodor-categories-{{ section.id }} .otodor-container {
+      width: calc(100% - 32px);
+    }
+
+    .otodor-categories__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 2.5rem;
+    }
+
+    .otodor-categories__grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .otodor-category-card {
+      aspect-ratio: 3 / 4;
+      grid-column: span 1 !important;
+      grid-row: span 1 !important;
+    }
+
+    .otodor-category-card__content {
+      padding: 1.5rem;
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-categories-{{ section.id }}"
+  class="otodor-categories"
+  data-otodor-section="categories"
+  aria-labelledby="otodor-categories-title-{{ section.id }}"
+>
+  <div class="otodor-container">
+    <div class="otodor-categories__header">
+      <div class="otodor-section-header">
+        <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+        <h2 class="otodor-heading-2" id="otodor-categories-title-{{ section.id }}" data-otodor-reveal="fade-up">
+          {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="otodor-categories__grid-wrapper">
+      <div class="otodor-categories__grid" data-otodor-stagger="true">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign collection = block.settings.collection
+            assign card_title = block.settings.custom_title | default: collection.title | default: 'Category'
+
+            # Priority 1: explicit custom URL override
+            assign card_url = block.settings.custom_url | default: ''
+
+            # Priority 2: live collection URL from Shopify (only if actually set)
+            if card_url == blank and collection != blank and collection.url != blank
+              assign card_url = collection.url
+            endif
+
+            # Priority 3: auto-build /collections/<handle> from the collection handle string
+            if card_url == blank and block.settings.collection != blank
+              assign card_url = '/collections/' | append: block.settings.collection
+            endif
+
+            # Priority 4: generate handle from custom_title as last resort
+            if card_url == blank and block.settings.custom_title != blank
+              assign collection_handle = block.settings.custom_title | downcase | replace: ' ', '-'
+              assign card_url = '/collections/' | append: collection_handle
+            endif
+
+            if card_url == blank
+              assign card_url = '#'
+            endif
+
+            # Safe escaped ALT text for image tags
+            assign bg_alt = block.settings.image.alt | default: card_title | escape
+            assign card_alt = card_title | escape
+          -%}
+
+          <a
+            href="{{ card_url }}"
+            class="otodor-category-card"
+            data-block-id="{{ block.id }}"
+            data-grid-size="{{ block.settings.grid_size }}"
+            aria-label="Shop {{ card_title | escape }}"
+            {{ block.shopify_attributes }}
+          >
+
+            {%- comment -%} Full-bleed background: product_image_1 first, then background image, then dark gradient {%- endcomment -%}
+            <div class="otodor-category-card__bg" aria-hidden="true">
+              {%- if block.settings.product_image_1 != blank -%}
+                {{
+                  block.settings.product_image_1
+                  | image_url: width: 1200
+                  | image_tag:
+                    loading: 'lazy',
+                    alt: card_alt
+                }}
+              {%- elsif block.settings.image != blank -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 1200
+                  | image_tag:
+                    loading: 'lazy',
+                    alt: bg_alt
+                }}
+              {%- else -%}
+                {%- comment -%} Dark gradient placeholder when no image is set {%- endcomment -%}
+                <div style="width:100%;height:100%;background:radial-gradient(ellipse at 60% 20%, rgba(77,166,255,0.12) 0%, transparent 55%), #0D0D0D;"></div>
+              {%- endif -%}
+            </div>
+
+            <div class="otodor-category-card__overlay" aria-hidden="true"></div>
+            <div class="otodor-category-card__glow" aria-hidden="true"></div>
+            <div class="otodor-category-card__mesh" aria-hidden="true"></div>
+
+            {%- comment -%} Bottom-anchored Netflix-style content block {%- endcomment -%}
+            <div class="otodor-category-card__content">
+              <div class="otodor-category-card__meta-top">
+                <span class="otodor-category-card__index">0{{ forloop.index }}</span>
+                {%- if block.settings.badge_text != blank -%}
+                  <span class="otodor-category-badge otodor-category-badge--{{ block.settings.badge_color }}">
+                    {{- block.settings.badge_text | escape -}}
+                  </span>
+                {%- endif -%}
+              </div>
+
+              <h3 class="otodor-category-card__title">{{ card_title | escape }}</h3>
+
+              {%- if block.settings.tagline != blank -%}
+                <p class="otodor-category-card__tagline">{{ block.settings.tagline | escape }}</p>
+              {%- endif -%}
+
+              <div class="otodor-category-card__link">
+                Explore
+                <span aria-hidden="true" class="otodor-category-card__arrow">
+                  {% render 'otodor-icon', name: 'arrow-right' %}
+                </span>
+              </div>
+            </div>
+          </a>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "OTODOR Shop by Category",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 10,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Browse Collection"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading Text",
+      "default": "Shop by "
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading Accent Text",
+      "default": "category."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category_card",
+      "name": "Category Card",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "Category Name Override",
+          "info": "Leave blank to use default Collection title."
+        },
+        {
+          "type": "url",
+          "id": "custom_url",
+          "label": "Custom Link URL",
+          "info": "Override the destination URL. Use for product pages, e.g. /products/cloud. Leave blank to auto-link the collection."
+        },
+        {
+          "type": "text",
+          "id": "tagline",
+          "label": "Category Tagline",
+          "default": "Explore our premium range."
+        },
+        {
+          "type": "select",
+          "id": "grid_size",
+          "label": "Grid Card Size",
+          "options": [
+            {
+              "value": "large",
+              "label": "Large (7 Columns, 2 Rows)"
+            },
+            {
+              "value": "medium",
+              "label": "Medium (6 Columns, 1 Row)"
+            },
+            {
+              "value": "small",
+              "label": "Small (5 Columns, 1 Row)"
+            }
+          ],
+          "default": "small"
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge Text",
+          "info": "e.g. 'New', 'Best Seller'"
+        },
+        {
+          "type": "select",
+          "id": "badge_color",
+          "label": "Badge Color Scheme",
+          "options": [
+            {
+              "value": "blue",
+              "label": "Accent Blue"
+            },
+            {
+              "value": "glass",
+              "label": "Muted Glass"
+            },
+            {
+              "value": "green",
+              "label": "Highlight Green"
+            }
+          ],
+          "default": "blue"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Category Background Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "product_image_1",
+          "label": "Product Image (Primary Floating)"
+        },
+        {
+          "type": "image_picker",
+          "id": "product_image_2",
+          "label": "Product Image (Secondary Floating)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Shop by Category",
+      "blocks": [
+        {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Digital Locks",
+            "tagline": "Premium secure locks engineered for wooden frames.",
+            "grid_size": "large"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Gate Locks",
+            "tagline": "Weatherproof robust security for metal gate entrances.",
+            "grid_size": "small",
+            "badge_text": "IP66 Weatherproof"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Sliding Gate Motors",
+            "tagline": "Powerful automated motors for heavy sliding gates.",
+            "grid_size": "small",
+            "badge_text": "IP55 Rated"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Hotel Locks",
+            "tagline": "Advanced smart keycard access solutions for hospitality.",
+            "grid_size": "medium"
+          }
+        },
+        {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Accessories",
+            "tagline": "RFID keycards, smart gateways, and replacement remotes.",
+            "grid_size": "medium"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,521 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Products Section
+     Horizontal scroll on mobile, structured grid on desktop.
+     Glassmorphic hover effects, and future-proof WebGL slots.
+  ───────────────────────────────────────────────────────── */
+
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 4;
+    background-color: transparent;
+  }
+
+  .otodor-products {
+    padding-block: var(--otodor-section-py);
+  }
+
+  .otodor-products__header {
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--otodor-space-lg);
+  }
+
+  .otodor-products__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--otodor-space-xl);
+  }
+
+  .otodor-product-card {
+    position: relative;
+    border-radius: var(--otodor-radius-2xl);
+    overflow: hidden;
+    aspect-ratio: 4/5;
+    background: var(--otodor-gradient-card);
+    border: 1px solid var(--otodor-glass-border);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    transition:
+      border-color var(--otodor-dur-base) var(--otodor-ease-out),
+      box-shadow var(--otodor-dur-base) var(--otodor-ease-out),
+      transform var(--otodor-dur-base) var(--otodor-ease-spring);
+  }
+
+  /* Overlay link to make the entire card clickable */
+  .otodor-product-card__overlay-link {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    cursor: pointer;
+    display: block;
+    background-color: transparent;
+  }
+
+  /* Card image background */
+  .otodor-product-card__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .otodor-product-card__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--otodor-dur-slow) var(--otodor-ease-spring);
+  }
+
+  /* Ambient card glow */
+  .otodor-product-card__glow {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: radial-gradient(circle at 50% 100%, rgba(77, 166, 255, 0.12) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity var(--otodor-dur-base) var(--otodor-ease-out);
+  }
+
+  /* Premium technology overlay grid */
+  .otodor-product-card__mesh {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(to top, black 20%, transparent 90%);
+    -webkit-mask-image: linear-gradient(to top, black 20%, transparent 90%);
+    opacity: 0.5;
+  }
+
+  /* Card dark gradient overlay */
+  .otodor-product-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(11, 11, 11, 0.1) 40%,
+      rgba(11, 11, 11, 0.85) 80%,
+      #0B0B0B 100%
+    );
+  }
+
+  /* Card content wrapper */
+  .otodor-product-card__content {
+    position: relative;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    gap: var(--otodor-space-md);
+    transform: translateY(12px);
+    transition: transform var(--otodor-dur-base) var(--otodor-ease-spring);
+    pointer-events: none;
+  }
+
+  .otodor-product-card__header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--otodor-space-sm);
+  }
+
+  .otodor-product-card__badge-wrap {
+    flex-shrink: 0;
+  }
+
+  .otodor-product-card__title {
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-2xl);
+    font-weight: 700;
+    line-height: var(--otodor-leading-tight);
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-white);
+    margin: 0;
+  }
+
+  .otodor-product-card__tagline {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-base);
+    line-height: var(--otodor-leading-base);
+    color: var(--otodor-muted);
+    margin: 0;
+    max-width: 32ch;
+  }
+
+  .otodor-product-card__cta {
+    align-self: flex-start;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity var(--otodor-dur-base) var(--otodor-ease-out),
+      transform var(--otodor-dur-base) var(--otodor-ease-spring);
+    pointer-events: auto;
+  }
+
+  /* ─ Hover States ────────────────────────────────────────── */
+  .otodor-product-card:hover {
+    border-color: rgba(77, 166, 255, 0.25);
+    box-shadow: var(--otodor-shadow-lg), var(--otodor-shadow-blue-sm);
+    transform: translateY(-4px);
+  }
+
+  .otodor-product-card:hover .otodor-product-card__bg img {
+    transform: scale(1.05);
+  }
+
+  .otodor-product-card:hover .otodor-product-card__glow {
+    opacity: 1;
+  }
+
+  .otodor-product-card:hover .otodor-product-card__content {
+    transform: translateY(0);
+  }
+
+  .otodor-product-card:hover .otodor-product-card__cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Placeholder product card styling */
+  .otodor-product-card--placeholder .otodor-product-card__bg {
+    background: radial-gradient(circle at 50% 30%, rgba(77, 166, 255, 0.15) 0%, transparent 65%), #121212;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .otodor-product-card--placeholder .otodor-product-card__bg::before {
+    content: 'OTODOR';
+    font-family: var(--otodor-font-display);
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.03);
+    text-transform: uppercase;
+  }
+
+  /* ─ Mobile & Tablet responsiveness ──────────────────────── */
+  @media (max-width: 768px) {
+    .otodor-products__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--otodor-space-md);
+    }
+    .otodor-products__grid {
+      grid-template-columns: 1fr;
+      gap: var(--otodor-space-lg);
+    }
+  }
+
+  @media (max-width: 599px) {
+    /* Horizontal scroll on mobile */
+    .otodor-products__grid-wrapper {
+      margin-inline: -1.5rem;
+      padding-inline: 1.5rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none; /* Firefox */
+    }
+
+    .otodor-products__grid-wrapper::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+    .otodor-products__grid {
+      grid-template-columns: repeat(4, 85vw);
+      gap: var(--otodor-space-md);
+      width: max-content;
+    }
+
+    .otodor-product-card {
+      scroll-snap-align: start;
+      aspect-ratio: 3/4;
+    }
+
+    /* Content static on mobile (no hover trigger) */
+    .otodor-product-card__content {
+      transform: none;
+    }
+
+    .otodor-product-card__cta {
+      opacity: 1;
+      transform: none;
+      margin-top: var(--otodor-space-xs);
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-products-{{ section.id }}"
+  class="otodor-products"
+  data-otodor-section="products"
+  aria-labelledby="otodor-products-title-{{ section.id }}"
+>
+  <div class="otodor-container">
+    <div class="otodor-products__header">
+      <div class="otodor-section-header">
+        <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+        <h2 class="otodor-heading-2" id="otodor-products-title-{{ section.id }}" data-otodor-reveal="fade-up">
+          {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
+        </h2>
+      </div>
+      {%- if section.settings.cta_link != blank and section.settings.cta_label != blank -%}
+        <div data-otodor-reveal="fade-up">
+          <a href="{{ section.settings.cta_link }}" class="otodor-btn otodor-btn--ghost">
+            {{- section.settings.cta_label | escape -}}
+            <span class="otodor-btn__icon" aria-hidden="true">
+              {% render 'otodor-icon', name: 'arrow-right' %}
+            </span>
+          </a>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="otodor-products__grid-wrapper">
+      <div class="otodor-products__grid">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign product = block.settings.product
+            assign product_title = block.settings.custom_label | default: product.title
+            assign has_product = false
+            if product != blank
+              assign has_product = true
+            endif
+
+            # Generate dynamic fallback URL based on block label (e.g., onyx -> /products/onyx)
+            assign fallback_handle = block.settings.custom_label | downcase | replace: '+', '' | replace: ' ', '-'
+            assign fallback_url = '/products/' | append: fallback_handle
+          -%}
+
+          {%- if has_product -%}
+            <div
+              class="otodor-product-card"
+              data-product-id="{{ product.id }}"
+              data-3d-slot="product-card"
+              {{ block.shopify_attributes }}
+            >
+              <a href="{{ product.url }}" class="otodor-product-card__overlay-link" aria-label="Discover {{ product_title | escape }}"></a>
+              
+              {%- if product.featured_image != blank -%}
+                <div class="otodor-product-card__bg" aria-hidden="true">
+                  {{
+                    product.featured_image
+                    | image_url: width: 1000
+                    | image_tag:
+                      loading: 'lazy',
+                      alt: product.featured_image.alt | default: product_title,
+                      sizes: '(min-width: 600px) 50vw, 85vw',
+                      widths: '400, 600, 800, 1000'
+                  }}
+                </div>
+              {%- else -%}
+                <div class="otodor-product-card__bg" aria-hidden="true">
+                  <div style="background: radial-gradient(circle at 50% 30%, rgba(77, 166, 255, 0.1) 0%, transparent 70%), #121212; width: 100%; height: 100%;"></div>
+                </div>
+              {%- endif -%}
+              <div class="otodor-product-card__glow" aria-hidden="true"></div>
+              <div class="otodor-product-card__mesh" aria-hidden="true"></div>
+              <div class="otodor-product-card__overlay" aria-hidden="true"></div>
+
+              <div class="otodor-product-card__content">
+                <div class="otodor-product-card__header-row">
+                  <h3 class="otodor-product-card__title">{{ product_title | escape }}</h3>
+                  {%- if block.settings.badge_visible and block.settings.badge_text != blank -%}
+                    <div class="otodor-product-card__badge-wrap">
+                      {% render 'otodor-badge', text: block.settings.badge_text, type: 'blue' %}
+                    </div>
+                  {%- endif -%}
+                </div>
+                {%- if block.settings.tagline != blank -%}
+                  <p class="otodor-product-card__tagline">{{ block.settings.tagline | escape }}</p>
+                {%- endif -%}
+                <a
+                  href="{{ product.url }}"
+                  class="otodor-btn otodor-btn--primary otodor-btn--sm otodor-product-card__cta"
+                  id="otodor-product-cta-{{ product.id }}"
+                >
+                  Discover
+                  <span class="otodor-btn__icon" aria-hidden="true">
+                    {% render 'otodor-icon', name: 'chevron-right' %}
+                  </span>
+                </a>
+              </div>
+            </div>
+
+          {%- else -%}
+            {%- comment -%} Placeholder Card (Merchants see this before setting up products) {%- endcomment -%}
+            <div
+              class="otodor-product-card otodor-product-card--placeholder"
+              data-product-id="placeholder-{{ forloop.index }}"
+              data-3d-slot="product-card"
+              {{ block.shopify_attributes }}
+            >
+              <a href="{{ fallback_url }}" class="otodor-product-card__overlay-link" aria-label="Discover {{ block.settings.custom_label | default: 'OTODOR Lock' | escape }}"></a>
+              
+              <div class="otodor-product-card__bg" aria-hidden="true"></div>
+              <div class="otodor-product-card__glow" aria-hidden="true"></div>
+              <div class="otodor-product-card__mesh" aria-hidden="true"></div>
+              <div class="otodor-product-card__overlay" aria-hidden="true"></div>
+
+              <div class="otodor-product-card__content">
+                <div class="otodor-product-card__header-row">
+                  <h3 class="otodor-product-card__title">{{ block.settings.custom_label | default: 'OTODOR Lock' }}</h3>
+                  {%- if block.settings.badge_visible and block.settings.badge_text != blank -%}
+                    <div class="otodor-product-card__badge-wrap">
+                      {% render 'otodor-badge', text: block.settings.badge_text, type: 'blue' %}
+                    </div>
+                  {%- endif -%}
+                </div>
+                {%- if block.settings.tagline != blank -%}
+                  <p class="otodor-product-card__tagline">{{ block.settings.tagline | escape }}</p>
+                {%- endif -%}
+                <a
+                  href="{{ fallback_url }}"
+                  class="otodor-btn otodor-btn--primary otodor-btn--sm otodor-product-card__cta"
+                  id="otodor-product-placeholder-cta-{{ forloop.index }}"
+                >
+                  Discover
+                  <span class="otodor-btn__icon" aria-hidden="true">
+                    {% render 'otodor-icon', name: 'chevron-right' %}
+                  </span>
+                </a>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "OTODOR Flagships",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Flagship Access"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading text",
+      "default": "Designed for spaces that demand the "
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading accented text",
+      "default": "best."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Section CTA label",
+      "default": "See All Products"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Section CTA link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product_card",
+      "name": "Product Card",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        },
+        {
+          "type": "text",
+          "id": "custom_label",
+          "label": "Product name override",
+          "info": "Leave blank to use default Shopify product title."
+        },
+        {
+          "type": "text",
+          "id": "tagline",
+          "label": "Card tagline",
+          "default": "Advanced 3D fingerprint recognition technology."
+        },
+        {
+          "type": "header",
+          "content": "Status Badge"
+        },
+        {
+          "type": "checkbox",
+          "id": "badge_visible",
+          "label": "Show status badge",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge text",
+          "default": "Available Now"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Flagships",
+      "blocks": [
+        {
+          "type": "product_card",
+          "settings": {
+            "custom_label": "ONYX",
+            "tagline": "Advanced 3D fingerprint recognition technology.",
+            "badge_text": "Available Now",
+            "badge_visible": true
+          }
+        },
+        {
+          "type": "product_card",
+          "settings": {
+            "custom_label": "SENTRY",
+            "tagline": "Dual-camera facial authentication smart locking console.",
+            "badge_text": "Available Now",
+            "badge_visible": true
+          }
+        },
+        {
+          "type": "product_card",
+          "settings": {
+            "custom_label": "NEXUS",
+            "tagline": "Premium minimalist design with complete remote wifi control.",
+            "badge_text": "Coming Soon",
+            "badge_visible": true
+          }
+        },
+        {
+          "type": "product_card",
+          "settings": {
+            "custom_label": "ZION+",
+            "tagline": "Heavy-duty smart lock console for security doors.",
+            "badge_text": "New Launch",
+            "badge_visible": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

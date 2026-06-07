@@ -1,0 +1,244 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Testimonials Section
+     Glassmorphic cards with responsive snapping slider.
+  ───────────────────────────────────────────────────────── */
+
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    background-color: transparent;
+  }
+
+  .otodor-testimonials {
+    padding-block: var(--otodor-section-py);
+  }
+
+  .otodor-testimonials__header {
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .otodor-testimonials__slider-wrapper {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Firefox */
+    margin-inline: -1.5rem;
+    padding-inline: 1.5rem;
+  }
+
+  .otodor-testimonials__slider-wrapper::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .otodor-testimonials__grid {
+    display: flex;
+    gap: var(--otodor-space-lg);
+    width: max-content;
+  }
+
+  .otodor-testimonial-card {
+    scroll-snap-align: start;
+    width: clamp(280px, 45vw, 420px);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--otodor-space-md);
+    height: 100%;
+    min-height: 250px;
+    justify-content: space-between;
+  }
+
+  .otodor-testimonial-card__quote {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-base);
+    line-height: var(--otodor-leading-loose);
+    color: var(--otodor-neutral);
+    margin: 0;
+    font-style: italic;
+  }
+
+  .otodor-testimonial-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--otodor-space-xs);
+  }
+
+  .otodor-testimonial-card__stars {
+    color: var(--otodor-blue);
+    display: flex;
+    gap: 2px;
+  }
+
+  .otodor-testimonial-card__stars svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .otodor-testimonial-card__author-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .otodor-testimonial-card__name {
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-sm);
+    font-weight: 700;
+    color: var(--otodor-white);
+  }
+
+  .otodor-testimonial-card__role {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-xs);
+    color: var(--otodor-faint);
+  }
+
+  /* ─ Responsive overrides ────────────────────────────────── */
+  @media (max-width: 599px) {
+    .otodor-testimonial-card {
+      width: 80vw;
+      padding: var(--otodor-space-lg);
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-testimonials-{{ section.id }}"
+  class="otodor-testimonials"
+  data-otodor-section="testimonials"
+  aria-labelledby="otodor-testimonials-title-{{ section.id }}"
+>
+  <div class="otodor-container">
+    <div class="otodor-testimonials__header otodor-section-header otodor-section-header--center">
+      <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+      <h2 class="otodor-heading-2" id="otodor-testimonials-title-{{ section.id }}" data-otodor-reveal="fade-up">
+        {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
+      </h2>
+    </div>
+
+    <div class="otodor-testimonials__slider-wrapper" data-otodor-reveal="fade-up">
+      <div class="otodor-testimonials__grid" data-otodor-stagger>
+        {%- for block in section.blocks -%}
+          <div
+            class="otodor-testimonial-card otodor-glass-card"
+            {{ block.shopify_attributes }}
+          >
+            <p class="otodor-testimonial-card__quote">
+              "{{ block.settings.quote | escape }}"
+            </p>
+            <div class="otodor-testimonial-card__meta">
+              <div class="otodor-testimonial-card__stars" aria-label="{{ block.settings.rating }} stars out of 5">
+                {%- for i in (1..block.settings.rating) -%}
+                  {% render 'otodor-icon', name: 'star' %}
+                {%- endfor -%}
+              </div>
+              <div class="otodor-testimonial-card__author-info">
+                <span class="otodor-testimonial-card__name">{{ block.settings.author | escape }}</span>
+                {%- if block.settings.role != blank -%}
+                  <span class="otodor-testimonial-card__role">{{ block.settings.role | escape }}</span>
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "OTODOR Testimonials",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Verified Trust"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading text",
+      "default": "What architects & builders "
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading accented text",
+      "default": "say."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "The design of SENTRY integrates perfectly into our smart home projects. Extremely sleek and reliable."
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Star Rating",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author Name",
+          "default": "Vikram Sen"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Author Role / Subtitle",
+          "default": "Lead Architect, Sen & Partners"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "The sleek glass design of SENTRY integrates perfectly into our luxury villa projects without looking industrial. Feedback from our clients has been stellar.",
+            "rating": 5,
+            "author": "Rohan Sharma",
+            "role": "Architect, Studio Void"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "We've installed ONYX locks across 40 premium apartments. The fingerprint recognition is incredibly fast, and customer service has been impeccable.",
+            "rating": 5,
+            "author": "Ankit Mehra",
+            "role": "Project Director, Apex Group"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Keyless living has been a revelation for my family. Managing temporary guest access via the mobile app is incredibly convenient.",
+            "rating": 5,
+            "author": "Priyanjali Kapoor",
+            "role": "Homeowner, DLF Phase V"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

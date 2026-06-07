@@ -1,0 +1,208 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR CTA Banner Section
+     Closing full-width banner with gradient mesh background.
+  ───────────────────────────────────────────────────────── */
+
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    background-color: transparent;
+  }
+
+  .otodor-cta-banner {
+    padding-block: clamp(4rem, 12vw, 10rem);
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--otodor-radius-2xl);
+    border: 1px solid var(--otodor-glass-border);
+    margin-vertical: var(--otodor-space-xl);
+    background: var(--otodor-gradient-cta);
+  }
+
+  /* Extra horizontal margins on desktop */
+  @media (min-width: 769px) {
+    .otodor-cta-banner {
+      margin-inline: var(--otodor-space-lg);
+    }
+  }
+
+  .otodor-cta-banner__glow {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, rgba(77, 166, 255, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .otodor-cta-banner__mesh {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .otodor-cta-banner__inner {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--otodor-space-lg);
+    max-width: 650px;
+    margin-inline: auto;
+    padding-inline: var(--otodor-space-lg);
+  }
+
+  .otodor-cta-banner__title {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    font-weight: 700;
+    line-height: var(--otodor-leading-tight);
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-white);
+    margin: 0;
+  }
+
+  .otodor-cta-banner__desc {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-lg);
+    line-height: var(--otodor-leading-base);
+    color: var(--otodor-muted);
+    margin: 0;
+    margin-bottom: var(--otodor-space-xs);
+  }
+
+  /* ─ Responsive overrides ────────────────────────────────── */
+  @media (max-width: 768px) {
+    .otodor-cta-banner {
+      border-radius: 0;
+      border-inline: none;
+      margin-vertical: var(--otodor-space-lg);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .otodor-cta-banner__inner {
+      gap: var(--otodor-space-md);
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-cta-banner-{{ section.id }}"
+  class="otodor-cta-banner otodor-noise"
+  data-otodor-section="cta-banner"
+  aria-labelledby="otodor-cta-title-{{ section.id }}"
+>
+  <div class="otodor-cta-banner__glow" aria-hidden="true"></div>
+  <div class="otodor-cta-banner__mesh" aria-hidden="true"></div>
+
+  <div class="otodor-cta-banner__inner" data-otodor-reveal="fade-up">
+    <h2 class="otodor-cta-banner__title" id="otodor-cta-title-{{ section.id }}">
+      {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
+    </h2>
+    
+    {%- if section.settings.description != blank -%}
+      <p class="otodor-cta-banner__desc">{{ section.settings.description | escape }}</p>
+    {%- endif -%}
+
+    <div class="otodor-btn-group otodor-justify-center">
+      {%- if section.settings.cta_primary_label != blank and section.settings.cta_primary_link != blank -%}
+        <a href="{{ section.settings.cta_primary_link }}" class="otodor-btn otodor-btn--primary otodor-btn--lg">
+          {{- section.settings.cta_primary_label | escape -}}
+          <span class="otodor-btn__icon" aria-hidden="true">
+            {% render 'otodor-icon', name: 'arrow-right' %}
+          </span>
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.cta_secondary_label != blank and section.settings.cta_secondary_link != blank -%}
+        <a href="{{ section.settings.cta_secondary_link }}" class="otodor-btn otodor-btn--ghost otodor-btn--lg">
+          {{- section.settings.cta_secondary_label | escape -}}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "OTODOR CTA Banner",
+  "tag": "section",
+  "class": "shopify-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading text",
+      "default": "Protect what matters "
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading accented text",
+      "default": "most."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Premium smart security, designed for modern Indian homes. Schedule your priority home survey and custom installation assessment today."
+    },
+    {
+      "type": "header",
+      "content": "Primary Call-to-action"
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_label",
+      "label": "Primary button label",
+      "default": "Shop Smart Locks"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "header",
+      "content": "Secondary Call-to-action"
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_label",
+      "label": "Secondary button label",
+      "default": "Contact Support"
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_link",
+      "label": "Secondary button link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR CTA Banner",
+      "settings": {
+        "heading": "Protect what matters ",
+        "heading_accent": "most.",
+        "cta_primary_label": "Shop Smart Locks",
+        "cta_secondary_label": "Contact Support"
+      }
+    }
+  ]
+}
+{% endschema %}

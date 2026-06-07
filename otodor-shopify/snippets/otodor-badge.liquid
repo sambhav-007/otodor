@@ -1,0 +1,13 @@
+{%- comment -%}
+  OTODOR — Reusable status badge / pill
+  Rendered as: {% render 'otodor-badge', text: 'Badge text', type: 'blue' %}
+{%- endcomment -%}
+
+{%- liquid
+  assign badge_type = type | default: 'default'
+-%}
+
+<div class="otodor-badge{% if badge_type == 'blue' %} otodor-badge--blue{% endif %}" role="status" aria-label="{{ text | escape }}">
+  <span class="otodor-badge__dot" aria-hidden="true"></span>
+  <span>{{- text | escape -}}</span>
+</div>

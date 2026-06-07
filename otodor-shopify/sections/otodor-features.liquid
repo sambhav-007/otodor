@@ -1,0 +1,239 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Features Section
+     A responsive grid of technology features with icon glows.
+  ───────────────────────────────────────────────────────── */
+
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    background-color: transparent;
+  }
+
+  .otodor-features {
+    padding-block: var(--otodor-section-py);
+  }
+
+  .otodor-features__header {
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .otodor-features__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--otodor-space-lg);
+  }
+
+  .otodor-feature-tile {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--otodor-space-md);
+    height: 100%;
+    min-height: 220px;
+    align-items: flex-start;
+  }
+
+  .otodor-feature-tile__icon {
+    color: var(--otodor-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .otodor-feature-tile__title {
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-lg);
+    font-weight: 700;
+    line-height: var(--otodor-leading-tight);
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-white);
+    margin: 0;
+    margin-top: var(--otodor-space-2xs);
+  }
+
+  .otodor-feature-tile__desc {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-sm);
+    line-height: var(--otodor-leading-base);
+    color: var(--otodor-muted);
+    margin: 0;
+  }
+
+  /* ─ Mobile & Tablet responsiveness ──────────────────────── */
+  @media (max-width: 1024px) {
+    .otodor-features__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 599px) {
+    .otodor-features__grid {
+      grid-template-columns: 1fr;
+      gap: var(--otodor-space-md);
+    }
+    .otodor-feature-tile {
+      min-height: auto;
+      padding: var(--otodor-space-lg);
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-features-{{ section.id }}"
+  class="otodor-features"
+  data-otodor-section="features"
+  aria-labelledby="otodor-features-title-{{ section.id }}"
+>
+  <div class="otodor-container">
+    <div class="otodor-features__header otodor-section-header otodor-section-header--center">
+      <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+      <h2 class="otodor-heading-2" id="otodor-features-title-{{ section.id }}" data-otodor-reveal="fade-up">
+        {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
+      </h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="otodor-body-lg" data-otodor-reveal="fade-up">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="otodor-features__grid" data-otodor-stagger>
+      {%- for block in section.blocks -%}
+        <div
+          class="otodor-feature-tile otodor-glass-card otodor-glass-card--raised"
+          {{ block.shopify_attributes }}
+        >
+          <div class="otodor-icon-wrap otodor-feature-tile__icon">
+            {% render 'otodor-icon', name: block.settings.icon %}
+          </div>
+          <h3 class="otodor-feature-tile__title">{{ block.settings.title | escape }}</h3>
+          <p class="otodor-feature-tile__desc">{{ block.settings.description | escape }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "OTODOR Key Features",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 9,
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "Core Technology"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading text",
+      "default": "Smart security for modern "
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading accented text",
+      "default": "homes."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Every access point engineered with next-generation recognition and military-grade encryption."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature Point",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "fingerprint",
+          "options": [
+            { "value": "fingerprint", "label": "Fingerprint Scanner" },
+            { "value": "mobile", "label": "Mobile App Control" },
+            { "value": "wifi", "label": "WiFi / Remote" },
+            { "value": "tag", "label": "RFID Tag Access" },
+            { "value": "keypad", "label": "PIN Keypad" },
+            { "value": "clock", "label": "Activity Logs / Clock" },
+            { "value": "shield", "label": "Shield / Security" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Feature Title",
+          "default": "Fingerprint Access"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Feature Description",
+          "default": "Unlock instantly with a single touch using advanced 3D biometric recognition."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Key Features",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "fingerprint",
+            "title": "Fingerprint Access",
+            "description": "Unlock instantly with a single touch using advanced 3D biometric recognition."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "mobile",
+            "title": "Mobile App Control",
+            "description": "Control lock status, manage temporary passcodes, and monitor entry from anywhere."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "wifi",
+            "title": "Remote Unlock",
+            "description": "Grant access remotely in real-time when guests or delivery personnel arrive."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "tag",
+            "title": "RFID Access",
+            "description": "Tap key cards or smart tags to enter instantly. Fast, secure, and effortless."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "keypad",
+            "title": "PIN Access",
+            "description": "Create custom access codes. Features anti-peep technology to protect your password."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "clock",
+            "title": "Audit Logs",
+            "description": "Access full, real-time logs of exactly who entered your home and when."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

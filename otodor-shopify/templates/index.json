@@ -1,0 +1,383 @@
+{
+  "sections": {
+    "otodor_hero": {
+      "type": "otodor-hero",
+      "settings": {
+        "heading": "Security Reimagined",
+        "heading_suffix": ".",
+        "subheading": "Smart Security Solutions Built For Modern Living.",
+        "show_badge": true,
+        "badge_text": "Now Available — Smart Locks & Gate Motors",
+        "cta_primary_label": "Explore Products",
+        "cta_primary_link": "",
+        "cta_secondary_label": "View Collections",
+        "cta_secondary_link": "",
+        "background_image": "",
+        "overlay_opacity": 65,
+        "show_scroll_indicator": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "otodor_trust_bar": {
+      "type": "otodor-trust-bar",
+      "blocks": {
+        "pillar_1": {
+          "type": "pillar",
+          "settings": {
+            "icon": "wrench",
+            "title": "Free Installation",
+            "description": "Free professional home installation across India."
+          }
+        },
+        "pillar_2": {
+          "type": "pillar",
+          "settings": {
+            "icon": "shield",
+            "title": "1-Year Warranty",
+            "description": "Complete peace of mind with a 1-year brand warranty."
+          }
+        },
+        "pillar_3": {
+          "type": "pillar",
+          "settings": {
+            "icon": "mobile",
+            "title": "App Connectivity",
+            "description": "Control access, view activity logs, and manage keys via app."
+          }
+        },
+        "pillar_4": {
+          "type": "pillar",
+          "settings": {
+            "icon": "key",
+            "title": "Smart Access",
+            "description": "Unlock via fingerprint, PIN, RFID card, physical key, or mobile app."
+          }
+        }
+      },
+      "block_order": [
+        "pillar_1",
+        "pillar_2",
+        "pillar_3",
+        "pillar_4"
+      ],
+      "settings": {}
+    },
+    "otodor_categories": {
+      "type": "otodor-categories",
+      "blocks": {
+        "cat_1": {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Digital Locks",
+            "tagline": "Premium secure locks engineered for wooden frames.",
+            "grid_size": "large",
+            "collection": "digital-locks",
+            "product_image_1": "shopify://shop_images/onyx_back_45.png"
+          }
+        },
+        "cat_2": {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Gate Locks",
+            "tagline": "Weatherproof robust security for metal gate entrances.",
+            "grid_size": "small",
+            "collection": "gate-locks"
+          }
+        },
+        "cat_3": {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Sliding Gate Motors",
+            "tagline": "Powerful automated motors for heavy sliding gates.",
+            "grid_size": "small",
+            "collection": "sliding-gate-motors",
+            "product_image_1": "shopify://shop_images/Sliding_gate_motor_45.png"
+          }
+        },
+        "cat_4": {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Hotel Locks",
+            "tagline": "Advanced smart keycard access solutions for hospitality.",
+            "grid_size": "medium",
+            "collection": "hotel-locks",
+            "custom_url": "/products/cloud",
+            "product_image_1": "shopify://shop_images/cloud_front.png"
+          }
+        },
+        "cat_5": {
+          "type": "category_card",
+          "settings": {
+            "custom_title": "Accessories",
+            "tagline": "RFID keycards, smart gateways, and replacement remotes.",
+            "grid_size": "medium",
+            "collection": "accessories",
+            "product_image_1": "shopify://shop_images/armour_front_2.png"
+          }
+        }
+      },
+      "block_order": [
+        "cat_1",
+        "cat_2",
+        "cat_3",
+        "cat_4",
+        "cat_5"
+      ],
+      "settings": {
+        "eyebrow": "Browse Collections",
+        "heading": "Shop by ",
+        "heading_accent": "category."
+      }
+    },
+    "otodor_features": {
+      "type": "otodor-features",
+      "blocks": {
+        "feat_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "fingerprint",
+            "title": "Fingerprint Access",
+            "description": "Unlock instantly with a single touch using advanced 3D biometric recognition."
+          }
+        },
+        "feat_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "mobile",
+            "title": "Mobile App Control",
+            "description": "Control lock status, manage temporary passcodes, and monitor entry from anywhere."
+          }
+        },
+        "feat_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "wifi",
+            "title": "Remote Unlock",
+            "description": "Grant access remotely in real-time when guests or delivery personnel arrive."
+          }
+        },
+        "feat_4": {
+          "type": "feature",
+          "settings": {
+            "icon": "tag",
+            "title": "RFID Access",
+            "description": "Tap key cards or smart tags to enter instantly. Fast, secure, and effortless."
+          }
+        },
+        "feat_5": {
+          "type": "feature",
+          "settings": {
+            "icon": "keypad",
+            "title": "PIN Access",
+            "description": "Create custom access codes. Features anti-peep technology to protect your password."
+          }
+        },
+        "feat_6": {
+          "type": "feature",
+          "settings": {
+            "icon": "clock",
+            "title": "Audit Logs",
+            "description": "Access full, real-time logs of exactly who entered your home and when."
+          }
+        }
+      },
+      "block_order": [
+        "feat_1",
+        "feat_2",
+        "feat_3",
+        "feat_4",
+        "feat_5",
+        "feat_6"
+      ],
+      "settings": {
+        "eyebrow": "Core Technology",
+        "heading": "Smart security for modern ",
+        "heading_accent": "homes.",
+        "subheading": "Every access point engineered with next-generation recognition and military-grade encryption."
+      }
+    },
+    "otodor_smart_living": {
+      "type": "otodor-smart-living",
+      "settings": {
+        "eyebrow": "Modern Lifestyle",
+        "heading": "Refined living, automated ",
+        "heading_accent": "security.",
+        "quote_text": "Designed for spaces that demand the absolute best.",
+        "description": "Every access point is a perfect statement of architectural harmony and convenience. OTODOR systems integrate seamlessly into premium homes, providing instant keyless entry and complete remote control.",
+        "cta_label": "Explore Flagships",
+        "cta_link": "",
+        "image": "shopify://shop_images/zion_B_front_45.png"
+      }
+    },
+    "otodor_comparison": {
+      "type": "otodor-comparison",
+      "blocks": {
+        "comp_1": {
+          "type": "product_column",
+          "settings": {
+            "title": "ONYX",
+            "fingerprint": true,
+            "pin_access": true,
+            "rfid_access": true,
+            "app_control": false,
+            "auto_lock": true,
+            "audit_log": false,
+            "warranty": "1 Year"
+          }
+        },
+        "comp_2": {
+          "type": "product_column",
+          "settings": {
+            "title": "SENTRY",
+            "fingerprint": true,
+            "pin_access": true,
+            "rfid_access": true,
+            "app_control": true,
+            "auto_lock": true,
+            "audit_log": true,
+            "warranty": "1 Year"
+          }
+        },
+        "comp_3": {
+          "type": "product_column",
+          "settings": {
+            "title": "NEXUS",
+            "fingerprint": true,
+            "pin_access": true,
+            "rfid_access": true,
+            "app_control": true,
+            "auto_lock": true,
+            "audit_log": true,
+            "warranty": "2 Years"
+          }
+        },
+        "comp_4": {
+          "type": "product_column",
+          "settings": {
+            "title": "ZION+",
+            "fingerprint": true,
+            "pin_access": true,
+            "rfid_access": true,
+            "app_control": true,
+            "auto_lock": true,
+            "audit_log": true,
+            "warranty": "3 Years"
+          }
+        }
+      },
+      "block_order": [
+        "comp_1",
+        "comp_2",
+        "comp_3",
+        "comp_4"
+      ],
+      "settings": {
+        "eyebrow": "Compare Models",
+        "heading": "Choose the right fit for your ",
+        "heading_accent": "door."
+      }
+    },
+    "otodor_process": {
+      "type": "otodor-process",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Choose Product",
+            "description": "Select the flagship lock matching your home aesthetics."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Schedule Installation",
+            "description": "Select a convenient date and our certified experts will handle the fitment."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Secure Your Property",
+            "description": "Register fingerprints on the app and enjoy premium keyless smart access."
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3"
+      ],
+      "settings": {
+        "eyebrow": "Installation",
+        "heading": "Three steps to complete ",
+        "heading_accent": "security."
+      }
+    },
+    "otodor_testimonials": {
+      "type": "otodor-testimonials",
+      "blocks": {
+        "review_1": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "The sleek glass design of SENTRY integrates perfectly into our luxury villa projects without looking industrial. Feedback from our clients has been stellar.",
+            "rating": 5,
+            "author": "Rohan Sharma",
+            "role": "Architect, Studio Void"
+          }
+        },
+        "review_2": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "We've installed ONYX locks across 40 premium apartments. The fingerprint recognition is incredibly fast, and customer service has been impeccable.",
+            "rating": 5,
+            "author": "Ankit Mehra",
+            "role": "Project Director, Apex Group"
+          }
+        },
+        "review_3": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Keyless living has been a revelation for my family. Managing temporary guest access via the mobile app is incredibly convenient.",
+            "rating": 5,
+            "author": "Priyanjali Kapoor",
+            "role": "Homeowner, DLF Phase V"
+          }
+        }
+      },
+      "block_order": [
+        "review_1",
+        "review_2",
+        "review_3"
+      ],
+      "settings": {
+        "eyebrow": "Verified Trust",
+        "heading": "What architects & builders ",
+        "heading_accent": "say."
+      }
+    },
+    "otodor_cta_banner": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "heading": "Protect what matters ",
+        "heading_accent": "most.",
+        "description": "Premium smart security, designed for modern Indian homes. Schedule your priority home survey and custom installation assessment today.",
+        "cta_primary_label": "Shop Smart Locks",
+        "cta_primary_link": "/collections/all",
+        "cta_secondary_label": "Contact Support",
+        "cta_secondary_link": "/pages/contact"
+      }
+    }
+  },
+  "order": [
+    "otodor_hero",
+    "otodor_categories",
+    "otodor_trust_bar",
+    "otodor_features",
+    "otodor_smart_living",
+    "otodor_comparison",
+    "otodor_process",
+    "otodor_testimonials",
+    "otodor_cta_banner"
+  ]
+}
