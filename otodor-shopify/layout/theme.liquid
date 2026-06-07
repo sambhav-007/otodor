@@ -23,6 +23,9 @@
       rel="stylesheet"
     >
 
+    {%- comment -%} OTODOR — BorderGlow card effect (React Bits port) {%- endcomment -%}
+    {{ 'otodor-border-glow.css' | asset_url | stylesheet_tag }}
+
     <title>
       {{ page_title }}
       {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
@@ -413,6 +416,7 @@
       defer="defer"
       crossorigin="anonymous"
     ></script>
+    <script src="{{ 'otodor-border-glow.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'otodor-animations.js' | asset_url }}" defer="defer"></script>
 
     {%- comment -%} OTODOR — Sitewide WhatsApp Floating Button {%- endcomment -%}
