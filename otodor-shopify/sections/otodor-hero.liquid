@@ -6,13 +6,13 @@
 
   #shopify-section-{{ section.id }} {
     display: block;
-    background-color: #0c0f11;
+    background-color: #0B0B0B;
     overflow: hidden;
   }
 
   /* ─ Base layout: Mobile First ──────────────────────────────── */
   .otodor-hero {
-    background-color: #0c0f11;
+    background-color: #0B0B0B;
     color: #ffffff;
     padding: 5rem 1.5rem 4rem;
     position: relative;
@@ -39,26 +39,7 @@
     overflow: hidden;
   }
 
-  .otodor-hero__glow-top {
-    position: absolute;
-    top: -20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    height: 50%;
-    background: radial-gradient(ellipse, rgba(77, 166, 255, 0.115) 0%, transparent 70%);
-  }
-
-  .otodor-hero__glow-bottom {
-    position: absolute;
-    bottom: -15%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    height: 50%;
-    background: radial-gradient(ellipse, rgba(77, 166, 255, 0.07) 0%, transparent 70%);
-  }
-
+  /* Single ambient light source behind the core — the only large glow we keep. */
   .otodor-hero__glow-core {
     position: absolute;
     top: 50%;
@@ -71,41 +52,6 @@
     pointer-events: none;
     z-index: 1;
     will-change: transform, opacity;
-  }
-
-  .otodor-hero__fog-cloud {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    filter: blur(40px);
-    pointer-events: none;
-  }
-
-  .otodor-hero__fog-cloud--back {
-    width: 150%;
-    height: 150%;
-    background: radial-gradient(ellipse at center, rgba(77, 166, 255, 0.055) 0%, transparent 65%);
-    animation: fog-drift-back 35s ease-in-out infinite alternate;
-    z-index: 1;
-  }
-
-  .otodor-hero__fog-cloud--front {
-    width: 120%;
-    height: 120%;
-    background: radial-gradient(ellipse at center, rgba(77, 166, 255, 0.028) 0%, transparent 55%);
-    animation: fog-drift-front 24s ease-in-out infinite alternate;
-    z-index: 3;
-  }
-
-  @keyframes fog-drift-back {
-    0% { transform: translate(-52%, -48%) scale(1.0); }
-    100% { transform: translate(-48%, -52%) scale(1.1); }
-  }
-
-  @keyframes fog-drift-front {
-    0% { transform: translate(-47%, -53%) scale(0.95); }
-    100% { transform: translate(-53%, -47%) scale(1.05); }
   }
 
   @keyframes product-premium-float {
@@ -160,70 +106,6 @@
     }
   }
 
-  /* Volumetric light rays */
-  .otodor-hero__light-ray {
-    position: absolute;
-    top: -50%;
-    width: 450px;
-    height: 200%;
-    background: linear-gradient(105deg, rgba(77, 166, 255, 0.065) 0%, transparent 60%);
-    transform: rotate(-15deg);
-    filter: blur(45px);
-    pointer-events: none;
-    z-index: 1;
-    will-change: transform, opacity;
-  }
-
-  .ray--1 {
-    left: 15%;
-  }
-
-  .ray--2 {
-    left: 58%;
-    width: 380px;
-    background: linear-gradient(105deg, rgba(77, 166, 255, 0.042) 0%, transparent 50%);
-    transform: rotate(-12deg);
-  }
-
-  /* ─ Floating Atmospheric Particles (20 items) ────────────────── */
-  .otodor-hero__particles {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    overflow: hidden;
-  }
-
-  .particle {
-    position: absolute;
-    background: rgba(77, 166, 255, 0.16);
-    border-radius: 50%;
-    filter: blur(0.5px);
-    will-change: transform, opacity;
-  }
-
-  /* Fallback values for CSS if JS is disabled */
-  .particle--1  { width: 4px;  height: 4px;  left: 12%; top: 80%; }
-  .particle--2  { width: 2px;  height: 2px;  left: 32%; top: 90%; }
-  .particle--3  { width: 5px;  height: 5px;  left: 52%; top: 85%; }
-  .particle--4  { width: 3px;  height: 3px;  left: 72%; top: 75%; }
-  .particle--5  { width: 4px;  height: 4px;  left: 88%; top: 60%; }
-  .particle--6  { width: 2px;  height: 2px;  left: 22%; top: 40%; }
-  .particle--7  { width: 4px;  height: 4px;  left: 42%; top: 30%; }
-  .particle--8  { width: 3px;  height: 3px;  left: 62%; top: 20%; }
-  .particle--9  { width: 5px;  height: 5px;  left: 92%; top: 15%; }
-  .particle--10 { width: 3px;  height: 3px;  left: 8%;  top: 55%; }
-  .particle--11 { width: 4px;  height: 4px;  left: 48%; top: 72%; }
-  .particle--12 { width: 2px;  height: 2px;  left: 68%; top: 48%; }
-  .particle--13 { width: 5px;  height: 5px;  left: 18%; top: 70%; }
-  .particle--14 { width: 3px;  height: 3px;  left: 38%; top: 65%; }
-  .particle--15 { width: 4px;  height: 4px;  left: 58%; top: 50%; }
-  .particle--16 { width: 2px;  height: 2px;  left: 78%; top: 35%; }
-  .particle--17 { width: 4px;  height: 4px;  left: 83%; top: 25%; }
-  .particle--18 { width: 3px;  height: 3px;  left: 28%; top: 18%; }
-  .particle--19 { width: 5px;  height: 5px;  left: 60%; top: 10%; }
-  .particle--20 { width: 2px;  height: 2px;  left: 95%; top: 5%; }
-
   /* ─ Security Core: Symmetrical Layered Obsidian Obelisk ──────── */
   .otodor-hero__core-container {
     position: relative;
@@ -251,9 +133,12 @@
 
   .pillar-face {
     position: absolute;
-    background: linear-gradient(135deg, #181818 0%, #060606 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.85);
+    background: linear-gradient(152deg, #1d1d20 0%, #101012 42%, #060607 78%, #030304 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 0 22px rgba(0, 0, 0, 0.9),
+      inset 0 -18px 30px rgba(0, 0, 0, 0.55);
   }
 
   /* Symmetrical plate layering inside front face */
@@ -278,10 +163,14 @@
   .pillar-layer-front {
     position: absolute;
     inset: 3px;
-    background: linear-gradient(135deg, #202020 0%, #0a0a0a 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(150deg, #242427 0%, #131315 50%, #0a0a0b 100%);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-top-color: rgba(255, 255, 255, 0.16);
     border-radius: 4px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 4px 15px rgba(0, 0, 0, 0.9),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -10px 22px rgba(0, 0, 0, 0.6);
     transform: translateZ(8px);
     transform-style: preserve-3d;
   }
@@ -471,7 +360,9 @@
   .face-gloss {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 50%);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 38%),
+      linear-gradient(200deg, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0.04) 100%);
     pointer-events: none;
     border-radius: 4px;
   }
@@ -529,12 +420,12 @@
   .otodor-hero__product-card {
     display: flex;
     align-items: center;
-    gap: 3rem;
+    gap: 1.25rem;
     background: rgba(18, 18, 18, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-left: 2.5px solid #4DA6FF;
     border-radius: 12px;
-    padding: 5rem;
+    padding: 1.25rem;
     text-decoration: none;
     color: inherit;
     transition: border-color 300ms ease, box-shadow 300ms ease;
@@ -548,8 +439,8 @@
   }
 
   .product-card__visual {
-    width: 340px;
-    height: 340px;
+    width: 88px;
+    height: 88px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -583,7 +474,7 @@
   }
 
   .product-card__feature {
-    font-size: 1.4rem;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -591,15 +482,15 @@
   }
 
   .product-card__title {
-    font-size: 2.5rem;
+    font-size: 1.15rem;
     font-weight: 600;
-    margin: 0;
+    margin: 0.1rem 0 0;
     color: #ffffff;
     letter-spacing: -0.01em;
   }
 
   .product-card__desc {
-    font-size: 1.5rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.45);
     margin: 0.25rem 0 0;
     line-height: 1.45;
@@ -893,10 +784,6 @@
       top: 46%;
     }
 
-    .otodor-hero.js-animated .otodor-hero__light-ray {
-      display: block;
-    }
-
     /* Curved ecosystem connections */
     .otodor-hero.js-animated .otodor-hero__connections-svg {
       display: block;
@@ -1030,10 +917,10 @@
     }
 
     .otodor-hero.js-animated .product-card__visual::before {
-      border: 1px solid rgba(77, 166, 255, 0.12);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 12px 0 26px rgba(77, 166, 255, 0.07), inset -10px 0 20px rgba(255, 255, 255, 0.035);
-      opacity: 0.62;
-      transition: opacity 700ms ease, border-color 700ms ease, box-shadow 700ms ease;
+      border: none;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      opacity: 0.5;
+      transition: opacity 700ms ease, box-shadow 700ms ease;
     }
 
     .otodor-hero.js-animated .product-card__visual::after {
@@ -1058,9 +945,8 @@
 
     .otodor-hero.js-animated .otodor-hero__product-node.is-ecosystem-active .product-card__visual::before,
     .otodor-hero.js-animated .otodor-hero__product-node.is-spotlight .product-card__visual::before {
-      opacity: 0.9;
-      border-color: rgba(77, 166, 255, 0.22);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 14px 0 28px rgba(77, 166, 255, 0.1), inset -10px 0 22px rgba(255, 255, 255, 0.05);
+      opacity: 0.85;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
     .otodor-hero.js-animated .product-card__visual svg.product-icon-svg {
@@ -1115,9 +1001,9 @@
 
     .otodor-hero.js-animated .product-node--3 .product-reveal-caption {
       top: auto;
-      bottom: calc(100% + 8px);
+      bottom: 4px;
       left: 50%;
-      transform: translate(-50%, 0);
+      transform: translate(-50%, 100%);
       text-align: center;
       align-items: center;
       width: 280px;
@@ -1125,9 +1011,9 @@
 
     .otodor-hero.js-animated .product-node--4 .product-reveal-caption {
       top: auto;
-      bottom: calc(100% + 8px);
+      bottom: 4px;
       left: 50%;
-      transform: translate(-50%, 0);
+      transform: translate(-50%, 100%);
       text-align: center;
       align-items: center;
       width: 280px;
@@ -1175,14 +1061,14 @@
     }
 
     .otodor-hero.js-animated .otodor-hero__text-container:last-of-type {
-      bottom: 7%;
+      bottom: 6%;
       top: auto;
       height: auto;
-      left: clamp(2rem, 6vw, 6rem);
+      left: 50%;
       right: auto;
-      transform: none;
-      max-width: min(36vw, 520px);
-      text-align: left;
+      transform: translateX(-50%);
+      max-width: min(62vw, 660px);
+      text-align: center;
     }
 
     .otodor-hero.js-animated .otodor-hero__text-frame {
@@ -1204,12 +1090,12 @@
 
     .otodor-hero.js-animated .frame--final {
       pointer-events: auto;
-      align-items: flex-start;
-      text-align: left;
+      align-items: center;
+      text-align: center;
     }
 
     .otodor-hero.js-animated .frame--final .otodor-hero__actions {
-      justify-content: flex-start;
+      justify-content: center;
     }
 
     .otodor-hero.js-animated .otodor-hero__heading {
@@ -1253,7 +1139,6 @@
       transform: none !important;
       width: 100% !important;
     }
-    .otodor-hero.js-animated .otodor-hero__light-ray,
     .otodor-hero.js-animated .otodor-hero__stage,
     .otodor-hero.js-animated .otodor-hero__vault-pedestal,
     .otodor-hero.js-animated .otodor-hero__connections-svg {
@@ -1287,40 +1172,9 @@
   class="otodor-hero"
   data-otodor-section="hero"
 >
-  <!-- Background ambient & depth fog layers -->
+  <!-- Background ambient — single soft light source behind the core -->
   <div class="otodor-hero__ambient">
-    <div class="otodor-hero__glow-top"></div>
-    <div class="otodor-hero__glow-bottom"></div>
     <div class="otodor-hero__glow-core"></div>
-    <div class="otodor-hero__fog-cloud otodor-hero__fog-cloud--back"></div>
-    <div class="otodor-hero__fog-cloud otodor-hero__fog-cloud--front"></div>
-    <!-- Volumetric light rays (Desktop only) -->
-    <div class="otodor-hero__light-ray ray--1" aria-hidden="true"></div>
-    <div class="otodor-hero__light-ray ray--2" aria-hidden="true"></div>
-  </div>
-
-  <!-- Floating particles (20 items - Desktop parallax atmosphere) -->
-  <div class="otodor-hero__particles" aria-hidden="true">
-    <div class="particle particle--1"></div>
-    <div class="particle particle--2"></div>
-    <div class="particle particle--3"></div>
-    <div class="particle particle--4"></div>
-    <div class="particle particle--5"></div>
-    <div class="particle particle--6"></div>
-    <div class="particle particle--7"></div>
-    <div class="particle particle--8"></div>
-    <div class="particle particle--9"></div>
-    <div class="particle particle--10"></div>
-    <div class="particle particle--11"></div>
-    <div class="particle particle--12"></div>
-    <div class="particle particle--13"></div>
-    <div class="particle particle--14"></div>
-    <div class="particle particle--15"></div>
-    <div class="particle particle--16"></div>
-    <div class="particle particle--17"></div>
-    <div class="particle particle--18"></div>
-    <div class="particle particle--19"></div>
-    <div class="particle particle--20"></div>
   </div>
 
   <div class="otodor-hero__viewport">
@@ -1370,7 +1224,7 @@
             <div class="pillar-layer-front">
               <div class="face-gloss"></div>
               <div class="pillar-logo-container">
-                <img class="pillar-logo-icon" src="{{ 'LogoIcon.png' | file_img_url: '80x80' }}" alt="OTODOR Logo" loading="lazy" width="80" height="80">
+                <img class="pillar-logo-icon" src="{{ 'LogoIcon.png' | file_img_url: '80x80' }}" alt="OTODOR Logo" loading="eager" fetchpriority="high" width="80" height="80">
               </div>
               <div class="pillar-seam pillar-seam--top"></div>
               <div class="pillar-seam pillar-seam--bottom"></div>
@@ -1419,9 +1273,9 @@
         <a href="{{ section.settings.p1_link | default: '#' }}" class="otodor-hero__product-card" id="otodor-hero-p1-card">
           <div class="product-card__visual">
             {%- if section.settings.p1_image != blank -%}
-              {{ section.settings.p1_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: section.settings.p1_title }}
+              {{ section.settings.p1_image | image_url: width: 400 | image_tag: loading: 'eager', fetchpriority: 'high', alt: section.settings.p1_title }}
             {%- else -%}
-              <img src="{{ 'zion_front_45.png' | file_img_url: '400x400' }}" loading="lazy" alt="{{ section.settings.p1_title | escape }}" class="product-visual-image" width="400" height="400">
+              <img src="{{ 'zion_front_45.png' | file_img_url: '400x400' }}" loading="eager" fetchpriority="high" alt="{{ section.settings.p1_title | escape }}" class="product-visual-image" width="400" height="400">
             {%- endif -%}
           </div>
           <div class="product-card__content">
@@ -1590,31 +1444,6 @@
     // Active animation styling flag
     section.classList.add('js-animated');
 
-    // Float particles randomly in an infinite loop (Volumetric atmosphere)
-    var particles = section.querySelectorAll('.particle');
-    particles.forEach(function (p, i) {
-      // Distribute particles randomly across viewport
-      var randomX = Math.random() * 100;
-      var randomY = Math.random() * 100;
-      gsap.set(p, {
-        left: randomX + '%',
-        top: randomY + '%',
-        scale: 0.5 + Math.random() * 1.0,
-        opacity: 0.05 + Math.random() * 0.2
-      });
-
-      // Continuous rising motion with random parameters
-      gsap.to(p, {
-        y: -400 - Math.random() * 200,
-        x: (Math.random() > 0.5 ? 40 : -40) * Math.random(),
-        opacity: 0.0,
-        duration: 12 + Math.random() * 10,
-        repeat: -1,
-        ease: 'none',
-        delay: -Math.random() * 20
-      });
-    });
-
     // Create ScrollTrigger Timeline for desktop scrubbing (scrub: 1)
     var tl = gsap.timeline({
       scrollTrigger: {
@@ -1654,8 +1483,6 @@
     var coreContainer = section.querySelector('.otodor-hero__core-container');
     var productsGrid = section.querySelector('.otodor-hero__products-grid');
 
-    var ray1 = section.querySelector('.ray--1');
-    var ray2 = section.querySelector('.ray--2');
     var connectionsSvg = section.querySelector('.otodor-hero__connections-svg');
 
     var paths = [
@@ -1666,25 +1493,29 @@
     ];
     var pulses = section.querySelectorAll('.ecosystem-pulse');
 
-    // Wide orbit — responsive footprint with a clean central exclusion zone
-    // node1/node2: upper diagonal, node3/node4: lower diagonal
-    var orbitX = Math.min(Math.max(window.innerWidth * 0.28, 360), 500);
-    var orbitY = Math.min(Math.max(window.innerHeight * 0.27, 250), 340);
+    // Wide orbit — responsive footprint with a clean central exclusion zone.
+    // The grid is centred at 46% (above the true middle), so the top row uses a
+    // SMALLER vertical magnitude than it appears to need — otherwise the top
+    // products clip off the top edge. The bottom row stays shallow to leave a
+    // clean band at the bottom for the final CTA.
+    var orbitX = Math.min(Math.max(window.innerWidth * 0.27, 340), 470);
+    var orbitYTop = Math.min(Math.max(window.innerHeight * 0.205, 175), 250);
+    var orbitYBot = Math.min(Math.max(window.innerHeight * 0.135, 120), 180);
     var finalSlots = [
-      { x: -orbitX, y: -orbitY },
-      { x: orbitX, y: -orbitY },
-      { x: -orbitX, y: orbitY * 0.42 },
-      { x: orbitX, y: orbitY * 0.42 }
+      { x: -orbitX, y: -orbitYTop },
+      { x: orbitX, y: -orbitYTop },
+      { x: -orbitX, y: orbitYBot },
+      { x: orbitX, y: orbitYBot }
     ];
     var entryVectors = [
-      { x: -170, y: -90, rotation: -10 },
-      { x: 170, y: -90, rotation: 12 },
-      { x: -170, y: 120, rotation: -12 },
-      { x: 170, y: 120, rotation: 8 }
+      { x: -150, y: -80, rotation: -10 },
+      { x: 150, y: -80, rotation: 12 },
+      { x: -150, y: 110, rotation: -12 },
+      { x: 150, y: 110, rotation: 8 }
     ];
-    var spotlightScale = 1.24;
-    var settledScale = 1.0;
-    var lineupScale = spotlightScale;
+    var spotlightScale = 1.12;
+    var settledScale = 0.92;
+    var lineupScale = 1.08;
 
     // ── Initial state ─────────────────────────────────────────
     gsap.set(centerPillar, { xPercent: -50, yPercent: -50, z: 0 });
@@ -1702,13 +1533,6 @@
         { scale: 1.08, duration: 8.9, ease: 'sine.inOut' },
         0
       );
-    }
-
-    if (ray1) {
-      gsap.to(ray1, { opacity: 0.06, duration: 7, repeat: -1, yoyo: true, ease: 'sine.inOut' });
-    }
-    if (ray2) {
-      gsap.to(ray2, { opacity: 0.04, duration: 9, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 2.5 });
     }
 
     function hideAllNarratives() {
@@ -1847,15 +1671,10 @@
 
     tl.to(captions[3], { opacity: 0, x: 10, duration: 0.55, ease: 'power3.inOut' }, s6 - 0.15);
 
-    // Vault lifts and activates — orbit ring moves with core
-    tl.to(coreContainer, { y: -28, duration: 1.75, ease: 'power4.out' }, s6);
-    tl.to(vaultPedestal, { y: -28, duration: 1.75, ease: 'power4.out' }, s6);
-    tl.to(productsGrid, { y: -28, duration: 1.75, ease: 'power4.out' }, s6);
-    if (connectionsSvg) tl.to(connectionsSvg, { y: -28, duration: 1.75, ease: 'power4.out' }, s6);
+    // Ecosystem activates in place — the monolith stays centred (no vertical lift)
     tl.to(centerpiece, {
       rotationY: 0,
       rotationX: 6,
-      scale: 0.98,
       duration: 1.75,
       ease: 'power4.out'
     }, s6);

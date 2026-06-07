@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Shopify Theme Dev (otodor-shopify)",
+      "runtimeExecutable": "shopify",
+      "runtimeArgs": ["theme", "dev", "--path", "otodor-shopify", "--store", "ttna2m-mh.myshopify.com"],
+      "port": 9292
+    }
+  ]
+}
