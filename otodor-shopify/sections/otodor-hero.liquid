@@ -1,7 +1,7 @@
 {%- style -%}
   /* ─────────────────────────────────────────────────────────
      OTODOR Hero Section
-     Dark Luxury Technology — Cinematic Ecosystem Assembly.
+     Cinematic Vault Reveal — Apple/Tesla-style progressive unveil.
   ───────────────────────────────────────────────────────── */
 
   #shopify-section-{{ section.id }} {
@@ -44,9 +44,9 @@
     top: -20%;
     left: 50%;
     transform: translateX(-50%);
-    width: 120%;
-    height: 60%;
-    background: radial-gradient(ellipse, rgba(77, 166, 255, 0.14) 0%, transparent 70%);
+    width: 100%;
+    height: 50%;
+    background: radial-gradient(ellipse, rgba(77, 166, 255, 0.09) 0%, transparent 70%);
   }
 
   .otodor-hero__glow-bottom {
@@ -64,10 +64,10 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 550px;
-    height: 550px;
-    background: radial-gradient(circle, rgba(77, 166, 255, 0.07) 0%, transparent 70%);
-    filter: blur(55px);
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(77, 166, 255, 0.05) 0%, transparent 70%);
+    filter: blur(45px);
     pointer-events: none;
     z-index: 1;
     will-change: transform, opacity;
@@ -175,11 +175,11 @@
   /* ─ Security Core: Symmetrical Layered Obsidian Obelisk ──────── */
   .otodor-hero__core-container {
     position: relative;
-    width: 180px;
-    height: 300px;
+    width: 150px;
+    height: 250px;
     perspective: 1000px;
     margin: 1.5rem auto;
-    z-index: 5;
+    z-index: 10;
   }
 
   .centerpiece-obelisk {
@@ -436,6 +436,7 @@
     filter: blur(12px);
     z-index: 1;
     pointer-events: none;
+    /* keep as background fog */
     mix-blend-mode: screen;
     will-change: transform, opacity;
   }
@@ -458,28 +459,35 @@
     flex-direction: column;
     gap: 1.5rem;
     width: 100%;
-    max-width: 480px;
-    z-index: 5;
+    max-width: 600px;
+    z-index: 25;
+    margin-left: -30px; /* pull closer to core */
+    margin-right: -30px;
   }
 
   .otodor-hero__product-node {
     width: 100%;
     will-change: transform, opacity;
+    overflow: visible;
+    z-index: 35;
+    transform-style: preserve-3d;
   }
 
   /* Mobile: Clean premium list panels */
   .otodor-hero__product-card {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 3rem;
     background: rgba(18, 18, 18, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-left: 2.5px solid #4DA6FF;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 5rem;
     text-decoration: none;
     color: inherit;
     transition: border-color 300ms ease, box-shadow 300ms ease;
+    z-index: 20;
+    overflow: visible;
   }
 
   .otodor-hero__product-card:hover {
@@ -488,17 +496,18 @@
   }
 
   .product-card__visual {
-    width: 80px;
-    height: 80px;
+    width: 340px;
+    height: 340px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.02);
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.04);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55)) drop-shadow(0 4px 12px rgba(77, 166, 255, 0.08));
   }
 
   .product-card__visual img {
@@ -522,7 +531,7 @@
   }
 
   .product-card__feature {
-    font-size: 0.7rem;
+    font-size: 1.4rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -530,7 +539,7 @@
   }
 
   .product-card__title {
-    font-size: 1.1rem;
+    font-size: 2.5rem;
     font-weight: 600;
     margin: 0;
     color: #ffffff;
@@ -538,7 +547,7 @@
   }
 
   .product-card__desc {
-    font-size: 0.85rem;
+    font-size: 1.5rem;
     color: rgba(255, 255, 255, 0.45);
     margin: 0.25rem 0 0;
     line-height: 1.45;
@@ -626,8 +635,10 @@
   }
 
   /* ─ Hidden / Desktop only containers by default ─────────────── */
-  .otodor-hero__network-svg,
-  .product-callout {
+  .otodor-hero__stage,
+  .otodor-hero__vault-pedestal,
+  .otodor-hero__connections-svg,
+  .product-reveal-caption {
     display: none;
   }
 
@@ -679,7 +690,7 @@
 
 
   /* ─────────────────────────────────────────────────────────────
-     Desktop Layout & Pinned Scroll Story Setup (>= 1024px)
+     Desktop — Vault-centric cinematic reveal (>= 1024px)
      ───────────────────────────────────────────────────────────── */
   @media (min-width: 1024px) {
 
@@ -694,240 +705,317 @@
       position: relative;
       display: block;
       max-width: none;
+      perspective: 1400px;
+      transform-style: preserve-3d;
     }
 
-    /* Pinned centerpiece obelisk core position */
+    /* Concentrated stage — vault + reveal runway */
+    .otodor-hero.js-animated .otodor-hero__stage {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+    }
+
+    .otodor-hero.js-animated .otodor-hero__vault-pedestal {
+      display: block;
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(38vw, 420px);
+      height: min(48vh, 520px);
+      background: radial-gradient(ellipse 50% 48% at 50% 55%, rgba(77, 166, 255, 0.14) 0%, rgba(77, 166, 255, 0.05) 38%, transparent 72%);
+      pointer-events: none;
+      z-index: 4;
+      will-change: transform, opacity;
+    }
+
+    /* Vault — 50–60% of visual composition */
     .otodor-hero.js-animated .otodor-hero__core-container {
       position: absolute;
-      top: 45%;
+      top: 40%;
       left: 50%;
       transform: translate(-50%, -50%);
       margin: 0;
-      width: 240px;
-      height: 380px;
+      width: min(52vw, 620px);
+      height: min(68vh, 780px);
+      z-index: 12;
     }
 
     .otodor-hero.js-animated .obelisk-pillar--center {
-      width: 60px;
-      height: 320px;
+      width: 120px;
+      height: 650px;
+    }
+
+    .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--right,
+    .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--left {
+      width: 46px;
+    }
+
+    .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--top {
+      height: 46px;
+    }
+
+    .otodor-hero.js-animated .pillar-logo-container {
+      width: 72px;
+      height: 72px;
     }
 
     .otodor-hero.js-animated .obelisk-pillar--left-wing {
-      width: 28px;
-      height: 240px;
-      transform: translate(-50%, -50%) translateX(-50px) translateZ(-16px);
+      width: 54px;
+      height: 520px;
+      transform: translate(-50%, -50%) translateX(-177px) translateZ(-36px);
+    }
+
+    .otodor-hero.js-animated .obelisk-pillar--left-wing .pillar-face--right,
+    .otodor-hero.js-animated .obelisk-pillar--left-wing .pillar-face--left,
+    .otodor-hero.js-animated .obelisk-pillar--right-wing .pillar-face--right,
+    .otodor-hero.js-animated .obelisk-pillar--right-wing .pillar-face--left {
+      width: 36px;
     }
 
     .otodor-hero.js-animated .obelisk-pillar--right-wing {
-      width: 28px;
-      height: 240px;
-      transform: translate(-50%, -50%) translateX(50px) translateZ(-16px);
+      width: 54px;
+      height: 520px;
+      transform: translate(-50%, -50%) translateX(177px) translateZ(-36px);
     }
 
-    /* Desktop Volumetric Light Rays */
+    .otodor-hero.js-animated .centerpiece-internal-glow {
+      width: 415px;
+      height: 572px;
+      opacity: 0.55;
+    }
+
+    .otodor-hero.js-animated .obsidian-monolith__shadow {
+      width: 440px;
+      height: 65px;
+      bottom: -45px;
+    }
+
+    .otodor-hero.js-animated .otodor-hero__glow-core {
+      width: min(58vw, 680px);
+      height: min(70vh, 840px);
+      top: 40%;
+    }
+
     .otodor-hero.js-animated .otodor-hero__light-ray {
       display: block;
     }
 
-    /* Desktop Network SVG overlay */
-    .otodor-hero.js-animated .otodor-hero__network-svg {
+    /* Curved ecosystem connections */
+    .otodor-hero.js-animated .otodor-hero__connections-svg {
       display: block;
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      z-index: 2;
+      z-index: 8;
       pointer-events: none;
     }
 
-    .network-path {
+    .ecosystem-path {
       fill: none;
-      stroke: rgba(77, 166, 255, 0.06);
-      stroke-width: 1.0;
+      stroke: rgba(77, 166, 255, 0.08);
+      stroke-width: 1.8;
       transition: stroke 300ms ease;
     }
 
-    .network-path-active {
-      stroke: rgba(77, 166, 255, 0.35);
-      stroke-dasharray: 6 6;
-      animation: dash-flow 25s linear infinite;
+    .ecosystem-path-active {
+      stroke: rgba(77, 166, 255, 0.42);
     }
 
-    @keyframes dash-flow {
-      to { stroke-dashoffset: -1000; }
+    .ecosystem-path-illuminated {
+      stroke: rgba(77, 166, 255, 0.65);
+      stroke-width: 2.2;
     }
 
-    .network-pulse {
+    .ecosystem-pulse {
       fill: none;
       stroke: #4DA6FF;
-      stroke-width: 2.5;
+      stroke-width: 2.4;
       stroke-linecap: round;
-      stroke-dasharray: 100 1000;
+      stroke-dasharray: 80 1200;
       stroke-dashoffset: 0;
       opacity: 0;
       pointer-events: none;
-      filter: drop-shadow(0 0 5px rgba(77, 166, 255, 0.95));
-      transition: opacity 200ms ease;
     }
 
-    .network-dot {
-      fill: #4DA6FF;
-      opacity: 0.05;
-      transition: opacity 300ms ease, r 300ms ease;
-    }
-
-    .network-dot-active {
-      opacity: 0.8;
-      r: 3.5;
-      filter: drop-shadow(0 0 3px rgba(77, 166, 255, 0.8));
-    }
-
-    /* Product nodes positioned in 4 corners */
+    /* Product orbit — wide ring with monolith exclusion zone */
     .otodor-hero.js-animated .otodor-hero__products-grid {
       position: absolute;
-      inset: 0;
-      width: 100%;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(85vw, 1280px);
+      height: min(80vh, 1000px);
       max-width: none;
       display: block;
+      margin: 0;
       pointer-events: none;
+      z-index: 20;
     }
 
     .otodor-hero.js-animated .otodor-hero__product-node {
       position: absolute;
-      width: 230px;
+      top: 50%;
+      left: 50%;
+      width: 110px;
       pointer-events: auto;
       opacity: 0;
+      z-index: 20;
     }
 
-    .otodor-hero.js-animated .product-node--1 {
-      top: 10%;
-      left: 10%;
+    /* Product sizing per node — scaled for presence */
+    .otodor-hero.js-animated .product-node--1 .product-card__visual {
+      width: 170px;
+      height: 170px;
     }
 
-    .otodor-hero.js-animated .product-node--2 {
-      top: 10%;
-      right: 10%;
+    .otodor-hero.js-animated .product-node--2 .product-card__visual {
+      width: 160px;
+      height: 160px;
     }
 
-    .otodor-hero.js-animated .product-node--3 {
-      bottom: 20%;
-      left: 10%;
+    .otodor-hero.js-animated .product-node--3 .product-card__visual {
+      width: 160px;
+      height: 160px;
     }
 
-    .otodor-hero.js-animated .product-node--4 {
-      bottom: 20%;
-      right: 10%;
+    .otodor-hero.js-animated .product-node--4 .product-card__visual {
+      width: 160px;
+      height: 160px;
     }
 
-    /* Remove cards styles entirely for a floating 3D design */
     .otodor-hero.js-animated .otodor-hero__product-card {
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
       padding: 0 !important;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0;
       position: relative;
+      overflow: visible;
     }
 
     .otodor-hero.js-animated .product-card__visual {
-      width: 120px;
-      height: 120px;
+      width: 100px;
+      height: 100px;
       background: transparent;
       border: none;
       border-radius: 0;
       overflow: visible;
-      filter: drop-shadow(0 0 15px rgba(77, 166, 255, 0.12));
+      filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.6));
       transition: filter 300ms ease;
     }
 
     .otodor-hero.js-animated .otodor-hero__product-card:hover .product-card__visual {
-      filter: drop-shadow(0 0 25px rgba(77, 166, 255, 0.35));
+      filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.7));
     }
 
     .otodor-hero.js-animated .product-card__content {
-      display: none; /* Mobile content hidden, using Pointer Callouts below */
+      display: none;
     }
 
-    /* Pointer Callout styling */
-    .otodor-hero.js-animated .product-callout {
+    /* Single active narrative — positioned beside/below product (animation-controlled) */
+    .otodor-hero.js-animated .product-reveal-caption {
       display: flex;
+      flex-direction: column;
       position: absolute;
-      top: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 210px;
+      opacity: 0;
+      will-change: transform, opacity;
+      pointer-events: none;
+      margin: 0;
+    }
+
+    .otodor-hero.js-animated .product-node--1 .product-reveal-caption {
+      top: auto;
+      bottom: -12px;
       left: 50%;
-      transform: translateX(-50%);
-      width: 220px;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 8px;
-      opacity: 0;
-      will-change: transform, opacity;
-    }
-
-    .product-callout__pointer-line {
-      width: 1px;
-      height: 0; /* Animated by GSAP */
-      background: linear-gradient(180deg, rgba(77, 166, 255, 0.35), transparent);
-      margin-bottom: 6px;
-      opacity: 0;
-      will-change: height, opacity;
-    }
-
-    .product-callout__content {
-      opacity: 0;
-      transform: translateY(8px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      transform: translate(-50%, 100%);
       text-align: center;
-      will-change: transform, opacity;
+      align-items: center;
+      width: 240px;
     }
 
-    .product-callout__tag {
-      font-size: 0.65rem;
+    .otodor-hero.js-animated .product-node--2 .product-reveal-caption {
+      right: calc(100% + 18px);
+      left: auto;
+      text-align: right;
+      align-items: flex-end;
+    }
+
+    .otodor-hero.js-animated .product-node--3 .product-reveal-caption {
+      left: calc(100% + 18px);
+      text-align: left;
+      align-items: flex-start;
+    }
+
+    .otodor-hero.js-animated .product-node--4 .product-reveal-caption {
+      top: auto;
+      bottom: calc(100% + 14px);
+      left: 50%;
+      transform: translate(-50%, 0);
+      text-align: center;
+      align-items: center;
+      width: 240px;
+    }
+
+    .product-reveal-caption__tag {
+      font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       color: #4DA6FF;
-      text-shadow: 0 0 8px rgba(77, 166, 255, 0.3);
     }
 
-    .product-callout__title {
+    .product-reveal-caption__title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
+      font-size: 1.15rem;
       font-weight: 600;
       color: #ffffff;
-      margin: 2px 0 0;
-      letter-spacing: -0.01em;
-    }
-
-    .product-callout__desc {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.45);
-      line-height: 1.4;
       margin: 4px 0 0;
-      text-align: center;
+      letter-spacing: -0.02em;
     }
 
-    /* Typography frames absolute overlay */
+    .product-reveal-caption__desc {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1.45;
+      margin: 6px 0 0;
+    }
+
+    /* Intro text — top of frame, vault is hero */
     .otodor-hero.js-animated .otodor-hero__text-container {
       position: absolute;
-      bottom: 8%;
       left: 50%;
       transform: translateX(-50%);
       width: 90%;
       max-width: 720px;
-      height: 180px;
       pointer-events: none;
+      z-index: 40;
+    }
+
+    .otodor-hero.js-animated .otodor-hero__text-container:first-of-type {
+      top: 6%;
+      bottom: auto;
+      height: auto;
+    }
+
+    .otodor-hero.js-animated .otodor-hero__text-container:last-of-type {
+      bottom: 5%;
+      top: auto;
+      height: auto;
     }
 
     .otodor-hero.js-animated .otodor-hero__text-frame {
-      position: absolute;
-      inset: 0;
+      position: relative;
+      inset: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -947,14 +1035,18 @@
     }
 
     .otodor-hero.js-animated .otodor-hero__heading {
-      font-size: clamp(2.8rem, 4.5vw, 3.8rem);
+      font-size: clamp(2.4rem, 4vw, 3.4rem);
       line-height: 1.1;
       letter-spacing: -0.03em;
     }
 
+    .otodor-hero.js-animated .frame--intro .otodor-hero__heading {
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+    }
+
     .otodor-hero.js-animated .otodor-hero__subheading {
-      font-size: 1.1rem;
-      margin-top: 0.85rem;
+      font-size: 1rem;
+      margin-top: 0.75rem;
     }
   }
 
@@ -983,14 +1075,16 @@
       transform: none !important;
       width: 100% !important;
     }
-    .otodor-hero.js-animated .otodor-hero__network-svg,
-    .otodor-hero.js-animated .otodor-hero__light-ray {
+    .otodor-hero.js-animated .otodor-hero__light-ray,
+    .otodor-hero.js-animated .otodor-hero__stage,
+    .otodor-hero.js-animated .otodor-hero__vault-pedestal,
+    .otodor-hero.js-animated .otodor-hero__connections-svg {
       display: none !important;
     }
     .otodor-hero.js-animated .product-card__content {
       display: flex !important;
     }
-    .otodor-hero.js-animated .product-callout {
+    .otodor-hero.js-animated .product-reveal-caption {
       display: none !important;
     }
     .otodor-hero.js-animated .otodor-hero__text-container {
@@ -1071,7 +1165,22 @@
       </div>
     </div>
 
-    <!-- Center core & Product arrangement -->
+    <!-- Cinematic vault stage -->
+    <div class="otodor-hero__stage">
+    <div class="otodor-hero__vault-pedestal" aria-hidden="true"></div>
+
+    <!-- Curved ecosystem connections -->
+    <svg class="otodor-hero__connections-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+      <path class="ecosystem-path path-1" d="M 500,455 C 500,380 500,280 500,175" />
+      <path class="ecosystem-path path-2" d="M 500,455 C 620,455 740,470 855,485" />
+      <path class="ecosystem-path path-3" d="M 500,455 C 380,455 260,470 145,485" />
+      <path class="ecosystem-path path-4" d="M 500,545 C 500,640 500,740 500,845" />
+      <path class="ecosystem-pulse pulse-1" d="M 500,455 C 500,380 500,280 500,175" />
+      <path class="ecosystem-pulse pulse-2" d="M 500,455 C 620,455 740,470 855,485" />
+      <path class="ecosystem-pulse pulse-3" d="M 500,455 C 380,455 260,470 145,485" />
+      <path class="ecosystem-pulse pulse-4" d="M 500,545 C 500,640 500,740 500,845" />
+    </svg>
+
     <div class="otodor-hero__core-container" data-3d-slot="security-core">
       <div class="obsidian-monolith__shadow"></div>
       <div class="centerpiece-obelisk">
@@ -1124,28 +1233,7 @@
       </div>
     </div>
 
-    <!-- Symmetrical connection network lines with pulse tracks (Desktop only) -->
-    <svg class="otodor-hero__network-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
-      <!-- Background connections -->
-      <path class="network-path path-1" d="M 500,500 L 330,500 L 220,390 L 220,280" />
-      <path class="network-path path-2" d="M 500,500 L 670,500 L 780,390 L 780,280" />
-      <path class="network-path path-3" d="M 500,500 L 330,500 L 220,610 L 220,660" />
-      <path class="network-path path-4" d="M 500,500 L 670,500 L 780,610 L 780,660" />
-      
-      <!-- Energy Pulse paths -->
-      <path class="network-pulse pulse-1" d="M 500,500 L 330,500 L 220,390 L 220,280" />
-      <path class="network-pulse pulse-2" d="M 500,500 L 670,500 L 780,390 L 780,280" />
-      <path class="network-pulse pulse-3" d="M 500,500 L 330,500 L 220,610 L 220,660" />
-      <path class="network-pulse pulse-4" d="M 500,500 L 670,500 L 780,610 L 780,660" />
-      
-      <!-- Nodes / Joints -->
-      <circle cx="220" cy="280" r="2.5" class="network-dot dot-1" />
-      <circle cx="780" cy="280" r="2.5" class="network-dot dot-2" />
-      <circle cx="220" cy="660" r="2.5" class="network-dot dot-3" />
-      <circle cx="780" cy="660" r="2.5" class="network-dot dot-4" />
-    </svg>
-
-    <!-- Product Grid -->
+    <!-- Product reveal runway -->
     <div class="otodor-hero__products-grid">
       
       <!-- Product Node 1: Smart Digital Lock -->
@@ -1153,9 +1241,9 @@
         <a href="{{ section.settings.p1_link | default: '#' }}" class="otodor-hero__product-card" id="otodor-hero-p1-card">
           <div class="product-card__visual">
             {%- if section.settings.p1_image != blank -%}
-              {{ section.settings.p1_image | image_url: width: 240 | image_tag: loading: 'lazy', alt: section.settings.p1_title }}
+              {{ section.settings.p1_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: section.settings.p1_title }}
             {%- else -%}
-              <img src="{{ 'zion_front_45.png' | file_img_url: '240x240' }}" loading="lazy" alt="{{ section.settings.p1_title | escape }}" class="product-visual-image" width="240" height="240">
+              <img src="{{ 'zion_front_45.png' | file_img_url: '400x400' }}" loading="lazy" alt="{{ section.settings.p1_title | escape }}" class="product-visual-image" width="400" height="400">
             {%- endif -%}
           </div>
           <div class="product-card__content">
@@ -1164,14 +1252,10 @@
             <p class="product-card__desc">{{ section.settings.p1_desc | escape }}</p>
           </div>
           
-          <!-- Desktop pointer callout -->
-          <div class="product-callout">
-            <div class="product-callout__pointer-line"></div>
-            <div class="product-callout__content">
-              <span class="product-callout__tag">{{ section.settings.p1_feature | escape }}</span>
-              <h3 class="product-callout__title">{{ section.settings.p1_title | escape }}</h3>
-              <p class="product-callout__desc">{{ section.settings.p1_desc | escape }}</p>
-            </div>
+          <div class="product-reveal-caption">
+            <span class="product-reveal-caption__tag">{{ section.settings.p1_feature | escape }}</span>
+            <h3 class="product-reveal-caption__title">{{ section.settings.p1_title | escape }}</h3>
+            <p class="product-reveal-caption__desc">{{ section.settings.p1_desc | escape }}</p>
           </div>
         </a>
       </div>
@@ -1181,7 +1265,7 @@
         <a href="{{ section.settings.p2_link | default: '#' }}" class="otodor-hero__product-card" id="otodor-hero-p2-card">
           <div class="product-card__visual">
             {%- if section.settings.p2_image != blank -%}
-              {{ section.settings.p2_image | image_url: width: 240 | image_tag: loading: 'lazy', alt: section.settings.p2_title }}
+              {{ section.settings.p2_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: section.settings.p2_title }}
             {%- else -%}
               <!-- Gate Lock Outline wireframe -->
               <svg class="product-icon-svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -1199,14 +1283,10 @@
             <p class="product-card__desc">{{ section.settings.p2_desc | escape }}</p>
           </div>
           
-          <!-- Desktop pointer callout -->
-          <div class="product-callout">
-            <div class="product-callout__pointer-line"></div>
-            <div class="product-callout__content">
-              <span class="product-callout__tag">{{ section.settings.p2_feature | escape }}</span>
-              <h3 class="product-callout__title">{{ section.settings.p2_title | escape }}</h3>
-              <p class="product-callout__desc">{{ section.settings.p2_desc | escape }}</p>
-            </div>
+          <div class="product-reveal-caption">
+            <span class="product-reveal-caption__tag">{{ section.settings.p2_feature | escape }}</span>
+            <h3 class="product-reveal-caption__title">{{ section.settings.p2_title | escape }}</h3>
+            <p class="product-reveal-caption__desc">{{ section.settings.p2_desc | escape }}</p>
           </div>
         </a>
       </div>
@@ -1216,9 +1296,9 @@
         <a href="{{ section.settings.p3_link | default: '#' }}" class="otodor-hero__product-card" id="otodor-hero-p3-card">
           <div class="product-card__visual">
             {%- if section.settings.p3_image != blank -%}
-              {{ section.settings.p3_image | image_url: width: 240 | image_tag: loading: 'lazy', alt: section.settings.p3_title }}
+              {{ section.settings.p3_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: section.settings.p3_title }}
             {%- else -%}
-              <img src="{{ 'armour_front.png' | file_img_url: '240x240' }}" loading="lazy" alt="{{ section.settings.p3_title | escape }}" class="product-visual-image" width="240" height="240">
+              <img src="{{ 'armour_front.png' | file_img_url: '400x400' }}" loading="lazy" alt="{{ section.settings.p3_title | escape }}" class="product-visual-image" width="400" height="400">
             {%- endif -%}
           </div>
           <div class="product-card__content">
@@ -1227,14 +1307,10 @@
             <p class="product-card__desc">{{ section.settings.p3_desc | escape }}</p>
           </div>
           
-          <!-- Desktop pointer callout -->
-          <div class="product-callout">
-            <div class="product-callout__pointer-line"></div>
-            <div class="product-callout__content">
-              <span class="product-callout__tag">{{ section.settings.p3_feature | escape }}</span>
-              <h3 class="product-callout__title">{{ section.settings.p3_title | escape }}</h3>
-              <p class="product-callout__desc">{{ section.settings.p3_desc | escape }}</p>
-            </div>
+          <div class="product-reveal-caption">
+            <span class="product-reveal-caption__tag">{{ section.settings.p3_feature | escape }}</span>
+            <h3 class="product-reveal-caption__title">{{ section.settings.p3_title | escape }}</h3>
+            <p class="product-reveal-caption__desc">{{ section.settings.p3_desc | escape }}</p>
           </div>
         </a>
       </div>
@@ -1244,9 +1320,9 @@
         <a href="{{ section.settings.p4_link | default: '#' }}" class="otodor-hero__product-card" id="otodor-hero-p4-card">
           <div class="product-card__visual">
             {%- if section.settings.p4_image != blank -%}
-              {{ section.settings.p4_image | image_url: width: 240 | image_tag: loading: 'lazy', alt: section.settings.p4_title }}
+              {{ section.settings.p4_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: section.settings.p4_title }}
             {%- else -%}
-              <img src="{{ 'sliding_gate_motor_45.png' | file_img_url: '240x240' }}" loading="lazy" alt="{{ section.settings.p4_title | escape }}" class="product-visual-image" width="240" height="240">
+              <img src="{{ 'sliding_gate_motor_45.png' | file_img_url: '400x400' }}" loading="lazy" alt="{{ section.settings.p4_title | escape }}" class="product-visual-image" width="400" height="400">
             {%- endif -%}
           </div>
           <div class="product-card__content">
@@ -1255,19 +1331,16 @@
             <p class="product-card__desc">{{ section.settings.p4_desc | escape }}</p>
           </div>
           
-          <!-- Desktop pointer callout -->
-          <div class="product-callout">
-            <div class="product-callout__pointer-line"></div>
-            <div class="product-callout__content">
-              <span class="product-callout__tag">{{ section.settings.p4_feature | escape }}</span>
-              <h3 class="product-callout__title">{{ section.settings.p4_title | escape }}</h3>
-              <p class="product-callout__desc">{{ section.settings.p4_desc | escape }}</p>
-            </div>
+          <div class="product-reveal-caption">
+            <span class="product-reveal-caption__tag">{{ section.settings.p4_feature | escape }}</span>
+            <h3 class="product-reveal-caption__title">{{ section.settings.p4_title | escape }}</h3>
+            <p class="product-reveal-caption__desc">{{ section.settings.p4_desc | escape }}</p>
           </div>
         </a>
       </div>
 
     </div>
+    </div><!-- /.otodor-hero__stage -->
 
     <!-- Final Ecosystem / CTA Screen -->
     <div class="otodor-hero__text-container">
@@ -1391,311 +1464,289 @@
     var node3 = section.querySelector('.product-node--3');
     var node4 = section.querySelector('.product-node--4');
     var nodes = [node1, node2, node3, node4];
-    
-    var callout1 = node1.querySelector('.product-callout');
-    var callout2 = node2.querySelector('.product-callout');
-    var callout3 = node3.querySelector('.product-callout');
-    var callout4 = node4.querySelector('.product-callout');
 
-    var pLine1 = callout1.querySelector('.product-callout__pointer-line');
-    var pLine2 = callout2.querySelector('.product-callout__pointer-line');
-    var pLine3 = callout3.querySelector('.product-callout__pointer-line');
-    var pLine4 = callout4.querySelector('.product-callout__pointer-line');
-
-    var pContent1 = callout1.querySelector('.product-callout__content');
-    var pContent2 = callout2.querySelector('.product-callout__content');
-    var pContent3 = callout3.querySelector('.product-callout__content');
-    var pContent4 = callout4.querySelector('.product-callout__content');
-    
-    var path1 = section.querySelector('.path-1');
-    var path2 = section.querySelector('.path-2');
-    var path3 = section.querySelector('.path-3');
-    var path4 = section.querySelector('.path-4');
-    var paths = [path1, path2, path3, path4];
-    
-    var dot1 = section.querySelector('.dot-1');
-    var dot2 = section.querySelector('.dot-2');
-    var dot3 = section.querySelector('.dot-3');
-    var dot4 = section.querySelector('.dot-4');
-    var dots = [dot1, dot2, dot3, dot4];
+    var captions = nodes.map(function (node) {
+      return node.querySelector('.product-reveal-caption');
+    });
 
     var frameIntro = section.querySelector('.frame--intro');
     var frameFinal = section.querySelector('.frame--final');
+    var vaultPedestal = section.querySelector('.otodor-hero__vault-pedestal');
+    var coreContainer = section.querySelector('.otodor-hero__core-container');
+    var productsGrid = section.querySelector('.otodor-hero__products-grid');
 
     var ray1 = section.querySelector('.ray--1');
     var ray2 = section.querySelector('.ray--2');
+    var connectionsSvg = section.querySelector('.otodor-hero__connections-svg');
 
-    // ── 0. Set Initial 3D Positions & Ambient rays ─────────────
+    var paths = [
+      section.querySelector('.path-1'),
+      section.querySelector('.path-2'),
+      section.querySelector('.path-3'),
+      section.querySelector('.path-4')
+    ];
+    var pulses = section.querySelectorAll('.ecosystem-pulse');
+
+    // Wide orbit — expanded footprint with generous cardinal spacing
+    // node1: Digital Lock (top), node2: Gate Lock (right),
+    // node3: Padlock (left), node4: Gate Motor (bottom)
+    var finalSlots = [
+      { x: 0, y: -460 },
+      { x: 500, y: 40 },
+      { x: -500, y: 40 },
+      { x: 0, y: 460 }
+    ];
+    var entryVectors = [
+      { x: 0, y: -380, rotation: -10 },
+      { x: 380, y: 0, rotation: 12 },
+      { x: -380, y: 0, rotation: -12 },
+      { x: 0, y: 380, rotation: 8 }
+    ];
+    var spotlightScale = 1.32;
+    var settledScale = 0.85;
+    var lineupScale = 1.0;
+
+    // ── Initial state ─────────────────────────────────────────
     gsap.set(centerPillar, { xPercent: -50, yPercent: -50, z: 0 });
-    gsap.set(leftWing, { xPercent: -50, yPercent: -50, x: -50, z: -16 });
-    gsap.set(rightWing, { xPercent: -50, yPercent: -50, x: 50, z: -16 });
+    gsap.set(leftWing, { xPercent: -50, yPercent: -50, x: -177, z: -36 });
+    gsap.set(rightWing, { xPercent: -50, yPercent: -50, x: 177, z: -36 });
+    gsap.set(centerpiece, { transformOrigin: '50% 50%' });
+    gsap.set(nodes, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.7, rotation: 0 });
+    gsap.set(captions, { opacity: 0, x: 16 });
+    gsap.set(productsGrid, { pointerEvents: 'none' });
+    if (connectionsSvg) gsap.set(connectionsSvg, { opacity: 0.85 });
 
-    // Slow pulse opacity of volumetric rays over time (runs independently of scroll)
     if (ray1) {
-      gsap.to(ray1, {
-        opacity: 0.07,
-        duration: 7,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      });
+      gsap.to(ray1, { opacity: 0.06, duration: 7, repeat: -1, yoyo: true, ease: 'sine.inOut' });
     }
     if (ray2) {
-      gsap.to(ray2, {
-        opacity: 0.05,
-        duration: 9,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: 2.5
-      });
+      gsap.to(ray2, { opacity: 0.04, duration: 9, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 2.5 });
     }
 
-    // ── 1. Gradual Camera Pullback & Parallax ambient shifts ─────────────
-    tl.fromTo(viewport,
-      { scale: 1.15 },
-      { scale: 1.00, ease: 'power1.inOut', duration: 9 },
+    function hideAllNarratives() {
+      gsap.set(captions, { opacity: 0, x: 16 });
+    }
+
+    function revealProduct(node, caption, slotIndex, time) {
+      var slot = finalSlots[slotIndex];
+      var entry = entryVectors[slotIndex];
+      var startX = slot.x + entry.x;
+      var startY = slot.y + entry.y;
+
+      gsap.set(node, {
+        xPercent: -50,
+        yPercent: -50,
+        x: startX,
+        y: startY,
+        rotation: entry.rotation,
+        opacity: 0,
+        scale: 0.72
+      });
+
+      tl.to(node, {
+        opacity: 1,
+        scale: spotlightScale,
+        x: slot.x,
+        y: slot.y,
+        rotation: 0,
+        duration: 1.15,
+        ease: 'power3.out'
+      }, time);
+
+      tl.to(caption, {
+        opacity: 1,
+        x: 0,
+        duration: 0.75,
+        ease: 'power2.out'
+      }, time + 0.45);
+
+      if (paths[slotIndex]) {
+        tl.to(paths[slotIndex], {
+          stroke: 'rgba(77, 166, 255, 0.38)',
+          duration: 0.6,
+          ease: 'power2.out'
+        }, time + 0.5);
+        tl.call(function () {
+          paths[slotIndex].classList.add('ecosystem-path-active');
+        }, null, time + 0.5);
+      }
+    }
+
+    function settleProduct(node, caption, time) {
+      tl.to(node, {
+        opacity: 0.5,
+        scale: settledScale,
+        duration: 0.55,
+        ease: 'power2.inOut'
+      }, time);
+      tl.to(caption, {
+        opacity: 0,
+        x: 10,
+        duration: 0.4,
+        ease: 'power2.in'
+      }, time);
+    }
+
+    // ── Scene 1: Vault only — anticipation ────────────────────
+    tl.fromTo(vaultPedestal,
+      { opacity: 0, scale: 0.85 },
+      { opacity: 1, scale: 1, duration: 1.8, ease: 'power2.out' },
       0
     );
 
-    tl.fromTo('.otodor-hero__ambient',
-      { y: -40, scale: 0.97 },
-      { y: 40, scale: 1.03, ease: 'power1.inOut', duration: 9 },
+    tl.fromTo(centerpiece,
+      { scale: 0.45, opacity: 0, rotationY: -28, rotationX: 14 },
+      { scale: 1, opacity: 1, rotationY: -12, rotationX: 10, duration: 1.8, ease: 'power3.out' },
       0
     );
+
+    if (internalGlow) {
+      tl.fromTo(internalGlow,
+        { scale: 0.7, opacity: 0 },
+        { scale: 1, opacity: 0.35, duration: 1.5, ease: 'power2.out' },
+        0.2
+      );
+    }
 
     tl.fromTo('.otodor-hero__glow-core',
-      { scale: 0.85 },
-      { scale: 1.15, ease: 'power1.inOut', duration: 9 },
+      { scale: 0.8, opacity: 0 },
+      { scale: 1, opacity: 0.5, duration: 1.8, ease: 'power2.out' },
       0
     );
 
-    // ── Scene 1: Monolith emerges & starts rotating, Intro headline fades out ───────
-    tl.fromTo(centerpiece,
-      { scale: 0.85, opacity: 0.5, rotationY: -35, rotationX: 18 },
-      { scale: 1.0, opacity: 1.0, rotationY: -15, rotationX: 12, duration: 7.4, ease: 'none' },
-      0
-    );
-    if (internalGlow) {
-      tl.fromTo(internalGlow, { scale: 0.85, opacity: 0.15 }, { scale: 1.0, opacity: 0.7, duration: 1.5 }, 0);
-    }
-    
     tl.fromTo(frameIntro,
       { opacity: 1, y: 0, pointerEvents: 'auto' },
-      { opacity: 0, y: -40, pointerEvents: 'none', duration: 1.0 },
-      0.6
+      { opacity: 0, y: -24, pointerEvents: 'none', duration: 0.8 },
+      1.0
     );
 
-    // ── Scene 2: Digital Lock slides in & connects ────────────
-    tl.fromTo(node1,
-      { opacity: 0, scale: 0.8, x: -60, y: -40 },
-      { opacity: 0.9, scale: 1.0, x: 0, y: 0, duration: 1.2, ease: 'power2.out' },
-      1.5
-    );
-    if (path1) {
-      tl.to(path1, { stroke: 'rgba(77, 166, 255, 0.45)', duration: 0.5 }, 1.5);
-      tl.call(function () { path1.classList.add('network-path-active'); }, null, 1.5);
-    }
-    if (dot1) {
-      tl.call(function () { dot1.classList.add('network-dot-active'); }, null, 1.5);
-    }
-    
-    // Callout diagnostic pointer reveal
-    tl.to(callout1, { opacity: 1, duration: 0.4 }, 1.8);
-    tl.fromTo(pLine1, { height: 0, opacity: 0 }, { height: 24, opacity: 1, duration: 0.5, ease: 'power1.out' }, 1.9);
-    tl.fromTo(pContent1, { opacity: 0, y: 8 }, { opacity: 0.9, y: 0, duration: 0.6, ease: 'power2.out' }, 2.1);
+    // ── Scene 2: Digital Lock enters from above ───────────────
+    var s2 = 1.8;
+    hideAllNarratives();
+    revealProduct(node1, captions[0], 0, s2);
+    tl.to(centerpiece, { rotationY: -10, rotationX: 9, duration: 1.0, ease: 'power1.inOut' }, s2);
 
-    // ── Scene 3: Gate Lock slides in & connects ───────────────
-    tl.fromTo(node2,
-      { opacity: 0, scale: 0.8, x: 60, y: -40 },
-      { opacity: 0.9, scale: 1.0, x: 0, y: 0, duration: 1.2, ease: 'power2.out' },
-      3.0
-    );
-    if (path2) {
-      tl.to(path2, { stroke: 'rgba(77, 166, 255, 0.45)', duration: 0.5 }, 3.0);
-      tl.call(function () { path2.classList.add('network-path-active'); }, null, 3.0);
-    }
-    if (dot2) {
-      tl.call(function () { dot2.classList.add('network-dot-active'); }, null, 3.0);
-    }
-    
-    tl.to(callout2, { opacity: 1, duration: 0.4 }, 3.3);
-    tl.fromTo(pLine2, { height: 0, opacity: 0 }, { height: 24, opacity: 1, duration: 0.5, ease: 'power1.out' }, 3.4);
-    tl.fromTo(pContent2, { opacity: 0, y: 8 }, { opacity: 0.9, y: 0, duration: 0.6, ease: 'power2.out' }, 3.6);
+    // ── Scene 3: Gate Lock enters from right ──────────────────
+    var s3 = 3.2;
+    settleProduct(node1, captions[0], s3 - 0.3);
+    revealProduct(node2, captions[1], 1, s3);
 
-    // ── Scene 4: Fingerprint Padlock slides in & connects ──────
-    tl.fromTo(node3,
-      { opacity: 0, scale: 0.8, x: -60, y: 40 },
-      { opacity: 0.9, scale: 1.0, x: 0, y: 0, duration: 1.2, ease: 'power2.out' },
-      4.5
-    );
-    if (path3) {
-      tl.to(path3, { stroke: 'rgba(77, 166, 255, 0.45)', duration: 0.5 }, 4.5);
-      tl.call(function () { path3.classList.add('network-path-active'); }, null, 4.5);
-    }
-    if (dot3) {
-      tl.call(function () { dot3.classList.add('network-dot-active'); }, null, 4.5);
-    }
-    
-    tl.to(callout3, { opacity: 1, duration: 0.4 }, 4.8);
-    tl.fromTo(pLine3, { height: 0, opacity: 0 }, { height: 24, opacity: 1, duration: 0.5, ease: 'power1.out' }, 4.9);
-    tl.fromTo(pContent3, { opacity: 0, y: 8 }, { opacity: 0.9, y: 0, duration: 0.6, ease: 'power2.out' }, 5.1);
+    // ── Scene 4: Padlock enters from left ───────────────────
+    var s4 = 4.6;
+    settleProduct(node2, captions[1], s4 - 0.3);
+    revealProduct(node3, captions[2], 2, s4);
 
-    // ── Scene 5: Sliding Gate Motor slides in & connects ───────
-    tl.fromTo(node4,
-      { opacity: 0, scale: 0.8, x: 60, y: 40 },
-      { opacity: 0.9, scale: 1.0, x: 0, y: 0, duration: 1.2, ease: 'power2.out' },
-      6.0
-    );
-    if (path4) {
-      tl.to(path4, { stroke: 'rgba(77, 166, 255, 0.45)', duration: 0.5 }, 6.0);
-      tl.call(function () { path4.classList.add('network-path-active'); }, null, 6.0);
-    }
-    if (dot4) {
-      tl.call(function () { dot4.classList.add('network-dot-active'); }, null, 6.0);
-    }
-    
-    tl.to(callout4, { opacity: 1, duration: 0.4 }, 6.3);
-    tl.fromTo(pLine4, { height: 0, opacity: 0 }, { height: 24, opacity: 1, duration: 0.5, ease: 'power1.out' }, 6.4);
-    tl.fromTo(pContent4, { opacity: 0, y: 8 }, { opacity: 0.9, y: 0, duration: 0.6, ease: 'power2.out' }, 6.6);
+    // ── Scene 5: Gate Motor enters from below ─────────────────
+    var s5 = 6.0;
+    settleProduct(node3, captions[2], s5 - 0.3);
+    revealProduct(node4, captions[3], 3, s5);
 
-    // ── Scene 6: Ecosystem Final Assembly & Power Activation ──
-    var finalStart = 7.4;
-    
-    // 1. Rotate centerpiece obelisk to front view
-    tl.to(centerpiece, { rotationY: 0, rotationX: 8, scale: 1.08, duration: 1.6, ease: 'power2.out' }, finalStart);
-    
-    // 2. Mechanical wing sliding shift (Left wing shifts left, Right shifts right)
-    tl.to(leftWing, { x: -68, duration: 1.5, ease: 'power3.out' }, finalStart);
-    tl.to(rightWing, { x: 68, duration: 1.5, ease: 'power3.out' }, finalStart);
-    
-    // 3. Core energy flare / activation light & glowing seams
+    // ── Scene 6: Full ecosystem — illuminate, pulse, activate ─
+    var s6 = 7.4;
+
+    tl.to(captions[3], { opacity: 0, x: 10, duration: 0.35, ease: 'power2.in' }, s6 - 0.15);
+
+    // Vault lifts and activates — orbit ring moves with core
+    tl.to(coreContainer, { y: -28, duration: 1.4, ease: 'power3.out' }, s6);
+    tl.to(vaultPedestal, { y: -28, duration: 1.4, ease: 'power3.out' }, s6);
+    tl.to(productsGrid, { y: -28, duration: 1.4, ease: 'power3.out' }, s6);
+    if (connectionsSvg) tl.to(connectionsSvg, { y: -28, duration: 1.4, ease: 'power3.out' }, s6);
+    tl.to(centerpiece, {
+      rotationY: 0,
+      rotationX: 6,
+      scale: 1.04,
+      duration: 1.4,
+      ease: 'power3.out'
+    }, s6);
+    tl.to(leftWing, { x: -158, duration: 1.3, ease: 'power3.out' }, s6);
+    tl.to(rightWing, { x: 158, duration: 1.3, ease: 'power3.out' }, s6);
+
     if (internalGlow) {
       tl.to(internalGlow, {
-        scale: 2.2,
-        opacity: 0.95,
-        background: 'radial-gradient(circle, rgba(77, 166, 255, 0.95) 0%, transparent 70%)',
-        filter: 'blur(20px)',
-        duration: 1.6,
+        scale: 1.25,
+        opacity: 0.8,
+        background: 'radial-gradient(circle, rgba(77, 166, 255, 0.75) 0%, transparent 70%)',
+        duration: 1.4,
         ease: 'power3.out'
-      }, finalStart);
+      }, s6);
     }
 
     if (plateGlows.length) {
       tl.to(plateGlows, {
-        background: 'rgba(77, 166, 255, 0.9)',
-        opacity: 0.95,
-        filter: 'blur(8px)',
-        duration: 1.5,
+        background: 'rgba(77, 166, 255, 0.7)',
+        opacity: 0.85,
+        duration: 1.3,
         ease: 'power2.out'
-      }, finalStart);
+      }, s6);
     }
 
     if (seams.length) {
       tl.to(seams, {
-        background: '#FFFFFF',
-        boxShadow: '0 0 12px rgba(77, 166, 255, 1), 0 0 4px #FFFFFF',
-        duration: 1.5,
+        background: 'rgba(255, 255, 255, 0.95)',
+        boxShadow: '0 0 10px rgba(77, 166, 255, 0.85)',
+        duration: 1.3,
         ease: 'power2.out'
-      }, finalStart);
+      }, s6);
     }
 
     var logoIcon = centerpiece.querySelector('.pillar-logo-icon');
     if (logoIcon) {
       tl.to(logoIcon, {
-        filter: 'drop-shadow(0 0 10px rgba(77, 166, 255, 0.95)) brightness(1.2)',
-        scale: 1.1,
-        duration: 1.5,
+        filter: 'drop-shadow(0 0 8px rgba(77, 166, 255, 0.8)) brightness(1.15)',
+        scale: 1.08,
+        duration: 1.3,
         ease: 'power2.out'
-      }, finalStart);
+      }, s6);
     }
 
-    // 4. Animate a bright energy pulse through all connection paths (flowing outwards)
-    var pulses = section.querySelectorAll('.network-pulse');
-    if (pulses.length) {
-      tl.set(pulses, { opacity: 1 }, finalStart);
-      tl.fromTo(pulses,
-        { strokeDashoffset: 0 },
-        { strokeDashoffset: -450, duration: 1.2, ease: 'power1.inOut' },
-        finalStart
-      );
-      tl.to(pulses, { opacity: 0, duration: 0.4 }, finalStart + 1.2);
-    }
+    tl.to(vaultPedestal, { opacity: 1, scale: 1.06, duration: 1.2, ease: 'power2.out' }, s6);
+    tl.to('.otodor-hero__glow-core', { opacity: 0.7, scale: 1.08, duration: 1.2, ease: 'power2.out' }, s6);
 
-    // Also intensify back network lines
+    // Network illuminates
     paths.forEach(function (path) {
       if (path) {
         tl.to(path, {
-          stroke: 'rgba(77, 166, 255, 0.85)',
-          strokeWidth: 1.5,
-          duration: 1.5,
+          stroke: 'rgba(77, 166, 255, 0.6)',
+          duration: 1.0,
           ease: 'power2.out'
-        }, finalStart);
+        }, s6);
+        tl.call(function () {
+          path.classList.add('ecosystem-path-illuminated');
+        }, null, s6);
       }
     });
 
-    dots.forEach(function (dot) {
-      if (dot) {
-        tl.to(dot, {
-          r: 5.0,
-          opacity: 1.0,
-          duration: 1.0
-        }, finalStart);
-      }
-    });
+    // Pulse travels through all connections once
+    if (pulses.length) {
+      tl.set(pulses, { opacity: 1 }, s6 + 0.15);
+      tl.fromTo(pulses,
+        { strokeDashoffset: 0 },
+        { strokeDashoffset: -520, duration: 1.1, ease: 'power1.inOut' },
+        s6 + 0.15
+      );
+      tl.to(pulses, { opacity: 0, duration: 0.35 }, s6 + 1.25);
+    }
 
-    // 5. Coordinated node activation pulse (all nodes illuminate simultaneously when pulse arrives)
-    nodes.forEach(function (node) {
+    // All four products at full orbit presence
+    nodes.forEach(function (node, i) {
       tl.to(node, {
-        scale: 1.05,
-        opacity: 1.0,
-        duration: 1.2,
+        opacity: 1,
+        scale: lineupScale,
+        x: finalSlots[i].x,
+        y: finalSlots[i].y,
+        rotation: 0,
+        duration: 1.0,
         ease: 'power3.out'
-      }, finalStart + 0.8);
-      
-      var visual = node.querySelector('.product-card__visual');
-      if (visual) {
-        tl.to(visual, {
-          filter: 'drop-shadow(0 0 30px rgba(77, 166, 255, 0.7))',
-          duration: 1.2,
-          ease: 'power3.out'
-        }, finalStart + 0.8);
-      }
-      
-      var tag = node.querySelector('.product-callout__tag');
-      if (tag) {
-        tl.to(tag, {
-          color: '#FFFFFF',
-          textShadow: '0 0 10px rgba(77, 166, 255, 0.8), 0 0 2px #FFFFFF',
-          duration: 1.2,
-          ease: 'power3.out'
-        }, finalStart + 0.8);
-      }
-
-      var pointerLine = node.querySelector('.product-callout__pointer-line');
-      if (pointerLine) {
-        tl.to(pointerLine, {
-          background: 'linear-gradient(180deg, rgba(77, 166, 255, 0.95), transparent)',
-          duration: 1.2,
-          ease: 'power3.out'
-        }, finalStart + 0.8);
-      }
-
-      var calloutContent = node.querySelector('.product-callout__content');
-      if (calloutContent) {
-        tl.to(calloutContent, {
-          opacity: 1.0,
-          duration: 1.2,
-          ease: 'power3.out'
-        }, finalStart + 0.8);
-      }
+      }, s6 + 0.25 + i * 0.06);
     });
 
-    // 6. Fade in final frame typography & CTAs
+    tl.set(productsGrid, { pointerEvents: 'auto' }, s6 + 1.0);
+
+    // Final headline & CTAs — payoff moment
     tl.fromTo(frameFinal,
-      { opacity: 0, y: 45, pointerEvents: 'none' },
-      { opacity: 1, y: 0, pointerEvents: 'auto', duration: 1.2, ease: 'power2.out' },
-      finalStart + 0.8
+      { opacity: 0, y: 36, pointerEvents: 'none' },
+      { opacity: 1, y: 0, pointerEvents: 'auto', duration: 1.0, ease: 'power2.out' },
+      s6 + 0.9
     );
   }
 
@@ -1706,11 +1757,11 @@
     var monolith = section.querySelector('.centerpiece-obelisk');
     if (monolith) {
       gsap.fromTo(monolith,
-        { scale: 0.8, opacity: 0 },
+        { scale: 0.6, opacity: 0 },
         {
           scale: 1,
           opacity: 1,
-          duration: 1.0,
+          duration: 1.2,
           scrollTrigger: {
             trigger: monolith,
             start: 'top 85%',
@@ -1723,10 +1774,11 @@
     var nodes = section.querySelectorAll('.otodor-hero__product-node');
     nodes.forEach(function (node) {
       gsap.fromTo(node,
-        { y: 30, opacity: 0 },
+        { y: 30, opacity: 0, scale: 0.95 },
         {
           y: 0,
           opacity: 1,
+          scale: 1,
           duration: 0.8,
           scrollTrigger: {
             trigger: node,
