@@ -577,12 +577,81 @@
     transform: scale(1.04);
   }
 
-  /* ─ Hidden / Desktop only containers by default ─────────────── */
-  .otodor-hero__stage,
+  /* ─ Hidden on mobile — desktop-only cinematic containers ─────── */
   .otodor-hero__vault-pedestal,
   .otodor-hero__connections-svg,
   .product-reveal-caption {
     display: none;
+  }
+
+  /* ─ Mobile / tablet centerpiece stage (< 1024px) ─────────────
+     The monolith becomes the focal hero between the intro and
+     final frames. Desktop (>= 1024px) re-governs the stage via
+     the .js-animated cinematic rules further below. */
+  @media (max-width: 1023px) {
+    /* Compact vertical rhythm so users reach the content below the
+       hero quickly — the hero should be ~one screen, not a long scroll. */
+    .otodor-hero {
+      padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .otodor-hero__viewport {
+      gap: 0.75rem;
+    }
+
+    .otodor-hero__text-frame {
+      margin-bottom: 0;
+    }
+
+    /* Drop the scroll cue on mobile — the hero is short now,
+       so it only adds vertical bulk. */
+    .otodor-hero__scroll-indicator {
+      display: none;
+    }
+
+    .otodor-hero__actions {
+      margin-top: 1rem;
+    }
+
+    .otodor-hero__stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      position: relative;
+      padding: 0;
+    }
+
+    /* Soft pedestal halo so the monolith reads as a deliberate
+       centerpiece rather than floating in empty space. */
+    .otodor-hero__stage::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(77, 166, 255, 0.10) 0%, rgba(77, 166, 255, 0.03) 42%, transparent 70%);
+      filter: blur(28px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Product cards are surfaced in the collection sections below;
+       keep the mobile hero clean and centred on the monolith. */
+    .otodor-hero__products-grid {
+      display: none;
+    }
+
+    /* Monolith centerpiece — sized to stay compact on mobile. */
+    .otodor-hero__core-container {
+      width: 120px;
+      height: 165px;
+      margin: 0.5rem auto;
+      z-index: 10;
+    }
   }
 
   /* ─ Scroll guide indicator (Mobile) ────────────────────────── */
@@ -1449,7 +1518,7 @@
       scrollTrigger: {
         trigger: section,
         start: 'top top',
-        end: '+=500%', // Pinned scroll track height
+        end: '+=280%', // Pinned scroll track height — shorter scroll to clear the hero
         scrub: 1,
         pin: true,
         anticipatePin: 1
@@ -1789,7 +1858,7 @@
         {
           scale: 1,
           opacity: 1,
-          duration: 1.2,
+          duration: 0.6,
           scrollTrigger: {
             trigger: monolith,
             start: 'top 85%',
@@ -1807,7 +1876,7 @@
           y: 0,
           opacity: 1,
           scale: 1,
-          duration: 0.8,
+          duration: 0.4,
           scrollTrigger: {
             trigger: node,
             start: 'top 85%',
