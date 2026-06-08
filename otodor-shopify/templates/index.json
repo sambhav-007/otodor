@@ -27,44 +27,52 @@
       "blocks": {
         "pillar_1": {
           "type": "pillar",
-          "settings": {
-            "icon": "wrench",
-            "title": "Free Installation",
-            "description": "Free professional home installation across India."
-          }
+          "settings": { "icon": "wrench", "title": "Free Professional Installation" }
         },
         "pillar_2": {
           "type": "pillar",
-          "settings": {
-            "icon": "shield",
-            "title": "1-Year Warranty",
-            "description": "Complete peace of mind with a 1-year brand warranty."
-          }
+          "settings": { "icon": "shield", "title": "1-Year Brand Warranty" }
         },
         "pillar_3": {
           "type": "pillar",
-          "settings": {
-            "icon": "mobile",
-            "title": "App Connectivity",
-            "description": "Control access, view activity logs, and manage keys via app."
-          }
+          "settings": { "icon": "fingerprint", "title": "Fingerprint & PIN Access" }
         },
         "pillar_4": {
           "type": "pillar",
-          "settings": {
-            "icon": "key",
-            "title": "Smart Access",
-            "description": "Unlock via fingerprint, PIN, RFID card, physical key, or mobile app."
-          }
+          "settings": { "icon": "mobile", "title": "Mobile App Control" }
+        },
+        "pillar_5": {
+          "type": "pillar",
+          "settings": { "icon": "wifi", "title": "Remote Access Anywhere" }
+        },
+        "pillar_6": {
+          "type": "pillar",
+          "settings": { "icon": "tag", "title": "RFID Keycard Entry" }
+        },
+        "pillar_7": {
+          "type": "pillar",
+          "settings": { "icon": "clock", "title": "Real-Time Audit Logs" }
+        },
+        "pillar_8": {
+          "type": "pillar",
+          "settings": { "icon": "star", "title": "Rated 4.9 by 500+ Homes" }
         }
       },
       "block_order": [
         "pillar_1",
         "pillar_2",
         "pillar_3",
-        "pillar_4"
+        "pillar_4",
+        "pillar_5",
+        "pillar_6",
+        "pillar_7",
+        "pillar_8"
       ],
-      "settings": {}
+      "settings": {
+        "speed": 55,
+        "pause_on_hover": true,
+        "aria_label": "Why choose OTODOR"
+      }
     },
     "otodor_categories": {
       "type": "otodor-categories",
@@ -131,6 +139,65 @@
         "eyebrow": "Browse Collections",
         "heading": "Shop by ",
         "heading_accent": "category."
+      }
+    },
+    "otodor_flagship": {
+      "type": "otodor-flagship",
+      "blocks": {
+        "spec_1": {
+          "type": "spec",
+          "settings": {
+            "label": "Obstacle Sensing",
+            "title": "Stops the instant it matters.",
+            "description": "Intelligent sensors halt the gate the moment a person, pet, or vehicle crosses its path.",
+            "hotspot_x": 50,
+            "hotspot_y": 44
+          }
+        },
+        "spec_2": {
+          "type": "spec",
+          "settings": {
+            "label": "Heavy-Duty Drive",
+            "title": "Moves the weight, every day.",
+            "description": "A high-torque motor drives large residential gates smoothly through thousands of cycles.",
+            "hotspot_x": 60,
+            "hotspot_y": 70
+          }
+        },
+        "spec_3": {
+          "type": "spec",
+          "settings": {
+            "label": "Remote & App Control",
+            "title": "Open the way before you arrive.",
+            "description": "Trigger the gate from your car remote or the OTODOR app — no stopping, no stepping out.",
+            "hotspot_x": 40,
+            "hotspot_y": 24
+          }
+        },
+        "spec_4": {
+          "type": "spec",
+          "settings": {
+            "label": "Built For The Outdoors",
+            "title": "Engineered for monsoon and dust.",
+            "description": "A weather-sealed housing and battery backup keep your gate moving through rain and power cuts.",
+            "hotspot_x": 54,
+            "hotspot_y": 56
+          }
+        }
+      },
+      "block_order": [
+        "spec_1",
+        "spec_2",
+        "spec_3",
+        "spec_4"
+      ],
+      "settings": {
+        "eyebrow": "The Flagship",
+        "flagship_name": "Sliding Gate Motor",
+        "tagline": "Effortless automation for heavy sliding gates — engineered to open the way before you arrive.",
+        "product_image": "shopify://shop_images/Sliding_gate_motor_45.png",
+        "cta_label": "Explore Gate Automation",
+        "cta_link": "/collections/sliding-gate-motors"
       }
     },
     "otodor_features": {
@@ -307,6 +374,7 @@
   "order": [
     "otodor_hero",
     "otodor_categories",
+    "otodor_flagship",
     "otodor_trust_bar",
     "otodor_features",
     "otodor_smart_living",

@@ -41,6 +41,9 @@
     endif
   -%}
   <div class="card-wrapper product-card-wrapper underline-links-hover">
+    <div class="border-glow-card" data-border-glow>
+      <span class="edge-light"></span>
+      <div class="border-glow-inner">
     <div
       class="
         card card--{{ settings.card_style }}
@@ -567,6 +570,8 @@
         </div>
       </div>
     </div>
+      </div>
+    </div>
   </div>
 {%- else -%}
   {%- liquid
@@ -577,6 +582,9 @@
     endif
   -%}
   <div class="card-wrapper product-card-wrapper underline-links-hover">
+    <div class="border-glow-card" data-border-glow>
+      <span class="edge-light"></span>
+      <div class="border-glow-inner">
     <div
       class="
         card card--{{ settings.card_style }}
@@ -618,6 +626,8 @@
             {% render 'price', placeholder: placeholder, show_compare_at_price: true %}
           </div>
         </div>
+      </div>
+    </div>
       </div>
     </div>
   </div>
