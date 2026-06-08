@@ -230,6 +230,9 @@
         "feat_1": {
           "type": "feature",
           "settings": {
+            "tile_size": "large",
+            "motif": "fingerprint",
+            "image": "shopify://shop_images/onyx_keypad.png",
             "icon": "fingerprint",
             "title": "Fingerprint Access",
             "description": "Unlock instantly with a single touch using advanced 3D biometric recognition."
@@ -238,6 +241,8 @@
         "feat_2": {
           "type": "feature",
           "settings": {
+            "tile_size": "wide",
+            "motif": "app",
             "icon": "mobile",
             "title": "Mobile App Control",
             "description": "Control lock status, manage temporary passcodes, and monitor entry from anywhere."
@@ -246,22 +251,28 @@
         "feat_3": {
           "type": "feature",
           "settings": {
+            "tile_size": "small",
+            "motif": "signal",
             "icon": "wifi",
             "title": "Remote Unlock",
-            "description": "Grant access remotely in real-time when guests or delivery personnel arrive."
+            "description": "Grant access in real-time when guests or delivery arrive."
           }
         },
         "feat_4": {
           "type": "feature",
           "settings": {
+            "tile_size": "small",
+            "motif": "rfid",
             "icon": "tag",
             "title": "RFID Access",
-            "description": "Tap key cards or smart tags to enter instantly. Fast, secure, and effortless."
+            "description": "Tap key cards or smart tags to enter instantly."
           }
         },
         "feat_5": {
           "type": "feature",
           "settings": {
+            "tile_size": "wide",
+            "motif": "keypad",
             "icon": "keypad",
             "title": "PIN Access",
             "description": "Create custom access codes. Features anti-peep technology to protect your password."
@@ -270,6 +281,8 @@
         "feat_6": {
           "type": "feature",
           "settings": {
+            "tile_size": "wide",
+            "motif": "log",
             "icon": "clock",
             "title": "Audit Logs",
             "description": "Access full, real-time logs of exactly who entered your home and when."

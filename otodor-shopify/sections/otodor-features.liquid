@@ -1,7 +1,8 @@
 {%- style -%}
   /* ─────────────────────────────────────────────────────────
-     OTODOR Features Section
-     A responsive grid of technology features with icon glows.
+     OTODOR Features — asymmetric "bento" grid.
+     Tiles vary in size (hierarchy) and each is filled with a
+     restrained CSS/SVG technical motif so there is no dead space.
   ───────────────────────────────────────────────────────── */
 
   #shopify-section-{{ section.id }} {
@@ -14,31 +15,92 @@
     padding-block: var(--otodor-section-py);
   }
 
+  /* Header — left-aligned split (breaks the centered accent-word pattern) */
   .otodor-features__header {
-    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--otodor-space-lg);
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
   }
 
+  .otodor-features__header-text { max-width: 40ch; }
+
+  .otodor-features__subheading {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-sm);
+    line-height: var(--otodor-leading-base);
+    color: var(--otodor-muted);
+    max-width: 38ch;
+    margin: 0;
+    text-align: right;
+  }
+
+  /* ─ Bento grid ──────────────────────────────────────────── */
   .otodor-features__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--otodor-space-lg);
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(168px, auto);
+    grid-auto-flow: dense;
+    gap: clamp(0.75rem, 1.4vw, 1.25rem);
   }
 
   .otodor-feature-tile {
-    padding: clamp(1.5rem, 3vw, 2.25rem);
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.4rem, 2.2vw, 2rem);
     display: flex;
     flex-direction: column;
-    gap: var(--otodor-space-md);
+    border-radius: 20px;
+    isolation: isolate;
+  }
+
+  /* Grid placement lives on the glow wrapper (the actual grid child) */
+  .otodor-feature-tile-glow--large { grid-column: span 2; grid-row: span 2; }
+  .otodor-feature-tile-glow--wide  { grid-column: span 2; }
+  .otodor-feature-tile-glow--small { grid-column: span 1; }
+
+  /* BorderGlow wrapper: keep only the glow layers; the inner tile carries the frame */
+  .otodor-feature-tile-glow.border-glow-card {
+    --border-radius: 20px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
     height: 100%;
-    min-height: 220px;
-    align-items: flex-start;
+  }
+  .otodor-feature-tile-glow > .border-glow-inner { height: 100%; }
+  .otodor-feature-tile-glow > .border-glow-inner > .otodor-feature-tile { height: 100%; }
+
+  /* Large hero tile anchors its content to the bottom over the render */
+  .otodor-feature-tile--large { justify-content: flex-end; }
+
+  /* Content sits above the motif */
+  .otodor-feature-tile__content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-width: 30ch;
   }
 
   .otodor-feature-tile__icon {
     color: var(--otodor-blue);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(77, 166, 255, 0.08);
+    border: 1px solid rgba(77, 166, 255, 0.16);
+    margin-bottom: 0.6rem;
+  }
+
+  .otodor-feature-tile__icon svg { width: 22px; height: 22px; }
+
+  .otodor-feature-tile--large .otodor-feature-tile__title {
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
   }
 
   .otodor-feature-tile__title {
@@ -49,7 +111,6 @@
     letter-spacing: var(--otodor-tracking-tight);
     color: var(--otodor-white);
     margin: 0;
-    margin-top: var(--otodor-space-2xs);
   }
 
   .otodor-feature-tile__desc {
@@ -60,22 +121,131 @@
     margin: 0;
   }
 
-  /* ─ Mobile & Tablet responsiveness ──────────────────────── */
+  /* Hover: lift + intensify motif */
+  .otodor-feature-tile {
+    transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 400ms ease, box-shadow 400ms ease;
+  }
+  .otodor-feature-tile:hover { transform: translateY(-4px); }
+  .otodor-feature-tile:hover .feat-motif { opacity: 0.9; }
+
+  /* ─ Motif base ──────────────────────────────────────────── */
+  .feat-motif {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.55;
+    transition: opacity 400ms ease;
+  }
+  .feat-motif svg { display: block; }
+  .feat-motif--stroke { stroke: var(--otodor-blue); fill: none; }
+
+  /* Fingerprint (large) — product render + scanning sweep */
+  .otodor-feature-tile--large .otodor-feature-tile__render {
+    position: absolute;
+    z-index: 2;
+    right: 4%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 54%;
+    max-width: 340px;
+    height: 84%;
+    object-fit: contain;
+    object-position: center right;
+    filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 30px rgba(77, 166, 255, 0.12));
+    pointer-events: none;
+  }
+  .feat-fingerprint {
+    left: auto; right: 2%; width: 58%;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0.4;
+  }
+  .feat-fingerprint svg { width: 78%; height: auto; color: var(--otodor-blue); }
+  .feat-fingerprint::after {
+    content: ""; position: absolute; left: 42%; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(77, 166, 255, 0.9), transparent);
+    top: 18%;
+    box-shadow: 0 0 12px rgba(77, 166, 255, 0.6);
+    animation: feat-scan 3.4s ease-in-out infinite;
+  }
+  @keyframes feat-scan { 0%,100% { top: 22%; opacity: 0.2; } 50% { top: 74%; opacity: 1; } }
+
+  /* Mobile app (wide) — minimal phone mock */
+  .feat-app {
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8%;
+  }
+  .feat-phone {
+    width: 116px; height: 152px; border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: linear-gradient(160deg, rgba(40,46,58,0.6), rgba(12,14,20,0.6));
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5); padding: 12px 10px;
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .feat-phone__pill { height: 28px; border-radius: 8px; background: rgba(77,166,255,0.16); border: 1px solid rgba(77,166,255,0.3); position: relative; }
+  .feat-phone__pill::after { content:""; position:absolute; right:6px; top:6px; width:16px; height:16px; border-radius:50%; background: var(--otodor-blue); box-shadow: 0 0 10px rgba(77,166,255,0.7); animation: feat-toggle 3s ease-in-out infinite; }
+  @keyframes feat-toggle { 0%,45% { right:6px; } 55%,100% { right: calc(100% - 22px); } }
+  .feat-phone__row { height: 9px; border-radius: 5px; background: rgba(255,255,255,0.07); }
+  .feat-phone__row--short { width: 60%; }
+
+  /* Signal (small) — concentric remote waves */
+  .feat-signal { display:flex; align-items:center; justify-content:center; }
+  .feat-signal span { position:absolute; width: 26px; height: 26px; border-radius:50%; border:1.5px solid rgba(77,166,255,0.5); animation: feat-ping 3s ease-out infinite; }
+  .feat-signal span:nth-child(2){ animation-delay: 1s; }
+  .feat-signal span:nth-child(3){ animation-delay: 2s; }
+  @keyframes feat-ping { 0% { transform: scale(0.4); opacity: 0.9; } 100% { transform: scale(3.4); opacity: 0; } }
+
+  /* RFID (small) — card + tap ripple */
+  .feat-rfid { display:flex; align-items:center; justify-content:center; }
+  .feat-rfid__card { width:52px; height:34px; border-radius:6px; border:1.5px solid rgba(77,166,255,0.5); position:relative; }
+  .feat-rfid__card::before { content:""; position:absolute; right:6px; top:8px; width:10px; height:10px; border-radius:50%; border:1.5px solid rgba(77,166,255,0.6); }
+  .feat-rfid__ripple { position:absolute; width:34px; height:34px; border-radius:50%; border:1.5px solid rgba(77,166,255,0.4); animation: feat-ping 2.6s ease-out infinite; }
+
+  /* Keypad (wide) — anti-peep PIN grid */
+  .feat-keypad { display:flex; align-items:center; justify-content:flex-end; padding-right: 9%; }
+  .feat-keypad__grid { display:grid; grid-template-columns: repeat(3, 18px); grid-auto-rows: 18px; gap: 9px; }
+  .feat-keypad__grid i { display:block; border-radius:50%; border:1.5px solid rgba(255,255,255,0.14); }
+  .feat-keypad__grid i.lit { border-color: rgba(77,166,255,0.7); background: rgba(77,166,255,0.18); box-shadow:0 0 10px rgba(77,166,255,0.4); animation: feat-key 4s steps(1) infinite; }
+  .feat-keypad__grid i:nth-child(2).lit { animation-delay: 1s; }
+  .feat-keypad__grid i:nth-child(8).lit { animation-delay: 2s; }
+  .feat-keypad__grid i:nth-child(6).lit { animation-delay: 3s; }
+  @keyframes feat-key { 0%,20% { opacity:1; } 25%,100% { opacity:0.25; } }
+
+  /* Log (wide) — audit feed rows */
+  .feat-log { display:flex; flex-direction:column; justify-content:center; gap:7px; padding-right: 8%; align-items:flex-end; }
+  .feat-log__row { display:flex; align-items:center; gap:8px; width: 150px; opacity:0.5; }
+  .feat-log__row i { width:6px; height:6px; border-radius:50%; background: var(--otodor-blue); flex:0 0 auto; }
+  .feat-log__row b { height:7px; border-radius:4px; background: rgba(255,255,255,0.12); flex:1; }
+  .feat-log__row--active { opacity:1; animation: feat-logfeed 4s ease-in-out infinite; }
+  @keyframes feat-logfeed { 0%,100% { opacity:0.35; } 50% { opacity:1; } }
+
+  /* ─ Responsive ──────────────────────────────────────────── */
   @media (max-width: 1024px) {
-    .otodor-features__grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    .otodor-features__grid { grid-template-columns: repeat(2, 1fr); }
+    .otodor-feature-tile-glow--large { grid-column: span 2; grid-row: span 1; min-height: 260px; }
+    .otodor-feature-tile-glow--wide  { grid-column: span 2; }
+    .otodor-feature-tile-glow--small { grid-column: span 1; }
   }
 
   @media (max-width: 599px) {
-    .otodor-features__grid {
-      grid-template-columns: 1fr;
-      gap: var(--otodor-space-md);
-    }
-    .otodor-feature-tile {
-      min-height: auto;
-      padding: var(--otodor-space-lg);
-    }
+    .otodor-features__header { flex-direction: column; align-items: flex-start; }
+    .otodor-features__subheading { text-align: left; }
+    .otodor-features__grid { grid-template-columns: 1fr; }
+    .otodor-feature-tile-glow,
+    .otodor-feature-tile-glow--large,
+    .otodor-feature-tile-glow--wide,
+    .otodor-feature-tile-glow--small { grid-column: span 1; grid-row: auto; }
+    .otodor-feature-tile--large .otodor-feature-tile__render { width: 42%; right: 3%; height: 72%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feat-fingerprint::after,
+    .feat-phone__pill::after,
+    .feat-signal span,
+    .feat-rfid__ripple,
+    .feat-keypad__grid i.lit,
+    .feat-log__row--active { animation: none !important; }
   }
 {%- endstyle -%}
 
@@ -86,27 +256,87 @@
   aria-labelledby="otodor-features-title-{{ section.id }}"
 >
   <div class="otodor-container">
-    <div class="otodor-features__header otodor-section-header otodor-section-header--center">
-      <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
-      <h2 class="otodor-heading-2" id="otodor-features-title-{{ section.id }}" data-otodor-reveal="fade-up">
-        {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
-      </h2>
+    <div class="otodor-features__header">
+      <div class="otodor-features__header-text">
+        <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+        <h2 class="otodor-heading-2" id="otodor-features-title-{{ section.id }}" data-otodor-reveal="fade-up">
+          {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
+        </h2>
+      </div>
       {%- if section.settings.subheading != blank -%}
-        <p class="otodor-body-lg" data-otodor-reveal="fade-up">{{ section.settings.subheading | escape }}</p>
+        <p class="otodor-features__subheading" data-otodor-reveal="fade-up">{{ section.settings.subheading | escape }}</p>
       {%- endif -%}
     </div>
 
     <div class="otodor-features__grid" data-otodor-stagger>
       {%- for block in section.blocks -%}
+        {%- assign size = block.settings.tile_size | default: 'small' -%}
+        <div class="otodor-feature-tile-glow otodor-feature-tile-glow--{{ size }} border-glow-card" data-border-glow {{ block.shopify_attributes }}>
+          <span class="edge-light"></span>
+          <div class="border-glow-inner">
         <div
-          class="otodor-feature-tile otodor-glass-card otodor-glass-card--raised"
-          {{ block.shopify_attributes }}
+          class="otodor-feature-tile otodor-feature-tile--{{ size }} otodor-glass-card otodor-glass-card--raised"
         >
-          <div class="otodor-icon-wrap otodor-feature-tile__icon">
-            {% render 'otodor-icon', name: block.settings.icon %}
+          {%- comment -%} Motif layer {%- endcomment -%}
+          {%- case block.settings.motif -%}
+            {%- when 'fingerprint' -%}
+              <div class="feat-motif feat-fingerprint" aria-hidden="true">
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                  <path d="M50 14a36 36 0 0 0-36 36"/>
+                  <path d="M50 24a26 26 0 0 0-26 26v10"/>
+                  <path d="M50 34a16 16 0 0 0-16 16v18"/>
+                  <path d="M50 44a6 6 0 0 0-6 6v24"/>
+                  <path d="M86 50a36 36 0 0 0-18-31"/>
+                  <path d="M76 56v-6a26 26 0 0 0-13-22"/>
+                  <path d="M66 68V50a16 16 0 0 0-8-14"/>
+                  <path d="M56 74V50a6 6 0 0 0-3-5"/>
+                </svg>
+              </div>
+            {%- when 'app' -%}
+              <div class="feat-motif feat-app" aria-hidden="true">
+                <div class="feat-phone">
+                  <div class="feat-phone__pill"></div>
+                  <div class="feat-phone__row"></div>
+                  <div class="feat-phone__row feat-phone__row--short"></div>
+                  <div class="feat-phone__row"></div>
+                  <div class="feat-phone__row feat-phone__row--short"></div>
+                </div>
+              </div>
+            {%- when 'signal' -%}
+              <div class="feat-motif feat-signal" aria-hidden="true"><span></span><span></span><span></span></div>
+            {%- when 'rfid' -%}
+              <div class="feat-motif feat-rfid" aria-hidden="true">
+                <div class="feat-rfid__card"></div>
+                <div class="feat-rfid__ripple"></div>
+              </div>
+            {%- when 'keypad' -%}
+              <div class="feat-motif feat-keypad" aria-hidden="true">
+                <div class="feat-keypad__grid">
+                  <i></i><i class="lit"></i><i></i><i></i><i></i><i class="lit"></i><i class="lit"></i><i></i><i class="lit"></i><i></i><i></i><i></i>
+                </div>
+              </div>
+            {%- when 'log' -%}
+              <div class="feat-motif feat-log" aria-hidden="true">
+                <div class="feat-log__row feat-log__row--active"><i></i><b></b></div>
+                <div class="feat-log__row"><i></i><b></b></div>
+                <div class="feat-log__row"><i></i><b></b></div>
+                <div class="feat-log__row feat-log__row--active"><i></i><b></b></div>
+              </div>
+          {%- endcase -%}
+
+          {%- if size == 'large' and block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy', class: 'otodor-feature-tile__render', alt: block.settings.title }}
+          {%- endif -%}
+
+          <div class="otodor-feature-tile__content">
+            <div class="otodor-icon-wrap otodor-feature-tile__icon">
+              {% render 'otodor-icon', name: block.settings.icon %}
+            </div>
+            <h3 class="otodor-feature-tile__title">{{ block.settings.title | escape }}</h3>
+            <p class="otodor-feature-tile__desc">{{ block.settings.description | escape }}</p>
           </div>
-          <h3 class="otodor-feature-tile__title">{{ block.settings.title | escape }}</h3>
-          <p class="otodor-feature-tile__desc">{{ block.settings.description | escape }}</p>
+        </div>
+          </div>
         </div>
       {%- endfor -%}
     </div>
@@ -120,36 +350,47 @@
   "class": "shopify-section",
   "max_blocks": 9,
   "settings": [
-    {
-      "type": "text",
-      "id": "eyebrow",
-      "label": "Eyebrow text",
-      "default": "Core Technology"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading text",
-      "default": "Smart security for modern "
-    },
-    {
-      "type": "text",
-      "id": "heading_accent",
-      "label": "Heading accented text",
-      "default": "homes."
-    },
-    {
-      "type": "textarea",
-      "id": "subheading",
-      "label": "Subheading",
-      "default": "Every access point engineered with next-generation recognition and military-grade encryption."
-    }
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Core Technology" },
+    { "type": "text", "id": "heading", "label": "Heading text", "default": "Smart security for modern " },
+    { "type": "text", "id": "heading_accent", "label": "Heading accented text", "default": "homes." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Every access point engineered with next-generation recognition and military-grade encryption." }
   ],
   "blocks": [
     {
       "type": "feature",
       "name": "Feature Point",
       "settings": [
+        {
+          "type": "select",
+          "id": "tile_size",
+          "label": "Tile size",
+          "default": "small",
+          "options": [
+            { "value": "large", "label": "Large (2x2 — hero)" },
+            { "value": "wide", "label": "Wide (2x1)" },
+            { "value": "small", "label": "Small (1x1)" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "motif",
+          "label": "Background motif",
+          "default": "none",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "fingerprint", "label": "Fingerprint scan" },
+            { "value": "app", "label": "Phone app" },
+            { "value": "signal", "label": "Remote signal" },
+            { "value": "rfid", "label": "RFID tap" },
+            { "value": "keypad", "label": "PIN keypad" },
+            { "value": "log", "label": "Audit log feed" }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Product render (large tile only)"
+        },
         {
           "type": "select",
           "id": "icon",
@@ -165,18 +406,8 @@
             { "value": "shield", "label": "Shield / Security" }
           ]
         },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Feature Title",
-          "default": "Fingerprint Access"
-        },
-        {
-          "type": "textarea",
-          "id": "description",
-          "label": "Feature Description",
-          "default": "Unlock instantly with a single touch using advanced 3D biometric recognition."
-        }
+        { "type": "text", "id": "title", "label": "Feature Title", "default": "Fingerprint Access" },
+        { "type": "textarea", "id": "description", "label": "Feature Description", "default": "Unlock instantly with a single touch using advanced 3D biometric recognition." }
       ]
     }
   ],
@@ -184,54 +415,12 @@
     {
       "name": "OTODOR Key Features",
       "blocks": [
-        {
-          "type": "feature",
-          "settings": {
-            "icon": "fingerprint",
-            "title": "Fingerprint Access",
-            "description": "Unlock instantly with a single touch using advanced 3D biometric recognition."
-          }
-        },
-        {
-          "type": "feature",
-          "settings": {
-            "icon": "mobile",
-            "title": "Mobile App Control",
-            "description": "Control lock status, manage temporary passcodes, and monitor entry from anywhere."
-          }
-        },
-        {
-          "type": "feature",
-          "settings": {
-            "icon": "wifi",
-            "title": "Remote Unlock",
-            "description": "Grant access remotely in real-time when guests or delivery personnel arrive."
-          }
-        },
-        {
-          "type": "feature",
-          "settings": {
-            "icon": "tag",
-            "title": "RFID Access",
-            "description": "Tap key cards or smart tags to enter instantly. Fast, secure, and effortless."
-          }
-        },
-        {
-          "type": "feature",
-          "settings": {
-            "icon": "keypad",
-            "title": "PIN Access",
-            "description": "Create custom access codes. Features anti-peep technology to protect your password."
-          }
-        },
-        {
-          "type": "feature",
-          "settings": {
-            "icon": "clock",
-            "title": "Audit Logs",
-            "description": "Access full, real-time logs of exactly who entered your home and when."
-          }
-        }
+        { "type": "feature", "settings": { "tile_size": "large", "motif": "fingerprint", "icon": "fingerprint", "title": "Fingerprint Access", "description": "Unlock instantly with a single touch using advanced 3D biometric recognition." } },
+        { "type": "feature", "settings": { "tile_size": "wide", "motif": "app", "icon": "mobile", "title": "Mobile App Control", "description": "Control lock status, manage temporary passcodes, and monitor entry from anywhere." } },
+        { "type": "feature", "settings": { "tile_size": "small", "motif": "signal", "icon": "wifi", "title": "Remote Unlock", "description": "Grant access remotely in real-time when guests arrive." } },
+        { "type": "feature", "settings": { "tile_size": "small", "motif": "rfid", "icon": "tag", "title": "RFID Access", "description": "Tap key cards or smart tags to enter instantly." } },
+        { "type": "feature", "settings": { "tile_size": "wide", "motif": "keypad", "icon": "keypad", "title": "PIN Access", "description": "Custom access codes with anti-peep protection." } },
+        { "type": "feature", "settings": { "tile_size": "wide", "motif": "log", "icon": "clock", "title": "Audit Logs", "description": "Real-time logs of exactly who entered and when." } }
       ]
     }
   ]
