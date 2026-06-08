@@ -27,35 +27,59 @@
       "blocks": {
         "pillar_1": {
           "type": "pillar",
-          "settings": { "icon": "wrench", "title": "Free Professional Installation" }
+          "settings": {
+            "icon": "wrench",
+            "title": "Free Professional Installation"
+          }
         },
         "pillar_2": {
           "type": "pillar",
-          "settings": { "icon": "shield", "title": "1-Year Brand Warranty" }
+          "settings": {
+            "icon": "shield",
+            "title": "1-Year Brand Warranty"
+          }
         },
         "pillar_3": {
           "type": "pillar",
-          "settings": { "icon": "fingerprint", "title": "Fingerprint & PIN Access" }
+          "settings": {
+            "icon": "fingerprint",
+            "title": "Fingerprint & PIN Access"
+          }
         },
         "pillar_4": {
           "type": "pillar",
-          "settings": { "icon": "mobile", "title": "Mobile App Control" }
+          "settings": {
+            "icon": "mobile",
+            "title": "Mobile App Control"
+          }
         },
         "pillar_5": {
           "type": "pillar",
-          "settings": { "icon": "wifi", "title": "Remote Access Anywhere" }
+          "settings": {
+            "icon": "wifi",
+            "title": "Remote Access Anywhere"
+          }
         },
         "pillar_6": {
           "type": "pillar",
-          "settings": { "icon": "tag", "title": "RFID Keycard Entry" }
+          "settings": {
+            "icon": "tag",
+            "title": "RFID Keycard Entry"
+          }
         },
         "pillar_7": {
           "type": "pillar",
-          "settings": { "icon": "clock", "title": "Real-Time Audit Logs" }
+          "settings": {
+            "icon": "clock",
+            "title": "Real-Time Audit Logs"
+          }
         },
         "pillar_8": {
           "type": "pillar",
-          "settings": { "icon": "star", "title": "Rated 4.9 by 500+ Homes" }
+          "settings": {
+            "icon": "star",
+            "title": "Rated 4.9 by 500+ Homes"
+          }
         }
       },
       "block_order": [
@@ -99,8 +123,8 @@
         "cat_3": {
           "type": "category_card",
           "settings": {
-            "custom_title": "Sliding Gate Motors",
-            "tagline": "Powerful automated motors for heavy sliding gates.",
+            "custom_title": "Gate Automation",
+            "tagline": "Powerful automated motors for heavy gates.",
             "grid_size": "small",
             "collection": "sliding-gate-motors",
             "product_image_1": "shopify://shop_images/Sliding_gate_motor_45.png"
