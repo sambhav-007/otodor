@@ -1718,22 +1718,29 @@
     var s2 = 1.8;
     hideAllNarratives();
     revealProduct(node1, captions[0], 0, s2);
-    tl.to(centerpiece, { rotationY: -10, rotationX: 9, duration: 1.0, ease: 'power1.inOut' }, s2);
+    // Monolith leans toward card 1 (top-left) as it reveals
+    tl.to(centerpiece, { rotationY: -18, rotationX: 13, duration: 1.1, ease: 'power2.inOut' }, s2);
 
     // ── Scene 3: Gate Lock enters from right ──────────────────
     var s3 = 3.2;
     settleProduct(node1, captions[0], s3 - 0.3);
     revealProduct(node2, captions[1], 1, s3);
+    // Monolith leans toward card 2 (top-right)
+    tl.to(centerpiece, { rotationY: 18, rotationX: 13, duration: 1.1, ease: 'power2.inOut' }, s3);
 
     // ── Scene 4: Padlock enters from left ───────────────────
     var s4 = 4.6;
     settleProduct(node2, captions[1], s4 - 0.3);
     revealProduct(node3, captions[2], 2, s4);
+    // Monolith leans toward card 3 (bottom-left)
+    tl.to(centerpiece, { rotationY: -18, rotationX: -1, duration: 1.1, ease: 'power2.inOut' }, s4);
 
     // ── Scene 5: Gate Motor enters from below ─────────────────
     var s5 = 6.0;
     settleProduct(node3, captions[2], s5 - 0.3);
     revealProduct(node4, captions[3], 3, s5);
+    // Monolith leans toward card 4 (bottom-right)
+    tl.to(centerpiece, { rotationY: 18, rotationX: -1, duration: 1.1, ease: 'power2.inOut' }, s5);
 
     // ── Scene 6: Full ecosystem — illuminate, pulse, activate ─
     var s6 = 7.4;
@@ -1741,12 +1748,19 @@
     tl.to(captions[3], { opacity: 0, x: 10, duration: 0.55, ease: 'power3.inOut' }, s6 - 0.15);
 
     // Ecosystem activates in place — the monolith stays centred (no vertical lift)
+    // Acknowledge all four, then straighten upright like the start
+    tl.to(centerpiece, {
+      rotationY: 0,
+      rotationX: 13,
+      duration: 0.85,
+      ease: 'power2.inOut'
+    }, s6);
     tl.to(centerpiece, {
       rotationY: 0,
       rotationX: 6,
-      duration: 1.75,
+      duration: 1.1,
       ease: 'power4.out'
-    }, s6);
+    }, s6 + 0.85);
     tl.to(leftWing, { x: -112, duration: 1.65, ease: 'power4.out' }, s6);
     tl.to(rightWing, { x: 112, duration: 1.65, ease: 'power4.out' }, s6);
 
