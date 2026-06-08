@@ -62,16 +62,18 @@
     filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 26px rgba(77, 166, 255, 0.08));
   }
 
-  .otodor-flagship__visual .flagship-img {
+  .otodor-flagship__visual .flagship-slide {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
+    opacity: 0;
   }
 
-  .otodor-flagship__visual .flagship-img--alt {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
+  /* When the scroll animation isn't driving (mobile / no-JS), show the intro image */
+  .otodor-flagship__visual .flagship-slide[data-frame="0"] {
+    opacity: 1;
   }
 
   /* Moving hotspot (desktop only) */
@@ -181,6 +183,7 @@
     font-size: 0.9rem;
     text-decoration: none;
     align-self: flex-start;
+    margin-top: 1.5rem;
     transition: transform 200ms ease, background-color 200ms ease;
   }
 
@@ -289,6 +292,49 @@
       display: none !important;
     }
   }
+
+  /* ─ Tablet & mobile (<1024) — force the clean static stack ─── */
+  @media (max-width: 1023px) {
+    .otodor-flagship.js-animated {
+      height: auto !important;
+      padding: 4rem 1.5rem !important;
+    }
+    .otodor-flagship.js-animated .otodor-flagship__inner {
+      flex-direction: column !important;
+      height: auto !important;
+      gap: 2rem !important;
+    }
+    .otodor-flagship.js-animated .otodor-flagship__stage,
+    .otodor-flagship.js-animated .otodor-flagship__content {
+      width: auto !important;
+      height: auto !important;
+      display: flex !important;
+    }
+    .otodor-flagship.js-animated .otodor-flagship__content {
+      flex-direction: column !important;
+    }
+    .otodor-flagship.js-animated .flagship-frame {
+      position: static !important;
+      opacity: 1 !important;
+      transform: none !important;
+      width: auto !important;
+      padding-right: 0 !important;
+    }
+    .otodor-flagship .otodor-flagship__hotspot {
+      display: none !important;
+    }
+    .otodor-flagship__visual {
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    /* Only the intro image is shown in the static stack */
+    .otodor-flagship__visual .flagship-slide {
+      opacity: 0;
+    }
+    .otodor-flagship__visual .flagship-slide[data-frame="0"] {
+      opacity: 1 !important;
+    }
+  }
 {%- endstyle -%}
 
 <section
@@ -303,14 +349,27 @@
     <!-- Product stage -->
     <div class="otodor-flagship__stage">
       <div class="otodor-flagship__visual" data-3d-slot="flagship">
+        {%- comment -%} Frame 0 — intro image {%- endcomment -%}
         {%- if section.settings.product_image != blank -%}
-          {{ section.settings.product_image | image_url: width: 1000 | image_tag: loading: 'lazy', class: 'flagship-img flagship-img--main', alt: section.settings.flagship_name, widths: '400,600,800,1000,1200' }}
+          <img class="flagship-img flagship-slide" data-frame="0" src="{{ section.settings.product_image | image_url: width: 1000 }}" alt="{{ section.settings.flagship_name | escape }}" loading="lazy" width="1000" height="1000">
         {%- else -%}
-          <img class="flagship-img flagship-img--main" src="{{ 'Sliding_gate_motor_45.png' | file_img_url: '1000x' }}" alt="{{ section.settings.flagship_name | escape }}" loading="lazy" width="1000" height="1000">
+          <img class="flagship-img flagship-slide" data-frame="0" src="{{ 'Sliding_gate_motor_45.png' | file_img_url: '1000x' }}" alt="{{ section.settings.flagship_name | escape }}" loading="lazy" width="1000" height="1000">
         {%- endif -%}
 
-        {%- if section.settings.product_image_alt != blank -%}
-          {{ section.settings.product_image_alt | image_url: width: 1000 | image_tag: loading: 'lazy', class: 'flagship-img flagship-img--alt', alt: section.settings.flagship_name, widths: '400,600,800,1000,1200' }}
+        {%- comment -%} Frames 1..N — one per spec (blank = empty, keeps previous image) {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'spec' -%}
+            {%- if block.settings.image != blank -%}
+              <img class="flagship-img flagship-slide" data-frame="{{ forloop.index }}" src="{{ block.settings.image | image_url: width: 1000 }}" alt="{{ section.settings.flagship_name | escape }}" loading="lazy" width="1000" height="1000">
+            {%- else -%}
+              <span class="flagship-slide flagship-slide--empty" data-frame="{{ forloop.index }}" aria-hidden="true"></span>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- comment -%} Final frame image {%- endcomment -%}
+        {%- if section.settings.final_image != blank -%}
+          <img class="flagship-img flagship-slide" data-frame="final" src="{{ section.settings.final_image | image_url: width: 1000 }}" alt="{{ section.settings.flagship_name | escape }}" loading="lazy" width="1000" height="1000">
         {%- endif -%}
 
         <div class="otodor-flagship__hotspot" aria-hidden="true"></div>
@@ -383,8 +442,7 @@
     section.classList.add('js-animated');
 
     var visual = section.querySelector('.otodor-flagship__visual');
-    var imgMain = section.querySelector('.flagship-img--main');
-    var imgAlt = section.querySelector('.flagship-img--alt');
+    var slides = Array.prototype.slice.call(section.querySelectorAll('.flagship-slide'));
     var bloom = section.querySelector('.otodor-flagship__bloom');
     var hotspot = section.querySelector('.otodor-flagship__hotspot');
     var intro = section.querySelector('.flagship-frame--intro');
@@ -393,6 +451,17 @@
 
     // ── Initial state ─────────────────────────────────────────
     gsap.set(visual, { opacity: 0, scale: 0.92, rotationY: -6 });
+    // Stack of per-frame images: show the intro slide (frame 0), hide the rest
+    gsap.set(slides, { opacity: 0 });
+    var introSlide = section.querySelector('.flagship-slide[data-frame="0"]');
+    if (introSlide) gsap.set(introSlide, { opacity: 1 });
+    function showSlide(frameKey, time) {
+      var target = section.querySelector('.flagship-slide[data-frame="' + frameKey + '"]');
+      if (!target || target.classList.contains('flagship-slide--empty')) return; // keep current image
+      slides.forEach(function (s) {
+        tl.to(s, { opacity: s === target ? 1 : 0, duration: 0.6, ease: 'sine.inOut' }, time);
+      });
+    }
     gsap.set(bloom, { opacity: 0, scale: 0.9 });
     gsap.set(intro, { opacity: 1, y: 0 });
     gsap.set(specs, { opacity: 0, y: 24 });
@@ -422,7 +491,6 @@
 
     var specStart = introOut + 0.4;
     var specDur = 1.4;
-    var altSwapIndex = imgAlt ? Math.floor(specs.length / 2) : -1;
 
     specs.forEach(function (spec, i) {
       var st = specStart + i * specDur;
@@ -439,10 +507,8 @@
       tl.to(visual, { rotationY: (i % 2 === 0 ? 4 : -4), duration: 0.9, ease: 'sine.inOut' }, st);
 
       // Optional angle cross-fade at the midpoint
-      if (i === altSwapIndex) {
-        tl.to(imgMain, { opacity: 0, duration: 0.6, ease: 'sine.inOut' }, st);
-        tl.to(imgAlt, { opacity: 1, duration: 0.6, ease: 'sine.inOut' }, st);
-      }
+      // Swap the product image to this spec's slide (data-frame = i + 1)
+      showSlide(i + 1, st);
 
       // Fade this chapter out before the next (except the last)
       if (i < specs.length - 1) {
@@ -458,6 +524,7 @@
     tl.to(hotspot, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, tEnd - 0.2);
     tl.call(function () { if (hotspot) hotspot.classList.remove('is-on'); }, null, tEnd);
     tl.to(visual, { rotationY: 0, scale: 1.02, duration: 0.9, ease: 'power3.out' }, tEnd);
+    showSlide('final', tEnd);
     tl.to(finalFrame, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, tEnd + 0.15);
   }
 
@@ -507,9 +574,9 @@
     },
     {
       "type": "image_picker",
-      "id": "product_image_alt",
-      "label": "Product Image (alternate angle)",
-      "info": "Optional. Cross-fades in during the tour for a sense of dimension."
+      "id": "final_image",
+      "label": "Final slide image",
+      "info": "Shown on the closing frame."
     },
     {
       "type": "text",
@@ -544,6 +611,11 @@
           "type": "textarea",
           "id": "description",
           "label": "Description"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Slide image"
         },
         {
           "type": "range",

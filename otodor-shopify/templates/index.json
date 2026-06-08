@@ -174,6 +174,7 @@
             "label": "Obstacle Sensing",
             "title": "Stops the instant it matters.",
             "description": "Intelligent sensors halt the gate the moment a person, pet, or vehicle crosses its path.",
+            "image": "shopify://shop_images/flagship1.png",
             "hotspot_x": 50,
             "hotspot_y": 44
           }
@@ -184,6 +185,7 @@
             "label": "Heavy-Duty Drive",
             "title": "Moves the weight, every day.",
             "description": "A high-torque motor drives large residential gates smoothly through thousands of cycles.",
+            "image": "shopify://shop_images/Sliding_gate_motor_back.png",
             "hotspot_x": 60,
             "hotspot_y": 70
           }
@@ -204,6 +206,7 @@
             "label": "Built For The Outdoors",
             "title": "Engineered for monsoon and dust.",
             "description": "A weather-sealed housing and battery backup keep your gate moving through rain and power cuts.",
+            "image": "shopify://shop_images/flagship2.png",
             "hotspot_x": 54,
             "hotspot_y": 56
           }
@@ -220,6 +223,7 @@
         "flagship_name": "Sliding Gate Motor",
         "tagline": "Effortless automation for heavy sliding gates — engineered to open the way before you arrive.",
         "product_image": "shopify://shop_images/Sliding_gate_motor_45.png",
+        "final_image": "shopify://shop_images/flagship3.png",
         "cta_label": "Explore Gate Automation",
         "cta_link": "/collections/sliding-gate-motors"
       }
