@@ -1234,6 +1234,74 @@
       display: none !important;
     }
   }
+
+  /* ─ Mobile purpose-built pinned scroll (<1024, js-mobile-animated) ─
+     The monolith reveals and "powers on" as you scroll, with the
+     intro heading handing off to the final heading + CTA. Runs on all
+     phone widths down to 320px. Products stay surfaced in the
+     sections below, keeping the small-screen hero clean. */
+  @media (max-width: 1023px) {
+    .otodor-hero.js-mobile-animated {
+      height: 100vh;
+      min-height: 600px;
+      padding: 0;
+      overflow: hidden;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__viewport {
+      height: 100%;
+      position: relative;
+      display: block;
+      gap: 0;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 6;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__core-container {
+      width: 150px;
+      height: 250px;
+      margin: 0;
+      z-index: 10;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__products-grid {
+      display: none !important;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__text-container {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 88%;
+      max-width: 420px;
+      text-align: center;
+      z-index: 40;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__text-container:first-of-type {
+      top: 9%;
+      bottom: auto;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__text-container:last-of-type {
+      bottom: 9%;
+      top: auto;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__text-frame {
+      position: relative;
+      opacity: 0;
+      margin: 0;
+    }
+    .otodor-hero.js-mobile-animated .frame--intro {
+      opacity: 1;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__actions {
+      justify-content: center;
+    }
+    .otodor-hero.js-mobile-animated .otodor-hero__scroll-indicator {
+      display: none;
+    }
+  }
 {%- endstyle -%}
 
 <section
@@ -1504,9 +1572,26 @@
     // Respect reduced motion settings
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    // ── Tear down any previous build ──────────────────────────
+    // initHeroAnimation can run more than once (page load, theme-editor
+    // section reload, and breakpoint changes). Without this cleanup a
+    // desktop build persists when the viewport later becomes a phone, so
+    // the long desktop animation keeps running on mobile.
+    ScrollTrigger.getAll().forEach(function (st) {
+      if (st.trigger === section) st.kill(true);
+    });
+    section.classList.remove('js-animated', 'js-mobile-animated');
+    gsap.set(section.querySelectorAll(
+      '.centerpiece-obelisk, .obelisk-pillar--left-wing, .obelisk-pillar--right-wing, ' +
+      '.otodor-hero__product-node, .product-reveal-caption, .otodor-hero__text-frame, ' +
+      '.centerpiece-internal-glow, .pillar-seam, .pillar-layer-glow, .pillar-logo-icon, ' +
+      '.otodor-hero__glow-core, .otodor-hero__core-container, .otodor-hero__products-grid, ' +
+      '.otodor-hero__vault-pedestal, .otodor-hero__connections-svg, .otodor-hero__stage'
+    ), { clearProps: 'all' });
+
     var isDesktop = window.matchMedia('(min-width: 1024px)').matches;
     if (!isDesktop) {
-      initMobileReveals();
+      initMobileHero();
       return;
     }
 
@@ -1861,7 +1946,65 @@
     );
   }
 
-  /* ── GSAP Mobile Stack reveals ───────────────────────────── */
+  /* ── Mobile purpose-built pinned hero (all phones >= 320px) ──
+     The monolith reveals and powers on as you scroll; the intro
+     heading hands off to the final heading + CTA. */
+  function initMobileHero() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      initMobileReveals();
+      return;
+    }
+
+    section.classList.add('js-mobile-animated');
+
+    var centerpiece = section.querySelector('.centerpiece-obelisk');
+    var internalGlow = section.querySelector('.centerpiece-internal-glow');
+    var seams = section.querySelectorAll('.pillar-seam');
+    var plateGlows = section.querySelectorAll('.pillar-layer-glow');
+    var logoIcon = section.querySelector('.pillar-logo-icon');
+    var glowCore = section.querySelector('.otodor-hero__glow-core');
+    var frameIntro = section.querySelector('.frame--intro');
+    var frameFinal = section.querySelector('.frame--final');
+
+    if (frameIntro) gsap.set(frameIntro, { opacity: 1, y: 0 });
+    if (frameFinal) gsap.set(frameFinal, { opacity: 0, y: 30 });
+
+    var tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: '+=140%',
+        scrub: 1,
+        pin: true,
+        anticipatePin: 1
+      }
+    });
+
+    var leftWing = section.querySelector('.obelisk-pillar--left-wing');
+    var rightWing = section.querySelector('.obelisk-pillar--right-wing');
+
+    // Monolith comes FORWARD (no tilt) — held at a fixed clean angle
+    if (centerpiece) {
+      tl.fromTo(centerpiece,
+        { scale: 0.55, opacity: 0.3, rotationY: -14, rotationX: 8 },
+        { scale: 1, opacity: 1, rotationY: -14, rotationX: 8, duration: 2, ease: 'power3.out' }, 0);
+    }
+    // Side slabs fade in and COMBINE with the centre
+    if (leftWing) tl.fromTo(leftWing, { opacity: 0 }, { opacity: 0.75, duration: 1.4, ease: 'power2.out' }, 0.5);
+    if (rightWing) tl.fromTo(rightWing, { opacity: 0 }, { opacity: 0.75, duration: 1.4, ease: 'power2.out' }, 0.5);
+    // Becomes CLEAR — glow + seams ignite
+    if (glowCore) tl.fromTo(glowCore, { opacity: 0.2, scale: 0.9 }, { opacity: 0.55, scale: 1.02, duration: 2, ease: 'power3.out' }, 0);
+    if (internalGlow) tl.fromTo(internalGlow, { opacity: 0.18, scale: 0.85 }, { opacity: 0.6, scale: 1.12, duration: 2, ease: 'power3.out' }, 0.3);
+    if (plateGlows.length) tl.to(plateGlows, { background: 'rgba(77, 166, 255, 0.7)', opacity: 0.85, duration: 1.3, ease: 'power3.out' }, 0.8);
+    if (seams.length) tl.to(seams, { background: 'rgba(255, 255, 255, 0.95)', boxShadow: '0 0 10px rgba(77, 166, 255, 0.85)', duration: 1.3, ease: 'power3.out' }, 0.8);
+    if (logoIcon) tl.to(logoIcon, { filter: 'drop-shadow(0 0 8px rgba(77, 166, 255, 0.8)) brightness(1.15)', scale: 1.08, duration: 1.3, ease: 'power3.out' }, 0.8);
+
+    // Heading hand-off (intro → final + CTA)
+    if (frameIntro) tl.to(frameIntro, { opacity: 0, y: -20, duration: 0.9, ease: 'power2.inOut' }, 1.7);
+    if (frameFinal) tl.to(frameFinal, { opacity: 1, y: 0, duration: 1.0, ease: 'power3.out' }, 2.4);
+  }
+
+  /* ── GSAP Mobile Stack reveals (fallback if GSAP missing) ──── */
   function initMobileReveals() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
@@ -1914,6 +2057,16 @@
       initHeroAnimation();
     }
   });
+
+  // Rebuild when crossing the desktop/mobile breakpoint so the correct
+  // experience is always active (handles resize and devtools toggling).
+  var heroMq = window.matchMedia('(min-width: 1024px)');
+  var heroMqHandler = function () { initHeroAnimation(); };
+  if (heroMq.addEventListener) {
+    heroMq.addEventListener('change', heroMqHandler);
+  } else if (heroMq.addListener) {
+    heroMq.addListener(heroMqHandler);
+  }
 
 })();
 </script>
