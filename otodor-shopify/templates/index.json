@@ -219,6 +219,7 @@
         "spec_4"
       ],
       "settings": {
+        "color_scheme": "light",
         "eyebrow": "The Flagship",
         "flagship_name": "Sliding Gate Motor",
         "tagline": "Effortless automation for heavy sliding gates — engineered to open the way before you arrive.",
@@ -352,6 +353,7 @@
         "step_3"
       ],
       "settings": {
+        "color_scheme": "light",
         "eyebrow": "Installation",
         "heading": "Three steps to complete ",
         "heading_accent": "security."
@@ -394,6 +396,7 @@
         "review_3"
       ],
       "settings": {
+        "color_scheme": "light",
         "eyebrow": "Verified Trust",
         "heading": "What architects & builders ",
         "heading_accent": "say."
@@ -402,6 +405,7 @@
     "otodor_cta_banner": {
       "type": "otodor-cta-banner",
       "settings": {
+        "light_background": true,
         "heading": "Protect what matters ",
         "heading_accent": "most.",
         "description": "Premium smart security, designed for modern Indian homes. Schedule your priority home survey and custom installation assessment today.",

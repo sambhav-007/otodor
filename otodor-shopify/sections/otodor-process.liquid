@@ -134,7 +134,7 @@
 
 <section
   id="otodor-process-{{ section.id }}"
-  class="otodor-process"
+  class="otodor-process{% if section.settings.color_scheme == 'light' %} otodor-light{% endif %}"
   data-otodor-section="process"
   aria-labelledby="otodor-process-title-{{ section.id }}"
 >
@@ -169,6 +169,16 @@
   "class": "shopify-section",
   "max_blocks": 5,
   "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "dark",
+      "options": [
+        { "value": "dark", "label": "Dark" },
+        { "value": "light", "label": "Light" }
+      ]
+    },
     {
       "type": "text",
       "id": "eyebrow",

@@ -103,7 +103,7 @@
 
 <section
   id="otodor-testimonials-{{ section.id }}"
-  class="otodor-testimonials"
+  class="otodor-testimonials{% if section.settings.color_scheme == 'light' %} otodor-light{% endif %}"
   data-otodor-section="testimonials"
   aria-labelledby="otodor-testimonials-title-{{ section.id }}"
 >
@@ -152,6 +152,16 @@
   "class": "shopify-section",
   "max_blocks": 8,
   "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "dark",
+      "options": [
+        { "value": "dark", "label": "Dark" },
+        { "value": "light", "label": "Light" }
+      ]
+    },
     {
       "type": "text",
       "id": "eyebrow",

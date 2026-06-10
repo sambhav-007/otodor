@@ -48,6 +48,19 @@
   --otodor-success:        #00D26A;
   --otodor-success-glow:   rgba(0, 210, 106, 0.20);
 
+  /* ─── Light surface palette (for light-mode sections) ───────
+     Warm off-white, not clinical. Accent shifts to the deeper
+     blue so links/labels keep contrast on light backgrounds. */
+  --otodor-bg-light:        #F7F6F3;
+  --otodor-bg-light-2:      #FFFFFF;
+  --otodor-plinth:          #ECEAE4;
+  --otodor-ink:             #1A1A1A;
+  --otodor-ink-soft:        rgba(26, 26, 26, 0.62);
+  --otodor-ink-faint:       rgba(26, 26, 26, 0.40);
+  --otodor-accent-on-light: #1A78D8;
+  --otodor-hairline-light:  rgba(0, 0, 0, 0.08);
+  --otodor-hairline-light-2: rgba(0, 0, 0, 0.14);
+
   /* ─── Glass Morphism ────────────────────────────────────── */
   --otodor-glass:          rgba(255, 255, 255, 0.04);
   --otodor-glass-mid:      rgba(255, 255, 255, 0.06);
@@ -1325,8 +1338,8 @@ sticky-header,
 /* ── Page body: override Dawn's white background ────────────── */
 /* Only apply if the theme admin hasn't set a dark color scheme.
    Scoped to avoid breaking the cart/checkout pages. */
-body.gradient:not(.template-cart):not(.template-customers) {
-  background: 
+body.gradient:not(.template-cart):not(.template-customers):not(.otodor-light-page) {
+  background:
     linear-gradient(115deg, rgba(77, 166, 255, 0.08), transparent 30%),
     radial-gradient(circle at 50% 15%, rgba(77, 166, 255, 0.18) 0%, transparent 45%),
     radial-gradient(circle at 80% 65%, rgba(77, 166, 255, 0.06) 0%, transparent 40%),
@@ -1484,4 +1497,163 @@ html {
 
 .header__heading-link:hover .header__heading-logo {
   transform: scale(1.03);
+}
+
+/* ─────────────────────────────────────────────────────────
+   LIGHT SCOPE — drop on any section to flip it to the warm
+   light palette. Sections that use the design tokens (text,
+   glass cards, hairlines, accent) recolor automatically.
+  ───────────────────────────────────────────────────────── */
+.otodor-light {
+  /* Text → ink */
+  --otodor-white: var(--otodor-ink);
+  --otodor-neutral: var(--otodor-ink);
+  --otodor-muted: var(--otodor-ink-soft);
+  --otodor-faint: var(--otodor-ink-faint);
+  /* Accent → deeper blue (contrast on light) */
+  --otodor-blue: var(--otodor-accent-on-light);
+  --otodor-blue-mid: var(--otodor-accent-on-light);
+  /* Cards / glass → solid light surface with dark hairlines */
+  --otodor-glass: var(--otodor-bg-light-2);
+  --otodor-glass-mid: var(--otodor-bg-light-2);
+  --otodor-glass-high: #FFFFFF;
+  --otodor-glass-border: var(--otodor-hairline-light);
+  --otodor-glass-border-h: var(--otodor-hairline-light-2);
+  --otodor-hairline: var(--otodor-hairline-light);
+  --otodor-hairline-mid: var(--otodor-hairline-light-2);
+  --otodor-blue-glow: rgba(26, 120, 216, 0.10);
+  --otodor-blue-glow-lg: rgba(26, 120, 216, 0.18);
+
+  background-color: var(--otodor-bg-light);
+  color: var(--otodor-ink);
+}
+
+/* Light cards get a soft shadow instead of a glow so they read as
+   raised surfaces on the off-white background. */
+.otodor-light .otodor-glass-card,
+.otodor-light .otodor-glass-card--raised {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* The reusable accent-word in headings stays the deeper blue on light. */
+.otodor-light .otodor-accent {
+  color: var(--otodor-accent-on-light);
+  -webkit-text-fill-color: var(--otodor-accent-on-light);
+}
+
+/* ─────────────────────────────────────────────────────────
+   COLLECTION & PRODUCT PAGES — light theme.
+   Reverses the dark "Section 15" overrides inside the page
+   content only (header + footer stay dark). Product cards drop
+   the rainbow glow and become white surfaces with ink text.
+  ───────────────────────────────────────────────────────── */
+body.otodor-light-page {
+  background: var(--otodor-bg-light) !important;
+}
+
+/* Dawn colour-scheme variables → light (content only) */
+.otodor-light-page main .color-scheme-1,
+.otodor-light-page main .color-scheme-2,
+.otodor-light-page main .color-scheme-3,
+.otodor-light-page main .color-scheme-4,
+.otodor-light-page main .color-scheme-5 {
+  --color-background: 247, 246, 243 !important;
+  --gradient-background: transparent !important;
+  --color-foreground: 26, 26, 26 !important;
+  --color-button: 26, 120, 216 !important;
+  --color-button-text: 255, 255, 255 !important;
+  --color-secondary-button-text: 26, 26, 26 !important;
+  --color-link: 26, 120, 216 !important;
+  --color-badge-background: 255, 255, 255 !important;
+  --color-badge-foreground: 26, 26, 26 !important;
+  --color-border: 26, 26, 26 !important;
+  --color-border-opacity: 0.12 !important;
+}
+
+/* Explicit dark text overrides → ink */
+.otodor-light-page main .product__title,
+.otodor-light-page main .price,
+.otodor-light-page main .price__container,
+.otodor-light-page main .price-item,
+.otodor-light-page main .product__info-container .h2,
+.otodor-light-page main .product__info-container .h3,
+.otodor-light-page main .product__info-container div,
+.otodor-light-page main .accordion__title,
+.otodor-light-page main .card__heading,
+.otodor-light-page main .card__heading a,
+.otodor-light-page main .full-unstyled-link {
+  color: var(--otodor-ink) !important;
+}
+
+.otodor-light-page main .product__description,
+.otodor-light-page main .product__description p,
+.otodor-light-page main .accordion__content {
+  color: var(--otodor-ink-soft) !important;
+}
+
+/* Variant pills → light */
+.otodor-light-page main .product-form__input input[type="radio"] + label {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: rgba(26, 26, 26, 0.75) !important;
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+.otodor-light-page main .product-form__input input[type="radio"] + label:hover {
+  color: var(--otodor-ink) !important;
+  background-color: rgba(26, 120, 216, 0.06) !important;
+}
+
+/* Quantity selector → light */
+.otodor-light-page main .quantity {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+.otodor-light-page main .quantity__input,
+.otodor-light-page main .quantity__button {
+  color: var(--otodor-ink) !important;
+}
+
+/* Accordion borders + chevron → ink */
+.otodor-light-page main .product__info-container .product__accordion,
+.otodor-light-page main .product__info-container details {
+  border-color: rgba(0, 0, 0, 0.10) !important;
+}
+.otodor-light-page main .product__info-container details summary .icon-accordion path {
+  fill: var(--otodor-ink) !important;
+}
+
+/* Product cards stay DARK for a striking contrast on the light page,
+   keeping the BorderGlow hover (it reads well on the dark surface). */
+.otodor-light-page main .product-card-wrapper > .border-glow-card {
+  background: #0B0B0B;
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+/* Dark card → white text/price (beats the page's ink override) */
+.otodor-light-page main .product-card-wrapper .card__heading,
+.otodor-light-page main .product-card-wrapper .card__heading a,
+.otodor-light-page main .product-card-wrapper .price .price-item,
+.otodor-light-page main .product-card-wrapper .price .price-item--regular {
+  color: #FFFFFF !important;
+}
+.otodor-light-page main .product-card-wrapper .price .price-item--sale {
+  color: var(--otodor-blue) !important;
+}
+
+/* PDP actions: Add to cart → white outline, Buy now → black solid */
+.otodor-light-page main .product-form__submit {
+  background: #FFFFFF !important;
+  color: #0B0B0B !important;
+  border: 1px solid rgba(0, 0, 0, 0.18) !important;
+}
+.otodor-light-page main .product-form__submit:hover {
+  background: #F2F2F2 !important;
+}
+.otodor-light-page main .shopify-payment-button__button,
+.otodor-light-page main .shopify-payment-button__button--unbranded {
+  background: #0B0B0B !important;
+  color: #FFFFFF !important;
+}
+.otodor-light-page main .shopify-payment-button__button:hover,
+.otodor-light-page main .shopify-payment-button__button--unbranded:hover {
+  background: #000000 !important;
 }

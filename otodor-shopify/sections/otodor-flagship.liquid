@@ -8,7 +8,7 @@
   ───────────────────────────────────────────────────────── */
 
   #shopify-section-{{ section.id }} {
-    background-color: #0B0B0B;
+    background-color: {% if section.settings.color_scheme == 'light' %}var(--otodor-bg-light){% else %}#0B0B0B{% endif %};
   }
 
   .otodor-flagship {
@@ -293,64 +293,123 @@
     }
   }
 
-  /* ─ Tablet & mobile (<1024) — vertical pinned tour ─────────── */
+  /* ─ Tablet & mobile (<1024) — clean static product layout ───
+     No pin on phones: a pinned flagship fights the categories pin and
+     hijacks the viewport. Stack it as a simple product page instead
+     (image → name → specs → CTA), so it always sits after categories. */
   @media (max-width: 1023px) {
-    .otodor-flagship.js-animated {
-      height: 100vh;
-      padding: 0 1.25rem;
-    }
-    .otodor-flagship.js-animated .otodor-flagship__inner {
+    .otodor-flagship__inner {
       flex-direction: column;
-      height: 100%;
-      gap: 0;
-      justify-content: center;
-      max-width: 520px;
+      gap: 2rem;
+      max-width: 460px;
     }
-    .otodor-flagship.js-animated .otodor-flagship__stage {
-      width: 100%;
-      height: 46vh;
-      flex: 0 0 auto;
-      perspective: 800px;
-    }
-    .otodor-flagship.js-animated .otodor-flagship__visual {
-      max-width: min(66vw, 320px);
+    .otodor-flagship__visual {
+      max-width: 300px;
       margin: 0 auto;
     }
-    .otodor-flagship.js-animated .otodor-flagship__content {
-      width: 100%;
-      flex: 1 1 auto;
-      position: relative;
-      display: block;
+    .otodor-flagship__hotspot {
+      display: none;
     }
-    .otodor-flagship.js-animated .flagship-frame {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      width: 100%;
-      transform: translateY(-50%);
-      padding: 0;
-      display: flex;
-      flex-direction: column;
+    /* Show only the intro product image in the static stack */
+    .otodor-flagship__visual .flagship-slide { opacity: 0; }
+    .otodor-flagship__visual .flagship-slide[data-frame="0"] { opacity: 1; }
+    .otodor-flagship__content {
       align-items: center;
       text-align: center;
-      opacity: 0;
-      pointer-events: none;
     }
-    .otodor-flagship.js-animated .flagship-frame--intro { opacity: 1; }
-    .otodor-flagship.js-animated .flagship-spec { border-left: none; padding-left: 0; }
-    .otodor-flagship.js-animated .flagship-spec__title { font-size: 1.4rem; }
-    .otodor-flagship.js-animated .flagship-frame--final { pointer-events: auto; }
-    .otodor-flagship.js-animated .flagship-frame--final .otodor-flagship__eyebrow,
-    .otodor-flagship.js-animated .flagship-frame--final .otodor-flagship__name { display: block; }
-    .otodor-flagship.js-animated .otodor-flagship__tagline { margin-left: auto; margin-right: auto; }
-    .otodor-flagship.js-animated .otodor-flagship__cta { align-self: center; }
+    .flagship-frame {
+      align-items: center;
+      text-align: center;
+    }
+    .otodor-flagship__tagline {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .flagship-spec {
+      border-left: none;
+      padding-left: 0;
+    }
+    .otodor-flagship__cta {
+      align-self: center;
+    }
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     LIGHT MODE — Apple-style off-white product stage.
+     The dark-lit render sits on a soft plinth with a real contact
+     shadow instead of floating on flat white.
+  ───────────────────────────────────────────────────────── */
+  .otodor-flagship--light {
+    background-color: var(--otodor-bg-light);
+    color: var(--otodor-ink);
+  }
+
+  /* Soft lit floor behind the product */
+  .otodor-flagship--light .otodor-flagship__bloom {
+    background:
+      radial-gradient(ellipse 60% 44% at 50% 64%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
+      radial-gradient(ellipse 82% 64% at 50% 52%, var(--otodor-plinth) 0%, rgba(236, 234, 228, 0) 74%);
+    opacity: 0.9;
+  }
+
+  /* Realistic contact shadow grounded under the product (behind slides) */
+  .otodor-flagship--light .otodor-flagship__visual::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 3%;
+    width: 74%;
+    height: 15%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.24) 0%, rgba(0, 0, 0, 0.10) 46%, transparent 72%);
+    filter: blur(7px);
+    pointer-events: none;
+  }
+
+  /* Product casts a soft neutral shadow rather than a blue glow */
+  .otodor-flagship--light .otodor-flagship__visual {
+    filter: drop-shadow(0 20px 26px rgba(0, 0, 0, 0.16));
+  }
+
+  .otodor-flagship--light .otodor-flagship__eyebrow,
+  .otodor-flagship--light .flagship-spec__label {
+    color: var(--otodor-accent-on-light);
+  }
+  .otodor-flagship--light .otodor-flagship__name,
+  .otodor-flagship--light .flagship-spec__title {
+    color: var(--otodor-ink);
+  }
+  .otodor-flagship--light .otodor-flagship__tagline,
+  .otodor-flagship--light .flagship-spec__desc {
+    color: var(--otodor-ink-soft);
+  }
+  .otodor-flagship--light .flagship-spec {
+    border-left-color: rgba(26, 120, 216, 0.45);
+  }
+
+  /* CTA inverts to ink so it pops on the light stage */
+  .otodor-flagship--light .otodor-flagship__cta {
+    background: var(--otodor-ink);
+    color: #ffffff;
+  }
+  .otodor-flagship--light .otodor-flagship__cta:hover {
+    background: #000000;
+  }
+
+  /* Hotspot uses the deeper accent for contrast on a light product */
+  .otodor-flagship--light .otodor-flagship__hotspot {
+    border-color: rgba(26, 120, 216, 0.8);
+    box-shadow: 0 0 14px rgba(26, 120, 216, 0.35);
+  }
+  .otodor-flagship--light .otodor-flagship__hotspot::before {
+    background: var(--otodor-accent-on-light);
+    box-shadow: 0 0 10px rgba(26, 120, 216, 0.6);
   }
 {%- endstyle -%}
 
 <section
   id="otodor-flagship-{{ section.id }}"
-  class="otodor-flagship"
+  class="otodor-flagship{% if section.settings.color_scheme == 'light' %} otodor-flagship--light{% endif %}"
   data-otodor-section="flagship"
 >
   <div class="otodor-flagship__bloom" aria-hidden="true"></div>
@@ -455,6 +514,10 @@
       console.warn('[OTODOR] GSAP/ScrollTrigger not loaded — flagship uses static layout.');
       return;
     }
+    // Ignore the mobile address-bar show/hide resize. Without this, the
+    // changing 100vh recalculates pin positions mid-scroll and the pinned
+    // flagship jumps up and overlaps the categories section.
+    ScrollTrigger.config({ ignoreMobileResize: true });
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // Runs on all widths now — layout adapts to a vertical tour on phones via CSS.
 
@@ -463,10 +526,16 @@
     ScrollTrigger.getAll().forEach(function (st) {
       if (st.trigger === section) st.kill(true);
     });
+    section.classList.remove('js-animated');
     gsap.set(section.querySelectorAll(
       '.otodor-flagship__visual, .flagship-slide, .flagship-frame, ' +
       '.otodor-flagship__bloom, .otodor-flagship__hotspot'
     ), { clearProps: 'all' });
+
+    // Mobile / tablet: no pinned scroll tour. Pinning the flagship on a
+    // phone fights the categories pin and hijacks the viewport. The CSS
+    // renders a clean static product layout instead.
+    if (!window.matchMedia('(min-width: 1024px)').matches) return;
 
     section.classList.add('js-animated');
 
@@ -576,6 +645,16 @@
       requestAnimationFrame(function () { ScrollTrigger.refresh(); });
     }
   });
+
+  // Rebuild when crossing the desktop/mobile breakpoint (desktop pins,
+  // mobile is static) so a resize never leaves a stale pinned state.
+  var flagshipMq = window.matchMedia('(min-width: 1024px)');
+  var flagshipMqHandler = function () { initFlagship(); };
+  if (flagshipMq.addEventListener) {
+    flagshipMq.addEventListener('change', flagshipMqHandler);
+  } else if (flagshipMq.addListener) {
+    flagshipMq.addListener(flagshipMqHandler);
+  }
 })();
 </script>
 
@@ -585,6 +664,16 @@
   "tag": "section",
   "class": "shopify-section",
   "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "light",
+      "options": [
+        { "value": "dark", "label": "Dark" },
+        { "value": "light", "label": "Light" }
+      ]
+    },
     {
       "type": "text",
       "id": "eyebrow",
