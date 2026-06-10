@@ -261,3 +261,16 @@
     opacity: 0 !important;
   }
 }
+
+/* Touch / no-hover devices never trigger the glow (it is hover-driven),
+   yet its blend-modes, mask-composite layers and large box-shadows still
+   composite for every card and can exhaust mobile GPU memory — which
+   crashes the page. Drop the heavy layers entirely where hover is
+   unavailable; the cards still render normally, just without the glow. */
+@media (hover: none), (pointer: coarse) {
+  .border-glow-card::before,
+  .border-glow-card::after,
+  .border-glow-card > .edge-light {
+    display: none !important;
+  }
+}

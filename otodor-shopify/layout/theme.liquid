@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {%- comment -%} Reload from the top so GSAP ScrollTrigger pinned sections
+      never get stuck when the page is reloaded mid-scroll. {%- endcomment -%}
+    <script>if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }</script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#0B0B0B">
     <link rel="canonical" href="{{ canonical_url }}">

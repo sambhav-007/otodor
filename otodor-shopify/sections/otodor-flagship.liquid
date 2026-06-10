@@ -442,6 +442,14 @@
   var section = document.getElementById('otodor-flagship-{{ section.id }}');
   if (!section) return;
 
+  // Pinned sections break when the browser restores a mid-page scroll on
+  // reload — the pin can get stuck fixed on screen, with other sections
+  // scrolling over it. Reload from the top so ScrollTrigger always
+  // calculates pin positions from a clean state.
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
   function initFlagship() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
       console.warn('[OTODOR] GSAP/ScrollTrigger not loaded — flagship uses static layout.');
@@ -449,6 +457,16 @@
     }
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // Runs on all widths now — layout adapts to a vertical tour on phones via CSS.
+
+    // Tear down any previous build (theme editor / hot reload) so a stale
+    // pin never stays stuck on screen.
+    ScrollTrigger.getAll().forEach(function (st) {
+      if (st.trigger === section) st.kill(true);
+    });
+    gsap.set(section.querySelectorAll(
+      '.otodor-flagship__visual, .flagship-slide, .flagship-frame, ' +
+      '.otodor-flagship__bloom, .otodor-flagship__hotspot'
+    ), { clearProps: 'all' });
 
     section.classList.add('js-animated');
 
@@ -548,6 +566,14 @@
   document.addEventListener('shopify:section:load', function (e) {
     if (e.detail && e.detail.sectionId === '{{ section.id }}') {
       initFlagship();
+    }
+  });
+
+  // Once images/fonts finish loading (which shift layout above this
+  // section), recalc all pin positions so nothing ends up stuck.
+  window.addEventListener('load', function () {
+    if (typeof ScrollTrigger !== 'undefined') {
+      requestAnimationFrame(function () { ScrollTrigger.refresh(); });
     }
   });
 })();
