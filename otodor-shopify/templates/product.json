@@ -12,20 +12,25 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "vendor": {
-          "type": "text",
-          "settings": {
-            "text": "{{ product.vendor }}",
-            "text_style": "uppercase"
-          }
-        },
         "title": {
           "type": "title",
           "settings": {}
         },
+        "positioning": {
+          "type": "custom_liquid",
+          "settings": {
+            "custom_liquid": "{%- assign pos_line = product.metafields.custom.positioning_line.value -%}{%- if pos_line != blank -%}<p style=\"font-family: var(--otodor-font-body); font-size: 1rem; line-height: 1.6; color: var(--otodor-ink-soft); margin: 0.2rem 0 0;\">{{ pos_line | escape }}</p>{%- endif -%}"
+          }
+        },
         "price": {
           "type": "price",
           "settings": {}
+        },
+        "access_chips": {
+          "type": "custom_liquid",
+          "settings": {
+            "custom_liquid": "{%- assign access = product.metafields.custom.access_methods.value -%}{%- if access != blank -%}<div style=\"display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.6rem 0 0.2rem;\">{%- assign parts = access | split: '·' -%}{%- for part in parts -%}<span style=\"font-family: var(--otodor-font-body); font-size: 0.78rem; font-weight: 500; color: var(--otodor-ink-soft); border: 1px solid var(--otodor-hairline-light-2); border-radius: 999px; padding: 0.3rem 0.85rem;\">{{ part | strip | escape }}</span>{%- endfor -%}</div>{%- endif -%}"
+          }
         },
         "variant_picker": {
           "type": "variant_picker",
@@ -42,29 +47,30 @@
           "type": "buy_buttons",
           "settings": {
             "show_dynamic_checkout": true,
-            "show_gift_card_recipient": true
+            "show_gift_card_recipient": false
+          }
+        },
+        "trust_row": {
+          "type": "custom_liquid",
+          "settings": {
+            "custom_liquid": "<div class=\"otodor-trust-row\"><span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 13l4 4L19 7\"/></svg>Free professional installation</span><span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z\"/></svg>1-year warranty</span><span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 3.5-6 8-6s8 2 8 6\"/></svg>Certified technicians</span></div>"
           }
         },
         "description": {
           "type": "description",
           "settings": {}
-        },
-        "share": {
-          "type": "share",
-          "settings": {
-            "share_label": "Share"
-          }
         }
       },
       "block_order": [
-        "vendor",
         "title",
+        "positioning",
         "price",
+        "access_chips",
         "variant_picker",
         "quantity_selector",
         "buy_buttons",
-        "description",
-        "share"
+        "trust_row",
+        "description"
       ],
       "settings": {
         "enable_sticky_info": true,
@@ -75,20 +81,76 @@
         "gallery_layout": "stacked",
         "mobile_thumbnails": "hide",
         "media_position": "left",
-        "image_zoom": "lightbox",
+        "image_zoom": "hover",
         "hide_variants": true,
         "enable_video_looping": false,
         "padding_top": 36,
         "padding_bottom": 12
       }
     },
+    "reveal": {
+      "type": "otodor-product-reveal",
+      "settings": {
+        "statement": "Engineered to disappear into your day."
+      }
+    },
+    "benefits": {
+      "type": "otodor-product-benefits",
+      "blocks": {
+        "benefit_1": {
+          "type": "benefit",
+          "settings": {
+            "title": "Your fingerprint is the key.",
+            "line": "Unlock in under a second — no keys, no codes to remember."
+          }
+        },
+        "benefit_2": {
+          "type": "benefit",
+          "settings": {
+            "title": "Control from anywhere.",
+            "line": "Lock, unlock, and grant access from your phone, wherever you are."
+          }
+        },
+        "benefit_3": {
+          "type": "benefit",
+          "settings": {
+            "title": "Built to be trusted.",
+            "line": "Solid alloy construction, tested for years of daily use."
+          }
+        }
+      },
+      "block_order": ["benefit_1", "benefit_2", "benefit_3"]
+    },
+    "specs": {
+      "type": "otodor-product-specs",
+      "settings": {
+        "heading": "Specifications"
+      }
+    },
+    "lifestyle": {
+      "type": "otodor-product-lifestyle",
+      "settings": {
+        "line": "Home knows it's you."
+      }
+    },
+    "install": {
+      "type": "otodor-product-install",
+      "settings": {
+        "promise": "We verify compatibility before installation.",
+        "estimate": "Most installations completed within 2–4 hours, by certified OTODOR professionals."
+      }
+    },
+    "comparison": {
+      "type": "otodor-comparison",
+      "settings": {}
+    },
     "related-products": {
       "type": "related-products",
       "settings": {
         "heading": "You may also like",
         "heading_size": "h2",
-        "products_to_show": 4,
-        "columns_desktop": 4,
+        "products_to_show": 3,
+        "columns_desktop": 3,
         "columns_mobile": "2",
         "color_scheme": "scheme-1",
         "image_ratio": "square",
@@ -99,10 +161,21 @@
         "padding_top": 36,
         "padding_bottom": 28
       }
+    },
+    "sticky-atc": {
+      "type": "otodor-sticky-atc",
+      "settings": {}
     }
   },
   "order": [
     "main",
-    "related-products"
+    "reveal",
+    "benefits",
+    "specs",
+    "lifestyle",
+    "install",
+    "related-products",
+    "comparison",
+    "sticky-atc"
   ]
 }

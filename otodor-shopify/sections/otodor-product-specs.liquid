@@ -1,0 +1,85 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Product Specs — quiet definition ledger.
+     Grouped hairline rows, no boxes. Metafield-driven
+     (custom.specs JSON) with manual block fallback.
+  ───────────────────────────────────────────────────────── */
+  #shopify-section-{{ section.id }} {
+    background: var(--otodor-bg-light);
+  }
+  .otodor-pspecs {
+    max-width: var(--otodor-container-sm);
+    margin: 0 auto;
+    padding: clamp(3rem, 7vw, 5.5rem) 0;
+  }
+  .otodor-pspecs__heading {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink);
+    margin: 0 0 1rem;
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign specs = product.metafields.custom.specs.value
+  assign has_blocks = false
+  if section.blocks.size > 0
+    assign has_blocks = true
+  endif
+-%}
+
+{%- if specs or has_blocks -%}
+  <div class="otodor-pspecs" data-otodor-reveal="fade-up">
+    <h2 class="otodor-pspecs__heading">{{ section.settings.heading | escape }}</h2>
+    <div class="otodor-ledger">
+      {%- if specs -%}
+        {%- for group in specs -%}
+          <div class="otodor-ledger__group">{{ group[0] | escape }}</div>
+          {%- for row in group[1] -%}
+            <div class="otodor-ledger__row">
+              <div class="otodor-ledger__key">{{ row[0] | escape }}</div>
+              <div class="otodor-ledger__val">{{ row[1] | escape }}</div>
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- assign current_group = '' -%}
+        {%- for block in section.blocks -%}
+          {%- if block.settings.group != blank and block.settings.group != current_group -%}
+            {%- assign current_group = block.settings.group -%}
+            <div class="otodor-ledger__group">{{ current_group | escape }}</div>
+          {%- endif -%}
+          <div class="otodor-ledger__row" {{ block.shopify_attributes }}>
+            <div class="otodor-ledger__key">{{ block.settings.key | escape }}</div>
+            <div class="otodor-ledger__val">{{ block.settings.value | escape }}</div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Product Specs",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Specifications" },
+    { "type": "paragraph", "content": "Primary source: product metafield custom.specs (JSON of groups → rows, e.g. {\"Security\": {\"Unlock methods\": \"Fingerprint, PIN, App\"}}). Blocks below render only when the metafield is empty." }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Spec row (fallback)",
+      "settings": [
+        { "type": "text", "id": "group", "label": "Group heading", "info": "Set on the first row of each group." },
+        { "type": "text", "id": "key", "label": "Label", "default": "Unlock methods" },
+        { "type": "text", "id": "value", "label": "Value", "default": "Fingerprint · PIN · App · Key" }
+      ]
+    }
+  ],
+  "max_blocks": 24,
+  "presets": [{ "name": "OTODOR Product Specs" }]
+}
+{% endschema %}

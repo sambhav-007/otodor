@@ -9,37 +9,53 @@
  */
 {
   "sections": {
-    "banner": {
-      "type": "main-collection-banner",
+    "hero": {
+      "type": "otodor-collection-hero",
       "settings": {
-        "show_collection_description": true,
-        "show_collection_image": false,
-        "color_scheme": "scheme-1"
+        "eyebrow": "OTODOR",
+        "fallback_line": "Smart security engineered for modern homes.",
+        "show_count": true,
+        "moment_line": "Security designed around how people actually live.",
+        "moment_sub": "Every OTODOR device is engineered, installed, and supported by us."
       }
     },
     "product-grid": {
-      "type": "main-collection-product-grid",
+      "type": "otodor-collection-grid",
+      "blocks": {
+        "cat_digital": {
+          "type": "category",
+          "settings": { "collection": "door-locks", "label": "Door locks" }
+        },
+        "cat_gate": {
+          "type": "category",
+          "settings": { "collection": "gate-locks", "label": "Gate locks" }
+        },
+        "cat_automation": {
+          "type": "category",
+          "settings": { "collection": "sliding-gate-motors", "label": "Gate automation" }
+        },
+        "cat_security": {
+          "type": "category",
+          "settings": { "collection": "security-system", "label": "Security systems" }
+        },
+        "cat_accessories": {
+          "type": "category",
+          "settings": { "collection": "accessories", "label": "Accessories" }
+        }
+      },
+      "block_order": ["cat_digital", "cat_gate", "cat_automation", "cat_security", "cat_accessories"],
       "settings": {
-        "products_per_page": 16,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "image_ratio": "portrait",
-        "image_shape": "default",
-        "show_secondary_image": false,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "enable_filtering": true,
-        "filter_type": "horizontal",
-        "enable_sorting": true,
-        "columns_mobile": "2",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "products_per_page": 12,
+        "show_sort": true,
+        "show_cta": true,
+        "cta_title": "Not sure which lock fits your door?",
+        "cta_sub": "We verify compatibility before installation — talk to a specialist.",
+        "cta_button_label": "Talk to us"
       }
     }
   },
   "order": [
-    "banner",
+    "hero",
     "product-grid"
   ]
 }

@@ -1,0 +1,86 @@
+{%- comment -%}
+  OTODOR Sticky Add-to-Cart — slim dock that appears once the
+  buy module scrolls out of view. Submits the main product form
+  so Dawn's variant state, cart drawer, and notifications keep
+  working untouched. Styles live in otodor-base.css (section 16).
+{%- endcomment -%}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+-%}
+
+<div class="otodor-sticky-atc" id="OtodorStickyAtc-{{ section.id }}" aria-hidden="true">
+  <div class="otodor-sticky-atc__inner">
+    {%- if product.featured_media -%}
+      {{ product.featured_media | image_url: width: 88 | image_tag: class: 'otodor-sticky-atc__thumb', loading: 'lazy', alt: product.title }}
+    {%- endif -%}
+    <span class="otodor-sticky-atc__name">{{ product.title | escape }}</span>
+    <span class="otodor-sticky-atc__price" data-sticky-price>
+      {%- if current_variant.price == 0 -%}Contact for pricing{%- else -%}{{ current_variant.price | money }}{%- endif -%}
+    </span>
+    {%- if current_variant.price == 0 -%}
+      {%- assign wa_number = settings.otodor_whatsapp_number | default: '917206895607' -%}
+      <a class="otodor-sticky-atc__btn" style="text-decoration:none; display:inline-flex; align-items:center;" href="https://wa.me/{{ wa_number }}?text={{ 'Hello! I would like pricing for ' | append: product.title | url_encode }}" target="_blank" rel="noopener">Enquire</a>
+    {%- else -%}
+      <button type="button" class="otodor-sticky-atc__btn" data-sticky-submit {% unless current_variant.available %}disabled{% endunless %}>
+        {%- if current_variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
+      </button>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (function () {
+    var bar = document.getElementById('OtodorStickyAtc-{{ section.id }}');
+    if (!bar) return;
+
+    var buyAnchor = document.querySelector('.product-form__buttons') || document.querySelector('.product__info-container');
+    if (!buyAnchor) return;
+
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        var below = entries[0].boundingClientRect.top < 0;
+        var show = !entries[0].isIntersecting && below;
+        bar.classList.toggle('is-visible', show);
+        bar.setAttribute('aria-hidden', show ? 'false' : 'true');
+      }, { threshold: 0 });
+      io.observe(buyAnchor);
+    }
+
+    var submitBtn = bar.querySelector('[data-sticky-submit]');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function () {
+        var mainSubmit = document.querySelector('form[data-type="add-to-cart-form"] .product-form__submit');
+        if (mainSubmit && !mainSubmit.disabled) {
+          mainSubmit.click();
+        } else {
+          buyAnchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }
+
+    document.addEventListener('change', function (e) {
+      if (!e.target.closest('variant-selects, variant-radios')) return;
+      setTimeout(function () {
+        var priceEl = document.querySelector('.product__info-container .price__regular .price-item--regular');
+        var stickyPrice = bar.querySelector('[data-sticky-price]');
+        if (priceEl && stickyPrice) stickyPrice.textContent = priceEl.textContent.trim();
+        var mainSubmit = document.querySelector('form[data-type="add-to-cart-form"] .product-form__submit');
+        if (mainSubmit && submitBtn) {
+          submitBtn.disabled = mainSubmit.disabled;
+          submitBtn.textContent = mainSubmit.disabled ? 'Sold out' : 'Add to cart';
+        }
+      }, 350);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "OTODOR Sticky Add to Cart",
+  "settings": [
+    { "type": "paragraph", "content": "Slim bottom bar with product, price, and add-to-cart. Appears after the buy module scrolls out of view." }
+  ],
+  "presets": [{ "name": "OTODOR Sticky Add to Cart" }]
+}
+{% endschema %}

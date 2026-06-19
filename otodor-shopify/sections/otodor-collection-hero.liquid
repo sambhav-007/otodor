@@ -1,0 +1,112 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Collection Hero — short dark brand handshake.
+     Collection name, one positioning line, product count.
+     Followed by an optional light brand-moment transition band.
+  ───────────────────────────────────────────────────────── */
+  #shopify-section-{{ section.id }} .otodor-chero {
+    position: relative;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% -10%, rgba(77, 166, 255, 0.10) 0%, transparent 60%),
+      linear-gradient(180deg, #0D0D0D 0%, #080808 100%);
+    color: #FFFFFF;
+    overflow: hidden;
+  }
+  .otodor-chero__inner {
+    max-width: var(--otodor-container);
+    margin: 0 auto;
+    padding: clamp(3.5rem, 8vw, 6rem) 0 clamp(3rem, 7vw, 5rem);
+    text-align: center;
+  }
+  .otodor-chero__eyebrow {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--otodor-tracking-widest);
+    color: var(--otodor-blue);
+    margin-bottom: 1.1rem;
+  }
+  .otodor-chero__title {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: var(--otodor-tracking-tight);
+    margin: 0;
+  }
+  .otodor-chero__line {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-md);
+    color: rgba(255, 255, 255, 0.55);
+    max-width: 52ch;
+    margin: 1.2rem auto 0;
+    line-height: 1.65;
+  }
+  .otodor-chero__count {
+    display: block;
+    font-family: var(--otodor-font-body);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 1.6rem;
+  }
+
+  /* Brand-moment transition: eases dark storytelling into the
+     light discovery surface. */
+  #shopify-section-{{ section.id }} .otodor-chero-moment {
+    background: var(--otodor-bg-light);
+    color: var(--otodor-ink);
+  }
+  .otodor-chero-moment__inner {
+    max-width: var(--otodor-container);
+    margin: 0 auto;
+  }
+{%- endstyle -%}
+
+<div class="otodor-chero" data-otodor-section="collection-hero">
+  <div class="otodor-chero__inner">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="otodor-chero__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+    {%- endif -%}
+    <h1 class="otodor-chero__title">{{ collection.title | escape }}</h1>
+    {%- assign positioning = collection.description | strip_html | strip -%}
+    {%- if positioning != blank -%}
+      <p class="otodor-chero__line">{{ positioning | truncate: 140 }}</p>
+    {%- elsif section.settings.fallback_line != blank -%}
+      <p class="otodor-chero__line">{{ section.settings.fallback_line | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.show_count -%}
+      <span class="otodor-chero__count">{{ collection.products_count }} {% if collection.products_count == 1 %}product{% else %}products{% endif %}</span>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- if section.settings.moment_line != blank -%}
+  <div class="otodor-chero-moment">
+    <div class="otodor-chero-moment__inner">
+      <div class="otodor-brand-moment" data-otodor-reveal="fade-up">
+        <p class="otodor-brand-moment__line">{{ section.settings.moment_line | escape }}</p>
+        {%- if section.settings.moment_sub != blank -%}
+          <p class="otodor-brand-moment__sub">{{ section.settings.moment_sub | escape }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Collection Hero",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "OTODOR" },
+    { "type": "text", "id": "fallback_line", "label": "Fallback positioning line", "info": "Shown when the collection has no description.", "default": "Smart security engineered for modern homes." },
+    { "type": "checkbox", "id": "show_count", "label": "Show product count", "default": true },
+    { "type": "header", "content": "Brand moment" },
+    { "type": "text", "id": "moment_line", "label": "Brand moment line", "default": "Security designed around how people actually live." },
+    { "type": "text", "id": "moment_sub", "label": "Supporting line", "default": "Every OTODOR device is engineered, installed, and supported by us." }
+  ],
+  "presets": [{ "name": "OTODOR Collection Hero" }]
+}
+{% endschema %}

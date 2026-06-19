@@ -1,248 +1,287 @@
 {%- style -%}
   /* ─────────────────────────────────────────────────────────
-     OTODOR Process / Timeline Section
-     Horizontal timeline on desktop, vertical stack on mobile.
+     OTODOR Installation — trust-first vertical journey.
+     Compatibility promise leads. Four stages, each with real
+     photography, a duration chip, and concise copy. A progress
+     line draws as the visitor scrolls.
   ───────────────────────────────────────────────────────── */
-
   #shopify-section-{{ section.id }} {
     position: relative;
     z-index: 3;
-    background-color: transparent;
+    background: var(--otodor-bg-light);
   }
 
-  .otodor-process {
+  .otodor-install {
+    max-width: var(--otodor-container);
+    margin: 0 auto;
     padding-block: var(--otodor-section-py);
   }
 
-  .otodor-process__header {
-    margin-bottom: clamp(3rem, 6vw, 5rem);
+  /* Header: eyebrow, heading, the two friction-killers */
+  .otodor-install__header {
+    max-width: 720px;
+    margin-bottom: clamp(3rem, 7vw, 5.5rem);
+  }
+  .otodor-install__eyebrow {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--otodor-tracking-widest);
+    color: var(--otodor-accent-on-light);
+    margin-bottom: 1.1rem;
+  }
+  .otodor-install__heading {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink);
+    margin: 0;
+  }
+  .otodor-install__promise {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-md);
+    line-height: 1.65;
+    color: var(--otodor-ink-soft);
+    margin: 1.2rem 0 0;
+    max-width: 52ch;
+  }
+  .otodor-install__promise strong {
+    color: var(--otodor-ink);
+    font-weight: 600;
   }
 
-  .otodor-process__timeline {
+  /* Stages: left number rail with drawn line, right photo+copy */
+  .otodor-install__stages {
     position: relative;
-    display: flex;
-    justify-content: space-between;
-    gap: var(--otodor-space-xl);
-  }
-
-  /* Connecting timeline line (desktop only) */
-  .otodor-process__timeline::before {
-    content: '';
-    position: absolute;
-    top: 32px; /* Center of the badge */
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(77, 166, 255, 0.40) 20%,
-      rgba(77, 166, 255, 0.40) 80%,
-      transparent 100%
-    );
-    z-index: 1;
-  }
-
-  .otodor-process__step {
-    position: relative;
-    z-index: 2;
-    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: var(--otodor-space-md);
+    gap: clamp(2.5rem, 6vw, 4.5rem);
+    padding-left: clamp(3.2rem, 7vw, 5.5rem);
+  }
+  .otodor-install__track {
+    position: absolute;
+    left: clamp(0.9rem, 2vw, 1.4rem);
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 1px;
+    background: var(--otodor-hairline-light-2);
+  }
+  .otodor-install__track-fill {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    transform-origin: top;
+    transform: scaleY(0);
+    background: linear-gradient(180deg, var(--otodor-accent-on-light) 0%, rgba(26, 120, 216, 0.35) 100%);
   }
 
-  /* Number Badge */
-  .otodor-process__number {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--otodor-glass-mid);
-    border: 1px solid var(--otodor-glass-border-h);
+  .otodor-install__stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+  .otodor-install__stage:nth-child(even) .otodor-install__media { order: 2; }
+
+  .otodor-install__num {
+    position: absolute;
+    left: calc(-1 * clamp(3.2rem, 7vw, 5.5rem));
+    top: 0.2rem;
+    width: clamp(1.9rem, 4vw, 2.9rem);
+    text-align: center;
+    font-family: var(--otodor-font-display);
+    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    font-weight: 700;
+    color: var(--otodor-accent-on-light);
+    background: var(--otodor-bg-light);
+    padding-block: 0.3rem;
+  }
+
+  .otodor-install__media {
+    border-radius: var(--otodor-radius-lg);
+    overflow: hidden;
+    background: var(--otodor-plinth);
+    aspect-ratio: 4 / 3;
+  }
+  .otodor-install__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .otodor-install__media--empty {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--otodor-ink-faint);
     font-family: var(--otodor-font-display);
-    font-size: var(--otodor-text-lg);
-    font-weight: 700;
-    color: var(--otodor-blue);
-    box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-sm);
-    transition:
-      border-color var(--otodor-dur-base) var(--otodor-ease-out),
-      box-shadow var(--otodor-dur-base) var(--otodor-ease-out),
-      transform var(--otodor-dur-base) var(--otodor-ease-spring);
+    font-size: 0.85rem;
+    letter-spacing: var(--otodor-tracking-wide);
   }
 
-  .otodor-process__step:hover .otodor-process__number {
-    border-color: var(--otodor-blue);
-    box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-blue-sm);
-    transform: scale(1.08);
-  }
-
-  .otodor-process__title {
+  .otodor-install__stage-title {
     font-family: var(--otodor-font-display);
-    font-size: var(--otodor-text-lg);
+    font-size: clamp(1.3rem, 2.8vw, 1.9rem);
     font-weight: 700;
-    line-height: var(--otodor-leading-tight);
     letter-spacing: var(--otodor-tracking-tight);
-    color: var(--otodor-white);
+    color: var(--otodor-ink);
     margin: 0;
   }
-
-  .otodor-process__desc {
+  .otodor-install__stage-desc {
     font-family: var(--otodor-font-body);
-    font-size: var(--otodor-text-sm);
-    line-height: var(--otodor-leading-base);
-    color: var(--otodor-muted);
-    margin: 0;
-    max-width: 28ch;
+    font-size: 0.97rem;
+    line-height: 1.65;
+    color: var(--otodor-ink-soft);
+    margin: 0.7rem 0 0;
+    max-width: 44ch;
+  }
+  .otodor-install__chip {
+    display: inline-block;
+    font-family: var(--otodor-font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--otodor-accent-on-light);
+    border: 1px solid rgba(26, 120, 216, 0.3);
+    border-radius: var(--otodor-radius-pill);
+    padding: 0.3rem 0.9rem;
+    margin-top: 1.1rem;
   }
 
-  /* ─ Responsive overrides ────────────────────────────────── */
-  @media (max-width: 768px) {
-    .otodor-process__timeline {
-      flex-direction: column;
-      gap: var(--otodor-space-xl);
-      align-items: center;
-    }
+  /* Closing trust row */
+  .otodor-install__trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 2.5rem;
+    margin-top: clamp(3rem, 7vw, 5rem);
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--otodor-hairline-light);
+  }
+  .otodor-install__trust span {
+    font-family: var(--otodor-font-body);
+    font-size: 0.88rem;
+    color: var(--otodor-ink-soft);
+  }
 
-    .otodor-process__timeline::before {
-      display: none; /* Hide horizontal line */
-    }
-
-    .otodor-process__step {
-      flex-direction: row;
-      text-align: left;
-      align-items: flex-start;
-      max-width: 450px;
-      width: 100%;
-      gap: var(--otodor-space-lg);
-    }
-
-    .otodor-process__number {
-      flex-shrink: 0;
-    }
-
-    .otodor-process__info {
-      display: flex;
-      flex-direction: column;
-      gap: var(--otodor-space-xs);
-    }
+  @media (max-width: 749px) {
+    .otodor-install__stage { grid-template-columns: 1fr; }
+    .otodor-install__stage:nth-child(even) .otodor-install__media { order: 0; }
   }
 {%- endstyle -%}
 
-<section
-  id="otodor-process-{{ section.id }}"
-  class="otodor-process{% if section.settings.color_scheme == 'light' %} otodor-light{% endif %}"
-  data-otodor-section="process"
-  aria-labelledby="otodor-process-title-{{ section.id }}"
->
-  <div class="otodor-container">
-    <div class="otodor-process__header otodor-section-header otodor-section-header--center">
-      <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
-      <h2 class="otodor-heading-2" id="otodor-process-title-{{ section.id }}" data-otodor-reveal="fade-up">
-        {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
-      </h2>
+<section class="otodor-install" data-otodor-section="install" aria-labelledby="otodor-install-title-{{ section.id }}">
+  <div class="otodor-install__header">
+    <span class="otodor-install__eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+    <h2 class="otodor-install__heading" id="otodor-install-title-{{ section.id }}" data-otodor-reveal="fade-up">{{ section.settings.heading | escape }}</h2>
+    <p class="otodor-install__promise" data-otodor-reveal="fade-up">
+      <strong>{{ section.settings.promise | escape }}</strong>
+      {{ section.settings.estimate | escape }}
+    </p>
+  </div>
+
+  <div class="otodor-install__stages">
+    <div class="otodor-install__track" aria-hidden="true">
+      <div class="otodor-install__track-fill" data-install-track></div>
     </div>
 
-    <div class="otodor-process__timeline" data-otodor-stagger>
-      {%- for block in section.blocks -%}
-        <div class="otodor-process__step" {{ block.shopify_attributes }}>
-          <div class="otodor-process__number">
-            {{ forloop.index }}
-          </div>
-          <div class="otodor-process__info">
-            <h3 class="otodor-process__title">{{ block.settings.title | escape }}</h3>
-            <p class="otodor-process__desc">{{ block.settings.description | escape }}</p>
-          </div>
+    {%- for block in section.blocks -%}
+      <div class="otodor-install__stage" data-otodor-reveal="fade-up" {{ block.shopify_attributes }}>
+        <span class="otodor-install__num" aria-hidden="true">0{{ forloop.index }}</span>
+        <div class="otodor-install__media{% if block.settings.image == blank %} otodor-install__media--empty{% endif %}">
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 1100 | image_tag: loading: 'lazy', widths: '550,820,1100', sizes: '(min-width: 750px) 45vw, 92vw', alt: block.settings.title }}
+          {%- else -%}
+            <span aria-hidden="true">PHOTO</span>
+          {%- endif -%}
         </div>
+        <div>
+          <h3 class="otodor-install__stage-title">{{ block.settings.title | escape }}</h3>
+          {%- if block.settings.description != blank -%}
+            <p class="otodor-install__stage-desc">{{ block.settings.description | escape }}</p>
+          {%- endif -%}
+          {%- if block.settings.duration != blank -%}
+            <span class="otodor-install__chip">{{ block.settings.duration | escape }}</span>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- if section.settings.trust_line != blank -%}
+    <div class="otodor-install__trust" data-otodor-reveal="fade-up">
+      {%- assign trust_parts = section.settings.trust_line | split: '·' -%}
+      {%- for part in trust_parts -%}
+        <span>{{ part | strip | escape }}</span>
       {%- endfor -%}
     </div>
-  </div>
+  {%- endif -%}
 </section>
+
+<script>
+  /* Progress line draws with scroll. GSAP ScrollTrigger when present,
+     static full line as fallback. */
+  (function () {
+    var fill = document.querySelector('#shopify-section-{{ section.id }} [data-install-track]');
+    if (!fill) return;
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function init() {
+      if (reduced || !window.gsap || !window.ScrollTrigger) {
+        fill.style.transform = 'scaleY(1)';
+        return;
+      }
+      gsap.to(fill, {
+        scaleY: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: fill.closest('.otodor-install__stages'),
+          start: 'top 75%',
+          end: 'bottom 60%',
+          scrub: 0.5
+        }
+      });
+    }
+    if (window.gsap) { init(); } else { window.addEventListener('load', init); }
+  })();
+</script>
 
 {% schema %}
 {
-  "name": "OTODOR Process Timeline",
+  "name": "OTODOR Installation",
   "tag": "section",
   "class": "shopify-section",
   "max_blocks": 5,
   "settings": [
-    {
-      "type": "select",
-      "id": "color_scheme",
-      "label": "Color scheme",
-      "default": "dark",
-      "options": [
-        { "value": "dark", "label": "Dark" },
-        { "value": "light", "label": "Light" }
-      ]
-    },
-    {
-      "type": "text",
-      "id": "eyebrow",
-      "label": "Eyebrow text",
-      "default": "Installation"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading text",
-      "default": "Three steps to complete "
-    },
-    {
-      "type": "text",
-      "id": "heading_accent",
-      "label": "Heading accented text",
-      "default": "security."
-    }
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Professional Installation" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "From order to secured." },
+    { "type": "text", "id": "promise", "label": "Compatibility promise", "default": "We verify compatibility before installation." },
+    { "type": "text", "id": "estimate", "label": "Estimate line", "default": "Most installations are completed within 2–4 hours." },
+    { "type": "text", "id": "trust_line", "label": "Trust row (· separated)", "default": "Certified OTODOR technicians · Background-verified · 1-year workmanship guarantee" }
   ],
   "blocks": [
     {
       "type": "step",
-      "name": "Process Step",
+      "name": "Stage",
       "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Step Title",
-          "default": "Choose Lock"
-        },
-        {
-          "type": "textarea",
-          "id": "description",
-          "label": "Step Description",
-          "default": "Select the flagship smart lock matching your door and home aesthetics."
-        }
+        { "type": "text", "id": "title", "label": "Title", "default": "Consultation" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "We assess your door and confirm the right fit — before you pay." },
+        { "type": "text", "id": "duration", "label": "Duration chip", "default": "~30 min" },
+        { "type": "image_picker", "id": "image", "label": "Photo", "info": "Real technician / installation photography builds the most trust." }
       ]
     }
   ],
   "presets": [
     {
-      "name": "OTODOR Process Timeline",
+      "name": "OTODOR Installation",
       "blocks": [
-        {
-          "type": "step",
-          "settings": {
-            "title": "Choose Product",
-            "description": "Select the flagship lock matching your home aesthetics."
-          }
-        },
-        {
-          "type": "step",
-          "settings": {
-            "title": "Schedule Installation",
-            "description": "Select a convenient date and our certified experts will handle the fitment."
-          }
-        },
-        {
-          "type": "step",
-          "settings": {
-            "title": "Secure Your Property",
-            "description": "Register fingerprints on the app and enjoy premium keyless smart access."
-          }
-        }
+        { "type": "step", "settings": { "title": "Consultation", "description": "We assess your door and confirm compatibility — before you pay.", "duration": "~30 min" } },
+        { "type": "step", "settings": { "title": "Professional installation", "description": "Installed by certified OTODOR professionals, not couriers.", "duration": "1–2 hrs" } },
+        { "type": "step", "settings": { "title": "Setup & training", "description": "Fingerprints enrolled, app connected, your family onboarded.", "duration": "~45 min" } },
+        { "type": "step", "settings": { "title": "Ongoing support", "description": "Real humans on WhatsApp, backed by a 1-year warranty.", "duration": "Always on" } }
       ]
     }
   ]

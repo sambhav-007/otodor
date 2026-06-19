@@ -1,0 +1,238 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Search — dark search header, light results grid.
+     Products render as brand cards; articles/pages as quiet
+     list rows.
+  ───────────────────────────────────────────────────────── */
+  #shopify-section-{{ section.id }} { background: var(--otodor-bg-light); }
+
+  .otodor-search-hero {
+    background:
+      radial-gradient(ellipse 90% 70% at 50% -10%, rgba(77, 166, 255, 0.10) 0%, transparent 60%),
+      linear-gradient(180deg, #0D0D0D 0%, #080808 100%);
+    color: #FFFFFF;
+  }
+  .otodor-search-hero__inner {
+    max-width: var(--otodor-container-sm);
+    margin: 0 auto;
+    text-align: center;
+    padding: clamp(3rem, 7vw, 5rem) 0 clamp(2.5rem, 6vw, 4rem);
+  }
+  .otodor-search-hero__title {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.8rem, 4.5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: var(--otodor-tracking-tight);
+    margin: 0 0 1.8rem;
+  }
+  .otodor-search-hero__form {
+    position: relative;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .otodor-search-hero__input {
+    width: 100%;
+    font-family: var(--otodor-font-body);
+    font-size: 1rem;
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--otodor-radius-pill);
+    padding: 0.95rem 3.4rem 0.95rem 1.5rem;
+    outline: none;
+    transition: border-color var(--otodor-dur-fast) var(--otodor-ease-out);
+  }
+  .otodor-search-hero__input::placeholder { color: rgba(255, 255, 255, 0.4); }
+  .otodor-search-hero__input:focus { border-color: rgba(77, 166, 255, 0.6); }
+  .otodor-search-hero__submit {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--otodor-gradient-blue);
+    color: #FFFFFF;
+    cursor: pointer;
+  }
+  .otodor-search-hero__submit svg { width: 17px; height: 17px; }
+  .otodor-search-hero__meta {
+    font-family: var(--otodor-font-body);
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin: 1.4rem 0 0;
+  }
+
+  .otodor-search-results {
+    max-width: var(--otodor-container);
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3.5rem, 7vw, 6rem);
+  }
+  .otodor-search-results__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+  }
+  @media (max-width: 989px) { .otodor-search-results__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 599px) { .otodor-search-results__grid { grid-template-columns: 1fr; } }
+
+  .otodor-search-results__list {
+    margin-top: clamp(2rem, 5vw, 3rem);
+  }
+  .otodor-search-row {
+    display: block;
+    text-decoration: none;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--otodor-hairline-light);
+  }
+  .otodor-search-row__kind {
+    font-family: var(--otodor-font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--otodor-tracking-wider);
+    color: var(--otodor-accent-on-light);
+  }
+  .otodor-search-row__title {
+    font-family: var(--otodor-font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--otodor-ink);
+    margin: 0.25rem 0 0;
+  }
+  .otodor-search-row:hover .otodor-search-row__title { color: var(--otodor-accent-on-light); }
+
+  .otodor-search-empty {
+    text-align: center;
+    padding: clamp(3rem, 8vw, 6rem) 1rem;
+  }
+  .otodor-search-empty h2 {
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-2xl);
+    color: var(--otodor-ink);
+    margin: 0 0 0.8rem;
+  }
+  .otodor-search-empty p {
+    font-family: var(--otodor-font-body);
+    color: var(--otodor-ink-soft);
+    margin: 0;
+  }
+  .otodor-search-empty a { color: var(--otodor-accent-on-light); }
+
+  .otodor-search-results .otodor-cgrid__pagination {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+  }
+{%- endstyle -%}
+
+<div class="otodor-search-hero">
+  <div class="otodor-search-hero__inner">
+    <h1 class="otodor-search-hero__title">
+      {%- if search.performed and search.terms != blank -%}
+        Results for &ldquo;{{ search.terms | escape }}&rdquo;
+      {%- else -%}
+        Search
+      {%- endif -%}
+    </h1>
+    <form action="{{ routes.search_url }}" method="get" role="search" class="otodor-search-hero__form">
+      <input
+        class="otodor-search-hero__input"
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="Search locks, gates, automation…"
+        aria-label="Search"
+      >
+      <input type="hidden" name="options[prefix]" value="last">
+      <button type="submit" class="otodor-search-hero__submit" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+    </form>
+    {%- if search.performed -%}
+      <p class="otodor-search-hero__meta">{{ search.results_count }} {% if search.results_count == 1 %}result{% else %}results{% endif %}</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- if search.performed -%}
+  <div class="otodor-search-results">
+    {%- if search.results_count == 0 -%}
+      <div class="otodor-search-empty">
+        <h2>Nothing found</h2>
+        <p>Try a different term, or <a href="{{ routes.all_products_collection_url }}">browse all products</a>.</p>
+      </div>
+    {%- else -%}
+      {%- paginate search.results by 12 -%}
+        {%- liquid
+          assign has_products = false
+          for item in search.results
+            if item.object_type == 'product'
+              assign has_products = true
+              break
+            endif
+          endfor
+        -%}
+
+        {%- if has_products -%}
+          <div class="otodor-search-results__grid">
+            {%- for item in search.results -%}
+              {%- if item.object_type == 'product' -%}
+                {% render 'otodor-card-product', card_product: item %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- liquid
+          assign has_other = false
+          for item in search.results
+            if item.object_type != 'product'
+              assign has_other = true
+              break
+            endif
+          endfor
+        -%}
+        {%- if has_other -%}
+          <div class="otodor-search-results__list">
+            {%- for item in search.results -%}
+              {%- unless item.object_type == 'product' -%}
+                <a href="{{ item.url }}" class="otodor-search-row">
+                  <span class="otodor-search-row__kind">{{ item.object_type }}</span>
+                  <p class="otodor-search-row__title">{{ item.title | escape }}</p>
+                </a>
+              {%- endunless -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="otodor-cgrid__pagination" aria-label="Pagination">
+            {%- if paginate.previous -%}<a href="{{ paginate.previous.url }}">&larr; Previous</a>{%- endif -%}
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a href="{{ part.url }}">{{ part.title }}</a>
+              {%- elsif part.title == paginate.current_page -%}
+                <span class="current">{{ part.title }}</span>
+              {%- else -%}
+                <span>{{ part.title }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if paginate.next -%}<a href="{{ paginate.next.url }}">Next &rarr;</a>{%- endif -%}
+          </nav>
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Search",
+  "settings": [],
+  "presets": [{ "name": "OTODOR Search" }]
+}
+{% endschema %}
