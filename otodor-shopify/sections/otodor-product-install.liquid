@@ -1,0 +1,212 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Product Install — compatibility trust section.
+     The will-it-fit-my-door objection answered at full scale:
+     big promise, four substantial stages, consult action.
+  ───────────────────────────────────────────────────────── */
+  #shopify-section-{{ section.id }} {
+    background: var(--otodor-bg-light);
+  }
+  .otodor-pinstall {
+    max-width: var(--otodor-container);
+    margin: 0 auto;
+    padding: clamp(4rem, 9vw, 7rem) 0;
+    border-top: 1px solid var(--otodor-hairline-light);
+  }
+
+  .otodor-pinstall__header {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 1.5rem clamp(2rem, 6vw, 5rem);
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .otodor-pinstall__eyebrow {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--otodor-tracking-widest);
+    color: var(--otodor-accent-on-light);
+    margin-bottom: 1.1rem;
+  }
+  .otodor-pinstall__promise {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink);
+    margin: 0;
+    max-width: 18ch;
+  }
+  .otodor-pinstall__aside {
+    padding-bottom: 0.4rem;
+  }
+  .otodor-pinstall__estimate {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-md);
+    line-height: 1.6;
+    color: var(--otodor-ink-soft);
+    margin: 0;
+    max-width: 36ch;
+  }
+  .otodor-pinstall__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 1.4rem;
+    font-family: var(--otodor-font-body);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    background: var(--otodor-ink);
+    text-decoration: none;
+    border-radius: var(--otodor-radius-pill);
+    padding: 0.75rem 1.6rem;
+    transition: background var(--otodor-dur-fast) var(--otodor-ease-out),
+                transform var(--otodor-dur-fast) var(--otodor-ease-spring);
+  }
+  .otodor-pinstall__cta:hover {
+    background: #000000;
+    transform: translateY(-2px);
+  }
+  .otodor-pinstall__cta svg { width: 17px; height: 17px; }
+
+  .otodor-pinstall__steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .otodor-pinstall__step {
+    position: relative;
+    border-top: 2px solid var(--otodor-hairline-light-2);
+    padding-top: 1.4rem;
+    transition: border-color var(--otodor-dur-base) var(--otodor-ease-out);
+  }
+  .otodor-pinstall__step:hover { border-top-color: var(--otodor-accent-on-light); }
+  .otodor-pinstall__num {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--otodor-ink-faint);
+    margin-bottom: 0.9rem;
+  }
+  .otodor-pinstall__name {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+    font-weight: 700;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink);
+    margin: 0;
+  }
+  .otodor-pinstall__desc {
+    font-family: var(--otodor-font-body);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--otodor-ink-soft);
+    margin: 0.6rem 0 0;
+    max-width: 30ch;
+  }
+  .otodor-pinstall__chip {
+    display: inline-block;
+    font-family: var(--otodor-font-body);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--otodor-accent-on-light);
+    border: 1px solid rgba(26, 120, 216, 0.3);
+    border-radius: var(--otodor-radius-pill);
+    padding: 0.28rem 0.85rem;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 989px) {
+    .otodor-pinstall__header { grid-template-columns: 1fr; align-items: start; }
+    .otodor-pinstall__steps { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 599px) {
+    .otodor-pinstall__steps { grid-template-columns: 1fr; }
+    .otodor-pinstall__desc { max-width: none; }
+  }
+{%- endstyle -%}
+
+<div class="otodor-pinstall" data-otodor-reveal="fade-up">
+  <div class="otodor-pinstall__header">
+    <div>
+      <span class="otodor-pinstall__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      <h2 class="otodor-pinstall__promise">{{ section.settings.promise | escape }}</h2>
+    </div>
+    <div class="otodor-pinstall__aside">
+      {%- if section.settings.estimate != blank -%}
+        <p class="otodor-pinstall__estimate">{{ section.settings.estimate | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.show_cta -%}
+        {%- assign wa_number = settings.otodor_whatsapp_number | default: '917206895607' -%}
+        {%- assign wa_message = 'Hello! Will ' | append: product.title | append: ' fit my door? I would like a compatibility check.' | url_encode -%}
+        <a class="otodor-pinstall__cta" href="https://wa.me/{{ wa_number }}?text={{ wa_message }}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 14.9L2 22l5.3-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3a8.2 8.2 0 1 1 7.1 3.9zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4 0-.5.2-.7l.4-.5c.1-.2.1-.3 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.3-.2z"/></svg>
+          {{ section.settings.cta_label | escape }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="otodor-pinstall__steps">
+    {%- if section.blocks.size > 0 -%}
+      {%- for block in section.blocks -%}
+        <div class="otodor-pinstall__step" {{ block.shopify_attributes }}>
+          <span class="otodor-pinstall__num">0{{ forloop.index }}</span>
+          <h3 class="otodor-pinstall__name">{{ block.settings.title | escape }}</h3>
+          {%- if block.settings.description != blank -%}
+            <p class="otodor-pinstall__desc">{{ block.settings.description | escape }}</p>
+          {%- endif -%}
+          {%- if block.settings.duration != blank -%}
+            <span class="otodor-pinstall__chip">{{ block.settings.duration | escape }}</span>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      {%- assign fallback_titles = 'Consultation|Professional installation|Setup & training|Ongoing support' | split: '|' -%}
+      {%- assign fallback_descs = 'We assess your door and confirm compatibility — before you pay.|Installed by certified OTODOR professionals, not couriers.|Fingerprints enrolled, app connected, your family onboarded.|Real humans on WhatsApp, backed by a 1-year warranty.' | split: '|' -%}
+      {%- assign fallback_chips = '~30 min|1–2 hrs|~45 min|Always on' | split: '|' -%}
+      {%- for title in fallback_titles -%}
+        <div class="otodor-pinstall__step">
+          <span class="otodor-pinstall__num">0{{ forloop.index }}</span>
+          <h3 class="otodor-pinstall__name">{{ title }}</h3>
+          <p class="otodor-pinstall__desc">{{ fallback_descs[forloop.index0] }}</p>
+          <span class="otodor-pinstall__chip">{{ fallback_chips[forloop.index0] }}</span>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "OTODOR Product Install",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Professional Installation" },
+    { "type": "text", "id": "promise", "label": "Compatibility promise", "default": "We verify compatibility before installation." },
+    { "type": "text", "id": "estimate", "label": "Estimate line", "default": "Most installations completed within 2–4 hours, by certified OTODOR professionals." },
+    { "type": "checkbox", "id": "show_cta", "label": "Show compatibility-check button", "default": true },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Check my door" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Stage",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Consultation" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "We assess your door and confirm compatibility — before you pay." },
+        { "type": "text", "id": "duration", "label": "Duration chip", "default": "~30 min" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [{ "name": "OTODOR Product Install" }]
+}
+{% endschema %}

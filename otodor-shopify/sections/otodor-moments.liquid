@@ -1,0 +1,336 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Moments — editorial day-in-the-life narrative.
+     Desktop (>=1024px): pinned scroll tour — the section holds
+     while scrolling crossfades through the moments
+     (Leave · Arrive · Welcome · Secure), flagship-style.
+     Mobile / no-JS / reduced motion: static stacked frames.
+     Copy is one word + one line. The image communicates.
+  ───────────────────────────────────────────────────────── */
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    background: var(--otodor-bg-light);
+  }
+
+  /* ─ Static baseline (mobile, no-JS, reduced motion) ──────── */
+  .otodor-moments__opener {
+    text-align: center;
+    padding: clamp(4.5rem, 10vw, 8rem) 1.5rem clamp(3.5rem, 8vw, 6rem);
+  }
+  .otodor-moments__opener-line {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.9rem, 4.5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink);
+    max-width: 20ch;
+    margin: 0 auto;
+  }
+
+  .otodor-moment {
+    position: relative;
+    min-height: clamp(480px, 85vh, 820px);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: linear-gradient(165deg, var(--otodor-plinth) 0%, #D8D4CB 100%);
+  }
+  .otodor-moment__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: transform, opacity;
+  }
+  .otodor-moment::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.52) 100%);
+    pointer-events: none;
+  }
+
+  .otodor-moment__copy {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: var(--otodor-container);
+    margin: 0 auto;
+    padding-bottom: clamp(3rem, 7vw, 5.5rem);
+  }
+  .otodor-moment--right .otodor-moment__copy { text-align: right; }
+
+  .otodor-moment__word {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(2.6rem, 7vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: #FFFFFF;
+    margin: 0;
+  }
+  .otodor-moment__line {
+    font-family: var(--otodor-font-body);
+    font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+    color: rgba(255, 255, 255, 0.78);
+    margin: 0.9rem 0 0;
+    max-width: 38ch;
+  }
+  .otodor-moment--right .otodor-moment__line { margin-left: auto; }
+
+  .otodor-moment--empty::after {
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.18) 100%);
+  }
+  .otodor-moment--empty .otodor-moment__word { color: var(--otodor-ink); }
+  .otodor-moment--empty .otodor-moment__line { color: var(--otodor-ink-soft); }
+
+  /* ─ Pinned tour layout (applied via .js-animated on desktop) ─ */
+  .otodor-moments.js-animated .otodor-moments__stage {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .otodor-moments.js-animated .otodor-moments__opener {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.5rem;
+    pointer-events: none;
+  }
+  .otodor-moments.js-animated .otodor-moment {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    opacity: 0;
+  }
+  /* Progress dots — quiet, right edge */
+  .otodor-moments__dots {
+    display: none;
+  }
+  .otodor-moments.js-animated .otodor-moments__dots {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    position: absolute;
+    right: clamp(1.2rem, 3vw, 2.5rem);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+  }
+  .otodor-moments__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    transition: background-color 300ms ease, transform 300ms ease;
+  }
+  .otodor-moments__dot.is-on {
+    background: #FFFFFF;
+    transform: scale(1.35);
+  }
+{%- endstyle -%}
+
+<div class="otodor-moments" data-otodor-section="moments" id="OtodorMoments-{{ section.id }}" aria-label="{{ section.settings.opener | escape }}">
+  <div class="otodor-moments__stage">
+    {%- if section.settings.opener != blank -%}
+      <div class="otodor-moments__opener" data-moments-opener>
+        <h2 class="otodor-moments__opener-line" data-otodor-reveal="fade-up">{{ section.settings.opener | escape }}</h2>
+      </div>
+    {%- endif -%}
+
+    {%- for block in section.blocks -%}
+      {%- assign align_class = '' -%}
+      {%- assign is_even = forloop.index | modulo: 2 -%}
+      {%- if is_even == 0 -%}{%- assign align_class = ' otodor-moment--right' -%}{%- endif -%}
+      <div
+        class="otodor-moment{{ align_class }}{% if block.settings.image == blank %} otodor-moment--empty{% endif %}"
+        data-otodor-moment
+        {{ block.shopify_attributes }}
+      >
+        {%- if block.settings.image != blank -%}
+          {{ block.settings.image | image_url: width: 2400 | image_tag: class: 'otodor-moment__img', loading: 'lazy', widths: '900,1400,2400', sizes: '100vw', alt: block.settings.word }}
+        {%- endif -%}
+        <div class="otodor-moment__copy">
+          <h3 class="otodor-moment__word" data-otodor-reveal="fade-up">{{ block.settings.word | escape }}</h3>
+          {%- if block.settings.line != blank -%}
+            <p class="otodor-moment__line" data-otodor-reveal="fade-up">{{ block.settings.line | escape }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+
+    <div class="otodor-moments__dots" aria-hidden="true">
+      {%- for block in section.blocks -%}
+        <span class="otodor-moments__dot" data-moments-dot></span>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var root = document.getElementById('OtodorMoments-{{ section.id }}');
+  if (!root) return;
+
+  // Pinned sections break when the browser restores a mid-page scroll on
+  // reload — reload from the top so ScrollTrigger calculates pin
+  // positions from a clean state (same guard as the other pinned tours).
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+
+  function initMoments() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    ScrollTrigger.config({ ignoreMobileResize: true });
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Tear down any previous build (theme editor / breakpoint change) so
+    // a stale pin never stays stuck on screen.
+    ScrollTrigger.getAll().forEach(function (st) {
+      if (st.trigger === root) st.kill(true);
+    });
+    root.classList.remove('js-animated');
+    gsap.set(root.querySelectorAll('.otodor-moment, .otodor-moment__img, .otodor-moment__word, .otodor-moment__line, [data-moments-opener]'), { clearProps: 'all' });
+
+    // Mobile / tablet: static stacked frames — a pinned tour on a phone
+    // fights the other pinned sections and hijacks the viewport.
+    if (!window.matchMedia('(min-width: 1024px)').matches) return;
+
+    var moments = Array.prototype.slice.call(root.querySelectorAll('[data-otodor-moment]'));
+    if (!moments.length) return;
+
+    root.classList.add('js-animated');
+
+    var opener = root.querySelector('[data-moments-opener]');
+    var dots = Array.prototype.slice.call(root.querySelectorAll('[data-moments-dot]'));
+
+    // The static reveal system must not fight the timeline inside the tour.
+    root.querySelectorAll('[data-otodor-reveal]').forEach(function (el) {
+      el.removeAttribute('data-otodor-reveal');
+      el.style.opacity = '';
+      el.style.transform = '';
+    });
+
+    // ── Initial state ─────────────────────────────────────────
+    if (opener) gsap.set(opener, { opacity: 1 });
+    gsap.set(moments, { opacity: 0 });
+    moments.forEach(function (m) {
+      var img = m.querySelector('.otodor-moment__img');
+      var word = m.querySelector('.otodor-moment__word');
+      var line = m.querySelector('.otodor-moment__line');
+      if (img) gsap.set(img, { scale: 1.08 });
+      if (word) gsap.set(word, { opacity: 0, y: 34 });
+      if (line) gsap.set(line, { opacity: 0, y: 22 });
+    });
+
+    function setDot(idx) {
+      dots.forEach(function (d, i) { d.classList.toggle('is-on', i === idx); });
+    }
+
+    var frameDur = 1.5;
+    var tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: root,
+        start: 'top top',
+        end: '+=' + (moments.length * 110) + '%',
+        scrub: 1,
+        pin: true,
+        anticipatePin: 1
+      }
+    });
+
+    // ── Phase 1: opener holds, then gives way to the first moment ──
+    var tourStart = 0.9;
+    if (opener) {
+      tl.to(opener, { opacity: 0, y: -24, duration: 0.5, ease: 'power2.inOut' }, tourStart - 0.45);
+    }
+
+    // ── Phase 2: moments crossfade tour ───────────────────────
+    moments.forEach(function (m, i) {
+      var t = tourStart + i * frameDur;
+      var img = m.querySelector('.otodor-moment__img');
+      var word = m.querySelector('.otodor-moment__word');
+      var line = m.querySelector('.otodor-moment__line');
+
+      tl.to(m, { opacity: 1, duration: 0.55, ease: 'sine.inOut' }, t);
+      if (img) tl.to(img, { scale: 1, duration: frameDur + 0.4, ease: 'none' }, t);
+      if (word) tl.to(word, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, t + 0.15);
+      if (line) tl.to(line, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, t + 0.3);
+      tl.call(setDot, [i], t + 0.2);
+
+      // Fade out before the next moment (the last one stays on screen)
+      if (i < moments.length - 1) {
+        tl.to(m, { opacity: 0, duration: 0.5, ease: 'sine.inOut' }, t + frameDur - 0.3);
+      }
+    });
+  }
+
+  if (document.readyState === 'complete') {
+    initMoments();
+  } else {
+    window.addEventListener('load', initMoments, { once: true });
+  }
+
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+      initMoments();
+    }
+  });
+
+  // Once images/fonts finish loading, recalc pin positions.
+  window.addEventListener('load', function () {
+    if (typeof ScrollTrigger !== 'undefined') {
+      requestAnimationFrame(function () { ScrollTrigger.refresh(); });
+    }
+  });
+
+  // Rebuild when crossing the desktop/mobile breakpoint.
+  var momentsMq = window.matchMedia('(min-width: 1024px)');
+  var momentsMqHandler = function () { initMoments(); };
+  if (momentsMq.addEventListener) {
+    momentsMq.addEventListener('change', momentsMqHandler);
+  } else if (momentsMq.addListener) {
+    momentsMq.addListener(momentsMqHandler);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "OTODOR Moments",
+  "settings": [
+    { "type": "text", "id": "opener", "label": "Opening line", "default": "Security that adapts to modern living." }
+  ],
+  "blocks": [
+    {
+      "type": "moment",
+      "name": "Moment",
+      "settings": [
+        { "type": "text", "id": "word", "label": "Action word", "default": "Arrive" },
+        { "type": "text", "id": "line", "label": "One line (optional)", "default": "Hands full. The door already knows." },
+        { "type": "image_picker", "id": "image", "label": "Cinematic image" }
+      ]
+    }
+  ],
+  "max_blocks": 5,
+  "presets": [
+    {
+      "name": "OTODOR Moments",
+      "blocks": [
+        { "type": "moment", "settings": { "word": "Leave", "line": "Walk out. It locks behind you." } },
+        { "type": "moment", "settings": { "word": "Arrive", "line": "Hands full. The door already knows." } },
+        { "type": "moment", "settings": { "word": "Welcome", "line": "Guest access, granted from anywhere." } },
+        { "type": "moment", "settings": { "word": "Secure", "line": "One glance. Everything is locked." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

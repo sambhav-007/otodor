@@ -1,0 +1,72 @@
+{%- comment -%}
+  OTODOR product card — technology-first, light surface.
+  Product on neutral plinth, name, access methods, price.
+
+  Accepts:
+  - card_product: {Object} Product object
+  - lazy:         {Boolean} lazy-load images (default true)
+
+  Access-method line resolution order:
+  1. product.metafields.custom.access_methods (single-line text, e.g. "Fingerprint · PIN · App")
+  2. product.type
+{%- endcomment -%}
+
+{%- liquid
+  assign loading = 'lazy'
+  if lazy == false
+    assign loading = 'eager'
+  endif
+  assign access_line = card_product.metafields.custom.access_methods.value | default: card_product.type
+-%}
+
+<a href="{{ card_product.url }}" class="otodor-pcard" aria-label="{{ card_product.title | escape }}">
+  <div class="otodor-pcard__media">
+    {%- if card_product.featured_media -%}
+      {{
+        card_product.featured_media
+        | image_url: width: 720
+        | image_tag:
+          class: 'otodor-pcard__img otodor-pcard__img--primary',
+          loading: loading,
+          widths: '360,540,720',
+          sizes: '(min-width: 990px) 30vw, (min-width: 750px) 45vw, 90vw',
+          alt: card_product.featured_media.alt
+      }}
+      {%- if card_product.media[1] != blank and card_product.media[1].media_type == 'image' -%}
+        {{
+          card_product.media[1]
+          | image_url: width: 720
+          | image_tag:
+            class: 'otodor-pcard__img otodor-pcard__img--alt',
+            loading: 'lazy',
+            widths: '360,540,720',
+            sizes: '(min-width: 990px) 30vw, (min-width: 750px) 45vw, 90vw',
+            alt: card_product.media[1].alt
+        }}
+      {%- endif -%}
+    {%- else -%}
+      <span class="otodor-pcard__placeholder" aria-hidden="true">OTODOR</span>
+    {%- endif -%}
+
+    {%- unless card_product.available -%}
+      <span class="otodor-pcard__badge">Sold out</span>
+    {%- endunless -%}
+  </div>
+
+  <div class="otodor-pcard__info">
+    <h3 class="otodor-pcard__title">{{ card_product.title | escape }}</h3>
+    {%- if access_line != blank -%}
+      <p class="otodor-pcard__meta">{{ access_line | escape }}</p>
+    {%- endif -%}
+    {%- if card_product.price == 0 -%}
+      <p class="otodor-pcard__price otodor-pcard__price--contact">Contact for pricing</p>
+    {%- else -%}
+      <p class="otodor-pcard__price">
+        {%- if card_product.compare_at_price > card_product.price -%}
+          <s>{{ card_product.compare_at_price | money }}</s>
+        {%- endif -%}
+        {{ card_product.price | money }}
+      </p>
+    {%- endif -%}
+  </div>
+</a>

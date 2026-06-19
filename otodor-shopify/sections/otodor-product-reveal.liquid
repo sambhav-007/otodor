@@ -1,0 +1,89 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Product Reveal — flagship moment after the buy
+     module. Large render, one powerful statement. Apple-style
+     restraint: the product is the interface.
+  ───────────────────────────────────────────────────────── */
+  #shopify-section-{{ section.id }} {
+    background: var(--otodor-bg-light);
+  }
+  .otodor-reveal {
+    max-width: var(--otodor-container);
+    margin: 0 auto;
+    text-align: center;
+    padding: clamp(4rem, 9vw, 7.5rem) 0 0;
+  }
+  .otodor-reveal__statement {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.9rem, 4.5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink);
+    max-width: 22ch;
+    margin: 0 auto;
+  }
+  .otodor-reveal__sub {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-md);
+    color: var(--otodor-ink-soft);
+    max-width: 48ch;
+    margin: 1.2rem auto 0;
+  }
+  .otodor-reveal__media {
+    position: relative;
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+    padding-bottom: clamp(3rem, 7vw, 5.5rem);
+  }
+  .otodor-reveal__media img {
+    width: min(680px, 82%);
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 40px 70px rgba(0, 0, 0, 0.16));
+  }
+  /* Soft plinth ellipse beneath the render */
+  .otodor-reveal__media::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: clamp(2rem, 5vw, 4rem);
+    transform: translateX(-50%);
+    width: min(560px, 70%);
+    height: 36px;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0, 0, 0, 0.10) 0%, transparent 70%);
+    z-index: -1;
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign reveal_image = product.metafields.custom.reveal_image | default: product.featured_media
+  assign statement = product.metafields.custom.reveal_statement.value | default: section.settings.statement
+-%}
+
+{%- if statement != blank or reveal_image != blank -%}
+  <div class="otodor-reveal">
+    {%- if statement != blank -%}
+      <h2 class="otodor-reveal__statement" data-otodor-reveal="fade-up">{{ statement | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.supporting_line != blank -%}
+      <p class="otodor-reveal__sub" data-otodor-reveal="fade-up">{{ section.settings.supporting_line | escape }}</p>
+    {%- endif -%}
+    {%- if reveal_image != blank -%}
+      <div class="otodor-reveal__media" data-otodor-reveal="scale-in">
+        {{ reveal_image | image_url: width: 1400 | image_tag: loading: 'lazy', widths: '700,1000,1400', sizes: '(min-width: 990px) 680px, 82vw', alt: product.title }}
+      </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Product Reveal",
+  "settings": [
+    { "type": "text", "id": "statement", "label": "Statement", "info": "Per-product override: metafield custom.reveal_statement.", "default": "Engineered to disappear into your day." },
+    { "type": "text", "id": "supporting_line", "label": "Supporting line" }
+  ],
+  "presets": [{ "name": "OTODOR Product Reveal" }]
+}
+{% endschema %}

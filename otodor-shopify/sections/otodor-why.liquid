@@ -1,0 +1,99 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Why — typographic credibility manifesto.
+     Paired statements, large type, nothing else.
+     "Installed. Not delivered." Credibility through restraint.
+  ───────────────────────────────────────────────────────── */
+  #shopify-section-{{ section.id }} {
+    background: var(--otodor-bg-light);
+  }
+  .otodor-why {
+    max-width: var(--otodor-container-sm);
+    margin: 0 auto;
+    padding: clamp(4.5rem, 10vw, 8rem) 0;
+  }
+  .otodor-why__eyebrow {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--otodor-tracking-widest);
+    color: var(--otodor-accent-on-light);
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+    text-align: center;
+  }
+
+  .otodor-why__statement {
+    padding: clamp(2rem, 5vw, 3.2rem) 0;
+    border-top: 1px solid var(--otodor-hairline-light);
+  }
+  .otodor-why__statement:last-child {
+    border-bottom: 1px solid var(--otodor-hairline-light);
+  }
+  .otodor-why__lead {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink);
+  }
+  .otodor-why__counter {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.3rem, 3.2vw, 2.2rem);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink-faint);
+    margin-top: 0.35rem;
+  }
+{%- endstyle -%}
+
+<div class="otodor-why" data-otodor-section="why">
+  {%- if section.settings.eyebrow != blank -%}
+    <span class="otodor-why__eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+  {%- endif -%}
+
+  {%- for block in section.blocks -%}
+    <div class="otodor-why__statement" data-otodor-reveal="fade-up" {{ block.shopify_attributes }}>
+      <span class="otodor-why__lead">{{ block.settings.lead | escape }}</span>
+      {%- if block.settings.counter != blank -%}
+        <span class="otodor-why__counter">{{ block.settings.counter | escape }}</span>
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "OTODOR Why",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Why OTODOR" }
+  ],
+  "blocks": [
+    {
+      "type": "statement",
+      "name": "Statement",
+      "settings": [
+        { "type": "text", "id": "lead", "label": "Lead line", "default": "Installed." },
+        { "type": "text", "id": "counter", "label": "Counter line", "default": "Not delivered." }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "OTODOR Why",
+      "blocks": [
+        { "type": "statement", "settings": { "lead": "Installed.", "counter": "Not delivered." } },
+        { "type": "statement", "settings": { "lead": "Protected.", "counter": "Not promised." } },
+        { "type": "statement", "settings": { "lead": "Supported.", "counter": "By real people." } },
+        { "type": "statement", "settings": { "lead": "Engineered.", "counter": "For every day." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

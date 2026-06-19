@@ -1,0 +1,121 @@
+{%- style -%}
+  /* ─────────────────────────────────────────────────────────
+     OTODOR Product Benefits — editorial alternating rows.
+     One benefit per row: large statement, one sentence, image.
+     No cards. No icons. Apple-style benefit storytelling.
+  ───────────────────────────────────────────────────────── */
+  #shopify-section-{{ section.id }} {
+    background: var(--otodor-bg-light);
+  }
+  .otodor-pbenefits {
+    max-width: var(--otodor-container);
+    margin: 0 auto;
+    padding: clamp(3rem, 7vw, 5.5rem) 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3.5rem, 8vw, 7rem);
+  }
+  .otodor-pbenefit {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 5.5rem);
+    align-items: center;
+  }
+  .otodor-pbenefit:nth-child(even) .otodor-pbenefit__media { order: 2; }
+
+  .otodor-pbenefit__media {
+    border-radius: var(--otodor-radius-lg);
+    overflow: hidden;
+    background: var(--otodor-plinth);
+    aspect-ratio: 4 / 3;
+  }
+  .otodor-pbenefit__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .otodor-pbenefit__media--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--otodor-ink-faint);
+    font-family: var(--otodor-font-display);
+    letter-spacing: var(--otodor-tracking-wide);
+  }
+
+  .otodor-pbenefit__title {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: var(--otodor-tracking-tight);
+    color: var(--otodor-ink);
+    margin: 0;
+    max-width: 18ch;
+  }
+  .otodor-pbenefit__line {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-md);
+    line-height: 1.65;
+    color: var(--otodor-ink-soft);
+    margin: 1.1rem 0 0;
+    max-width: 42ch;
+  }
+
+  @media (max-width: 749px) {
+    .otodor-pbenefit { grid-template-columns: 1fr; }
+    .otodor-pbenefit:nth-child(even) .otodor-pbenefit__media { order: 0; }
+  }
+{%- endstyle -%}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="otodor-pbenefits">
+    {%- for block in section.blocks -%}
+      <div class="otodor-pbenefit" data-otodor-reveal="fade-up" {{ block.shopify_attributes }}>
+        <div class="otodor-pbenefit__media{% if block.settings.image == blank %} otodor-pbenefit__media--empty{% endif %}">
+          {%- if block.settings.image != blank -%}
+            {{ block.settings.image | image_url: width: 1100 | image_tag: loading: 'lazy', widths: '550,820,1100', sizes: '(min-width: 750px) 48vw, 92vw', alt: block.settings.title }}
+          {%- else -%}
+            <span aria-hidden="true">OTODOR</span>
+          {%- endif -%}
+        </div>
+        <div class="otodor-pbenefit__copy">
+          <h3 class="otodor-pbenefit__title">{{ block.settings.title | escape }}</h3>
+          {%- if block.settings.line != blank -%}
+            <p class="otodor-pbenefit__line">{{ block.settings.line | escape }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Product Benefits",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Statement", "default": "Your fingerprint is the key." },
+        { "type": "text", "id": "line", "label": "One sentence", "default": "Unlock in under a second — no keys, no codes to remember." },
+        { "type": "image_picker", "id": "image", "label": "Image" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "OTODOR Product Benefits",
+      "blocks": [
+        { "type": "benefit", "settings": { "title": "Your fingerprint is the key.", "line": "Unlock in under a second — no keys, no codes to remember." } },
+        { "type": "benefit", "settings": { "title": "Control from anywhere.", "line": "Lock, unlock, and grant access from your phone, wherever you are." } },
+        { "type": "benefit", "settings": { "title": "Built to be trusted.", "line": "Solid alloy construction, tested for years of daily use." } }
+      ]
+    }
+  ]
+}
+{% endschema %}
