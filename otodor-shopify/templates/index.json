@@ -1,25 +1,171 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "otodor_hero": {
       "type": "otodor-hero",
       "settings": {
         "heading": "Security Reimagined",
-        "heading_suffix": ".",
+        "heading_accent": "Protected.",
         "subheading": "Smart Security Solutions Built For Modern Living.",
-        "show_badge": true,
-        "badge_text": "Now Available — Smart Locks & Gate Motors",
+        "final_heading": "The Complete OTODOR Ecosystem",
+        "p1_image": "shopify://shop_images/zion_B_front_45.png",
+        "p1_title": "Smart Digital Lock",
+        "p1_feature": "Smart Access",
+        "p1_desc": "Next-generation digital door locks designed for wooden entries.",
+        "p1_link": "",
+        "p2_title": "Smart Gate Lock",
+        "p2_feature": "Perimeter Protection",
+        "p2_desc": "Heavy-duty weatherproof smart locks for your outer gates.",
+        "p2_link": "",
+        "p3_image": "shopify://shop_images/armour_front_2.png",
+        "p3_title": "Fingerprint Padlock",
+        "p3_feature": "Portable Security",
+        "p3_desc": "High-security biometric padlocks for versatile access control.",
+        "p3_link": "",
+        "p4_image": "shopify://shop_images/Sliding_gate_motor_45.png",
+        "p4_title": "Sliding Gate Motor",
+        "p4_feature": "Intelligent Automation",
+        "p4_desc": "Automate heavy sliding gates with powerful obstacle-sensing motors.",
+        "p4_link": "",
         "cta_primary_label": "Explore Products",
         "cta_primary_link": "",
         "cta_secondary_label": "View Collections",
-        "cta_secondary_link": "",
-        "background_image": "",
-        "overlay_opacity": 65,
-        "show_scroll_indicator": true,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "p1_image": "shopify://shop_images/zion_B_front_45.png",
-        "p3_image": "shopify://shop_images/armour_front_2.png",
-        "p4_image": "shopify://shop_images/Sliding_gate_motor_45.png"
+        "cta_secondary_link": ""
+      }
+    },
+    "otodor_categories": {
+      "type": "otodor-categories",
+      "blocks": {
+        "cat_1": {
+          "type": "category_card",
+          "settings": {
+            "collection": "digital-locks",
+            "custom_title": "Digital Locks",
+            "custom_url": "",
+            "tagline": "Premium secure locks engineered for wooden frames.",
+            "grid_size": "large",
+            "badge_text": "",
+            "badge_color": "blue",
+            "product_image_1": "shopify://shop_images/onyx_back_45.png"
+          }
+        },
+        "cat_2": {
+          "type": "category_card",
+          "settings": {
+            "collection": "gate-locks",
+            "custom_title": "Gate Locks",
+            "custom_url": "",
+            "tagline": "Weatherproof robust security for metal gate entrances.",
+            "grid_size": "small",
+            "badge_text": "",
+            "badge_color": "blue"
+          }
+        },
+        "cat_3": {
+          "type": "category_card",
+          "settings": {
+            "collection": "sliding-gate-motors",
+            "custom_title": "Gate Automation",
+            "custom_url": "",
+            "tagline": "Powerful automated motors for heavy gates.",
+            "grid_size": "small",
+            "badge_text": "",
+            "badge_color": "blue",
+            "product_image_1": "shopify://shop_images/Sliding_gate_motor_45.png"
+          }
+        },
+        "cat_4": {
+          "type": "category_card",
+          "settings": {
+            "collection": "hotel-locks",
+            "custom_title": "Hotel Locks",
+            "custom_url": "/products/cloud",
+            "tagline": "Advanced smart keycard access solutions for hospitality.",
+            "grid_size": "medium",
+            "badge_text": "",
+            "badge_color": "blue",
+            "product_image_1": "shopify://shop_images/cloud_front.png"
+          }
+        },
+        "cat_5": {
+          "type": "category_card",
+          "settings": {
+            "collection": "accessories",
+            "custom_title": "Accessories",
+            "custom_url": "",
+            "tagline": "RFID keycards, smart gateways, and replacement remotes.",
+            "grid_size": "medium",
+            "badge_text": "",
+            "badge_color": "blue",
+            "product_image_1": "shopify://shop_images/armour_front_2.png"
+          }
+        }
+      },
+      "block_order": [
+        "cat_1",
+        "cat_2",
+        "cat_3",
+        "cat_4",
+        "cat_5"
+      ],
+      "settings": {
+        "eyebrow": "Browse Collections",
+        "heading": "Shop by",
+        "heading_accent": "category."
+      }
+    },
+    "otodor_moments": {
+      "type": "otodor-moments",
+      "blocks": {
+        "moment_leave": {
+          "type": "moment",
+          "settings": {
+            "word": "Leave",
+            "line": "Walk out. It locks behind you.",
+            "image": "shopify://shop_images/leave.png"
+          }
+        },
+        "moment_arrive": {
+          "type": "moment",
+          "settings": {
+            "word": "Arrive",
+            "line": "Hands full. The door already knows.",
+            "image": "shopify://shop_images/arrive.png"
+          }
+        },
+        "moment_welcome": {
+          "type": "moment",
+          "settings": {
+            "word": "Welcome",
+            "line": "Guest access, granted from anywhere.",
+            "image": "shopify://shop_images/welcome.png"
+          }
+        },
+        "moment_secure": {
+          "type": "moment",
+          "settings": {
+            "word": "Secure",
+            "line": "One glance. Everything is locked.",
+            "image": "shopify://shop_images/secure.png"
+          }
+        }
+      },
+      "block_order": [
+        "moment_leave",
+        "moment_arrive",
+        "moment_welcome",
+        "moment_secure"
+      ],
+      "settings": {
+        "opener": "Security that adapts to modern living."
       }
     },
     "otodor_trust_bar": {
@@ -29,56 +175,64 @@
           "type": "pillar",
           "settings": {
             "icon": "wrench",
-            "title": "Free Professional Installation"
+            "title": "Free Professional Installation",
+            "description": ""
           }
         },
         "pillar_2": {
           "type": "pillar",
           "settings": {
             "icon": "shield",
-            "title": "1-Year Brand Warranty"
+            "title": "1-Year Brand Warranty",
+            "description": ""
           }
         },
         "pillar_3": {
           "type": "pillar",
           "settings": {
             "icon": "fingerprint",
-            "title": "Fingerprint & PIN Access"
+            "title": "Fingerprint & PIN Access",
+            "description": ""
           }
         },
         "pillar_4": {
           "type": "pillar",
           "settings": {
             "icon": "mobile",
-            "title": "Mobile App Control"
+            "title": "Mobile App Control",
+            "description": ""
           }
         },
         "pillar_5": {
           "type": "pillar",
           "settings": {
             "icon": "wifi",
-            "title": "Remote Access Anywhere"
+            "title": "Remote Access Anywhere",
+            "description": ""
           }
         },
         "pillar_6": {
           "type": "pillar",
           "settings": {
             "icon": "tag",
-            "title": "RFID Keycard Entry"
+            "title": "RFID Keycard Entry",
+            "description": ""
           }
         },
         "pillar_7": {
           "type": "pillar",
           "settings": {
             "icon": "clock",
-            "title": "Real-Time Audit Logs"
+            "title": "Real-Time Audit Logs",
+            "description": ""
           }
         },
         "pillar_8": {
           "type": "pillar",
           "settings": {
             "icon": "star",
-            "title": "Rated 4.9 by 500+ Homes"
+            "title": "Rated 4.9 by 500+ Homes",
+            "description": ""
           }
         }
       },
@@ -96,73 +250,6 @@
         "speed": 55,
         "pause_on_hover": true,
         "aria_label": "Why choose OTODOR"
-      }
-    },
-    "otodor_categories": {
-      "type": "otodor-categories",
-      "blocks": {
-        "cat_1": {
-          "type": "category_card",
-          "settings": {
-            "custom_title": "Digital Locks",
-            "tagline": "Premium secure locks engineered for wooden frames.",
-            "grid_size": "large",
-            "collection": "digital-locks",
-            "product_image_1": "shopify://shop_images/onyx_back_45.png"
-          }
-        },
-        "cat_2": {
-          "type": "category_card",
-          "settings": {
-            "custom_title": "Gate Locks",
-            "tagline": "Weatherproof robust security for metal gate entrances.",
-            "grid_size": "small",
-            "collection": "gate-locks"
-          }
-        },
-        "cat_3": {
-          "type": "category_card",
-          "settings": {
-            "custom_title": "Gate Automation",
-            "tagline": "Powerful automated motors for heavy gates.",
-            "grid_size": "small",
-            "collection": "sliding-gate-motors",
-            "product_image_1": "shopify://shop_images/Sliding_gate_motor_45.png"
-          }
-        },
-        "cat_4": {
-          "type": "category_card",
-          "settings": {
-            "custom_title": "Hotel Locks",
-            "tagline": "Advanced smart keycard access solutions for hospitality.",
-            "grid_size": "medium",
-            "collection": "hotel-locks",
-            "custom_url": "/products/cloud",
-            "product_image_1": "shopify://shop_images/cloud_front.png"
-          }
-        },
-        "cat_5": {
-          "type": "category_card",
-          "settings": {
-            "custom_title": "Accessories",
-            "tagline": "RFID keycards, smart gateways, and replacement remotes.",
-            "grid_size": "medium",
-            "collection": "accessories",
-            "product_image_1": "shopify://shop_images/armour_front_2.png"
-          }
-        }
-      },
-      "block_order": [
-        "cat_1",
-        "cat_2",
-        "cat_3",
-        "cat_4",
-        "cat_5"
-      ],
-      "settings": {
-        "eyebrow": "Browse Collections",
-        "heading": "Shop by ",
-        "heading_accent": "category."
       }
     },
     "otodor_features": {
@@ -240,34 +327,9 @@
       ],
       "settings": {
         "eyebrow": "Core Technology",
-        "heading": "Smart security for modern ",
+        "heading": "Smart security for modern",
         "heading_accent": "homes.",
         "subheading": "Every access point engineered with next-generation recognition and military-grade encryption."
-      }
-    },
-    "otodor_moments": {
-      "type": "otodor-moments",
-      "blocks": {
-        "moment_leave": {
-          "type": "moment",
-          "settings": { "word": "Leave", "line": "Walk out. It locks behind you." }
-        },
-        "moment_arrive": {
-          "type": "moment",
-          "settings": { "word": "Arrive", "line": "Hands full. The door already knows." }
-        },
-        "moment_welcome": {
-          "type": "moment",
-          "settings": { "word": "Welcome", "line": "Guest access, granted from anywhere." }
-        },
-        "moment_secure": {
-          "type": "moment",
-          "settings": { "word": "Secure", "line": "One glance. Everything is locked." }
-        }
-      },
-      "block_order": ["moment_leave", "moment_arrive", "moment_welcome", "moment_secure"],
-      "settings": {
-        "opener": "Security that adapts to modern living."
       }
     },
     "otodor_why": {
@@ -275,74 +337,41 @@
       "blocks": {
         "why_installed": {
           "type": "statement",
-          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+          "settings": {
+            "lead": "Installed.",
+            "counter": "Not delivered."
+          }
         },
         "why_protected": {
           "type": "statement",
-          "settings": { "lead": "Protected.", "counter": "Not promised." }
+          "settings": {
+            "lead": "Protected.",
+            "counter": "Not promised."
+          }
         },
         "why_supported": {
           "type": "statement",
-          "settings": { "lead": "Supported.", "counter": "By real people." }
+          "settings": {
+            "lead": "Supported.",
+            "counter": "By real people."
+          }
         },
         "why_engineered": {
           "type": "statement",
-          "settings": { "lead": "Engineered.", "counter": "For every day." }
-        }
-      },
-      "block_order": ["why_installed", "why_protected", "why_supported", "why_engineered"],
-      "settings": {
-        "eyebrow": "Why OTODOR"
-      }
-    },
-    "otodor_process": {
-      "type": "otodor-process",
-      "blocks": {
-        "step_1": {
-          "type": "step",
           "settings": {
-            "title": "Consultation",
-            "description": "We assess your door and confirm compatibility — before you pay.",
-            "duration": "~30 min"
-          }
-        },
-        "step_2": {
-          "type": "step",
-          "settings": {
-            "title": "Professional installation",
-            "description": "Installed by certified OTODOR professionals, not couriers.",
-            "duration": "1–2 hrs"
-          }
-        },
-        "step_3": {
-          "type": "step",
-          "settings": {
-            "title": "Setup & training",
-            "description": "Fingerprints enrolled, app connected, your family onboarded.",
-            "duration": "~45 min"
-          }
-        },
-        "step_4": {
-          "type": "step",
-          "settings": {
-            "title": "Ongoing support",
-            "description": "Real humans on WhatsApp, backed by a 1-year warranty.",
-            "duration": "Always on"
+            "lead": "Engineered.",
+            "counter": "For every day."
           }
         }
       },
       "block_order": [
-        "step_1",
-        "step_2",
-        "step_3",
-        "step_4"
+        "why_installed",
+        "why_protected",
+        "why_supported",
+        "why_engineered"
       ],
       "settings": {
-        "eyebrow": "Professional Installation",
-        "heading": "From order to secured.",
-        "promise": "We verify compatibility before installation.",
-        "estimate": "Most installations are completed within 2–4 hours.",
-        "trust_line": "Certified OTODOR technicians · Background-verified · 1-year workmanship guarantee"
+        "eyebrow": "Why OTODOR"
       }
     },
     "otodor_testimonials": {
@@ -384,8 +413,62 @@
       "settings": {
         "color_scheme": "light",
         "eyebrow": "Verified Trust",
-        "heading": "What architects & builders ",
+        "heading": "What architects & builders",
         "heading_accent": "say."
+      }
+    },
+    "otodor_process": {
+      "type": "otodor-process",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Consultation",
+            "description": "We assess your door and confirm compatibility — before you pay.",
+            "duration": "~30 min",
+            "image": "shopify://shop_images/consultation.png"
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Professional installation",
+            "description": "Installed by certified OTODOR professionals, not couriers.",
+            "duration": "1–2 hrs",
+            "image": "shopify://shop_images/installation.png"
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Setup & training",
+            "description": "Fingerprints enrolled, app connected, your family onboarded.",
+            "duration": "~45 min",
+            "image": "shopify://shop_images/setup.png"
+          }
+        },
+        "step_4": {
+          "type": "step",
+          "settings": {
+            "title": "Ongoing support",
+            "description": "Real humans on WhatsApp, backed by a 1-year warranty.",
+            "duration": "Always on",
+            "image": "shopify://shop_images/support.png"
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3",
+        "step_4"
+      ],
+      "settings": {
+        "eyebrow": "Professional Installation",
+        "heading": "From order to secured.",
+        "promise": "We verify compatibility before installation.",
+        "estimate": "Most installations are completed within 2–4 hours.",
+        "trust_line": "Certified OTODOR technicians · Background-verified · 1-year workmanship guarantee"
       }
     },
     "otodor_ecosystem": {
@@ -393,22 +476,43 @@
       "blocks": {
         "node_lock": {
           "type": "node",
-          "settings": { "name": "Smart Lock", "role": "Front door entry" }
+          "settings": {
+            "name": "Smart Lock",
+            "role": "Front door entry",
+            "link": ""
+          }
         },
         "node_access": {
           "type": "node",
-          "settings": { "name": "Access Control", "role": "Who gets in" }
+          "settings": {
+            "name": "Access Control",
+            "role": "Who gets in",
+            "link": ""
+          }
         },
         "node_gate": {
           "type": "node",
-          "settings": { "name": "Gate Automation", "role": "Driveway, automated" }
+          "settings": {
+            "name": "Gate Automation",
+            "role": "Driveway, automated",
+            "link": ""
+          }
         },
         "node_mobile": {
           "type": "node",
-          "settings": { "name": "Mobile Control", "role": "Everything, anywhere" }
+          "settings": {
+            "name": "Mobile Control",
+            "role": "Everything, anywhere",
+            "link": ""
+          }
         }
       },
-      "block_order": ["node_lock", "node_access", "node_gate", "node_mobile"],
+      "block_order": [
+        "node_lock",
+        "node_access",
+        "node_gate",
+        "node_mobile"
+      ],
       "settings": {
         "eyebrow": "The OTODOR Ecosystem",
         "heading": "One ecosystem. Every entry point.",
@@ -419,7 +523,7 @@
       "type": "otodor-cta-banner",
       "settings": {
         "light_background": false,
-        "heading": "Protect what matters ",
+        "heading": "Protect what matters",
         "heading_accent": "most.",
         "description": "Premium smart security, designed for modern Indian homes. Schedule your priority home survey and custom installation assessment today.",
         "cta_primary_label": "Shop Smart Locks",

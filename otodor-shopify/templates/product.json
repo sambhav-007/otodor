@@ -100,12 +100,6 @@
         "heading": "Specifications"
       }
     },
-    "lifestyle": {
-      "type": "otodor-product-lifestyle",
-      "settings": {
-        "line": "Home knows it's you."
-      }
-    },
     "install": {
       "type": "otodor-product-install",
       "settings": {
@@ -144,7 +138,6 @@
     "main",
     "reveal",
     "specs",
-    "lifestyle",
     "install",
     "related-products",
     "comparison",
