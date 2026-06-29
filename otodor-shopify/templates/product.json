@@ -94,33 +94,6 @@
         "statement": "Engineered to disappear into your day."
       }
     },
-    "benefits": {
-      "type": "otodor-product-benefits",
-      "blocks": {
-        "benefit_1": {
-          "type": "benefit",
-          "settings": {
-            "title": "Your fingerprint is the key.",
-            "line": "Unlock in under a second — no keys, no codes to remember."
-          }
-        },
-        "benefit_2": {
-          "type": "benefit",
-          "settings": {
-            "title": "Control from anywhere.",
-            "line": "Lock, unlock, and grant access from your phone, wherever you are."
-          }
-        },
-        "benefit_3": {
-          "type": "benefit",
-          "settings": {
-            "title": "Built to be trusted.",
-            "line": "Solid alloy construction, tested for years of daily use."
-          }
-        }
-      },
-      "block_order": ["benefit_1", "benefit_2", "benefit_3"]
-    },
     "specs": {
       "type": "otodor-product-specs",
       "settings": {
@@ -170,7 +143,6 @@
   "order": [
     "main",
     "reveal",
-    "benefits",
     "specs",
     "lifestyle",
     "install",

@@ -87,6 +87,23 @@
   .otodor-moment--empty .otodor-moment__word { color: var(--otodor-ink); }
   .otodor-moment--empty .otodor-moment__line { color: var(--otodor-ink-soft); }
 
+  /* ─ Mobile: landscape-friendly frame ─────────────────────────
+     The tall 85vh frame turns wide landscape photos into a
+     heavily side-cropped strip (object-fit: cover). On mobile,
+     constrain each moment to a landscape aspect ratio so the
+     uploaded photo reads as intended, with the copy still
+     overlaid at the bottom over the gradient. */
+  @media (max-width: 1023px) {
+    .otodor-moment {
+      min-height: 0;
+      aspect-ratio: 4 / 3;
+    }
+    .otodor-moment__copy {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
   /* ─ Pinned tour layout (applied via .js-animated on desktop) ─ */
   .otodor-moments.js-animated .otodor-moments__stage {
     position: relative;
