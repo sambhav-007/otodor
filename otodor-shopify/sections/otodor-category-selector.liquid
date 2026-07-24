@@ -1,0 +1,348 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Section: Category Selector  (aka "Door Type Selector")
+  Reference implementation for the OTODOR reusable-section standard.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Generic "choose your category" chooser. Renders a grid
+                      of category cards that link to collections. Used as the
+                      Digital Locks door-type selector (Wooden / Glass / Metal
+                      / Padlocks) and for any other category set.
+  Inputs:             `category` blocks (one per card). Each references a
+                      Collection and may override any field.
+  Outputs:            Accessible links to collections (or custom URLs), plus an
+                      optional "custom / ask an expert" CTA card.
+  Dependencies:       snippets/otodor-icon.liquid; otodor-base.css design tokens.
+                      No JS. No metaobjects. No external assets.
+  Supported sources:  Collection (title, url, image, description) +
+                      collection metafields custom.menu_image / menu_description
+                      / menu_icon. All optional.
+  Reusable for:       Homepage, collection/landing pages, PDP cross-sell —
+                      Digital Locks, Gate Automation, Security, Smart Home, etc.
+  Merchant editable:  YES — everything via theme-editor settings + blocks.
+  Required metafields: none.
+  Optional metafields: collection custom.menu_image, custom.menu_description,
+                       custom.menu_icon.
+
+  Per-field OVERRIDE PRIORITY (first non-blank wins) → FALLBACK:
+    title       block.title        → collection.title            → (card skipped)
+    url         block.custom_url   → collection.url              → /collections/all
+    image       block.image        → collection.metafields.custom.menu_image
+                                    → collection.image
+                                    → collection.featured_image
+                                    → first product image        → gradient placeholder
+    description block.description   → collection.metafields.custom.menu_description
+                                    → collection.description      → (omitted)
+    icon        block.icon         → collection.metafields.custom.menu_icon
+                                    → (omitted)
+    badge       block.badge        → (omitted)
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign scheme = section.settings.color_scheme | default: 'light'
+  assign cols = section.settings.columns_desktop | default: 4
+-%}
+
+{%- style -%}
+  #otodor-cat-selector-{{ section.id }} {
+    padding-block: {{ section.settings.padding_top | default: 96 }}px {{ section.settings.padding_bottom | default: 96 }}px;
+  }
+  #otodor-cat-selector-{{ section.id }}.otodor-cats--light { background: var(--otodor-bg-light); color: var(--otodor-ink); --cats-accent: var(--otodor-accent-on-light); }
+  #otodor-cat-selector-{{ section.id }}.otodor-cats--dark  { background: var(--otodor-black); color: var(--otodor-white); --cats-accent: var(--otodor-blue); }
+
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__inner {
+    max-width: var(--otodor-container-wide);
+    margin-inline: auto;
+  }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__head {
+    max-width: 48rem;
+    margin-bottom: clamp(2rem, 4vw, 3.25rem);
+  }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__eyebrow {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: var(--otodor-tracking-widest);
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+  }
+  .otodor-cats--light .otodor-cats__eyebrow { color: var(--otodor-accent-on-light); }
+  .otodor-cats--dark  .otodor-cats__eyebrow { color: var(--cats-accent); }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__title {
+    font-family: var(--otodor-font-display);
+    font-size: clamp(1.9rem, 4.5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: var(--otodor-tracking-tight);
+    margin: 0;
+  }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__title .accent { color: var(--cats-accent); }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__sub {
+    margin: 0.9rem 0 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    opacity: 0.62;
+  }
+
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat({{ cols }}, minmax(0, 1fr));
+    gap: clamp(1rem, 1.8vw, 1.5rem);
+  }
+  @media (max-width: 990px) { #otodor-cat-selector-{{ section.id }} .otodor-cats__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { #otodor-cat-selector-{{ section.id }} .otodor-cats__grid { grid-template-columns: 1fr; } }
+
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: var(--otodor-radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid transparent;
+    transition: transform var(--otodor-dur-base) var(--otodor-ease-spring),
+      border-color var(--otodor-dur-base) ease, box-shadow var(--otodor-dur-base) ease;
+  }
+  .otodor-cats--light .otodor-cats__card { background: var(--otodor-bg-light-2); border-color: var(--otodor-hairline-light); box-shadow: var(--otodor-shadow-xs); }
+  .otodor-cats--dark  .otodor-cats__card { background: var(--otodor-surface); border-color: var(--otodor-hairline); }
+  a.otodor-cats__card:hover { transform: translateY(-4px); }
+  .otodor-cats--light a.otodor-cats__card:hover { border-color: var(--otodor-hairline-light-2); box-shadow: var(--otodor-shadow-md); }
+  .otodor-cats--dark  a.otodor-cats__card:hover { border-color: var(--otodor-glass-border-h); }
+  #otodor-cat-selector-{{ section.id }} a.otodor-cats__card:focus-visible { outline: 2px solid var(--cats-accent); outline-offset: 3px; }
+
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 100% at 50% 0%, var(--otodor-blue-glow) 0%, transparent 60%),
+      linear-gradient(160deg, var(--otodor-surface-2), var(--otodor-surface));
+  }
+  .otodor-cats--light .otodor-cats__media { background: linear-gradient(160deg, var(--otodor-plinth), var(--otodor-bg-light)); }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__media img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform var(--otodor-dur-slow) var(--otodor-ease-spring);
+  }
+  a.otodor-cats__card:hover .otodor-cats__media img { transform: scale(1.05); }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__badge {
+    position: absolute; top: 0.75rem; left: 0.75rem;
+    font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.3rem 0.6rem; border-radius: var(--otodor-radius-pill);
+    background: var(--cats-accent); color: #fff;
+  }
+
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__body {
+    display: flex; flex-direction: column; gap: 0.4rem;
+    padding: clamp(1rem, 1.6vw, 1.4rem);
+    flex: 1 1 auto;
+  }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__card-top { display: flex; align-items: center; gap: 0.6rem; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__icon { display: inline-flex; color: var(--cats-accent); }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__icon svg { width: 22px; height: 22px; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__name {
+    font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em; margin: 0;
+  }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__desc { margin: 0; font-size: 0.85rem; line-height: 1.5; opacity: 0.6; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__go {
+    margin-top: auto; display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.8rem; font-weight: 600; color: var(--cats-accent); padding-top: 0.6rem;
+  }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__go svg { width: 15px; height: 15px; transition: transform var(--otodor-dur-fast) ease; }
+  a.otodor-cats__card:hover .otodor-cats__go svg { transform: translateX(3px); }
+
+  /* CTA card */
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__card--cta { justify-content: center; padding: clamp(1.2rem, 2vw, 1.75rem); }
+  .otodor-cats--light .otodor-cats__card--cta { background: var(--otodor-ink); color: #fff; border-color: transparent; }
+  .otodor-cats--dark  .otodor-cats__card--cta { background: var(--otodor-gradient-blue-subtle); }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__cta-title { font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.1rem; margin: 0 0 0.4rem; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__cta-text { font-size: 0.85rem; line-height: 1.5; opacity: 0.72; margin: 0 0 1rem; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__cta-btn {
+    align-self: flex-start; display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.6rem 1.1rem; border-radius: var(--otodor-radius-pill);
+    background: var(--cats-accent); color: #fff; font-weight: 600; font-size: 0.82rem; text-decoration: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #otodor-cat-selector-{{ section.id }} .otodor-cats__card,
+    #otodor-cat-selector-{{ section.id }} .otodor-cats__media img { transition: none; }
+    a.otodor-cats__card:hover { transform: none; }
+    a.otodor-cats__card:hover .otodor-cats__media img { transform: none; }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-cat-selector-{{ section.id }}"
+  class="otodor-cats otodor-cats--{{ scheme }}"
+  data-otodor-section="category-selector"
+  {% if section.settings.heading != blank %}aria-labelledby="otodor-cats-title-{{ section.id }}"{% endif %}
+>
+  <div class="otodor-cats__inner">
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="otodor-cats__head" data-otodor-reveal="fade-up">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-cats__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="otodor-cats__title" id="otodor-cats-title-{{ section.id }}">
+            {{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %} <span class="accent">{{ section.settings.heading_accent | escape }}</span>{% endif %}
+          </h2>
+        {%- endif -%}
+        {%- if section.settings.subheading != blank -%}
+          <p class="otodor-cats__sub">{{ section.settings.subheading | escape }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <ul class="otodor-cats__grid" role="list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign col = block.settings.collection
+
+          # title
+          assign card_title = block.settings.title | default: col.title
+
+          # url
+          assign card_url = block.settings.custom_url
+          if card_url == blank and col != blank
+            assign card_url = col.url
+          endif
+          if card_url == blank
+            assign card_url = routes.all_products_collection_url
+          endif
+
+          # image
+          assign card_image = block.settings.image
+          if card_image == blank and col != blank
+            assign card_image = col.metafields.custom.menu_image.value | default: col.image
+            if card_image == blank and col.products.first != blank
+              assign card_image = col.products.first.featured_image
+            endif
+          endif
+
+          # description
+          assign card_desc = block.settings.description
+          if card_desc == blank and col != blank
+            assign card_desc = col.metafields.custom.menu_description.value | default: col.description
+          endif
+
+          # icon
+          assign card_icon = block.settings.icon
+          if card_icon == blank and col != blank
+            assign card_icon = col.metafields.custom.menu_icon.value
+          endif
+        -%}
+        {%- if card_title != blank -%}
+          <li {{ block.shopify_attributes }}>
+            <a class="otodor-cats__card" href="{{ card_url }}" data-otodor-reveal="fade-up">
+              <span class="otodor-cats__media">
+                {%- if card_image != blank -%}
+                  {{ card_image | image_url: width: 720 | image_tag: loading: 'lazy', widths: '360,540,720', sizes: '(max-width: 560px) 100vw, 25vw', alt: '' }}
+                {%- endif -%}
+                {%- if block.settings.badge != blank -%}<span class="otodor-cats__badge">{{ block.settings.badge | escape }}</span>{%- endif -%}
+              </span>
+              <span class="otodor-cats__body">
+                <span class="otodor-cats__card-top">
+                  {%- if card_icon != blank and section.settings.show_icons -%}
+                    <span class="otodor-cats__icon">{% render 'otodor-icon', name: card_icon %}</span>
+                  {%- endif -%}
+                  <span class="otodor-cats__name">{{ card_title | escape }}</span>
+                </span>
+                {%- if card_desc != blank and section.settings.show_descriptions -%}
+                  <span class="otodor-cats__desc">{{ card_desc | strip_html | truncatewords: 14 }}</span>
+                {%- endif -%}
+                <span class="otodor-cats__go">{{ section.settings.card_link_label | default: 'Explore' | escape }}{% render 'otodor-icon', name: 'arrow-right' %}</span>
+              </span>
+            </a>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if section.settings.show_cta -%}
+        {%- assign cta_url = section.settings.cta_link | default: routes.root_url -%}
+        <li>
+          <div class="otodor-cats__card otodor-cats__card--cta" data-otodor-reveal="fade-up">
+            {%- if section.settings.cta_title != blank -%}<p class="otodor-cats__cta-title">{{ section.settings.cta_title | escape }}</p>{%- endif -%}
+            {%- if section.settings.cta_text != blank -%}<p class="otodor-cats__cta-text">{{ section.settings.cta_text | escape }}</p>{%- endif -%}
+            {%- if section.settings.cta_button_label != blank -%}
+              <a class="otodor-cats__cta-btn" href="{{ cta_url }}">{{ section.settings.cta_button_label | escape }}{% render 'otodor-icon', name: 'arrow-right' %}</a>
+            {%- endif -%}
+          </div>
+        </li>
+      {%- endif -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "OTODOR Category Selector",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "A generic, collection-driven category chooser. Add a block per category and pick a collection — title, image and description are pulled automatically. No metaobjects required." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Find your fit" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Which type of lock" },
+    { "type": "text", "id": "heading_accent", "label": "Heading accent (coloured)", "default": "are you looking for?" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Choose your door and we'll show the OTODOR range built for it." },
+    { "type": "text", "id": "card_link_label", "label": "Card link label", "default": "Explore" },
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "color_scheme", "label": "Colour scheme", "options": [ { "value": "light", "label": "Light" }, { "value": "dark", "label": "Dark" } ], "default": "light" },
+    { "type": "range", "id": "columns_desktop", "label": "Columns (desktop)", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "show_descriptions", "label": "Show descriptions", "default": true },
+    { "type": "checkbox", "id": "show_icons", "label": "Show icons", "default": true },
+    { "type": "header", "content": "\"Custom / ask an expert\" card" },
+    { "type": "checkbox", "id": "show_cta", "label": "Show CTA card", "default": true },
+    { "type": "text", "id": "cta_title", "label": "CTA title", "default": "Any other custom?" },
+    { "type": "textarea", "id": "cta_text", "label": "CTA text", "default": "Not sure or need something bespoke? Ask our OTODOR experts." },
+    { "type": "text", "id": "cta_button_label", "label": "CTA button label", "default": "Ask an expert" },
+    { "type": "url", "id": "cta_link", "label": "CTA button link" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Title, image and description are pulled from this collection unless overridden below." },
+        { "type": "text", "id": "title", "label": "Title override" },
+        { "type": "text", "id": "description", "label": "Description override" },
+        { "type": "image_picker", "id": "image", "label": "Image override" },
+        { "type": "url", "id": "custom_url", "label": "URL override" },
+        {
+          "type": "select", "id": "icon", "label": "Icon", "default": "",
+          "options": [
+            { "value": "", "label": "None" },
+            { "value": "fingerprint", "label": "Fingerprint" },
+            { "value": "keypad", "label": "Keypad / PIN" },
+            { "value": "key", "label": "Key" },
+            { "value": "tag", "label": "RFID / Tag" },
+            { "value": "wifi", "label": "Remote / Wi-Fi" },
+            { "value": "mobile", "label": "App / Mobile" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "wrench", "label": "Installation" }
+          ]
+        },
+        { "type": "text", "id": "badge", "label": "Badge (optional)", "info": "e.g. New, Coming soon" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Category Selector",
+      "blocks": [
+        { "type": "category", "settings": { "title": "Wooden Door", "description": "Smart locks engineered for wooden main and internal doors.", "icon": "fingerprint" } },
+        { "type": "category", "settings": { "title": "Glass Door", "description": "Frameless-friendly locks for glass office and home doors.", "icon": "key" } },
+        { "type": "category", "settings": { "title": "Metal Gate", "description": "Weatherproof smart locks built for outer metal gates.", "icon": "shield" } },
+        { "type": "category", "settings": { "title": "Smart Padlocks", "description": "Portable biometric padlocks for versatile access.", "icon": "tag" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

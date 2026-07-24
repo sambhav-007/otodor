@@ -8,7 +8,7 @@
 > 1. **Data lives on Shopify objects** (products, collections, metaobjects), never duplicated in templates.
 > 2. **Every section must render without any metafield set** (graceful fallbacks), then get richer as data is added.
 > 3. **Namespaces:** `specs.*` = comparable spec matrix (one value per field); `custom.*` = content/media/relationships.
-> 4. Prefer **metaobjects** for anything reused across pages (FAQs, door types, auth methods); **section blocks** are the local fallback.
+> 4. **Native Shopify first.** Data priority: products → collections → pages → blogs → navigation → recommendations → Search & Discovery → metafields → **section blocks**. Use a **metaobject only when the data is shared across many unrelated places or needs relationships** (e.g. `comparison_spec` row definitions). Before adding one, ask: can this be a collection metafield, product metafield, section block, or page? If yes, don't. The metaobjects in §3 are **optional enhancements**, never required — every section works from collections/products/blocks alone.
 
 Companion docs: `OTODOR-COMMERCE-ARCHITECTURE.md` (section map), `OTODOR-AUDIT.md` (brand audit).
 

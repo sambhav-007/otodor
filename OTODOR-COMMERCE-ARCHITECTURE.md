@@ -20,7 +20,7 @@ sections (specs, comparison, install) are also droppable on `product.json`.
 ```
 collection.digital-locks.json
   otodor-collection-hero      (category hero)
-  otodor-door-selector        (door-type selector)        ← NEW, reusable
+  otodor-category-selector        (door-type selector)        ← NEW, reusable
   otodor-categories           (product category grid)     ← REUSE
   otodor-why                  (why OTODOR Digital Locks)   ← REUSE
   otodor-features             (feature highlights)         ← REUSE
@@ -83,7 +83,7 @@ Legend — **Verdict:** REUSE (use as-is) · EXTEND (enhance existing) · NEW (b
 - **Blocks:** none. **Metafields:** `custom.hero_eyebrow/subheading`.
 - **Reusable elsewhere:** YES — every collection. **Merchant editable:** YES.
 
-### 3.2 Door Type Selector — `otodor-door-selector` · **NEW (reusable)**
+### 3.2 Door Type Selector — `otodor-category-selector` · **NEW (reusable)**
 - **Purpose:** help the customer pick the right lock category (Wooden / Glass / Metal / Padlocks) — PDF signature UX.
 - **Inputs:** door types (icon, label, image, target collection/url).
 - **Shopify source:** `door_type` metaobjects **or** collections referenced per block; icons via otodor-icon.
@@ -204,7 +204,7 @@ Everything else reuses the mature library. This keeps the repo recognizably Vilt
 ## 5. Build order (small reviewable commits)
 1. **Data model** — document + define metafield/metaobject keys (admin) [this doc]; wire product `specs.*` reading helper snippet.
 2. **Comparison → spec-driven** (`otodor-comparison` extend): product-block columns + spec-row blocks + metafield reads. *(Blueprint-critical.)*
-3. **Door Type Selector** (`otodor-door-selector`, new, metaobject/collection-driven).
+3. **Door Type Selector** (`otodor-category-selector`, new, metaobject/collection-driven).
 4. **FAQ + FAQPage schema** (extend `collapsible-content` or new `otodor-faq`).
 5. **Compose `collection.digital-locks.json`** from the section library (hero → selector → grid → why → features → auth → comparison → guide → process → warranty → faq → related → lead → seo).
 6. **Verify + assign** the template to the `digital-locks` collection; QA on dev server.
