@@ -231,7 +231,7 @@
           "type": "pillar",
           "settings": {
             "icon": "star",
-            "title": "Rated 4.9 by 500+ Homes",
+            "title": "Trusted by 10,000+ Homes",
             "description": ""
           }
         }
@@ -362,13 +362,29 @@
             "lead": "Engineered.",
             "counter": "For every day."
           }
+        },
+        "why_german": {
+          "type": "statement",
+          "settings": {
+            "lead": "German-engineered.",
+            "counter": "Built for Indian conditions."
+          }
+        },
+        "why_heritage": {
+          "type": "statement",
+          "settings": {
+            "lead": "16 years of trust.",
+            "counter": "Behind every install."
+          }
         }
       },
       "block_order": [
         "why_installed",
         "why_protected",
         "why_supported",
-        "why_engineered"
+        "why_engineered",
+        "why_german",
+        "why_heritage"
       ],
       "settings": {
         "eyebrow": "Why OTODOR"
