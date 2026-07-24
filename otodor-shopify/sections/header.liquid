@@ -14,6 +14,7 @@
 
 {%- if section.settings.menu_type_desktop == 'mega' -%}
   <link rel="stylesheet" href="{{ 'component-mega-menu.css' | asset_url }}" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ 'otodor-mega-menu.css' | asset_url }}" media="print" onload="this.media='all'">
 {%- endif -%}
 
 <style>
@@ -603,6 +604,52 @@
       ],
       "default": "dropdown",
       "label": "t:sections.header.settings.menu_type_desktop.label"
+    },
+    {
+      "type": "header",
+      "content": "OTODOR mega menu",
+      "info": "Premium presentation for the desktop mega menu. Menu items are managed in Online Store → Navigation. Per-category icon/description/image can be set via collection metafields (custom.menu_icon, custom.menu_description, custom.menu_image)."
+    },
+    {
+      "type": "checkbox",
+      "id": "mega_show_thumbnails",
+      "label": "Show product thumbnails",
+      "info": "Shows a small image next to menu links that point to a product.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "mega_show_cta",
+      "label": "Show \"Get a Custom Quote\" panel",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "mega_cta_heading",
+      "label": "Quote panel heading",
+      "default": "Not sure which fits your door?"
+    },
+    {
+      "type": "textarea",
+      "id": "mega_cta_text",
+      "label": "Quote panel text",
+      "default": "Tell us about your door and we'll recommend the right OTODOR system — with professional installation."
+    },
+    {
+      "type": "text",
+      "id": "mega_cta_button_label",
+      "label": "Quote panel button label",
+      "default": "Get a Custom Quote"
+    },
+    {
+      "type": "url",
+      "id": "mega_cta_button_link",
+      "label": "Quote panel button link"
+    },
+    {
+      "type": "image_picker",
+      "id": "mega_cta_image",
+      "label": "Quote panel image (optional)"
     },
     {
       "type": "select",

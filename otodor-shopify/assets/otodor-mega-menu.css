@@ -1,0 +1,219 @@
+/* ============================================================
+   OTODOR — Premium Mega Menu (presentation only)
+   Data comes from Shopify Navigation. This file restyles Dawn's
+   mega menu; it adapts to the header colour scheme via Dawn's
+   --color-foreground / --color-background, and uses OTODOR tokens
+   for rhythm, type and motion.
+   ============================================================ */
+
+/* Panel ---------------------------------------------------- */
+.mega-menu__content {
+  padding-top: clamp(1.75rem, 3vw, 2.75rem);
+  padding-bottom: clamp(1.75rem, 3vw, 2.75rem);
+  border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.16);
+}
+
+.js .mega-menu__content {
+  opacity: 0;
+  transform: translateY(-1rem);
+  transition: opacity var(--otodor-dur-base, 280ms) var(--otodor-ease-spring, cubic-bezier(0.16, 1, 0.3, 1)),
+    transform var(--otodor-dur-base, 280ms) var(--otodor-ease-spring, cubic-bezier(0.16, 1, 0.3, 1));
+}
+.mega-menu[open] .mega-menu__content {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Layout: columns + optional CTA aside --------------------- */
+.otodor-mega {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+
+.otodor-mega__columns {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: clamp(1.4rem, 2.2vw, 2.6rem) clamp(1.4rem, 2.6vw, 3rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.otodor-mega__col {
+  min-width: 0;
+}
+
+/* Column heading (level-2) --------------------------------- */
+.otodor-mega__col-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+  font-family: var(--otodor-font-display, inherit);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.otodor-mega__col-head:hover .otodor-mega__col-title,
+.otodor-mega__col-head.is-active .otodor-mega__col-title {
+  color: var(--otodor-blue, #4da6ff);
+}
+.otodor-mega__col-icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--otodor-blue, #4da6ff);
+}
+.otodor-mega__col-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.otodor-mega__col-desc {
+  margin: 0.45rem 0 0.9rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(var(--color-foreground), 0.55);
+  max-width: 24ch;
+}
+
+/* Column links (level-3) ----------------------------------- */
+.otodor-mega__links {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.otodor-mega__col-desc + .otodor-mega__links {
+  margin-top: 0;
+}
+
+.otodor-mega__link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 0;
+  text-decoration: none;
+  color: rgba(var(--color-foreground), 0.66);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  transition: color var(--otodor-dur-fast, 160ms) ease, transform var(--otodor-dur-fast, 160ms) ease;
+}
+.otodor-mega__link:hover,
+.otodor-mega__link.is-active {
+  color: rgb(var(--color-foreground));
+  transform: translateX(3px);
+}
+.otodor-mega__link.is-active {
+  font-weight: 600;
+}
+
+.otodor-mega__thumb {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(var(--color-foreground), 0.05);
+}
+
+/* "Get a Custom Quote" panel ------------------------------- */
+.otodor-mega__cta {
+  position: relative;
+  flex: 0 0 clamp(240px, 24%, 340px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  border-radius: var(--otodor-radius-lg, 20px);
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  background: rgba(var(--color-foreground), 0.045);
+  border: 1px solid rgba(var(--color-foreground), 0.08);
+  isolation: isolate;
+}
+.otodor-mega__cta-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--otodor-mega-cta-image);
+  background-size: cover;
+  background-position: center;
+}
+.otodor-mega__cta-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.72) 100%);
+}
+.otodor-mega__cta:has(.otodor-mega__cta-media) .otodor-mega__cta-heading,
+.otodor-mega__cta:has(.otodor-mega__cta-media) .otodor-mega__cta-text {
+  color: #fff;
+}
+
+.otodor-mega__cta-heading {
+  margin: 0 0 0.4rem;
+  font-family: var(--otodor-font-display, inherit);
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  color: rgb(var(--color-foreground));
+}
+.otodor-mega__cta-text {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(var(--color-foreground), 0.6);
+}
+.otodor-mega__cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--otodor-radius-pill, 999px);
+  background: var(--otodor-blue, #4da6ff);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: transform var(--otodor-dur-fast, 160ms) ease, box-shadow var(--otodor-dur-fast, 160ms) ease;
+}
+.otodor-mega__cta-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(77, 166, 255, 0.35);
+}
+.otodor-mega__cta-arrow {
+  width: 16px;
+  height: 16px;
+}
+
+/* Responsive / motion -------------------------------------- */
+@media screen and (max-width: 1200px) {
+  .otodor-mega {
+    flex-direction: column;
+  }
+  .otodor-mega__cta {
+    flex-basis: auto;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+    gap: 1rem;
+  }
+  .otodor-mega__cta-text {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .mega-menu__content {
+    transition: opacity var(--otodor-dur-fast, 160ms) ease;
+    transform: none;
+  }
+  .otodor-mega__link:hover {
+    transform: none;
+  }
+}

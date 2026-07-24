@@ -1,5 +1,18 @@
 {% comment %}
-  Renders a megamenu for the header.
+  OTODOR premium mega menu for the header.
+
+  DATA SOURCE: Shopify Navigation (section.settings.menu) — native and
+  merchant-editable in Online Store → Navigation → Main Menu. This snippet
+  renders a 3-level menu: top-level item → level-2 columns → level-3 links.
+
+  Per-column extras are read from the LINKED COLLECTION (never duplicated):
+    • icon        — collection metafield custom.menu_icon (an otodor-icon name)
+    • description — collection metafield custom.menu_description, else the
+                    collection description
+    • thumbnails  — product's featured image (when a link points to a product
+                    and "Show product thumbnails" is enabled)
+
+  Interaction (details/summary + <header-menu>) is Dawn's, kept intact.
 
   Usage:
   {% render 'header-mega-menu' %}
@@ -30,43 +43,86 @@
                 class="mega-menu__content color-{{ section.settings.menu_color_scheme }} gradient motion-reduce global-settings-popup"
                 tabindex="-1"
               >
-                <ul
-                  class="mega-menu__list page-width{% if link.levels == 1 %} mega-menu__list--condensed{% endif %}"
-                  role="list"
-                >
-                  {%- for childlink in link.links -%}
-                    <li>
-                      <a
-                        id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
-                        href="{{ childlink.url }}"
-                        class="mega-menu__link mega-menu__link--level-2 link{% if childlink.current %} mega-menu__link--active{% endif %}"
-                        {% if childlink.current %}
-                          aria-current="page"
-                        {% endif %}
-                      >
-                        {{ childlink.title | escape }}
-                      </a>
-                      {%- if childlink.links != blank -%}
-                        <ul class="list-unstyled" role="list">
-                          {%- for grandchildlink in childlink.links -%}
-                            <li>
-                              <a
-                                id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
-                                href="{{ grandchildlink.url }}"
-                                class="mega-menu__link link{% if grandchildlink.current %} mega-menu__link--active{% endif %}"
-                                {% if grandchildlink.current %}
-                                  aria-current="page"
-                                {% endif %}
-                              >
-                                {{ grandchildlink.title | escape }}
-                              </a>
-                            </li>
-                          {%- endfor -%}
-                        </ul>
+                <div class="otodor-mega page-width">
+                  <ul class="otodor-mega__columns" role="list">
+                    {%- for childlink in link.links -%}
+                      {%- liquid
+                        assign col_icon = ''
+                        assign col_desc = ''
+                        if childlink.type == 'collection_link' and childlink.object != blank
+                          assign col_obj = childlink.object
+                          assign col_icon = col_obj.metafields.custom.menu_icon.value
+                          assign col_desc = col_obj.metafields.custom.menu_description.value | default: col_obj.description
+                        endif
+                      -%}
+                      <li class="otodor-mega__col">
+                        <a
+                          href="{{ childlink.url }}"
+                          class="otodor-mega__col-head{% if childlink.current or childlink.child_active %} is-active{% endif %}"
+                          {% if childlink.current %}aria-current="page"{% endif %}
+                        >
+                          {%- if col_icon != blank -%}
+                            <span class="otodor-mega__col-icon">{% render 'otodor-icon', name: col_icon %}</span>
+                          {%- endif -%}
+                          <span class="otodor-mega__col-title">{{ childlink.title | escape }}</span>
+                        </a>
+
+                        {%- if col_desc != blank -%}
+                          <p class="otodor-mega__col-desc">{{ col_desc | strip_html | truncatewords: 12 }}</p>
+                        {%- endif -%}
+
+                        {%- if childlink.links != blank -%}
+                          <ul class="otodor-mega__links" role="list">
+                            {%- for grandchild in childlink.links -%}
+                              <li>
+                                <a
+                                  href="{{ grandchild.url }}"
+                                  class="otodor-mega__link{% if grandchild.current %} is-active{% endif %}"
+                                  {% if grandchild.current %}aria-current="page"{% endif %}
+                                >
+                                  {%- if section.settings.mega_show_thumbnails and grandchild.type == 'product_link' and grandchild.object.featured_image != blank -%}
+                                    <img
+                                      class="otodor-mega__thumb"
+                                      src="{{ grandchild.object.featured_image | image_url: width: 96 }}"
+                                      width="40"
+                                      height="40"
+                                      loading="lazy"
+                                      alt=""
+                                    >
+                                  {%- endif -%}
+                                  <span>{{ grandchild.title | escape }}</span>
+                                </a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+
+                  {%- if section.settings.mega_show_cta -%}
+                    {%- assign mega_cta_url = section.settings.mega_cta_button_link | default: routes.root_url -%}
+                    <aside class="otodor-mega__cta"{% if section.settings.mega_cta_image != blank %} style="--otodor-mega-cta-image: url('{{ section.settings.mega_cta_image | image_url: width: 720 }}')"{% endif %}>
+                      {%- if section.settings.mega_cta_image != blank -%}
+                        <span class="otodor-mega__cta-media" aria-hidden="true"></span>
                       {%- endif -%}
-                    </li>
-                  {%- endfor -%}
-                </ul>
+                      <div class="otodor-mega__cta-body">
+                        {%- if section.settings.mega_cta_heading != blank -%}
+                          <p class="otodor-mega__cta-heading">{{ section.settings.mega_cta_heading | escape }}</p>
+                        {%- endif -%}
+                        {%- if section.settings.mega_cta_text != blank -%}
+                          <p class="otodor-mega__cta-text">{{ section.settings.mega_cta_text | escape }}</p>
+                        {%- endif -%}
+                        {%- if section.settings.mega_cta_button_label != blank -%}
+                          <a href="{{ mega_cta_url }}" class="otodor-mega__cta-button">
+                            {{ section.settings.mega_cta_button_label | escape }}
+                            {% render 'otodor-icon', name: 'arrow-right', class: 'otodor-mega__cta-arrow' %}
+                          </a>
+                        {%- endif -%}
+                      </div>
+                    </aside>
+                  {%- endif -%}
+                </div>
               </div>
             </details>
           </header-menu>
