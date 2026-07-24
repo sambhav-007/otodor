@@ -18,13 +18,38 @@
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {%- endunless -%}
 
-    {%- comment -%} OTODOR — Brand Fonts {%- endcomment -%}
+    {%- comment -%} OTODOR — Brand Fonts
+      Display face: Hanken Grotesk, self-hosted (stand-in for BR Sonoma).
+      To upgrade to licensed BR Sonoma: drop its .woff2 files in /assets,
+      rename them to match the loop below (or edit the names), and change
+      the font-family here + --otodor-font-display in otodor-base.css.
+      Body face: Inter (Google Fonts). {%- endcomment -%}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     >
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ 'hankengrotesk-600.woff2' | asset_url }}">
+    {%- style -%}
+      {%- assign otodor_display_weights = '400,500,600,700' | split: ',' -%}
+      {%- for w in otodor_display_weights -%}
+        @font-face {
+          font-family: 'Hanken Grotesk';
+          font-style: normal;
+          font-weight: {{ w }};
+          font-display: swap;
+          src: url('{{ 'hankengrotesk-' | append: w | append: '.woff2' | asset_url }}') format('woff2');
+        }
+        @font-face {
+          font-family: 'Hanken Grotesk';
+          font-style: italic;
+          font-weight: {{ w }};
+          font-display: swap;
+          src: url('{{ 'hankengrotesk-' | append: w | append: '-italic.woff2' | asset_url }}') format('woff2');
+        }
+      {%- endfor -%}
+    {%- endstyle -%}
 
     {%- comment -%} OTODOR — BorderGlow card effect (React Bits port) {%- endcomment -%}
     {{ 'otodor-border-glow.css' | asset_url | stylesheet_tag }}

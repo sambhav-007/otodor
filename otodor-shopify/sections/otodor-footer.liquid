@@ -43,14 +43,23 @@
     object-fit: contain;
   }
   .otodor-footer__wordmark {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: var(--otodor-font-display);
     font-size: 1.6rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     color: #ffffff;
   }
+  .otodor-footer__signature {
+    margin: 0.95rem 0 0;
+    font-family: var(--otodor-font-display);
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: rgba(255, 255, 255, 0.62);
+  }
   .otodor-footer__tagline {
-    margin: 1.5rem 0 0;
+    margin: 1rem 0 0;
     max-width: 34ch;
     font-size: 0.98rem;
     line-height: 1.65;
@@ -88,7 +97,7 @@
     gap: clamp(2rem, 4vw, 3rem);
   }
   .otodor-footer__col-title {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: var(--otodor-font-display);
     font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -124,7 +133,7 @@
 
   /* ─ Giant watermark wordmark ──────────────────────────────── */
   .otodor-footer__watermark {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: var(--otodor-font-display);
     font-weight: 700;
     font-size: clamp(4.5rem, 23vw, 20rem);
     line-height: 0.78;
@@ -159,6 +168,12 @@
   }
   .otodor-footer__bottom-inner a { color: rgba(255, 255, 255, 0.6); text-decoration: none; }
   .otodor-footer__bottom-inner a:hover { color: #4DA6FF; }
+  .otodor-footer__bottom-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .otodor-footer__bottom-mark { opacity: 0.55; flex: none; }
   .otodor-footer__policies {
     display: flex;
     flex-wrap: wrap;
@@ -185,6 +200,8 @@
             <img src="{{ 'otodor_log_bg_removed.png' | file_img_url: '360x' }}" alt="{{ shop.name }}" loading="lazy">
           {%- endif -%}
         </a>
+
+        <p class="otodor-footer__signature">Secure Smart Automatic</p>
 
         {%- if section.settings.tagline != blank -%}
           <p class="otodor-footer__tagline">{{ section.settings.tagline | escape }}</p>
@@ -245,7 +262,10 @@
 
   <div class="otodor-footer__bottom">
     <div class="otodor-footer__inner otodor-footer__bottom-inner">
-      <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}{% if section.settings.credit_text != blank %} &middot; {{ section.settings.credit_text | escape }}{%- assign credit_name = section.settings.credit_name | default: 'Viltrumate Technologies' -%}{% if section.settings.credit_link != blank %} <a href="{{ section.settings.credit_link }}">{{ credit_name | escape }}</a>{% else %} {{ credit_name | escape }}{% endif %}{% endif %}</span>
+      <div class="otodor-footer__bottom-brand">
+        {% render 'otodor-monogram', size: 20, class: 'otodor-footer__bottom-mark' %}
+        <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}{% if section.settings.credit_text != blank %} &middot; {{ section.settings.credit_text | escape }}{%- assign credit_name = section.settings.credit_name | default: 'Viltrumate Technologies' -%}{% if section.settings.credit_link != blank %} <a href="{{ section.settings.credit_link }}">{{ credit_name | escape }}</a>{% else %} {{ credit_name | escape }}{% endif %}{% endif %}</span>
+      </div>
       {%- if section.settings.show_policies -%}
         <nav class="otodor-footer__policies" aria-label="Legal">
           {%- for policy in shop.policies -%}

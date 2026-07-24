@@ -183,7 +183,7 @@
           "type": "pillar",
           "settings": {
             "icon": "shield",
-            "title": "1-Year Brand Warranty",
+            "title": "3-Year Lock Warranty",
             "description": ""
           }
         },
@@ -451,7 +451,7 @@
           "type": "step",
           "settings": {
             "title": "Ongoing support",
-            "description": "Real humans on WhatsApp, backed by a 1-year warranty.",
+            "description": "Real humans on WhatsApp, backed by a 3-year warranty.",
             "duration": "Always on",
             "image": "shopify://shop_images/support.png"
           }

@@ -1,0 +1,33 @@
+{%- comment -%}
+  OTODOR monogram — the official brand mark (split ring + diagonal bar:
+  a fingerprint's broken ring crossed by the rotating handle's bar).
+
+  Transparent PNG derived from the official logo artwork, so it composites
+  on any background with no tile seam.
+
+  Usage:
+    {% render 'otodor-monogram' %}                    white mark  (dark backgrounds)
+    {% render 'otodor-monogram', variant: 'dark' %}   near-black  (light backgrounds)
+    {% render 'otodor-monogram', size: 40, class: 'my-mark' %}
+    {% render 'otodor-monogram', size: 40, alt: 'OTODOR' %}   (semantic, not decorative)
+
+  Params:
+    size    — px width/height (default 28)
+    variant — 'light' (white, default) or 'dark' (near-black)
+    class   — extra class(es) appended to .otodor-monogram
+    alt     — accessible label; if blank the mark is decorative (aria-hidden)
+{%- endcomment -%}
+{%- assign _size = size | default: 28 -%}
+{%- if variant == 'dark' -%}
+  {%- assign _file = 'otodor-monogram-dark.png' -%}
+{%- else -%}
+  {%- assign _file = 'otodor-monogram.png' -%}
+{%- endif -%}
+<img
+  class="otodor-monogram{% if class %} {{ class }}{% endif %}"
+  src="{{ _file | asset_url }}"
+  width="{{ _size }}"
+  height="{{ _size }}"
+  loading="lazy"
+  {% if alt != blank %}alt="{{ alt | escape }}"{% else %}alt="" aria-hidden="true"{% endif %}
+>

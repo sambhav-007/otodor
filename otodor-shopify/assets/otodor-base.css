@@ -95,7 +95,7 @@
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
 
   /* ─── Typography ────────────────────────────────────────── */
-  --otodor-font-display:   'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --otodor-font-display:   'Hanken Grotesk', system-ui, -apple-system, sans-serif;
   --otodor-font-body:      'Inter', system-ui, -apple-system, sans-serif;
 
   --otodor-text-xs:   clamp(0.7rem,  1.2vw, 0.75rem);
@@ -211,7 +211,7 @@
    3. TYPOGRAPHY SYSTEM
    ============================================================ */
 
-/* Display headings — Space Grotesk, tight tracking */
+/* Display headings — Hanken Grotesk (BR Sonoma stand-in), tight tracking */
 .otodor-heading-hero {
   font-family: var(--otodor-font-display);
   font-size: var(--otodor-text-hero);
