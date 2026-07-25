@@ -65,6 +65,17 @@ Types chosen so a generic comparison can render any row. `boolean` → ✓/—; 
 | `custom.documents` | list.file_reference | datasheets/manuals (PDF) | Downloads |
 | `custom.spec_groups` | list.metaobject_reference → `comparison_spec` | ordered/grouped spec rows | specs / comparison |
 | `custom.faqs` | list.metaobject_reference → `faq` | product FAQs | FAQ + schema |
+| `custom.buying_guide` | **article_reference** *(or page_reference)* | canonical buying guide | Content Guide |
+| `custom.installation_guide` | article_reference | canonical install walkthrough | Content Guide |
+| `custom.compatibility_guide` | article_reference | fit / requirements guide | Content Guide |
+| `custom.related_guides` | list.article_reference | educational reading set | Content Rail |
+
+> **Content Experience Layer (STEP 7):** guides are authored as **Articles** (preferred) or **Pages** — the
+> canonical, single-URL source — and products/collections link to them by reference. The theme surfaces a
+> preview + Read More; long-form is never duplicated into settings/metaobjects. These reference metafields
+> **supersede** the old `custom.buying_guide` = `list.metaobject_reference → buying_guide_block`; the
+> `buying_guide_block` metaobject (§3) is **deprecated** (documented, unused). Collections may carry
+> `custom.buying_guide` / `custom.compatibility_guide` / `custom.related_guides` too. See `OTODOR-CONTENT-LAYER.md`.
 
 ---
 
@@ -80,7 +91,9 @@ Types chosen so a generic comparison can render any row. `boolean` → ✓/—; 
 | `custom.hero_video` | file_reference (video) or url | hero motion | collection hero |
 | `custom.door_types` | list.metaobject_reference → `door_type` | selector options | door-type selector |
 | `custom.feature_highlights` | list.metaobject_reference → `feature` | features | feature highlights |
-| `custom.buying_guide` | list.metaobject_reference → `buying_guide_block` *(or rich_text)* | buying guide | buying guide |
+| `custom.buying_guide` | **article_reference** *(or page_reference)* | canonical buying guide | Content Guide *(was buying_guide_block — deprecated)* |
+| `custom.compatibility_guide` | article_reference | fit / requirements guide | Content Guide |
+| `custom.related_guides` | list.article_reference | educational reading set | Content Rail |
 | `custom.installation_steps` | list.metaobject_reference → `installation_step` | install flow | installation process |
 | `custom.warranty_policies` | list.metaobject_reference → `warranty_policy` | warranty | warranty & support |
 | `custom.faqs` | list.metaobject_reference → `faq` | category FAQs | FAQ + schema |
@@ -115,7 +128,10 @@ Each is defined once in **Settings → Custom data → Metaobjects**, then refer
 | `answer` | rich_text |
 | `group` | single_line_text *(optional)* |
 
-### `buying_guide_block`
+### `buying_guide_block` — ⚠️ DEPRECATED (STEP 7)
+> Superseded by authoring guides as **Articles/Pages** and linking via `custom.buying_guide`
+> (article_reference). Do not create new instances; kept for historical reference only. See `OTODOR-CONTENT-LAYER.md`.
+
 | Field | Type |
 |---|---|
 | `title` | single_line_text |
