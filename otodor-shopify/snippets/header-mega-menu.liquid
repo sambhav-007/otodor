@@ -1,21 +1,24 @@
 {% comment %}
-  OTODOR premium mega menu for the header.
+  OTODOR premium mega menu for the header (desktop / tablet).
 
   DATA SOURCE: Shopify Navigation (section.settings.menu) — native and
-  merchant-editable in Online Store → Navigation → Main Menu. This snippet
-  renders a 3-level menu: top-level item → level-2 columns → level-3 links.
+  merchant-editable in Online Store → Navigation → Main Menu. The Shopify Main
+  Menu is the single source of truth. This snippet renders a 3-level menu:
+  top-level item → level-2 category columns → level-3 links, plus a FEATURED
+  PANEL on the right that updates to match the hovered/focused category.
 
-  Per-column extras are read from the LINKED COLLECTION (never duplicated):
-    • icon        — collection metafield custom.menu_icon (an otodor-icon name)
-    • description — collection metafield custom.menu_description, else the
-                    collection description
-    • thumbnails  — product's featured image (when a link points to a product
-                    and "Show product thumbnails" is enabled)
+  Per-category extras come from the LINKED COLLECTION (never duplicated):
+    • icon        — collection metafield custom.menu_icon (otodor-icon name)
+    • description — custom.menu_description → collection.description
+    • image       — custom.menu_image → collection.image → first product image
+    • url/title   — the navigation link / collection
+  Priority per field: collection metafield → collection data → placeholder.
 
-  Interaction (details/summary + <header-menu>) is Dawn's, kept intact.
+  Open/close, ESC and focus handling stay with Dawn's <header-menu> +
+  details/summary. A tiny scoped script only swaps the active featured panel
+  (no AJAX, no reload). Mobile uses Dawn's drawer (header-drawer) — untouched.
 
-  Usage:
-  {% render 'header-mega-menu' %}
+  Usage: {% render 'header-mega-menu' %}
 {% endcomment %}
 
 <nav class="header__inline-menu">
@@ -29,11 +32,7 @@
                 id="HeaderMenu-{{ link.handle }}"
                 class="header__menu-item list-menu__item link focus-inset"
               >
-                <span
-                  {%- if link.child_active %}
-                    class="header__active-menu-item"
-                  {% endif %}
-                >
+                <span {%- if link.child_active %} class="header__active-menu-item"{% endif %}>
                   {{- link.title | escape -}}
                 </span>
                 {{- 'icon-caret.svg' | inline_asset_content -}}
@@ -43,68 +42,111 @@
                 class="mega-menu__content color-{{ section.settings.menu_color_scheme }} gradient motion-reduce global-settings-popup"
                 tabindex="-1"
               >
-                <div class="otodor-mega page-width">
-                  <ul class="otodor-mega__columns" role="list">
+                <div class="otodor-mega page-width" data-otodor-mega>
+                  {%- comment -%} ── Left: category columns (level-2 → level-3) ── {%- endcomment -%}
+                  <div class="otodor-mega__nav">
+                    <ul class="otodor-mega__columns" role="list">
+                      {%- for childlink in link.links -%}
+                        {%- liquid
+                          assign col_icon = ''
+                          assign col_desc = ''
+                          if childlink.type == 'collection_link' and childlink.object != blank
+                            assign col_obj = childlink.object
+                            assign col_icon = col_obj.metafields.custom.menu_icon.value
+                            assign col_desc = col_obj.metafields.custom.menu_description.value | default: col_obj.description
+                          endif
+                        -%}
+                        <li class="otodor-mega__col">
+                          <a
+                            href="{{ childlink.url }}"
+                            class="otodor-mega__col-head{% if childlink.current or childlink.child_active %} is-active{% endif %}"
+                            data-otodor-feature-trigger="{{ forloop.index }}"
+                            {% if childlink.current %}aria-current="page"{% endif %}
+                          >
+                            {%- if col_icon != blank -%}
+                              <span class="otodor-mega__col-icon">{% render 'otodor-icon', name: col_icon %}</span>
+                            {%- endif -%}
+                            <span class="otodor-mega__col-title">{{ childlink.title | escape }}</span>
+                          </a>
+
+                          {%- if childlink.links != blank -%}
+                            <ul class="otodor-mega__links" role="list">
+                              {%- for grandchild in childlink.links -%}
+                                <li>
+                                  <a
+                                    href="{{ grandchild.url }}"
+                                    class="otodor-mega__link{% if grandchild.current %} is-active{% endif %}"
+                                    {% if grandchild.current %}aria-current="page"{% endif %}
+                                  >
+                                    {%- if section.settings.mega_show_thumbnails and grandchild.type == 'product_link' and grandchild.object.featured_image != blank -%}
+                                      <img
+                                        class="otodor-mega__thumb"
+                                        src="{{ grandchild.object.featured_image | image_url: width: 96 }}"
+                                        width="40"
+                                        height="40"
+                                        loading="lazy"
+                                        alt=""
+                                      >
+                                    {%- endif -%}
+                                    <span>{{ grandchild.title | escape }}</span>
+                                  </a>
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- elsif col_desc != blank -%}
+                            <p class="otodor-mega__col-desc">{{ col_desc | strip_html | truncatewords: 12 }}</p>
+                          {%- endif -%}
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+
+                  {%- comment -%} ── Right: featured panel (updates to the hovered category). Decorative — mirrors the column links, so hidden from AT. ── {%- endcomment -%}
+                  <div class="otodor-mega__feature-wrap" aria-hidden="true">
                     {%- for childlink in link.links -%}
                       {%- liquid
-                        assign col_icon = ''
-                        assign col_desc = ''
+                        assign feat_image = ''
+                        assign feat_desc = ''
                         if childlink.type == 'collection_link' and childlink.object != blank
-                          assign col_obj = childlink.object
-                          assign col_icon = col_obj.metafields.custom.menu_icon.value
-                          assign col_desc = col_obj.metafields.custom.menu_description.value | default: col_obj.description
+                          assign fc = childlink.object
+                          assign feat_image = fc.metafields.custom.menu_image.value | default: fc.image
+                          if feat_image == blank and fc.products.first != blank
+                            assign feat_image = fc.products.first.featured_image
+                          endif
+                          assign feat_desc = fc.metafields.custom.menu_description.value | default: fc.description
                         endif
                       -%}
-                      <li class="otodor-mega__col">
-                        <a
-                          href="{{ childlink.url }}"
-                          class="otodor-mega__col-head{% if childlink.current or childlink.child_active %} is-active{% endif %}"
-                          {% if childlink.current %}aria-current="page"{% endif %}
-                        >
-                          {%- if col_icon != blank -%}
-                            <span class="otodor-mega__col-icon">{% render 'otodor-icon', name: col_icon %}</span>
+                      <div
+                        class="otodor-mega__feature{% if forloop.first %} is-active{% endif %}"
+                        data-otodor-feature-panel="{{ forloop.index }}"
+                      >
+                        <span class="otodor-mega__feature-media">
+                          {%- if feat_image != blank -%}
+                            {{ feat_image | image_url: width: 760 | image_tag: loading: 'lazy', widths: '380,570,760', sizes: '360px', alt: '', class: 'otodor-mega__feature-img' }}
                           {%- endif -%}
-                          <span class="otodor-mega__col-title">{{ childlink.title | escape }}</span>
-                        </a>
-
-                        {%- if col_desc != blank -%}
-                          <p class="otodor-mega__col-desc">{{ col_desc | strip_html | truncatewords: 12 }}</p>
-                        {%- endif -%}
-
-                        {%- if childlink.links != blank -%}
-                          <ul class="otodor-mega__links" role="list">
-                            {%- for grandchild in childlink.links -%}
-                              <li>
-                                <a
-                                  href="{{ grandchild.url }}"
-                                  class="otodor-mega__link{% if grandchild.current %} is-active{% endif %}"
-                                  {% if grandchild.current %}aria-current="page"{% endif %}
-                                >
-                                  {%- if section.settings.mega_show_thumbnails and grandchild.type == 'product_link' and grandchild.object.featured_image != blank -%}
-                                    <img
-                                      class="otodor-mega__thumb"
-                                      src="{{ grandchild.object.featured_image | image_url: width: 96 }}"
-                                      width="40"
-                                      height="40"
-                                      loading="lazy"
-                                      alt=""
-                                    >
-                                  {%- endif -%}
-                                  <span>{{ grandchild.title | escape }}</span>
-                                </a>
-                              </li>
-                            {%- endfor -%}
-                          </ul>
-                        {%- endif -%}
-                      </li>
+                        </span>
+                        <div class="otodor-mega__feature-body">
+                          <p class="otodor-mega__feature-title">{{ childlink.title | escape }}</p>
+                          {%- if feat_desc != blank -%}
+                            <p class="otodor-mega__feature-desc">{{ feat_desc | strip_html | truncatewords: 20 }}</p>
+                          {%- endif -%}
+                          <a href="{{ childlink.url }}" class="otodor-mega__feature-link" tabindex="-1">
+                            {{ section.settings.mega_featured_label | default: 'Shop collection' | escape }}
+                            {% render 'otodor-icon', name: 'arrow-right', class: 'otodor-mega__feature-arrow' %}
+                          </a>
+                        </div>
+                      </div>
                     {%- endfor -%}
-                  </ul>
+                  </div>
 
+                  {%- comment -%} ── Footer: persistent "Get a Custom Quote" CTA ── {%- endcomment -%}
                   {%- if section.settings.mega_show_cta -%}
                     {%- assign mega_cta_url = section.settings.mega_cta_button_link | default: routes.root_url -%}
-                    <aside class="otodor-mega__cta"{% if section.settings.mega_cta_image != blank %} style="--otodor-mega-cta-image: url('{{ section.settings.mega_cta_image | image_url: width: 720 }}')"{% endif %}>
+                    <aside class="otodor-mega__cta">
                       {%- if section.settings.mega_cta_image != blank -%}
-                        <span class="otodor-mega__cta-media" aria-hidden="true"></span>
+                        <span class="otodor-mega__cta-media">
+                          {{ section.settings.mega_cta_image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120,240', sizes: '120px', alt: '', class: 'otodor-mega__cta-img' }}
+                        </span>
                       {%- endif -%}
                       <div class="otodor-mega__cta-body">
                         {%- if section.settings.mega_cta_heading != blank -%}
@@ -113,13 +155,13 @@
                         {%- if section.settings.mega_cta_text != blank -%}
                           <p class="otodor-mega__cta-text">{{ section.settings.mega_cta_text | escape }}</p>
                         {%- endif -%}
-                        {%- if section.settings.mega_cta_button_label != blank -%}
-                          <a href="{{ mega_cta_url }}" class="otodor-mega__cta-button">
-                            {{ section.settings.mega_cta_button_label | escape }}
-                            {% render 'otodor-icon', name: 'arrow-right', class: 'otodor-mega__cta-arrow' %}
-                          </a>
-                        {%- endif -%}
                       </div>
+                      {%- if section.settings.mega_cta_button_label != blank -%}
+                        <a href="{{ mega_cta_url }}" class="otodor-mega__cta-button">
+                          {{ section.settings.mega_cta_button_label | escape }}
+                          {% render 'otodor-icon', name: 'arrow-right', class: 'otodor-mega__cta-arrow' %}
+                        </a>
+                      {%- endif -%}
                     </aside>
                   {%- endif -%}
                 </div>
@@ -131,15 +173,9 @@
             id="HeaderMenu-{{ link.handle }}"
             href="{{ link.url }}"
             class="header__menu-item list-menu__item link link--text focus-inset"
-            {% if link.current %}
-              aria-current="page"
-            {% endif %}
+            {% if link.current %}aria-current="page"{% endif %}
           >
-            <span
-              {%- if link.current %}
-                class="header__active-menu-item"
-              {% endif %}
-            >
+            <span {%- if link.current %} class="header__active-menu-item"{% endif %}>
               {{- link.title | escape -}}
             </span>
           </a>
@@ -148,3 +184,44 @@
     {%- endfor -%}
   </ul>
 </nav>
+
+<script>
+  (function () {
+    if (window.otodorMegaFeatureInit) return;
+    window.otodorMegaFeatureInit = true;
+    var bind = function (mega) {
+      if (mega.dataset.otodorMegaBound) return;
+      mega.dataset.otodorMegaBound = '1';
+      var panels = mega.querySelectorAll('[data-otodor-feature-panel]');
+      if (!panels.length) return;
+      var setActive = function (id) {
+        for (var i = 0; i < panels.length; i++) {
+          panels[i].classList.toggle('is-active', panels[i].getAttribute('data-otodor-feature-panel') === id);
+        }
+      };
+      var triggers = mega.querySelectorAll('[data-otodor-feature-trigger]');
+      for (var t = 0; t < triggers.length; t++) {
+        (function (trigger) {
+          var id = trigger.getAttribute('data-otodor-feature-trigger');
+          trigger.addEventListener('mouseenter', function () { setActive(id); });
+          trigger.addEventListener('focus', function () { setActive(id); });
+        })(triggers[t]);
+      }
+      var nav = mega.querySelector('.otodor-mega__nav');
+      if (nav) {
+        nav.addEventListener('mouseleave', function () {
+          setActive(triggers.length ? triggers[0].getAttribute('data-otodor-feature-trigger') : '1');
+        });
+      }
+    };
+    var init = function () {
+      var megas = document.querySelectorAll('[data-otodor-mega]');
+      for (var i = 0; i < megas.length; i++) bind(megas[i]);
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
