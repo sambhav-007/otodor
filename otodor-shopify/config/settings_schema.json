@@ -1493,8 +1493,7 @@
         "type": "text",
         "id": "otodor_org_founding_year",
         "label": "Founding year",
-        "info": "e.g. 2008. Used as Organization foundingDate. Leave blank to omit.",
-        "default": ""
+        "info": "e.g. 2008. Used as Organization foundingDate. Leave blank to omit."
       }
     ]
   }
