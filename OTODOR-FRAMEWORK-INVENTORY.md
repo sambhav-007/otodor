@@ -1,0 +1,98 @@
+# OTODOR Commerce Framework — Module Inventory
+
+> **The canonical register of every reusable section in the OTODOR commerce framework.** A new product
+> category is built by *composing these modules and supplying data* — not by writing Liquid. Each entry lists
+> the eight facts you need to reuse it: Name · Purpose · Data sources · Fallback chain · Visibility rule ·
+> Reusable in · Dependencies · Status.
+
+Companion docs: `OTODOR-MODULE-CONTRACT.md` (the standard), `OTODOR-PRODUCT-MODULES.md`,
+`OTODOR-COLLECTION-TEMPLATE.md`, `OTODOR-DATA-MODEL.md`.
+
+**Status legend**
+- ✅ **Contract-compliant** — implements the full `OTODOR-MODULE-CONTRACT.md` (10-field doc block, 5-step
+  lifecycle, single `has_content` gate, preset, a11y).
+- ◑ **Framework section** — data-driven and self-hiding, predates the formal contract; retrofit the doc block
+  when next edited.
+- ○ **Brand/editorial** — narrative homepage section, outside the data-contract module set (listed for completeness).
+
+---
+
+## 1. Product Information Modules
+
+Consumed by the `product.json` orchestrator (Gallery → Purchase → **modules** → Related → SEO). Order:
+`main → reveal → specs → compatibility → install → warranty → downloads → comparison → related-products → sticky-atc`.
+
+| Module | Purpose | Data sources (primary) | Fallback chain | Visibility rule | Reusable in | Dependencies | Status |
+|---|---|---|---|---|---|---|---|
+| **otodor-product-specs** | The specification ledger | `product.metafields.custom.specs` (grouped JSON) | metafield → `row` blocks → hide | Hidden if no metafield **and** no blocks | PDP, collection, landing, comparison source | `.otodor-ledger`, base.css | ✅ |
+| **otodor-product-compat** | Will it fit my door/gate/opening? | `product.metafields[ns][key]` fit tags (default `custom.door_compatibility`) + `specs.door_thickness` / `specs.installation_type` | Tags: metafield → `tag` blocks → hide · Specs: `specs.*` → `spec` blocks → hide | Hidden when **both** tags and specs empty | PDP, comparison; **any category** (repoint tag metafield) | `.otodor-ledger`, base.css | ✅ |
+| **otodor-product-install** | Installation flow + 85 mm clearance | `step` blocks / settings | blocks → built-in default stages; clearance note from setting (auto-hides if blank) | Always (has sensible defaults) | PDP, landing | base.css, `settings.otodor_whatsapp_number` | ◑ (doc block retrofit pending) |
+| **otodor-product-warranty** | What the warranty covers, for how long | `custom.warranty_policies` metaobjects + `specs.warranty` / `specs.warranty_battery` | metaobjects → `policy` blocks → spec metafields on 2 slots → editable setting defaults → hide | Hidden only when all sources cleared | PDP, comparison, collection | `otodor-icon`, base.css; opt. `warranty_policy` metaobject | ✅ |
+| **otodor-product-downloads** | Manuals, datasheets, certs, brochures | `product.metafields.custom.documents` (list.file_reference) | metafield files → `document` blocks → hide | Hidden if no document exists | PDP, collection, landing | base.css | ✅ |
+| **otodor-product-reveal** | Editorial statement between purchase & specs | section setting (`statement`) | setting → hide when blank | Optional slot | PDP | base.css | ◑ |
+| **otodor-comparison** | Compare models across the range | section blocks (product + spec rows) — *generalises to `specs.*` in STEP 5* | blocks → hide | Per instance | PDP, collection, landing | base.css | ◑ (STEP 5 spec-driven) |
+| **otodor-sticky-atc** | Persistent purchase bar | `product`, variants, price | always on PDP | Scroll-triggered | PDP | `.otodor-sticky-atc`, base.css, JS | ◑ |
+
+**Reused as-is (Dawn):** Gallery + Purchase (`main-product`), Video (`video`), FAQ (`collapsible-content`),
+Related (`related-products`, self-hides), SEO (`rich-text`). See `OTODOR-PRODUCT-MODULES.md`.
+
+---
+
+## 2. Collection Framework sections
+
+Composed by `templates/collection.json` (inherited by every category); Digital Locks is instantiated by
+`templates/collection.digital-locks.json` (config only). See `OTODOR-COLLECTION-TEMPLATE.md`.
+
+| Section | Purpose | Data sources (primary) | Fallback chain | Visibility rule | Reusable in | Dependencies | Status |
+|---|---|---|---|---|---|---|---|
+| **otodor-collection-hero** | Dark brand handshake for a category | collection `custom.hero_*` / `custom.category_intro` | metafields → collection title/description/count → theme defaults | Never (always has collection title) | All categories | base.css | ◑ |
+| **otodor-category-selector** | "Choose your type" chooser (reference impl.) | `category` blocks → collection (title/image/desc via `custom.menu_*`) | per-block override → collection → collection image → 1st product image → gradient | Hidden if no `category` blocks | Home, collection, landing, PDP cross-sell | `otodor-icon`, base.css | ✅ (reference) |
+| **otodor-collection-grid** | Product discovery grid | collection products | products → collection empty state | Hides grid if 0 products | All categories | base.css | ◑ |
+| **otodor-features** | Feature highlights | `feature` blocks *(ext: `custom.feature_highlights`)* | blocks → hide | Hidden if no `feature` blocks | All categories, home | base.css | ◑ |
+| **otodor-why** | "Why OTODOR" statements | `statement` blocks | blocks → hide | Hidden if no `statement` blocks | All categories, home | base.css | ◑ |
+
+**Optional slots (Dawn, added per instance):** `rich-text` (Content / SEO), `collapsible-content` (FAQ),
+`related-products`.
+
+---
+
+## 3. Cross-cutting brand sections
+
+Homepage/brand narrative. Data-driven where noted, but outside the product/collection data-contract set —
+listed so the inventory is complete.
+
+| Section | Purpose | Data sources | Visibility | Status |
+|---|---|---|---|---|
+| **otodor-hero** | Homepage hero | section settings | Always | ○ |
+| **otodor-categories** | Homepage category grid | blocks / collections | Per instance | ○ |
+| **otodor-moments** | Pinned scroll storytelling | blocks | Per instance | ○ |
+| **otodor-trust-bar** | Credibility strip | settings/blocks | Per instance | ○ |
+| **otodor-process** | How it works | blocks | Per instance | ○ |
+| **otodor-ecosystem** | Product ecosystem | blocks | Per instance | ○ |
+| **otodor-smart-living** | Lifestyle band | settings | Per instance | ○ |
+| **otodor-testimonials** | Social proof | blocks | Per instance | ○ |
+| **otodor-cta-banner** | Lead-capture CTA (→ contact-form, STEP 8) | settings | Per instance | ○ |
+| **otodor-products** | Curated product rail | collection/products | Per instance | ○ |
+| **otodor-search** | Search surface | Shopify search | Route-driven | ○ |
+| **otodor-footer** | Brand footer | settings + navigation | Always | ○ |
+
+---
+
+## 4. Coverage summary
+
+- **Contract-compliant modules (✅):** 5 — `otodor-product-specs`, `otodor-product-compat`,
+  `otodor-product-warranty`, `otodor-product-downloads`, `otodor-category-selector` (reference).
+- **Framework sections pending doc-block retrofit (◑):** `otodor-product-install`, `otodor-product-reveal`,
+  `otodor-comparison`, `otodor-sticky-atc`, `otodor-collection-hero`, `otodor-collection-grid`,
+  `otodor-features`, `otodor-why`. All are already self-hiding/data-driven; retrofit adds the 10-field block.
+- **Genuinely new this phase (STEP 4b):** Compatibility, Warranty, Downloads.
+
+## 5. Building a new category (recap)
+
+1. Create the collection; assign `collection.json` (or a `collection.<handle>.json` copy).
+2. Populate collection metafields (`custom.menu_*`, `hero_*`, …) and product metafields (`specs.*`, `custom.*`).
+3. Point the Category Selector / Compatibility tag source at the category's data. **No Liquid changes** — every
+   module self-hides until its data exists, then lights up.
+
+> Retrofit rule: whenever a ◑ section is next edited, bring it to ✅ by adding the
+> `OTODOR-MODULE-CONTRACT.md` §4 doc block and confirming the §6 conformance checklist.
