@@ -1,0 +1,206 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Content Rail  (related educational content)
+  See OTODOR-CONTENT-LAYER.md. Surfaces a SET of native Articles as a rail of
+  guide cards. Content lives in Shopify; this only previews + links.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Surface related educational reading (guides / explainers)
+                      for a product, collection or page.
+  Primary source:     product/collection `related_guides` (list.article_reference)
+  Fallback order:     reference-metafield list → a chosen blog's latest articles → hide.
+  Visibility rule:    Renders when ≥1 article resolves; hides completely otherwise.
+  Merchant editable:  YES — set the metafield key, or pick a blog; heading + count.
+  Required metafields: none
+  Optional metafields: product/collection custom.related_guides (list.article_reference)
+  Dependencies:       otodor-base.css tokens. No JS. No snippets.
+  Preset:             Added empty; renders once a metafield list or blog resolves.
+  Accessibility:      <section> landmark + aria-labelledby; each card is a real
+                      <a>; images carry alt; visible focus; reduced-motion safe.
+  Reusable for:       PDP, collection, article ("related reading"), home.
+
+  No Article/ItemList JSON-LD is emitted — each article page owns its schema
+  (OTODOR-STRUCTURED-CONTENT.md); this surface only references canonical URLs.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign max = section.settings.max_articles | default: 3
+
+  # 1. READ + 2. resolve the article set (metafield list → blog latest)
+  assign mf_ns = section.settings.metafield_namespace | default: 'custom'
+  assign mf_key = section.settings.metafield_key | default: 'related_guides'
+  assign articles = nil
+  if product != blank and product != empty
+    assign articles = product.metafields[mf_ns][mf_key].value
+  elsif collection != blank and collection != empty
+    assign articles = collection.metafields[mf_ns][mf_key].value
+  endif
+  if articles == blank and section.settings.blog != blank
+    assign articles = section.settings.blog.articles
+  endif
+
+  # 3. VALIDATE
+  assign has_content = false
+  if articles != blank and articles.size > 0
+    assign has_content = true
+  endif
+-%}
+
+{%- if has_content -%}
+  {%- style -%}
+    #shopify-section-{{ section.id }} { background: var(--otodor-bg-light); }
+    #shopify-section-{{ section.id }} .otodor-rail {
+      max-width: var(--otodor-container);
+      margin-inline: auto;
+      padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__head { max-width: 46rem; margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem); }
+    #shopify-section-{{ section.id }} .otodor-rail__eyebrow {
+      display: block;
+      font-family: var(--otodor-font-display);
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: var(--otodor-tracking-widest);
+      color: var(--otodor-accent-on-light); margin-bottom: 0.9rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__heading {
+      font-family: var(--otodor-font-display);
+      font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 700;
+      letter-spacing: var(--otodor-tracking-tight);
+      color: var(--otodor-ink); margin: 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__grid {
+      list-style: none; margin: 0; padding: 0;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+      gap: clamp(1.25rem, 2.5vw, 2rem);
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__card {
+      display: flex; flex-direction: column; height: 100%;
+      border-radius: var(--otodor-radius-lg); overflow: hidden;
+      background: var(--otodor-bg-light-2);
+      border: 1px solid var(--otodor-hairline-light);
+      box-shadow: var(--otodor-shadow-xs);
+      text-decoration: none; color: inherit;
+      transition: transform var(--otodor-dur-base) var(--otodor-ease-spring),
+                  border-color var(--otodor-dur-base) ease, box-shadow var(--otodor-dur-base) ease;
+    }
+    #shopify-section-{{ section.id }} a.otodor-rail__card:hover {
+      transform: translateY(-4px);
+      border-color: var(--otodor-hairline-light-2);
+      box-shadow: var(--otodor-shadow-md);
+    }
+    #shopify-section-{{ section.id }} a.otodor-rail__card:focus-visible { outline: 2px solid var(--otodor-accent-on-light); outline-offset: 3px; }
+    #shopify-section-{{ section.id }} .otodor-rail__media {
+      aspect-ratio: 16 / 10; overflow: hidden;
+      background: linear-gradient(160deg, var(--otodor-plinth), var(--otodor-bg-light));
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__media img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform var(--otodor-dur-slow) var(--otodor-ease-spring);
+    }
+    #shopify-section-{{ section.id }} a.otodor-rail__card:hover .otodor-rail__media img { transform: scale(1.04); }
+    #shopify-section-{{ section.id }} .otodor-rail__body { display: flex; flex-direction: column; gap: 0.5rem; padding: clamp(1.1rem, 2vw, 1.5rem); flex: 1 1 auto; }
+    #shopify-section-{{ section.id }} .otodor-rail__meta {
+      font-family: var(--otodor-font-body); font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--otodor-accent-on-light);
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__title {
+      font-family: var(--otodor-font-display); font-size: 1.12rem; font-weight: 700;
+      line-height: 1.25; letter-spacing: var(--otodor-tracking-tight); color: var(--otodor-ink); margin: 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__excerpt {
+      font-family: var(--otodor-font-body); font-size: 0.88rem; line-height: 1.55;
+      color: var(--otodor-ink-soft); margin: 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__go {
+      margin-top: auto; display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--otodor-font-body); font-size: 0.82rem; font-weight: 600;
+      color: var(--otodor-accent-on-light); padding-top: 0.5rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-rail__go svg { width: 15px; height: 15px; transition: transform var(--otodor-dur-fast) ease; }
+    #shopify-section-{{ section.id }} a.otodor-rail__card:hover .otodor-rail__go svg { transform: translateX(3px); }
+    @media (prefers-reduced-motion: reduce) {
+      #shopify-section-{{ section.id }} .otodor-rail__card,
+      #shopify-section-{{ section.id }} .otodor-rail__media img,
+      #shopify-section-{{ section.id }} .otodor-rail__go svg { transition: none; }
+      #shopify-section-{{ section.id }} a.otodor-rail__card:hover { transform: none; }
+      #shopify-section-{{ section.id }} a.otodor-rail__card:hover .otodor-rail__media img { transform: none; }
+    }
+  {%- endstyle -%}
+
+  <section
+    class="otodor-rail"
+    data-otodor-section="content-rail"
+    {% if section.settings.heading != blank %}aria-labelledby="otodor-rail-title-{{ section.id }}"{% endif %}
+  >
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="otodor-rail__head" data-otodor-reveal="fade-up">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-rail__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="otodor-rail__heading" id="otodor-rail-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <ul class="otodor-rail__grid" role="list" data-otodor-reveal="fade-up">
+      {%- for article in articles limit: max -%}
+        {%- if article.url != blank -%}
+          <li>
+            <a class="otodor-rail__card" href="{{ article.url }}">
+              <span class="otodor-rail__media">
+                {%- if article.image != blank -%}
+                  {{ article.image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320,480,640', sizes: '(max-width: 749px) 100vw, 33vw', alt: article.title | escape }}
+                {%- endif -%}
+              </span>
+              <span class="otodor-rail__body">
+                {%- assign tag_label = article.tags.first -%}
+                {%- if tag_label != blank -%}
+                  <span class="otodor-rail__meta">{{ tag_label | escape }}</span>
+                {%- elsif article.published_at != blank -%}
+                  <span class="otodor-rail__meta">{{ article.published_at | date: '%b %-d, %Y' }}</span>
+                {%- endif -%}
+                <span class="otodor-rail__title">{{ article.title | escape }}</span>
+                {%- assign excerpt = article.excerpt | default: article.content | strip_html | truncatewords: 18 -%}
+                {%- if excerpt != blank -%}<span class="otodor-rail__excerpt">{{ excerpt | strip_html | escape }}</span>{%- endif -%}
+                <span class="otodor-rail__go">{{ section.settings.card_link_label | default: 'Read more' | escape }}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M14 5l7 7-7 7"/></svg></span>
+              </span>
+            </a>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </section>
+
+{%- elsif request.design_mode -%}
+  <section class="otodor-rail" style="padding-block: 48px;">
+    <div class="otodor-container">
+      <p style="font-family: var(--otodor-font-body); color: var(--otodor-ink-soft); text-align: center;">
+        <strong>Content Rail</strong> — set a product/collection <code>related_guides</code> metafield (articles) or pick a blog. Articles are surfaced as cards linking to their canonical Shopify URLs.
+      </p>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Content Rail",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "Surfaces a set of native Articles as guide cards. Priority: the product/collection reference metafield list → a chosen blog's latest articles. Content lives in Shopify — this only previews + links." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Learn" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Guides & resources" },
+    { "type": "text", "id": "card_link_label", "label": "Card link label", "default": "Read more" },
+    { "type": "header", "content": "Source" },
+    { "type": "text", "id": "metafield_namespace", "label": "Namespace", "default": "custom" },
+    { "type": "text", "id": "metafield_key", "label": "Key", "default": "related_guides", "info": "product/collection list.article_reference." },
+    { "type": "blog", "id": "blog", "label": "Blog (fallback)", "info": "Latest articles are shown when no metafield list is set." },
+    { "type": "range", "id": "max_articles", "label": "Max articles", "min": 2, "max": 6, "step": 1, "default": 3 },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "presets": [{ "name": "OTODOR Content Rail" }]
+}
+{% endschema %}

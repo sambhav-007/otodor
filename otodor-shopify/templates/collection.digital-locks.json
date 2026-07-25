@@ -225,6 +225,22 @@
         "cta_secondary_link": "/pages/contact"
       }
     },
+    "buying-guide": {
+      "type": "otodor-content-guide",
+      "settings": {
+        "eyebrow": "Buying guide",
+        "metafield_key": "buying_guide",
+        "cta_label": "Read the buying guide"
+      }
+    },
+    "content-rail": {
+      "type": "otodor-content-rail",
+      "settings": {
+        "eyebrow": "Learn",
+        "heading": "Guides & resources",
+        "metafield_key": "related_guides"
+      }
+    },
     "seo": {
       "type": "rich-text",
       "blocks": {
@@ -250,6 +266,8 @@
     "content",
     "comparison",
     "faq",
+    "buying-guide",
+    "content-rail",
     "cta",
     "seo"
   ]

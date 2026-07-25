@@ -123,6 +123,14 @@
       "type": "otodor-comparison",
       "settings": {}
     },
+    "content-rail": {
+      "type": "otodor-content-rail",
+      "settings": {
+        "eyebrow": "Learn",
+        "heading": "Guides & resources",
+        "metafield_key": "related_guides"
+      }
+    },
     "related-products": {
       "type": "related-products",
       "settings": {
@@ -155,6 +163,7 @@
     "warranty",
     "downloads",
     "comparison",
+    "content-rail",
     "related-products",
     "sticky-atc"
   ]
