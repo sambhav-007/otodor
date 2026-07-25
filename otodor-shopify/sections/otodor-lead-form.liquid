@@ -19,8 +19,11 @@
                        context for hidden lead-attribution fields; uses
                        settings.otodor_whatsapp_number / _enabled / _message.
   Dependencies:       snippets/otodor-icon.liquid; otodor-base.css tokens.
-                      Native `{% form 'contact' %}`. Tiny inline prefill script
-                      (reads ?interest= / ?product= / ?msg= query params).
+                      Native `{% form 'contact' %}`. Tiny inline script: prefill
+                      from ?interest=/?product=/?msg= query params + rebuild the
+                      WhatsApp link live from the fields the visitor has typed
+                      (name/phone/email/interest/message). Static wa_link is the
+                      no-JS fallback.
   Preset:             Full split layout — heading + 3 trust reasons + 4 interest
                       options + phone/email/message + WhatsApp. Renders live.
   Accessibility:      <section aria-labelledby>, <label> per field, aria-required
@@ -56,7 +59,8 @@
     elsif collection != blank
       assign wa_context = ' — Category: ' | append: collection.title
     endif
-    assign wa_text = wa_base | append: wa_context | url_encode
+    assign wa_intro = wa_base | append: wa_context
+    assign wa_text = wa_intro | url_encode
     assign wa_link = 'https://wa.me/' | append: wa_number | append: '?text=' | append: wa_text
   endif
 -%}
@@ -312,7 +316,16 @@
               <span aria-hidden="true">{% render 'otodor-icon', name: 'arrow-right' %}</span>
             </button>
             {%- if wa_enabled -%}
-              <a class="otodor-lead__wa" href="{{ wa_link }}" target="_blank" rel="noopener" aria-label="{{ section.settings.whatsapp_label | escape }} (opens WhatsApp)">
+              <a class="otodor-lead__wa" href="{{ wa_link }}" target="_blank" rel="noopener"
+                aria-label="{{ section.settings.whatsapp_label | escape }} (opens WhatsApp)"
+                data-otodor-lead-wa
+                data-wa-number="{{ wa_number | escape }}"
+                data-wa-intro="{{ wa_intro | escape }}"
+                data-l-name="{{ section.settings.label_name | escape }}"
+                data-l-phone="{{ section.settings.label_phone | escape }}"
+                data-l-email="{{ section.settings.label_email | escape }}"
+                data-l-interest="{{ section.settings.label_interest | escape }}"
+                data-l-message="{{ section.settings.label_message | escape }}">
                 <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
                 {{ section.settings.whatsapp_label | escape }}
               </a>
@@ -354,6 +367,37 @@
 
     var body = root.querySelector('[data-otodor-lead-message]');
     if (body && msg && !body.value.trim()) body.value = msg;
+
+    // ── Dynamic WhatsApp message: fold in whatever the visitor has typed ──
+    var wa = root.querySelector('[data-otodor-lead-wa]');
+    if (wa) {
+      var num = wa.getAttribute('data-wa-number');
+      var intro = wa.getAttribute('data-wa-intro') || '';
+      var fields = [
+        ['data-l-name', 'contact[Name]'],
+        ['data-l-phone', 'contact[Phone]'],
+        ['data-l-email', 'contact[email]'],
+        ['data-l-interest', 'contact[Interest]'],
+        ['data-l-message', 'contact[Comment]']
+      ];
+      var stripStar = function (s) { return (s || '').replace(/\s*\*+\s*$/, '').trim(); };
+      var valOf = function (name) {
+        var el = root.querySelector('[name="' + name + '"]');
+        return el && el.value ? el.value.trim() : '';
+      };
+      var rebuildWa = function () {
+        var lines = [];
+        if (intro) lines.push(intro);
+        fields.forEach(function (f) {
+          var v = valOf(f[1]);
+          if (v) lines.push(stripStar(wa.getAttribute(f[0])) + ': ' + v);
+        });
+        wa.setAttribute('href', 'https://wa.me/' + num + '?text=' + encodeURIComponent(lines.join('\n')));
+      };
+      root.addEventListener('input', rebuildWa);
+      root.addEventListener('change', rebuildWa);
+      rebuildWa();
+    }
   })();
 </script>
 
