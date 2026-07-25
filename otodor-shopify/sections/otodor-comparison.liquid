@@ -1,202 +1,233 @@
-{%- style -%}
-  /* ─────────────────────────────────────────────────────────
-     OTODOR Comparison Section
-     Responsive, sticky-column comparison matrix.
-  ───────────────────────────────────────────────────────── */
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Comparison Matrix  (a CONSUMER of the Spec Rendering Engine)
+  See OTODOR-SPEC-ENGINE.md. This section contains NO specification names —
+  it only resolves products and asks the registry + renderer to display them.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Compare products across the OTODOR specification set.
+  Primary source:     otodor-spec-registry (specs) × resolved products (specs.*)
+  Product Resolver:   `product` blocks → `collection` setting → current product
+                      + its collection siblings (PDP) → hide
+  Fallback order:     per cell — metafield → registry default → '—'
+  Visibility rule:    Hidden when < 2 products resolve; empty spec rows are
+                      dropped; empty groups print no header. (Editor shows a hint.)
+  Merchant editable:  YES — heading + product columns (pickers) / collection.
+                      NOT the spec list — that lives in the registry.
+  Required metafields: none
+  Optional metafields: any product specs.* the registry references
+  Dependencies:       snippets/otodor-spec-registry, otodor-spec-value,
+                      otodor-icon; otodor-base.css (.otodor-spec__*).
+  Preset:             Adds empty product columns; renders once products chosen
+                      (comparison needs real products — auto-hides until then).
+  Accessibility:      <section> landmark + aria-labelledby; <table> with <th
+                      scope>; check/dash carry aria-labels; horizontal scroll.
+  Reusable for:       PDP (current + siblings), collection/landing (blocks or
+                      collection), any category — the registry drives the rows.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
 
-  #shopify-section-{{ section.id }} {
-    position: relative;
-    z-index: 3;
-    background-color: transparent;
-  }
+{%- liquid
+  # ── Product Resolver → a handle list (objects re-fetched via all_products) ──
+  assign max_products = section.settings.max_products | default: 4
+  assign handles = ''
 
-  .otodor-comparison {
-    padding-block: var(--otodor-section-py);
-  }
+  # 1. product-column blocks
+  for block in section.blocks
+    if block.type == 'product' and block.settings.product != blank
+      assign handles = handles | append: ',' | append: block.settings.product.handle
+    endif
+  endfor
 
-  .otodor-comparison__header {
-    margin-bottom: clamp(2.5rem, 5vw, 4rem);
-  }
+  # 2. collection setting
+  if handles == blank and section.settings.collection != blank
+    for p in section.settings.collection.products limit: max_products
+      assign handles = handles | append: ',' | append: p.handle
+    endfor
+  endif
 
-  .otodor-comparison__table-wrapper {
-    overflow-x: auto;
-    border-radius: var(--otodor-radius-xl);
-    border: 1px solid var(--otodor-glass-border);
-    background: var(--otodor-glass);
-    box-shadow: var(--otodor-shadow-md);
-  }
+  # 2b. current collection page context (drop the section on any collection)
+  if handles == blank and collection != blank and collection != empty
+    for p in collection.products limit: max_products
+      assign handles = handles | append: ',' | append: p.handle
+    endfor
+  endif
 
-  .otodor-comparison__table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    min-width: 750px;
-    font-family: var(--otodor-font-body);
-  }
+  # 3. PDP context: current product + siblings from its first collection
+  if handles == blank and product != blank and product != empty
+    assign handles = ',' | append: product.handle
+    assign sib = product.collections.first
+    if sib != blank
+      for p in sib.products limit: 8
+        unless p.handle == product.handle
+          assign handles = handles | append: ',' | append: p.handle
+        endunless
+      endfor
+    endif
+  endif
 
-  .otodor-comparison__table th,
-  .otodor-comparison__table td {
-    padding: var(--otodor-space-md) var(--otodor-space-lg);
-    border-bottom: 1px solid var(--otodor-hairline);
-    font-size: var(--otodor-text-sm);
-  }
+  assign cols = handles | remove_first: ',' | split: ','
+  if cols.size > max_products
+    assign cols = cols | slice: 0, max_products
+  endif
+  assign col_count = cols.size
 
-  .otodor-comparison__table th {
-    font-family: var(--otodor-font-display);
-    font-weight: 700;
-    color: var(--otodor-white);
-    background: rgba(18, 18, 18, 0.4);
-    letter-spacing: var(--otodor-tracking-wide);
-    text-transform: uppercase;
-  }
+  # ── Registry (comparable view) ──
+  capture reg
+    render 'otodor-spec-registry', only_comparable: true
+  endcapture
+  assign specs = reg | strip | split: ';;;'
+-%}
 
-  .otodor-comparison__table th:first-child,
-  .otodor-comparison__table td:first-child {
-    font-weight: 600;
-    color: var(--otodor-white);
-    width: 250px;
-    position: sticky;
-    left: 0;
-    background: #0B0B0B;
-    z-index: 2;
-  }
-
-  .otodor-comparison__table tr:hover td {
-    background-color: rgba(255, 255, 255, 0.02);
-  }
-
-  .otodor-comparison__icon-check {
-    color: var(--otodor-success);
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-  }
-
-  .otodor-comparison__icon-dash {
-    color: var(--otodor-faint);
-    font-weight: 500;
-  }
-
-  /* ─ Responsive overrides ────────────────────────────────── */
-  @media (max-width: 768px) {
-    .otodor-comparison__table-wrapper {
-      margin-inline: -1.5rem;
-      border-radius: 0;
-      border-inline: none;
+{%- if col_count >= 2 -%}
+  {%- style -%}
+    #shopify-section-{{ section.id }} { position: relative; z-index: 3; background-color: transparent; }
+    #shopify-section-{{ section.id }} .otodor-comparison { padding-block: var(--otodor-section-py); }
+    #shopify-section-{{ section.id }} .otodor-comparison__header { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+    #shopify-section-{{ section.id }} .otodor-comparison__table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--otodor-radius-xl);
+      border: 1px solid var(--otodor-glass-border);
+      background: var(--otodor-glass);
+      box-shadow: var(--otodor-shadow-md);
     }
-  }
-{%- endstyle -%}
+    #shopify-section-{{ section.id }} .otodor-comparison__table {
+      width: 100%; border-collapse: collapse; text-align: left;
+      min-width: 640px; font-family: var(--otodor-font-body);
+    }
+    #shopify-section-{{ section.id }} .otodor-comparison__table th,
+    #shopify-section-{{ section.id }} .otodor-comparison__table td {
+      padding: var(--otodor-space-md) var(--otodor-space-lg);
+      border-bottom: 1px solid var(--otodor-hairline);
+      font-size: var(--otodor-text-sm);
+      color: var(--otodor-white);
+    }
+    #shopify-section-{{ section.id }} .otodor-comparison__spec {
+      font-family: var(--otodor-font-display); font-weight: 600;
+      color: var(--otodor-white); width: 240px;
+      position: sticky; left: 0; background: #0B0B0B; z-index: 2;
+    }
+    #shopify-section-{{ section.id }} .otodor-comparison__group th {
+      font-family: var(--otodor-font-display); font-weight: 700;
+      font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: var(--otodor-tracking-wider);
+      color: var(--otodor-blue); background: rgba(18, 18, 18, 0.6);
+    }
+    #shopify-section-{{ section.id }} .otodor-comparison__prod {
+      vertical-align: bottom; background: rgba(18, 18, 18, 0.4);
+    }
+    #shopify-section-{{ section.id }} .otodor-comparison__prod a { color: var(--otodor-white); text-decoration: none; }
+    #shopify-section-{{ section.id }} .otodor-comparison__thumb {
+      width: 64px; height: 64px; object-fit: contain; display: block;
+      margin-bottom: 0.5rem; border-radius: var(--otodor-radius-sm);
+      background: rgba(255,255,255,0.04);
+    }
+    #shopify-section-{{ section.id }} .otodor-comparison__name {
+      font-family: var(--otodor-font-display); font-weight: 700;
+      letter-spacing: var(--otodor-tracking-wide);
+    }
+    #shopify-section-{{ section.id }} .otodor-comparison__price { display: block; font-size: 0.78rem; color: var(--otodor-faint); margin-top: 0.2rem; font-weight: 500; }
+    #shopify-section-{{ section.id }} .otodor-comparison__table tbody tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
+    #shopify-section-{{ section.id }} .otodor-comparison__table tbody tr:hover .otodor-comparison__spec { background: #111; }
+    @media (max-width: 768px) {
+      #shopify-section-{{ section.id }} .otodor-comparison__table-wrapper { margin-inline: -1.5rem; border-radius: 0; border-inline: none; }
+      #shopify-section-{{ section.id }} .otodor-comparison__spec { width: 150px; }
+    }
+  {%- endstyle -%}
 
-<section
-  id="otodor-comparison-{{ section.id }}"
-  class="otodor-comparison"
-  data-otodor-section="comparison"
-  aria-labelledby="otodor-comparison-title-{{ section.id }}"
->
-  <div class="otodor-container">
-    <div class="otodor-comparison__header otodor-section-header otodor-section-header--center">
-      <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
-      <h2 class="otodor-heading-2" id="otodor-comparison-title-{{ section.id }}" data-otodor-reveal="fade-up">
-        {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
-      </h2>
-    </div>
+  <section
+    id="otodor-comparison-{{ section.id }}"
+    class="otodor-comparison"
+    data-otodor-section="comparison"
+    aria-labelledby="otodor-comparison-title-{{ section.id }}"
+  >
+    <div class="otodor-container">
+      <div class="otodor-comparison__header otodor-section-header otodor-section-header--center">
+        <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+        <h2 class="otodor-heading-2" id="otodor-comparison-title-{{ section.id }}" data-otodor-reveal="fade-up">
+          {{ section.settings.heading | escape }}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>
+        </h2>
+      </div>
 
-    <div class="otodor-comparison__table-wrapper" data-otodor-reveal="fade-up">
-      <table class="otodor-comparison__table">
-        <thead>
-          <tr>
-            <th>Specifications</th>
-            {%- for block in section.blocks -%}
-              <th {{ block.shopify_attributes }}>{{ block.settings.title | escape }}</th>
-            {%- endfor -%}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Fingerprint Access</td>
-            {%- for block in section.blocks -%}
-              <td>
-                {%- if block.settings.fingerprint -%}
-                  <span class="otodor-comparison__icon-check">✓</span>
-                {%- else -%}
-                  <span class="otodor-comparison__icon-dash">—</span>
+      <div class="otodor-comparison__table-wrapper" data-otodor-reveal="fade-up">
+        <table class="otodor-comparison__table">
+          <thead>
+            <tr>
+              <th class="otodor-comparison__spec" scope="col">{{ section.settings.spec_column_label | escape }}</th>
+              {%- for h in cols -%}
+                {%- assign p = all_products[h] -%}
+                {%- if p != empty -%}
+                  <th class="otodor-comparison__prod" scope="col">
+                    <a href="{{ p.url }}">
+                      {%- if p.featured_image -%}
+                        {{ p.featured_image | image_url: width: 128 | image_tag: loading: 'lazy', class: 'otodor-comparison__thumb', widths: '64,128', alt: p.title | escape }}
+                      {%- endif -%}
+                      <span class="otodor-comparison__name">{{ p.title | escape }}</span>
+                      {%- if p.price > 0 -%}<span class="otodor-comparison__price">{{ p.price | money }}</span>{%- endif -%}
+                    </a>
+                  </th>
                 {%- endif -%}
-              </td>
-            {%- endfor -%}
-          </tr>
-          <tr>
-            <td>PIN Access</td>
-            {%- for block in section.blocks -%}
-              <td>
-                {%- if block.settings.pin_access -%}
-                  <span class="otodor-comparison__icon-check">✓</span>
-                {%- else -%}
-                  <span class="otodor-comparison__icon-dash">—</span>
+              {%- endfor -%}
+            </tr>
+          </thead>
+          <tbody>
+            {%- assign current_group = '' -%}
+            {%- for row in specs -%}
+              {%- assign f = row | strip | split: '|' -%}
+              {%- if f[0] == blank -%}{%- continue -%}{%- endif -%}
+              {%- liquid
+                assign s_ns = f[2]
+                assign s_key = f[3]
+                assign s_default = f[7]
+                # Visibility: does any resolved product carry this spec?
+                assign row_has = false
+                if s_default != blank
+                  assign row_has = true
+                endif
+                unless row_has
+                  for h in cols
+                    assign p = all_products[h]
+                    assign mv = p.metafields[s_ns][s_key].value
+                    if mv != blank
+                      assign row_has = true
+                      break
+                    endif
+                  endfor
+                endunless
+              -%}
+              {%- if row_has -%}
+                {%- if f[6] != blank and f[6] != current_group -%}
+                  {%- assign current_group = f[6] -%}
+                  <tr class="otodor-comparison__group">
+                    <th class="otodor-comparison__spec" scope="colgroup" colspan="{{ col_count | plus: 1 }}">{{ f[6] | escape }}</th>
+                  </tr>
                 {%- endif -%}
-              </td>
+                <tr>
+                  <th class="otodor-comparison__spec" scope="row">{{ f[1] | escape }}</th>
+                  {%- for h in cols -%}
+                    {%- assign p = all_products[h] -%}
+                    {%- if p != empty -%}
+                      <td>{%- render 'otodor-spec-value', product: p, namespace: f[2], key: f[3], type: f[4], unit: f[5], spec_default: f[7], context: 'comparison' -%}</td>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </tr>
+              {%- endif -%}
             {%- endfor -%}
-          </tr>
-          <tr>
-            <td>RFID Tag Access</td>
-            {%- for block in section.blocks -%}
-              <td>
-                {%- if block.settings.rfid_access -%}
-                  <span class="otodor-comparison__icon-check">✓</span>
-                {%- else -%}
-                  <span class="otodor-comparison__icon-dash">—</span>
-                {%- endif -%}
-              </td>
-            {%- endfor -%}
-          </tr>
-          <tr>
-            <td>Mobile App Control</td>
-            {%- for block in section.blocks -%}
-              <td>
-                {%- if block.settings.app_control -%}
-                  <span class="otodor-comparison__icon-check">✓</span>
-                {%- else -%}
-                  <span class="otodor-comparison__icon-dash">—</span>
-                {%- endif -%}
-              </td>
-            {%- endfor -%}
-          </tr>
-          <tr>
-            <td>Auto-Lock Sensor</td>
-            {%- for block in section.blocks -%}
-              <td>
-                {%- if block.settings.auto_lock -%}
-                  <span class="otodor-comparison__icon-check">✓</span>
-                {%- else -%}
-                  <span class="otodor-comparison__icon-dash">—</span>
-                {%- endif -%}
-              </td>
-            {%- endfor -%}
-          </tr>
-          <tr>
-            <td>Audit Log Access</td>
-            {%- for block in section.blocks -%}
-              <td>
-                {%- if block.settings.audit_log -%}
-                  <span class="otodor-comparison__icon-check">✓</span>
-                {%- else -%}
-                  <span class="otodor-comparison__icon-dash">—</span>
-                {%- endif -%}
-              </td>
-            {%- endfor -%}
-          </tr>
-          <tr>
-            <td>Warranty Period</td>
-            {%- for block in section.blocks -%}
-              <td style="color: var(--otodor-white); font-weight: 500;">
-                {{ block.settings.warranty | escape }}
-              </td>
-            {%- endfor -%}
-          </tr>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+
+{%- elsif request.design_mode -%}
+  <section class="otodor-comparison" style="padding-block: var(--otodor-section-py);">
+    <div class="otodor-container">
+      <p style="font-family: var(--otodor-font-body); color: var(--otodor-ink-soft); text-align: center;">
+        <strong>Comparison Matrix</strong> — add at least two product columns (or pick a collection) to compare.
+        Spec rows come from the OTODOR specification registry automatically.
+      </p>
+    </div>
+  </section>
+{%- endif -%}
 
 {% schema %}
 {
@@ -205,79 +236,21 @@
   "class": "shopify-section",
   "max_blocks": 5,
   "settings": [
-    {
-      "type": "text",
-      "id": "eyebrow",
-      "label": "Eyebrow text",
-      "default": "Compare Models"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading text",
-      "default": "Choose the right fit for your "
-    },
-    {
-      "type": "text",
-      "id": "heading_accent",
-      "label": "Heading accented text",
-      "default": "door."
-    }
+    { "type": "paragraph", "content": "Rows are driven by the OTODOR specification registry (otodor-spec-registry) and read each product's specs.* metafields — no specs are configured here. Add product columns below, or pick a collection; on a product page it auto-compares the product with its collection siblings." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Compare Models" },
+    { "type": "text", "id": "heading", "label": "Heading text", "default": "Choose the right fit for your " },
+    { "type": "text", "id": "heading_accent", "label": "Heading accented text", "default": "door." },
+    { "type": "text", "id": "spec_column_label", "label": "Spec column label", "default": "Specification" },
+    { "type": "header", "content": "Products" },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "Used when no product columns are added below." },
+    { "type": "range", "id": "max_products", "label": "Max products", "min": 2, "max": 5, "step": 1, "default": 4 }
   ],
   "blocks": [
     {
-      "type": "product_column",
-      "name": "Product Spec Column",
+      "type": "product",
+      "name": "Product column",
       "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Product Name",
-          "default": "ONYX"
-        },
-        {
-          "type": "checkbox",
-          "id": "fingerprint",
-          "label": "Fingerprint Access",
-          "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "pin_access",
-          "label": "PIN Access",
-          "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "rfid_access",
-          "label": "RFID Access",
-          "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "app_control",
-          "label": "Mobile App Control",
-          "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "auto_lock",
-          "label": "Auto-Lock Sensor",
-          "default": true
-        },
-        {
-          "type": "checkbox",
-          "id": "audit_log",
-          "label": "Audit Log Access",
-          "default": true
-        },
-        {
-          "type": "text",
-          "id": "warranty",
-          "label": "Warranty Duration",
-          "default": "3 Years",
-          "info": "Configurable brand warranty copy."
-        }
+        { "type": "product", "id": "product", "label": "Product", "info": "Specs are read from this product's metafields via the registry." }
       ]
     }
   ],
@@ -285,58 +258,9 @@
     {
       "name": "OTODOR Comparison Matrix",
       "blocks": [
-        {
-          "type": "product_column",
-          "settings": {
-            "title": "ONYX",
-            "fingerprint": true,
-            "pin_access": true,
-            "rfid_access": true,
-            "app_control": false,
-            "auto_lock": true,
-            "audit_log": false,
-            "warranty": "3 Years"
-          }
-        },
-        {
-          "type": "product_column",
-          "settings": {
-            "title": "SENTRY",
-            "fingerprint": true,
-            "pin_access": true,
-            "rfid_access": true,
-            "app_control": true,
-            "auto_lock": true,
-            "audit_log": true,
-            "warranty": "3 Years"
-          }
-        },
-        {
-          "type": "product_column",
-          "settings": {
-            "title": "NEXUS",
-            "fingerprint": true,
-            "pin_access": true,
-            "rfid_access": true,
-            "app_control": true,
-            "auto_lock": true,
-            "audit_log": true,
-            "warranty": "3 Years"
-          }
-        },
-        {
-          "type": "product_column",
-          "settings": {
-            "title": "ZION+",
-            "fingerprint": true,
-            "pin_access": true,
-            "rfid_access": true,
-            "app_control": true,
-            "auto_lock": true,
-            "audit_log": true,
-            "warranty": "3 Years"
-          }
-        }
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
       ]
     }
   ]
