@@ -145,7 +145,7 @@
                     <aside class="otodor-mega__cta">
                       {%- if section.settings.mega_cta_image != blank -%}
                         <span class="otodor-mega__cta-media">
-                          {{ section.settings.mega_cta_image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120,240', sizes: '120px', alt: '', class: 'otodor-mega__cta-img' }}
+                          {{ section.settings.mega_cta_image | image_url: width: 680 | image_tag: loading: 'lazy', widths: '340,680', sizes: '340px', alt: '', class: 'otodor-mega__cta-img' }}
                         </span>
                       {%- endif -%}
                       <div class="otodor-mega__cta-body">
@@ -187,11 +187,15 @@
 
 <script>
   (function () {
-    if (window.otodorMegaFeatureInit) return;
-    window.otodorMegaFeatureInit = true;
-    var bind = function (mega) {
-      if (mega.dataset.otodorMegaBound) return;
-      mega.dataset.otodorMegaBound = '1';
+    if (window.otodorMegaInit) return;
+    window.otodorMegaInit = true;
+
+    var desktop = window.matchMedia('(hover: hover) and (min-width: 990px)');
+
+    // 1) Featured panel: swap the active preview to the hovered/focused category.
+    var bindFeature = function (mega) {
+      if (mega.dataset.otodorFeatureBound) return;
+      mega.dataset.otodorFeatureBound = '1';
       var panels = mega.querySelectorAll('[data-otodor-feature-panel]');
       if (!panels.length) return;
       var setActive = function (id) {
@@ -214,9 +218,49 @@
         });
       }
     };
+
+    // 2) Hover-intent: open on hover with a short close delay (Dawn opens on
+    //    click only). Keyboard focus/focusout and Esc keep working.
+    var bindHover = function (menu) {
+      if (menu.dataset.otodorHoverBound) return;
+      menu.dataset.otodorHoverBound = '1';
+      var details = menu.querySelector('details.mega-menu');
+      if (!details) return;
+      var summary = details.querySelector('summary');
+      var timer;
+      var open = function () {
+        if (!desktop.matches) return;
+        clearTimeout(timer);
+        if (!details.open) {
+          details.open = true;
+          if (summary) summary.setAttribute('aria-expanded', 'true');
+        }
+      };
+      var scheduleClose = function () {
+        if (!desktop.matches) return;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          if (details.contains(document.activeElement)) return; // keyboard user inside
+          details.open = false;
+          if (summary) summary.setAttribute('aria-expanded', 'false');
+        }, 200);
+      };
+      menu.addEventListener('mouseenter', open);
+      menu.addEventListener('mouseleave', scheduleClose);
+      menu.addEventListener('focusin', function () { clearTimeout(timer); });
+      menu.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && details.open) {
+          details.open = false;
+          if (summary) { summary.setAttribute('aria-expanded', 'false'); summary.focus(); }
+        }
+      });
+    };
+
     var init = function () {
       var megas = document.querySelectorAll('[data-otodor-mega]');
-      for (var i = 0; i < megas.length; i++) bind(megas[i]);
+      for (var i = 0; i < megas.length; i++) bindFeature(megas[i]);
+      var menus = document.querySelectorAll('.header__inline-menu header-menu');
+      for (var j = 0; j < menus.length; j++) bindHover(menus[j]);
     };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);

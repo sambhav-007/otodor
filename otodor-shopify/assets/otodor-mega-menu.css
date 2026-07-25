@@ -4,14 +4,36 @@
    adapts to the header colour scheme via Dawn's --color-foreground
    / --color-background, and uses OTODOR tokens for rhythm, type and
    motion. Enterprise-grade: luxurious, spacious, editorial.
-   Layout: [ category columns | featured panel ] + full-width CTA.
-   Motion: opacity + translateY + scale only, 150–250ms.
+
+   Layout: full-width panel below the navbar →
+     LEFT  (~70%) responsive category grid
+     RIGHT (340px) featured panel + "Get a Custom Quote" card
+   Motion: opacity + translateY + scale only, 150–200ms.
    ============================================================ */
+
+/* --- Full-width positioning (authoritative) ----------------
+   Dawn base.css sets `header-menu > details { position: relative }`,
+   and only component-mega-menu.css flips it to static — but that file
+   is lazy-loaded (media="print"), so the panel can anchor to the narrow
+   nav item. Force it here (this file is reliably applied) so the panel
+   always spans .header-wrapper (position: relative, full width). */
+.header__inline-menu header-menu,
+.header__inline-menu details.mega-menu {
+  position: static;
+}
+.header__inline-menu .mega-menu__content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  width: auto;
+  z-index: 5;
+}
 
 /* Panel ---------------------------------------------------- */
 .mega-menu__content {
-  padding-top: clamp(2rem, 3.2vw, 3rem);
-  padding-bottom: clamp(2rem, 3.2vw, 3rem);
+  padding-top: clamp(2rem, 3vw, 2.75rem);
+  padding-bottom: clamp(2rem, 3vw, 2.75rem);
   border-top: 1px solid rgba(var(--color-foreground), 0.07);
   box-shadow: 0 24px 48px -30px rgba(0, 0, 0, 0.28);
 }
@@ -19,33 +41,34 @@
 .js .mega-menu__content {
   opacity: 0;
   transform: translateY(-8px) scale(0.985);
-  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .mega-menu[open] .mega-menu__content {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
 
-/* Layout: columns + featured panel + full-width CTA --------- */
+/* Root layout: category grid | featured + CTA sidebar ------ */
 .otodor-mega {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(280px, 26%, 380px);
+  grid-template-columns: minmax(0, 1fr) 340px;
   grid-template-areas:
     "nav feature"
-    "cta cta";
-  column-gap: clamp(2rem, 4vw, 4.5rem);
-  row-gap: clamp(1.5rem, 2.6vw, 2.5rem);
+    "nav cta";
+  column-gap: clamp(2rem, 4vw, 4rem);
+  row-gap: clamp(1.25rem, 2vw, 1.75rem);
   align-items: start;
 }
-.otodor-mega__nav { grid-area: nav; }
+.otodor-mega__nav { grid-area: nav; min-width: 0; }
 .otodor-mega__feature-wrap { grid-area: feature; }
 .otodor-mega__cta { grid-area: cta; }
 
+/* LEFT — responsive category grid -------------------------- */
 .otodor-mega__columns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: clamp(1.6rem, 2.4vw, 2.75rem) clamp(1.6rem, 2.8vw, 3rem);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -127,7 +150,7 @@
   background: rgba(var(--color-foreground), 0.05);
 }
 
-/* Featured panel (updates to the hovered category) --------- */
+/* RIGHT — featured panel (updates to the hovered category) -- */
 .otodor-mega__feature-wrap {
   display: grid;
   align-self: stretch;
@@ -143,16 +166,16 @@
   opacity: 0;
   visibility: hidden;
   transform: translateY(6px) scale(0.98);
-  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 0s linear 200ms;
+  transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 180ms;
 }
 .otodor-mega__feature.is-active {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
-  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .otodor-mega__feature-media {
   display: block;
@@ -160,15 +183,8 @@
   background: rgba(var(--color-foreground), 0.05);
   overflow: hidden;
 }
-.otodor-mega__feature-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.otodor-mega__feature-body {
-  padding: clamp(1.1rem, 1.6vw, 1.5rem);
-}
+.otodor-mega__feature-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.otodor-mega__feature-body { padding: clamp(1.1rem, 1.4vw, 1.4rem); }
 .otodor-mega__feature-title {
   margin: 0;
   font-family: var(--otodor-font-display, inherit);
@@ -196,55 +212,53 @@
 .otodor-mega__feature-link .otodor-mega__feature-arrow { width: 15px; height: 15px; transition: transform 160ms ease; }
 .otodor-mega__feature:hover .otodor-mega__feature-arrow { transform: translateX(3px); }
 
-/* Full-width "Get a Custom Quote" CTA ---------------------- */
+/* RIGHT — "Get a Custom Quote" card (pinned beneath featured) */
 .otodor-mega__cta {
   display: flex;
-  align-items: center;
-  gap: clamp(1rem, 2vw, 1.75rem);
-  margin-top: clamp(0.5rem, 1.5vw, 1.25rem);
-  padding: clamp(1rem, 1.6vw, 1.4rem) clamp(1.25rem, 2vw, 1.75rem);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: clamp(1.1rem, 1.4vw, 1.4rem);
   border-radius: var(--otodor-radius-lg, 20px);
   border: 1px solid rgba(var(--color-foreground), 0.08);
   background: rgba(var(--color-foreground), 0.035);
 }
 .otodor-mega__cta-media {
-  flex: none;
-  width: 56px;
-  height: 56px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
   border-radius: var(--otodor-radius-md, 12px);
   overflow: hidden;
   background: rgba(var(--color-foreground), 0.06);
 }
 .otodor-mega__cta-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.otodor-mega__cta-body { flex: 1 1 auto; min-width: 0; }
+.otodor-mega__cta-body { min-width: 0; }
 .otodor-mega__cta-heading {
   margin: 0;
   font-family: var(--otodor-font-display, inherit);
   font-weight: 600;
-  font-size: 1.02rem;
+  font-size: 1rem;
   line-height: 1.25;
   color: rgb(var(--color-foreground));
 }
 .otodor-mega__cta-text {
-  margin: 0.25rem 0 0;
-  font-size: 0.84rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
   line-height: 1.5;
   color: rgba(var(--color-foreground), 0.58);
-  max-width: 60ch;
 }
 .otodor-mega__cta-button {
-  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.72rem 1.4rem;
+  margin-top: 0.2rem;
+  padding: 0.7rem 1.3rem;
   border-radius: var(--otodor-radius-pill, 999px);
   background: var(--otodor-blue, #4da6ff);
   color: #fff;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   text-decoration: none;
-  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  transition: transform 160ms ease, box-shadow 160ms ease;
 }
 .otodor-mega__cta-button:hover {
   transform: translateY(-1px);
@@ -259,8 +273,8 @@
   border-radius: 2px;
 }
 
-/* Tablet / compact ----------------------------------------- */
-@media screen and (max-width: 1200px) {
+/* Tablet / compact (mega shows 990px+; stack below ~1100px) - */
+@media screen and (max-width: 1100px) {
   .otodor-mega {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -269,10 +283,9 @@
       "cta";
     row-gap: clamp(1.25rem, 2.4vw, 2rem);
   }
-  .otodor-mega__feature-wrap { max-width: 420px; }
+  .otodor-mega__feature-wrap,
+  .otodor-mega__cta { max-width: 460px; }
   .otodor-mega__feature-media { aspect-ratio: 16 / 9; }
-  .otodor-mega__cta { flex-wrap: wrap; }
-  .otodor-mega__cta-text { display: none; }
 }
 
 /* Motion preferences --------------------------------------- */
