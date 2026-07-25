@@ -85,6 +85,21 @@ Composed by `templates/collection.json` (inherited by every category); Digital L
 
 ---
 
+## 2b. Content Experience Layer
+
+Native-first educational content (`OTODOR-CONTENT-LAYER.md`). Guides are authored as Shopify **Articles/Pages**
+(canonical source); these sections **surface** them by reference — no long-form duplicated, no Article schema
+re-emitted (the article page owns it).
+
+| Section | Purpose | Data sources (primary) | Fallback chain | Visibility rule | Reusable in | Dependencies | Status |
+|---|---|---|---|---|---|---|---|
+| **otodor-content-guide** | Surface one guide (buying/install/compat/…) | section Article pick | Article → Page → product/collection ref metafield (configurable, default `custom.buying_guide`) → hide | Hidden if no source resolves | PDP, collection, home, article — any guide type via the key | base.css | ✅ |
+| **otodor-content-rail** | Related educational reading | product/collection `custom.related_guides` (list.article_reference) | metafield list → chosen blog's latest → hide | Hidden if 0 articles | PDP, collection, article, home | base.css | ✅ |
+
+**Reused as-is (Dawn):** `main-article`/`main-blog`/`main-page` (+ `article \| structured_data` owns Article
+JSON-LD), `featured-blog`, `article-card`. Content metafields: `custom.buying_guide` / `installation_guide` /
+`compatibility_guide` (article_reference) + `custom.related_guides` (list.article_reference).
+
 ## 3. Cross-cutting brand sections
 
 Homepage/brand narrative. Data-driven where noted, but outside the product/collection data-contract set —
@@ -116,7 +131,10 @@ listed so the inventory is complete.
 - **Framework sections pending doc-block retrofit (◑):** `otodor-product-install`, `otodor-product-reveal`,
   `otodor-sticky-atc`, `otodor-collection-hero`, `otodor-collection-grid`, `otodor-features`, `otodor-why`.
   All are already self-hiding/data-driven; retrofit adds the 10-field block.
+- **Content Experience Layer (✅, STEP 7):** `otodor-content-guide`, `otodor-content-rail` — surface native
+  Articles/Pages by reference.
 - **Genuinely new (STEP 4b):** Compatibility, Warranty, Downloads. **STEP 5:** the Spec Rendering Engine.
+  **STEP 6:** the Schema Registry. **STEP 7:** the Content Experience Layer.
 
 ## 5. Building a new category (recap)
 
