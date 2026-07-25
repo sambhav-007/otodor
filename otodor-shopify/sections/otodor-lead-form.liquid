@@ -1,0 +1,448 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Lead Form  (Quote / Consultation / Survey capture)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Convert a high-intent visitor into a qualified, attributed
+                      lead (quote / site survey / consultation) via the native
+                      Shopify `contact` form — plus an instant WhatsApp path.
+  Primary source:     Section settings + `reason` / `interest` blocks. A lead
+                      form is config-driven, not metafield-driven.
+  Fallback order:     interest blocks → single message field only;
+                      reason blocks → omit the left trust rail.
+  Visibility rule:    Always renders (a contact form is never "empty"), but every
+                      sub-part (trust rail, interest select, WhatsApp, consent)
+                      self-hides when it has nothing to show.
+  Merchant editable:  YES — all copy, fields, interest options, trust reasons,
+                      colour scheme, WhatsApp toggle.
+  Required metafields: none.
+  Optional metafields: none. Reads `product` / `collection` in the render
+                       context for hidden lead-attribution fields; uses
+                       settings.otodor_whatsapp_number / _enabled / _message.
+  Dependencies:       snippets/otodor-icon.liquid; otodor-base.css tokens.
+                      Native `{% form 'contact' %}`. Tiny inline prefill script
+                      (reads ?interest= / ?product= / ?msg= query params).
+  Preset:             Full split layout — heading + 3 trust reasons + 4 interest
+                      options + phone/email/message + WhatsApp. Renders live.
+  Accessibility:      <section aria-labelledby>, <label> per field, aria-required
+                      on required fields, error aria-describedby, visible focus,
+                      success panel tabindex=-1 autofocus (Dawn parity).
+  Reusable for:       Quote page, contact page, PDP footer, collection footer,
+                      landing pages, homepage CTA.
+
+  CONTEXT CAPTURE (the native trick): each hidden contact[Label] field arrives
+  as a labelled line in the merchant's contact email, so a quote request lands
+  pre-attributed (which product / collection / page it came from).
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign scheme = section.settings.color_scheme | default: 'light'
+  assign anchor = section.settings.anchor_id | default: 'otodor-lead' | handle
+
+  # interest options come from `interest` blocks
+  assign interest_blocks = section.blocks | where: 'type', 'interest'
+  assign reason_blocks = section.blocks | where: 'type', 'reason'
+
+  # WhatsApp dual-path
+  assign wa_enabled = false
+  if section.settings.show_whatsapp and settings.otodor_whatsapp_enabled and settings.otodor_whatsapp_number != blank
+    assign wa_enabled = true
+    assign wa_number = settings.otodor_whatsapp_number
+    assign wa_base = section.settings.whatsapp_message | default: settings.otodor_whatsapp_message | default: 'Hello OTODOR, I would like a quote.'
+    assign wa_context = ''
+    if product != blank
+      assign wa_context = ' — Product: ' | append: product.title
+    elsif collection != blank
+      assign wa_context = ' — Category: ' | append: collection.title
+    endif
+    assign wa_text = wa_base | append: wa_context | url_encode
+    assign wa_link = 'https://wa.me/' | append: wa_number | append: '?text=' | append: wa_text
+  endif
+-%}
+
+{%- style -%}
+  #otodor-lead-{{ section.id }} {
+    padding-block: {{ section.settings.padding_top | default: 96 }}px {{ section.settings.padding_bottom | default: 96 }}px;
+    scroll-margin-top: 90px;
+  }
+  #otodor-lead-{{ section.id }}.otodor-lead--light { background: var(--otodor-bg-light); color: var(--otodor-ink); --lead-accent: var(--otodor-accent-on-light); }
+  #otodor-lead-{{ section.id }}.otodor-lead--dark  { background: var(--otodor-black); color: var(--otodor-white); --lead-accent: var(--otodor-blue); }
+
+  #otodor-lead-{{ section.id }} .otodor-lead__inner {
+    max-width: var(--otodor-container);
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    #otodor-lead-{{ section.id }} .otodor-lead__inner { grid-template-columns: 1fr; gap: clamp(1.75rem, 6vw, 2.75rem); }
+    {% if section.settings.form_first %}#otodor-lead-{{ section.id }} .otodor-lead__aside { order: 2; } #otodor-lead-{{ section.id }} .otodor-lead__panel { order: 1; }{% endif %}
+  }
+
+  /* ─ Left rail (value proposition) ─────────────────────────── */
+  #otodor-lead-{{ section.id }} .otodor-lead__eyebrow {
+    display: block; font-family: var(--otodor-font-display); font-size: 0.75rem; font-weight: 600;
+    letter-spacing: var(--otodor-tracking-widest); text-transform: uppercase; margin-bottom: 0.9rem; color: var(--lead-accent);
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__title {
+    font-family: var(--otodor-font-display); font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 700;
+    line-height: 1.05; letter-spacing: var(--otodor-tracking-tight); margin: 0;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__title .accent { color: var(--lead-accent); }
+  #otodor-lead-{{ section.id }} .otodor-lead__sub { margin: 1rem 0 0; font-size: 1.05rem; line-height: 1.55; opacity: 0.66; max-width: 34rem; }
+
+  #otodor-lead-{{ section.id }} .otodor-lead__reasons { list-style: none; margin: clamp(1.75rem, 3vw, 2.5rem) 0 0; padding: 0; display: grid; gap: 1.1rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason { display: flex; gap: 0.85rem; align-items: flex-start; }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-icon {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: var(--otodor-radius-md); color: var(--lead-accent);
+  }
+  .otodor-lead--light .otodor-lead__reason-icon { background: rgba(26,120,216,0.08); }
+  .otodor-lead--dark  .otodor-lead__reason-icon { background: rgba(77,166,255,0.12); }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-icon svg { width: 20px; height: 20px; }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-title { font-family: var(--otodor-font-display); font-weight: 600; font-size: 0.98rem; margin: 0 0 0.15rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-text { margin: 0; font-size: 0.86rem; line-height: 1.5; opacity: 0.6; }
+
+  /* ─ Right panel (the form card) ───────────────────────────── */
+  #otodor-lead-{{ section.id }} .otodor-lead__panel {
+    border-radius: var(--otodor-radius-lg); padding: clamp(1.5rem, 3vw, 2.4rem);
+  }
+  .otodor-lead--light .otodor-lead__panel { background: var(--otodor-bg-light-2); border: 1px solid var(--otodor-hairline-light); box-shadow: var(--otodor-shadow-md); }
+  .otodor-lead--dark  .otodor-lead__panel { background: var(--otodor-surface); border: 1px solid var(--otodor-hairline); }
+
+  #otodor-lead-{{ section.id }} .otodor-lead__form { display: grid; gap: 1rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 480px) { #otodor-lead-{{ section.id }} .otodor-lead__row { grid-template-columns: 1fr; } }
+  #otodor-lead-{{ section.id }} .otodor-lead__field { display: grid; gap: 0.4rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.01em; opacity: 0.85; }
+  #otodor-lead-{{ section.id }} .otodor-lead__label .req { color: var(--lead-accent); }
+  #otodor-lead-{{ section.id }} .otodor-lead__input,
+  #otodor-lead-{{ section.id }} .otodor-lead__select,
+  #otodor-lead-{{ section.id }} .otodor-lead__textarea {
+    width: 100%; font-family: var(--otodor-font-body); font-size: 0.95rem; color: inherit;
+    padding: 0.72rem 0.9rem; border-radius: var(--otodor-radius-md); border: 1px solid; background: transparent;
+    transition: border-color var(--otodor-dur-fast) ease, box-shadow var(--otodor-dur-fast) ease;
+  }
+  .otodor-lead--light .otodor-lead__input,
+  .otodor-lead--light .otodor-lead__select,
+  .otodor-lead--light .otodor-lead__textarea { border-color: var(--otodor-hairline-light-2); background: #fff; }
+  .otodor-lead--dark .otodor-lead__input,
+  .otodor-lead--dark .otodor-lead__select,
+  .otodor-lead--dark .otodor-lead__textarea { border-color: var(--otodor-hairline-mid); background: rgba(255,255,255,0.03); }
+  #otodor-lead-{{ section.id }} .otodor-lead__textarea { resize: vertical; min-height: 96px; }
+  #otodor-lead-{{ section.id }} .otodor-lead__input:focus-visible,
+  #otodor-lead-{{ section.id }} .otodor-lead__select:focus-visible,
+  #otodor-lead-{{ section.id }} .otodor-lead__textarea:focus-visible {
+    outline: none; border-color: var(--lead-accent); box-shadow: 0 0 0 3px var(--otodor-blue-glow);
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__select { appearance: none; -webkit-appearance: none; cursor: pointer; }
+
+  #otodor-lead-{{ section.id }} .otodor-lead__consent { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.8rem; line-height: 1.45; opacity: 0.72; }
+  #otodor-lead-{{ section.id }} .otodor-lead__consent input { margin-top: 0.2rem; accent-color: var(--lead-accent); flex: 0 0 auto; }
+
+  #otodor-lead-{{ section.id }} .otodor-lead__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.35rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__submit {
+    flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.85rem 1.4rem; border: none; cursor: pointer; border-radius: var(--otodor-radius-pill);
+    font-family: var(--otodor-font-display); font-weight: 600; font-size: 0.95rem;
+    background: var(--lead-accent); color: #fff;
+    transition: transform var(--otodor-dur-fast) ease, filter var(--otodor-dur-fast) ease;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__submit:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  #otodor-lead-{{ section.id }} .otodor-lead__submit svg { width: 16px; height: 16px; }
+  #otodor-lead-{{ section.id }} .otodor-lead__wa {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.85rem 1.2rem; border-radius: var(--otodor-radius-pill); text-decoration: none;
+    font-family: var(--otodor-font-display); font-weight: 600; font-size: 0.9rem;
+    background: #25D366; color: #05300f;
+    transition: transform var(--otodor-dur-fast) ease;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__wa:hover { transform: translateY(-1px); }
+  #otodor-lead-{{ section.id }} .otodor-lead__wa svg { width: 17px; height: 17px; }
+
+  /* ─ Success + error states ────────────────────────────────── */
+  #otodor-lead-{{ section.id }} .otodor-lead__success {
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.75rem;
+    padding: clamp(1.5rem, 4vw, 3rem) 1rem;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-badge {
+    display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px;
+    border-radius: 50%; background: rgba(37,211,102,0.14); color: #25D366;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-badge svg { width: 26px; height: 26px; }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-title { font-family: var(--otodor-font-display); font-weight: 700; font-size: 1.35rem; margin: 0; }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-text { margin: 0; font-size: 0.95rem; line-height: 1.55; opacity: 0.66; max-width: 26rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__errors {
+    margin: 0 0 0.5rem; padding: 0.75rem 0.9rem; border-radius: var(--otodor-radius-md);
+    background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.28); font-size: 0.85rem;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__errors ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__field-error { color: #dc2626; font-size: 0.78rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #otodor-lead-{{ section.id }} .otodor-lead__submit,
+    #otodor-lead-{{ section.id }} .otodor-lead__wa { transition: none; }
+    #otodor-lead-{{ section.id }} .otodor-lead__submit:hover,
+    #otodor-lead-{{ section.id }} .otodor-lead__wa:hover { transform: none; }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-lead-{{ section.id }}"
+  class="otodor-lead otodor-lead--{{ scheme }}"
+  data-otodor-section="lead-form"
+  aria-labelledby="otodor-lead-title-{{ section.id }}"
+>
+  <span id="{{ anchor }}" class="otodor-lead__anchor" aria-hidden="true"></span>
+  <div class="otodor-lead__inner">
+
+    {%- comment -%} ── Left rail: value proposition + trust reasons ── {%- endcomment -%}
+    <div class="otodor-lead__aside" data-otodor-reveal="fade-up">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="otodor-lead__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      <h2 class="otodor-lead__title" id="otodor-lead-title-{{ section.id }}">
+        {{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %} <span class="accent">{{ section.settings.heading_accent | escape }}</span>{% endif %}
+      </h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="otodor-lead__sub">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+
+      {%- if reason_blocks.size > 0 -%}
+        <ul class="otodor-lead__reasons" role="list">
+          {%- for block in reason_blocks -%}
+            <li class="otodor-lead__reason" {{ block.shopify_attributes }}>
+              {%- if block.settings.icon != blank -%}
+                <span class="otodor-lead__reason-icon" aria-hidden="true">{% render 'otodor-icon', name: block.settings.icon %}</span>
+              {%- endif -%}
+              <span>
+                {%- if block.settings.title != blank -%}<span class="otodor-lead__reason-title">{{ block.settings.title | escape }}</span>{%- endif -%}
+                {%- if block.settings.text != blank -%}<p class="otodor-lead__reason-text">{{ block.settings.text | escape }}</p>{%- endif -%}
+              </span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ── Right panel: the native contact form ── {%- endcomment -%}
+    <div class="otodor-lead__panel" data-otodor-reveal="fade-up">
+      {%- form 'contact', id: 'otodor-lead-form-' | append: section.id, class: 'otodor-lead__form' -%}
+        {%- if form.posted_successfully? -%}
+          <div class="otodor-lead__success" tabindex="-1" autofocus>
+            <span class="otodor-lead__success-badge" aria-hidden="true">{% render 'otodor-icon', name: 'warranty' %}</span>
+            <h3 class="otodor-lead__success-title">{{ section.settings.success_title | escape }}</h3>
+            <p class="otodor-lead__success-text">{{ section.settings.success_text | escape }}</p>
+          </div>
+        {%- else -%}
+          {%- if form.errors -%}
+            <div class="otodor-lead__errors" role="alert" tabindex="-1" autofocus>
+              {{ 'templates.contact.form.error_heading' | t }}
+              <ul>
+                {%- for field in form.errors -%}
+                  <li>{{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} Hidden lead-attribution context (arrives as labelled lines in the email). {%- endcomment -%}
+          <input type="hidden" name="contact[Source page]" value="{{ canonical_url | escape }}">
+          {%- if product != blank -%}<input type="hidden" name="contact[Product]" value="{{ product.title | escape }}">{%- endif -%}
+          {%- if collection != blank -%}<input type="hidden" name="contact[Collection]" value="{{ collection.title | escape }}">{%- endif -%}
+          <input type="hidden" name="contact[Advisor result]" value="" data-otodor-lead-advisor>
+
+          <div class="otodor-lead__row">
+            <div class="otodor-lead__field">
+              <label class="otodor-lead__label" for="otodor-lead-name-{{ section.id }}">{{ section.settings.label_name | escape }}</label>
+              <input class="otodor-lead__input" type="text" id="otodor-lead-name-{{ section.id }}" name="contact[Name]" autocomplete="name"
+                value="{% if form.name %}{{ form.name | escape }}{% elsif customer %}{{ customer.name | escape }}{% endif %}">
+            </div>
+            <div class="otodor-lead__field">
+              <label class="otodor-lead__label" for="otodor-lead-phone-{{ section.id }}">{{ section.settings.label_phone | escape }} <span class="req" aria-hidden="true">*</span></label>
+              <input class="otodor-lead__input" type="tel" id="otodor-lead-phone-{{ section.id }}" name="contact[Phone]" autocomplete="tel"
+                inputmode="tel" required aria-required="true"
+                value="{% if customer %}{{ customer.phone | escape }}{% endif %}">
+            </div>
+          </div>
+
+          <div class="otodor-lead__field">
+            <label class="otodor-lead__label" for="otodor-lead-email-{{ section.id }}">{{ section.settings.label_email | escape }} <span class="req" aria-hidden="true">*</span></label>
+            <input class="otodor-lead__input" type="email" id="otodor-lead-email-{{ section.id }}" name="contact[email]"
+              autocomplete="email" spellcheck="false" autocapitalize="off" aria-required="true"
+              {% if form.errors contains 'email' %}aria-invalid="true" aria-describedby="otodor-lead-email-error-{{ section.id }}"{% endif %}
+              value="{% if form.email %}{{ form.email | escape }}{% elsif customer %}{{ customer.email | escape }}{% endif %}">
+            {%- if form.errors contains 'email' -%}
+              <small class="otodor-lead__field-error" id="otodor-lead-email-error-{{ section.id }}">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</small>
+            {%- endif -%}
+          </div>
+
+          {%- if interest_blocks.size > 0 -%}
+            <div class="otodor-lead__field">
+              <label class="otodor-lead__label" for="otodor-lead-interest-{{ section.id }}">{{ section.settings.label_interest | escape }}</label>
+              <select class="otodor-lead__select" id="otodor-lead-interest-{{ section.id }}" name="contact[Interest]" data-otodor-lead-interest>
+                <option value="">{{ section.settings.interest_placeholder | escape }}</option>
+                {%- for block in interest_blocks -%}
+                  <option value="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endif -%}
+
+          <div class="otodor-lead__field">
+            <label class="otodor-lead__label" for="otodor-lead-body-{{ section.id }}">{{ section.settings.label_message | escape }}</label>
+            <textarea class="otodor-lead__textarea" id="otodor-lead-body-{{ section.id }}" name="contact[Comment]" data-otodor-lead-message
+              placeholder="{{ section.settings.message_placeholder | escape }}">{{ form.body }}</textarea>
+          </div>
+
+          {%- if section.settings.show_consent -%}
+            <label class="otodor-lead__consent" for="otodor-lead-consent-{{ section.id }}">
+              <input type="checkbox" id="otodor-lead-consent-{{ section.id }}" name="contact[Consent]" value="Yes"
+                {% if section.settings.consent_required %}required aria-required="true"{% endif %}>
+              <span>{{ section.settings.consent_text | escape }}</span>
+            </label>
+          {%- endif -%}
+
+          <div class="otodor-lead__actions">
+            <button type="submit" class="otodor-lead__submit">
+              {{ section.settings.submit_label | escape }}
+              <span aria-hidden="true">{% render 'otodor-icon', name: 'arrow-right' %}</span>
+            </button>
+            {%- if wa_enabled -%}
+              <a class="otodor-lead__wa" href="{{ wa_link }}" target="_blank" rel="noopener" aria-label="{{ section.settings.whatsapp_label | escape }} (opens WhatsApp)">
+                <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+                {{ section.settings.whatsapp_label | escape }}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{%- comment -%}
+  Advisor / CTA handoff: prefill interest + message from ?interest= / ?product= / ?msg= query params
+  (used by otodor-advisor and any deep-linked "Get a quote" CTA). Progressive enhancement only.
+{%- endcomment -%}
+<script>
+  (function () {
+    var root = document.getElementById('otodor-lead-{{ section.id }}');
+    if (!root) return;
+    var params = new URLSearchParams(window.location.search);
+    var interest = params.get('interest');
+    var product = params.get('product');
+    var msg = params.get('msg');
+
+    var sel = root.querySelector('[data-otodor-lead-interest]');
+    if (interest && sel) {
+      var matched = false;
+      Array.prototype.forEach.call(sel.options, function (opt) {
+        if (opt.value.toLowerCase() === interest.toLowerCase()) { opt.selected = true; matched = true; }
+      });
+      if (!matched) {
+        var o = document.createElement('option');
+        o.value = interest; o.textContent = interest; o.selected = true;
+        sel.appendChild(o);
+      }
+    }
+    var adv = root.querySelector('[data-otodor-lead-advisor]');
+    if (adv && (interest || product)) adv.value = product || interest;
+
+    var body = root.querySelector('[data-otodor-lead-message]');
+    if (body && msg && !body.value.trim()) body.value = msg;
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "OTODOR Lead Form",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "Native quote / consultation capture. Submissions arrive at your store's contact email (Settings → Notifications). Hidden fields auto-attach which product / collection / page the lead came from." },
+    { "type": "text", "id": "anchor_id", "label": "Anchor id (for CTA deep-links)", "default": "otodor-lead", "info": "Link CTAs to this page with #otodor-lead to scroll straight to the form." },
+    { "type": "select", "id": "color_scheme", "label": "Colour scheme", "options": [ { "value": "light", "label": "Light" }, { "value": "dark", "label": "Dark" } ], "default": "light" },
+    { "type": "checkbox", "id": "form_first", "label": "Show form first on mobile", "default": false },
+
+    { "type": "header", "content": "Value proposition (left rail)" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Talk to a specialist" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Request a" },
+    { "type": "text", "id": "heading_accent", "label": "Heading accent (coloured)", "default": "custom quote." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Tell us about your door and we'll recommend the right OTODOR system, with a free site survey and installation assessment." },
+
+    { "type": "header", "content": "Form labels" },
+    { "type": "text", "id": "label_name", "label": "Name label", "default": "Name" },
+    { "type": "text", "id": "label_phone", "label": "Phone label", "default": "Phone" },
+    { "type": "text", "id": "label_email", "label": "Email label", "default": "Email" },
+    { "type": "text", "id": "label_interest", "label": "Interest label", "default": "What are you looking for?" },
+    { "type": "text", "id": "interest_placeholder", "label": "Interest placeholder", "default": "Select a category" },
+    { "type": "text", "id": "label_message", "label": "Message label", "default": "Tell us more (optional)" },
+    { "type": "text", "id": "message_placeholder", "label": "Message placeholder", "default": "Door type, address area, timeline…" },
+    { "type": "text", "id": "submit_label", "label": "Submit button label", "default": "Request my quote" },
+
+    { "type": "header", "content": "Consent" },
+    { "type": "checkbox", "id": "show_consent", "label": "Show consent checkbox", "default": true },
+    { "type": "checkbox", "id": "consent_required", "label": "Consent is required", "default": false },
+    { "type": "text", "id": "consent_text", "label": "Consent text", "default": "I agree to be contacted by OTODOR about my enquiry." },
+
+    { "type": "header", "content": "WhatsApp (instant path)" },
+    { "type": "checkbox", "id": "show_whatsapp", "label": "Show WhatsApp button", "default": true, "info": "Uses the store WhatsApp number (Theme settings → OTODOR WhatsApp Settings)." },
+    { "type": "text", "id": "whatsapp_label", "label": "WhatsApp button label", "default": "Chat on WhatsApp" },
+    { "type": "text", "id": "whatsapp_message", "label": "WhatsApp pre-filled message", "default": "Hello OTODOR, I'd like a quote for a smart lock." },
+
+    { "type": "header", "content": "Success message" },
+    { "type": "text", "id": "success_title", "label": "Success title", "default": "Request received." },
+    { "type": "textarea", "id": "success_text", "label": "Success text", "default": "Thank you — an OTODOR specialist will call you within one business day to arrange your survey." },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "reason",
+      "name": "Trust reason",
+      "settings": [
+        {
+          "type": "select", "id": "icon", "label": "Icon", "default": "warranty",
+          "options": [
+            { "value": "", "label": "None" },
+            { "value": "warranty", "label": "Warranty / Shield" },
+            { "value": "fingerprint", "label": "Fingerprint" },
+            { "value": "installation", "label": "Installation" },
+            { "value": "smart", "label": "Smart / Support" },
+            { "value": "remote", "label": "Remote" },
+            { "value": "star", "label": "Star" }
+          ]
+        },
+        { "type": "text", "id": "title", "label": "Title", "default": "3-year warranty" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Every OTODOR lock is covered for three years." }
+      ]
+    },
+    {
+      "type": "interest",
+      "name": "Interest option",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Option label", "default": "Wooden door lock" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Lead Form",
+      "blocks": [
+        { "type": "reason", "settings": { "icon": "warranty", "title": "3-year warranty", "text": "Every OTODOR lock is covered for three years." } },
+        { "type": "reason", "settings": { "icon": "installation", "title": "Free site survey", "text": "A specialist assesses your door before you buy." } },
+        { "type": "reason", "settings": { "icon": "smart", "title": "16 years' heritage", "text": "Backed by NavKar's security engineering track record." } },
+        { "type": "interest", "settings": { "label": "Wooden door lock" } },
+        { "type": "interest", "settings": { "label": "Glass door lock" } },
+        { "type": "interest", "settings": { "label": "Metal gate lock" } },
+        { "type": "interest", "settings": { "label": "Smart padlock" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
