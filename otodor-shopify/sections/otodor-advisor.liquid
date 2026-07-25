@@ -1,0 +1,325 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Guided Advisor  ("Find your lock in 30 seconds")
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Turn "I don't know which lock I need" into a confident
+                      recommendation + a warm lead, in a few taps. The concierge
+                      that walks an unsure visitor to the lead desk.
+  Primary source:     `question` blocks. Each has a prompt + up to 4 options;
+                      each option targets a Collection and carries a weight.
+  Fallback order:     option → its collection → default recommendation
+                      (default_url / default_title) when scoring resolves nothing.
+  Visibility rule:    Auto-hides when there are no `question` blocks.
+  Merchant editable:  YES — questions, options, target collections, weights,
+                      copy, colour scheme, quote link.
+  Required metafields: none.
+  Optional metafields: collection custom.menu_image / menu_description enrich the
+                       recommendation card image/reason (with graceful fallback).
+  Dependencies:       snippets/otodor-icon.liquid; otodor-base.css tokens;
+                      assets/otodor-advisor.js (scoped, vanilla, per-instance).
+  Preset:             Working 3-question "find your lock" flow.
+  Accessibility:      radiogroup steps, option <button>s (keyboard native),
+                      aria-live step announcements, progress meter, visible focus,
+                      prefers-reduced-motion disables step transitions.
+  Reusable for:       Home, quote page, collection landing, PDP cross-sell.
+
+  NOT an LLM. A deterministic client-side questionnaire scored over real
+  merchant data — same concierge outcome, instant, zero backend, no key to leak.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign scheme = section.settings.color_scheme | default: 'dark'
+  assign question_blocks = section.blocks | where: 'type', 'question'
+  assign quote_url = section.settings.quote_url | default: routes.root_url
+
+  # WhatsApp
+  assign wa_ok = false
+  if settings.otodor_whatsapp_enabled and settings.otodor_whatsapp_number != blank
+    assign wa_ok = true
+    assign wa_number = settings.otodor_whatsapp_number
+  endif
+-%}
+
+{%- if question_blocks.size > 0 -%}
+
+{%- style -%}
+  #otodor-advisor-{{ section.id }} {
+    padding-block: {{ section.settings.padding_top | default: 96 }}px {{ section.settings.padding_bottom | default: 96 }}px;
+  }
+  #otodor-advisor-{{ section.id }}.otodor-adv--light { background: var(--otodor-bg-light); color: var(--otodor-ink); --adv-accent: var(--otodor-accent-on-light); --adv-card: var(--otodor-bg-light-2); --adv-hair: var(--otodor-hairline-light); --adv-hair-2: var(--otodor-hairline-light-2); }
+  #otodor-advisor-{{ section.id }}.otodor-adv--dark  { background: var(--otodor-black); color: var(--otodor-white); --adv-accent: var(--otodor-blue); --adv-card: var(--otodor-surface); --adv-hair: var(--otodor-hairline); --adv-hair-2: var(--otodor-hairline-mid); }
+
+  #otodor-advisor-{{ section.id }} .otodor-adv__inner { max-width: var(--otodor-container-sm); margin-inline: auto; text-align: center; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__eyebrow { display: block; font-family: var(--otodor-font-display); font-size: 0.75rem; font-weight: 600; letter-spacing: var(--otodor-tracking-widest); text-transform: uppercase; margin-bottom: 0.9rem; color: var(--adv-accent); }
+  #otodor-advisor-{{ section.id }} .otodor-adv__title { font-family: var(--otodor-font-display); font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 700; line-height: 1.05; letter-spacing: var(--otodor-tracking-tight); margin: 0; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__title .accent { color: var(--adv-accent); }
+  #otodor-advisor-{{ section.id }} .otodor-adv__sub { margin: 1rem auto 0; font-size: 1.05rem; line-height: 1.55; opacity: 0.66; max-width: 34rem; }
+
+  #otodor-advisor-{{ section.id }} .otodor-adv__stage {
+    margin-top: clamp(2rem, 4vw, 3rem); border-radius: var(--otodor-radius-lg);
+    background: var(--adv-card); border: 1px solid var(--adv-hair); padding: clamp(1.5rem, 4vw, 3rem);
+    text-align: left;
+  }
+  .otodor-adv--dark #otodor-advisor-{{ section.id }} .otodor-adv__stage,
+  #otodor-advisor-{{ section.id }}.otodor-adv--dark .otodor-adv__stage { box-shadow: none; }
+  .otodor-adv--light .otodor-adv__stage { box-shadow: var(--otodor-shadow-md); }
+
+  /* progress */
+  #otodor-advisor-{{ section.id }} .otodor-adv__progress { display: flex; align-items: center; gap: 0.75rem; margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+  #otodor-advisor-{{ section.id }} .otodor-adv__bar { flex: 1 1 auto; height: 4px; border-radius: 999px; background: var(--adv-hair-2); overflow: hidden; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__bar-fill { height: 100%; width: 0%; background: var(--adv-accent); border-radius: 999px; transition: width var(--otodor-dur-base) var(--otodor-ease-spring); }
+  #otodor-advisor-{{ section.id }} .otodor-adv__count { font-size: 0.78rem; font-weight: 600; opacity: 0.6; white-space: nowrap; }
+
+  /* steps */
+  #otodor-advisor-{{ section.id }} .otodor-adv__step[hidden] { display: none; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__q { font-family: var(--otodor-font-display); font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 700; line-height: 1.15; margin: 0 0 clamp(1.1rem, 2.5vw, 1.6rem); border: 0; padding: 0; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; }
+  @media (max-width: 560px) { #otodor-advisor-{{ section.id }} .otodor-adv__options { grid-template-columns: 1fr; } }
+  #otodor-advisor-{{ section.id }} .otodor-adv__option {
+    display: flex; align-items: center; gap: 0.75rem; width: 100%; text-align: left; cursor: pointer;
+    padding: 1rem 1.1rem; border-radius: var(--otodor-radius-md); border: 1px solid var(--adv-hair-2);
+    background: transparent; color: inherit; font-family: var(--otodor-font-body); font-size: 0.98rem; font-weight: 500;
+    transition: border-color var(--otodor-dur-fast) ease, transform var(--otodor-dur-fast) ease, background var(--otodor-dur-fast) ease;
+  }
+  #otodor-advisor-{{ section.id }} .otodor-adv__option:hover { border-color: var(--adv-accent); transform: translateY(-2px); }
+  #otodor-advisor-{{ section.id }} .otodor-adv__option:focus-visible { outline: 2px solid var(--adv-accent); outline-offset: 2px; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__option-icon { flex: 0 0 auto; display: inline-flex; color: var(--adv-accent); }
+  #otodor-advisor-{{ section.id }} .otodor-adv__option-icon svg { width: 22px; height: 22px; }
+
+  #otodor-advisor-{{ section.id }} .otodor-adv__back {
+    margin-top: 1.5rem; display: none; align-items: center; gap: 0.4rem; background: none; border: 0; cursor: pointer;
+    color: inherit; opacity: 0.6; font-family: var(--otodor-font-body); font-size: 0.85rem; padding: 0;
+  }
+  #otodor-advisor-{{ section.id }} .otodor-adv__back:hover { opacity: 1; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__back svg { width: 14px; height: 14px; transform: rotate(180deg); }
+
+  /* result */
+  #otodor-advisor-{{ section.id }} .otodor-adv__result[hidden] { display: none; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__result-label { font-size: 0.78rem; font-weight: 600; letter-spacing: var(--otodor-tracking-widest); text-transform: uppercase; color: var(--adv-accent); margin: 0 0 1rem; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__rec[hidden] { display: none; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__rec { display: grid; grid-template-columns: 150px 1fr; gap: clamp(1rem, 3vw, 1.75rem); align-items: center; }
+  @media (max-width: 560px) { #otodor-advisor-{{ section.id }} .otodor-adv__rec { grid-template-columns: 1fr; } }
+  #otodor-advisor-{{ section.id }} .otodor-adv__rec-media { aspect-ratio: 1 / 1; border-radius: var(--otodor-radius-md); overflow: hidden; background: linear-gradient(160deg, var(--otodor-surface-2), var(--otodor-surface)); }
+  .otodor-adv--light .otodor-adv__rec-media { background: linear-gradient(160deg, var(--otodor-plinth), var(--otodor-bg-light)); }
+  #otodor-advisor-{{ section.id }} .otodor-adv__rec-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__rec-title { font-family: var(--otodor-font-display); font-size: 1.4rem; font-weight: 700; margin: 0 0 0.4rem; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__rec-reason { margin: 0 0 1.1rem; font-size: 0.92rem; line-height: 1.55; opacity: 0.66; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__rec-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.7rem 1.2rem; border-radius: var(--otodor-radius-pill); font-family: var(--otodor-font-display); font-weight: 600; font-size: 0.85rem; text-decoration: none; transition: transform var(--otodor-dur-fast) ease, filter var(--otodor-dur-fast) ease; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__btn:hover { transform: translateY(-1px); }
+  #otodor-advisor-{{ section.id }} .otodor-adv__btn--primary { background: var(--adv-accent); color: #fff; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__btn--ghost { border: 1px solid var(--adv-hair-2); color: inherit; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__btn svg { width: 15px; height: 15px; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__restart { margin-top: 1.5rem; background: none; border: 0; cursor: pointer; color: inherit; opacity: 0.55; font-size: 0.82rem; text-decoration: underline; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__restart:hover { opacity: 1; }
+
+  #otodor-advisor-{{ section.id }} .otodor-adv__noscript { text-align: center; }
+  #otodor-advisor-{{ section.id }} .otodor-adv__noscript a { color: var(--adv-accent); font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #otodor-advisor-{{ section.id }} .otodor-adv__bar-fill,
+    #otodor-advisor-{{ section.id }} .otodor-adv__option,
+    #otodor-advisor-{{ section.id }} .otodor-adv__btn { transition: none; }
+    #otodor-advisor-{{ section.id }} .otodor-adv__option:hover,
+    #otodor-advisor-{{ section.id }} .otodor-adv__btn:hover { transform: none; }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-advisor-{{ section.id }}"
+  class="otodor-adv otodor-adv--{{ scheme }}"
+  data-otodor-section="advisor"
+  data-otodor-advisor
+  data-total="{{ question_blocks.size }}"
+  aria-labelledby="otodor-adv-title-{{ section.id }}"
+>
+  <div class="otodor-adv__inner">
+    {%- if section.settings.eyebrow != blank -%}<span class="otodor-adv__eyebrow">{{ section.settings.eyebrow | escape }}</span>{%- endif -%}
+    <h2 class="otodor-adv__title" id="otodor-adv-title-{{ section.id }}">
+      {{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %} <span class="accent">{{ section.settings.heading_accent | escape }}</span>{% endif %}
+    </h2>
+    {%- if section.settings.subheading != blank -%}<p class="otodor-adv__sub">{{ section.settings.subheading | escape }}</p>{%- endif -%}
+
+    <div class="otodor-adv__stage">
+      <div class="otodor-adv__progress" data-adv-progress>
+        <div class="otodor-adv__bar" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="{{ question_blocks.size }}" aria-valuenow="1" data-adv-progressbar>
+          <span class="otodor-adv__bar-fill" data-adv-fill></span>
+        </div>
+        <span class="otodor-adv__count" data-adv-count>1 / {{ question_blocks.size }}</span>
+      </div>
+
+      {%- comment -%} ── Question steps ── {%- endcomment -%}
+      <div class="otodor-adv__steps" aria-live="polite">
+        {%- for question in question_blocks -%}
+          <fieldset class="otodor-adv__step" data-adv-step="{{ forloop.index0 }}" {% unless forloop.first %}hidden{% endunless %}>
+            <legend class="otodor-adv__q">{{ question.settings.prompt | escape }}</legend>
+            <div class="otodor-adv__options" role="group">
+              {%- for i in (1..4) -%}
+                {%- liquid
+                  assign lk = 'o' | append: i | append: '_label'
+                  assign ck = 'o' | append: i | append: '_collection'
+                  assign wk = 'o' | append: i | append: '_weight'
+                  assign ik = 'o' | append: i | append: '_icon'
+                  assign o_label = question.settings[lk]
+                  assign o_col = question.settings[ck]
+                  assign o_weight = question.settings[wk] | default: 1
+                  assign o_icon = question.settings[ik]
+                  assign o_key = 'default'
+                  if o_col != blank
+                    assign o_key = o_col.handle
+                  endif
+                -%}
+                {%- if o_label != blank -%}
+                  <button type="button" class="otodor-adv__option" data-adv-option data-adv-target="{{ o_key }}" data-adv-weight="{{ o_weight }}">
+                    {%- if o_icon != blank -%}<span class="otodor-adv__option-icon" aria-hidden="true">{% render 'otodor-icon', name: o_icon %}</span>{%- endif -%}
+                    <span>{{ o_label | escape }}</span>
+                  </button>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            {%- unless forloop.first -%}
+              <button type="button" class="otodor-adv__back" data-adv-back>{% render 'otodor-icon', name: 'arrow-right' %} {{ section.settings.back_label | default: 'Back' | escape }}</button>
+            {%- endunless -%}
+          </fieldset>
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%}
+        ── Result: one hidden recommendation card per unique target collection.
+        JS tallies option weights by target key and reveals the winner.
+      {%- endcomment -%}
+      <div class="otodor-adv__result" hidden data-adv-result tabindex="-1">
+        <p class="otodor-adv__result-label">{{ section.settings.result_label | escape }}</p>
+
+        {%- assign seen = '' -%}
+        {%- for question in question_blocks -%}
+          {%- for i in (1..4) -%}
+            {%- liquid
+              assign ck = 'o' | append: i | append: '_collection'
+              assign o_col = question.settings[ck]
+              assign key = 'default'
+              if o_col != blank
+                assign key = o_col.handle
+              endif
+              assign token = '|' | append: key | append: '|'
+            -%}
+            {%- unless seen contains token or o_col == blank -%}
+              {%- assign seen = seen | append: token -%}
+              {%- liquid
+                assign rec_title = o_col.title
+                assign rec_url = o_col.url
+                assign rec_reason = o_col.metafields.custom.menu_description.value | default: o_col.description
+                assign rec_image = o_col.metafields.custom.menu_image.value | default: o_col.image
+                if rec_image == blank and o_col.products.first != blank
+                  assign rec_image = o_col.products.first.featured_image
+                endif
+                assign rec_quote = quote_url | append: '?interest=' | append: rec_title | url_encode
+              -%}
+              {%- render 'otodor-advisor-rec',
+                key: key, title: rec_title, url: rec_url, reason: rec_reason, image: rec_image,
+                quote: rec_quote, wa_ok: wa_ok, wa_number: wa_number, settings: section.settings -%}
+            {%- endunless -%}
+          {%- endfor -%}
+        {%- endfor -%}
+
+        {%- comment -%} Default recommendation fallback. {%- endcomment -%}
+        {%- liquid
+          assign def_quote = quote_url | append: '?interest=' | append: section.settings.default_title | url_encode
+          assign def_url = section.settings.default_url | default: routes.all_products_collection_url
+        -%}
+        {%- render 'otodor-advisor-rec',
+          key: 'default', title: section.settings.default_title, url: def_url,
+          reason: section.settings.default_reason, image: section.settings.default_image,
+          quote: def_quote, wa_ok: wa_ok, wa_number: wa_number, settings: section.settings -%}
+
+        <button type="button" class="otodor-adv__restart" data-adv-restart>{{ section.settings.restart_label | escape }}</button>
+      </div>
+
+      <noscript>
+        <p class="otodor-adv__noscript"><a href="{{ quote_url }}">{{ section.settings.noscript_label | escape }}</a></p>
+      </noscript>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'otodor-advisor.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Guided Advisor",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "A guided \"help me choose\" flow. Add a question per block; each option points to a collection and adds weight to it. The highest-scoring collection is recommended, with View / Get-a-quote / WhatsApp exits. Auto-hides until at least one question exists." },
+    { "type": "select", "id": "color_scheme", "label": "Colour scheme", "options": [ { "value": "light", "label": "Light" }, { "value": "dark", "label": "Dark" } ], "default": "dark" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Not sure where to start?" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Find your lock in" },
+    { "type": "text", "id": "heading_accent", "label": "Heading accent (coloured)", "default": "30 seconds." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Answer a few questions and we'll point you to the OTODOR system built for your door." },
+
+    { "type": "header", "content": "Quote handoff" },
+    { "type": "url", "id": "quote_url", "label": "Quote / lead-form page", "info": "The recommendation's \"Get a quote\" button links here (with ?interest= pre-filled)." },
+
+    { "type": "header", "content": "Labels" },
+    { "type": "text", "id": "back_label", "label": "Back label", "default": "Back" },
+    { "type": "text", "id": "result_label", "label": "Result eyebrow", "default": "Our recommendation" },
+    { "type": "text", "id": "view_label", "label": "View button label", "default": "View the range" },
+    { "type": "text", "id": "quote_label", "label": "Quote button label", "default": "Get a quote" },
+    { "type": "text", "id": "whatsapp_label", "label": "WhatsApp button label", "default": "WhatsApp us" },
+    { "type": "text", "id": "restart_label", "label": "Restart label", "default": "Start over" },
+    { "type": "text", "id": "noscript_label", "label": "No-JS fallback link text", "default": "Talk to a specialist →" },
+
+    { "type": "header", "content": "Default recommendation (fallback)" },
+    { "type": "text", "id": "default_title", "label": "Default title", "default": "The full OTODOR range" },
+    { "type": "textarea", "id": "default_reason", "label": "Default reason", "default": "Explore every OTODOR smart lock, or talk to a specialist for a tailored recommendation." },
+    { "type": "url", "id": "default_url", "label": "Default link" },
+    { "type": "image_picker", "id": "default_image", "label": "Default image" },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "prompt", "label": "Question", "default": "Which door is it for?" },
+        { "type": "paragraph", "content": "Add up to 4 options. Each option adds its weight to the chosen collection's score." },
+        { "type": "header", "content": "Option 1" },
+        { "type": "text", "id": "o1_label", "label": "Label", "default": "Wooden door" },
+        { "type": "collection", "id": "o1_collection", "label": "Recommends collection" },
+        { "type": "select", "id": "o1_icon", "label": "Icon", "default": "fingerprint", "options": [ { "value": "", "label": "None" }, { "value": "fingerprint", "label": "Fingerprint" }, { "value": "pin", "label": "Keypad" }, { "value": "rfid", "label": "RFID" }, { "value": "remote", "label": "Remote" }, { "value": "app", "label": "App" }, { "value": "warranty", "label": "Shield" }, { "value": "installation", "label": "Installation" }, { "value": "smart", "label": "Smart" } ] },
+        { "type": "range", "id": "o1_weight", "label": "Weight", "min": 1, "max": 5, "step": 1, "default": 2 },
+        { "type": "header", "content": "Option 2" },
+        { "type": "text", "id": "o2_label", "label": "Label", "default": "Glass door" },
+        { "type": "collection", "id": "o2_collection", "label": "Recommends collection" },
+        { "type": "select", "id": "o2_icon", "label": "Icon", "default": "key", "options": [ { "value": "", "label": "None" }, { "value": "fingerprint", "label": "Fingerprint" }, { "value": "pin", "label": "Keypad" }, { "value": "rfid", "label": "RFID" }, { "value": "remote", "label": "Remote" }, { "value": "app", "label": "App" }, { "value": "warranty", "label": "Shield" }, { "value": "installation", "label": "Installation" }, { "value": "smart", "label": "Smart" } ] },
+        { "type": "range", "id": "o2_weight", "label": "Weight", "min": 1, "max": 5, "step": 1, "default": 2 },
+        { "type": "header", "content": "Option 3" },
+        { "type": "text", "id": "o3_label", "label": "Label" },
+        { "type": "collection", "id": "o3_collection", "label": "Recommends collection" },
+        { "type": "select", "id": "o3_icon", "label": "Icon", "default": "", "options": [ { "value": "", "label": "None" }, { "value": "fingerprint", "label": "Fingerprint" }, { "value": "pin", "label": "Keypad" }, { "value": "rfid", "label": "RFID" }, { "value": "remote", "label": "Remote" }, { "value": "app", "label": "App" }, { "value": "warranty", "label": "Shield" }, { "value": "installation", "label": "Installation" }, { "value": "smart", "label": "Smart" } ] },
+        { "type": "range", "id": "o3_weight", "label": "Weight", "min": 1, "max": 5, "step": 1, "default": 2 },
+        { "type": "header", "content": "Option 4" },
+        { "type": "text", "id": "o4_label", "label": "Label" },
+        { "type": "collection", "id": "o4_collection", "label": "Recommends collection" },
+        { "type": "select", "id": "o4_icon", "label": "Icon", "default": "", "options": [ { "value": "", "label": "None" }, { "value": "fingerprint", "label": "Fingerprint" }, { "value": "pin", "label": "Keypad" }, { "value": "rfid", "label": "RFID" }, { "value": "remote", "label": "Remote" }, { "value": "app", "label": "App" }, { "value": "warranty", "label": "Shield" }, { "value": "installation", "label": "Installation" }, { "value": "smart", "label": "Smart" } ] },
+        { "type": "range", "id": "o4_weight", "label": "Weight", "min": 1, "max": 5, "step": 1, "default": 2 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Guided Advisor",
+      "blocks": [
+        { "type": "question", "settings": { "prompt": "Which door is it for?", "o1_label": "Wooden main door", "o1_icon": "fingerprint", "o2_label": "Glass door", "o2_icon": "key", "o3_label": "Metal gate", "o3_icon": "warranty", "o4_label": "A padlock need", "o4_icon": "rfid" } },
+        { "type": "question", "settings": { "prompt": "How do you want to unlock it?", "o1_label": "Fingerprint", "o1_icon": "fingerprint", "o2_label": "PIN keypad", "o2_icon": "pin", "o3_label": "Phone app", "o3_icon": "app", "o4_label": "RFID card", "o4_icon": "rfid" } },
+        { "type": "question", "settings": { "prompt": "What matters most?", "o1_label": "Maximum security", "o1_icon": "warranty", "o2_label": "Convenience", "o2_icon": "smart", "o3_label": "Remote access", "o3_icon": "remote", "o4_label": "Easy install", "o4_icon": "installation" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

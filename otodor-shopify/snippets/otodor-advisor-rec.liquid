@@ -1,0 +1,37 @@
+{%- comment -%}
+  ────────────────────────────────────────────────────────────────────────
+  OTODOR snippet: Guided Advisor — recommendation card
+  Renders one hidden recommendation. otodor-advisor.js reveals the winner.
+  Inputs: key, title, url, reason, image, quote (url), wa_ok, wa_number, settings.
+  Rendered inside #otodor-advisor-<section.id>, so the section's scoped CSS applies.
+  ────────────────────────────────────────────────────────────────────────
+{%- endcomment -%}
+{%- if title != blank -%}
+  {%- liquid
+    assign wa_link = ''
+    if wa_ok
+      assign wa_msg = 'Hello OTODOR, the advisor recommended ' | append: title | append: '. I would like a quote.' | url_encode
+      assign wa_link = 'https://wa.me/' | append: wa_number | append: '?text=' | append: wa_msg
+    endif
+  -%}
+  <div class="otodor-adv__rec" hidden data-adv-rec="{{ key | escape }}">
+    <div class="otodor-adv__rec-media">
+      {%- if image != blank -%}
+        {{ image | image_url: width: 400 | image_tag: loading: 'lazy', widths: '150,300,400', sizes: '150px', alt: title | escape }}
+      {%- endif -%}
+    </div>
+    <div class="otodor-adv__rec-body">
+      <h3 class="otodor-adv__rec-title">{{ title | escape }}</h3>
+      {%- if reason != blank -%}<p class="otodor-adv__rec-reason">{{ reason | strip_html | truncatewords: 26 }}</p>{%- endif -%}
+      <div class="otodor-adv__rec-actions">
+        {%- if url != blank -%}
+          <a class="otodor-adv__btn otodor-adv__btn--primary" href="{{ url }}">{{ settings.view_label | escape }}{% render 'otodor-icon', name: 'arrow-right' %}</a>
+        {%- endif -%}
+        <a class="otodor-adv__btn otodor-adv__btn--ghost" href="{{ quote }}">{{ settings.quote_label | escape }}</a>
+        {%- if wa_ok -%}
+          <a class="otodor-adv__btn otodor-adv__btn--ghost" href="{{ wa_link }}" target="_blank" rel="noopener">{{ settings.whatsapp_label | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
