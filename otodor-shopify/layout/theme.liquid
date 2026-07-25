@@ -67,6 +67,9 @@
 
     {% render 'meta-tags' %}
 
+    {%- comment -%} OTODOR centralized structured data (Schema Registry). {%- endcomment -%}
+    {% render 'otodor-schema' %}
+
     <script src="{{ 'constants.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>

@@ -1,0 +1,298 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Schema Registry  (centralized JSON-LD generation)
+  See OTODOR-STRUCTURED-CONTENT.md. One place all structured data is built,
+  so Product / FAQ / Breadcrumb / HowTo objects never duplicate or drift.
+  ────────────────────────────────────────────────────────────────────────
+  Modes (param `build`):
+    'graph'   (default) — render ONCE from theme.liquid <head>. Emits a single
+              @graph of every page-level object that has data: Organization,
+              WebSite, BreadcrumbList, CollectionPage, VideoObject.
+    'faqpage' — {% render 'otodor-schema', build: 'faqpage', faq_section: section %}
+              standalone FAQPage from a section's collapsible_row blocks.
+    'howto'   — {% render 'otodor-schema', build: 'howto', howto_section: section,
+              howto_name: '…' %} standalone HowTo from `step` blocks (>= 2).
+
+  Rules: every object is gated by data sufficiency (emit nothing otherwise).
+  Product/Offer/AggregateRating stay with Shopify `structured_data` (main-product)
+  and are intentionally NOT re-emitted here. JSON is built with the `| json`
+  filter on every dynamic value; objects joined with '§' then split|join ','.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign build = build | default: 'graph'
+-%}
+
+{%- case build -%}
+
+{%- when 'faqpage' -%}
+  {%- liquid
+    assign faq_out = ''
+    if faq_section != blank
+      for block in faq_section.blocks
+        if block.type != 'collapsible_row'
+          continue
+        endif
+        assign q = block.settings.heading | default: block.settings.page.title
+        assign a = block.settings.row_content | default: block.settings.page.content
+        assign a = a | strip_html | strip
+        assign q = q | strip_html | strip
+        if q == blank or a == blank
+          continue
+        endif
+        capture qa
+          echo '{"@type":"Question","name":'
+          echo q | json
+          echo ',"acceptedAnswer":{"@type":"Answer","text":'
+          echo a | json
+          echo '}}'
+        endcapture
+        if faq_out == blank
+          assign faq_out = qa
+        else
+          assign faq_out = faq_out | append: '§' | append: qa
+        endif
+      endfor
+    endif
+  -%}
+  {%- if faq_out != blank -%}
+    <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{{ faq_out | split: '§' | join: ',' }}]}
+    </script>
+  {%- endif -%}
+
+{%- when 'howto' -%}
+  {%- liquid
+    assign steps_out = ''
+    assign n = 0
+    if howto_section != blank
+      for block in howto_section.blocks
+        if block.type != 'step'
+          continue
+        endif
+        assign st = block.settings.title | strip_html | strip
+        if st == blank
+          continue
+        endif
+        assign n = n | plus: 1
+        assign sd = block.settings.description | strip_html | strip
+        capture step
+          echo '{"@type":"HowToStep","position":'
+          echo n
+          echo ',"name":'
+          echo st | json
+          if sd != blank
+            echo ',"text":'
+            echo sd | json
+          endif
+          echo '}'
+        endcapture
+        if steps_out == blank
+          assign steps_out = step
+        else
+          assign steps_out = steps_out | append: '§' | append: step
+        endif
+      endfor
+    endif
+    assign ht_name = howto_name | default: 'Installation'
+    if product != blank and product != empty and howto_name == blank
+      assign ht_name = 'How to install ' | append: product.title
+    endif
+  -%}
+  {%- if n >= 2 -%}
+    <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"HowTo","name":{{ ht_name | json }},"step":[{{ steps_out | split: '§' | join: ',' }}]}
+    </script>
+  {%- endif -%}
+
+{%- else -%}
+  {%- comment -%} ── Page-level @graph ── {%- endcomment -%}
+  {%- liquid
+    assign home_url = request.origin | append: '/'
+    assign org_id = request.origin | append: '/#organization'
+    assign web_id = request.origin | append: '/#website'
+
+    # sameAs from non-blank social settings
+    assign social_raw = ''
+    assign social_raw = social_raw | append: settings.social_twitter_link | append: '§'
+    assign social_raw = social_raw | append: settings.social_facebook_link | append: '§'
+    assign social_raw = social_raw | append: settings.social_instagram_link | append: '§'
+    assign social_raw = social_raw | append: settings.social_youtube_link | append: '§'
+    assign social_raw = social_raw | append: settings.social_tiktok_link | append: '§'
+    assign social_raw = social_raw | append: settings.social_pinterest_link | append: '§'
+    assign social_raw = social_raw | append: settings.social_linkedin_link | append: '§'
+    assign sameas_inner = ''
+    assign social_arr = social_raw | split: '§'
+    for s in social_arr
+      if s == blank
+        continue
+      endif
+      if sameas_inner == blank
+        assign sameas_inner = s | json
+      else
+        assign sameas_inner = sameas_inner | append: ',' | append: s | json
+      endif
+    endfor
+  -%}
+
+  {%- liquid
+    # Organization
+    capture obj_org
+      echo '{"@type":"Organization","@id":'
+      echo org_id | json
+      echo ',"name":'
+      echo shop.name | json
+      echo ',"url":'
+      echo home_url | json
+      if settings.logo != blank
+        echo ',"logo":'
+        echo settings.logo | image_url: width: 500 | prepend: 'https:' | json
+      endif
+      if sameas_inner != blank
+        echo ',"sameAs":['
+        echo sameas_inner
+        echo ']'
+      endif
+      echo '}'
+    endcapture
+
+    # WebSite
+    assign search_target = request.origin | append: routes.search_url | append: '?q={search_term_string}'
+    capture obj_web
+      echo '{"@type":"WebSite","@id":'
+      echo web_id | json
+      echo ',"name":'
+      echo shop.name | json
+      echo ',"url":'
+      echo home_url | json
+      echo ',"publisher":{"@id":'
+      echo org_id | json
+      echo '},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":'
+      echo search_target | json
+      echo '},"query-input":"required name=search_term_string"}}'
+    endcapture
+
+    assign graph_parts = obj_org | append: '§' | append: obj_web
+  -%}
+
+  {%- liquid
+    # BreadcrumbList (product / collection)
+    assign bc_items = ''
+    assign pos = 0
+    if request.page_type == 'product' and product != blank and product != empty
+      assign pos = 1
+      capture li
+        echo '{"@type":"ListItem","position":1,"name":"Home","item":'
+        echo home_url | json
+        echo '}'
+      endcapture
+      assign bc_items = li
+      assign pcol = product.collections.first
+      if pcol != blank
+        assign pos = pos | plus: 1
+        capture li
+          echo '{"@type":"ListItem","position":'
+          echo pos
+          echo ',"name":'
+          echo pcol.title | json
+          echo ',"item":'
+          echo request.origin | append: pcol.url | json
+          echo '}'
+        endcapture
+        assign bc_items = bc_items | append: '§' | append: li
+      endif
+      assign pos = pos | plus: 1
+      capture li
+        echo '{"@type":"ListItem","position":'
+        echo pos
+        echo ',"name":'
+        echo product.title | json
+        echo ',"item":'
+        echo request.origin | append: product.url | json
+        echo '}'
+      endcapture
+      assign bc_items = bc_items | append: '§' | append: li
+    elsif request.page_type == 'collection' and collection != blank and collection != empty
+      capture li
+        echo '{"@type":"ListItem","position":1,"name":"Home","item":'
+        echo home_url | json
+        echo '}'
+      endcapture
+      capture li2
+        echo '{"@type":"ListItem","position":2,"name":'
+        echo collection.title | json
+        echo ',"item":'
+        echo request.origin | append: collection.url | json
+        echo '}'
+      endcapture
+      assign bc_items = li | append: '§' | append: li2
+    endif
+    if bc_items != blank
+      capture obj_bc
+        echo '{"@type":"BreadcrumbList","itemListElement":['
+        echo bc_items | split: '§' | join: ','
+        echo ']}'
+      endcapture
+      assign graph_parts = graph_parts | append: '§' | append: obj_bc
+    endif
+  -%}
+
+  {%- liquid
+    # CollectionPage
+    if request.page_type == 'collection' and collection != blank and collection != empty
+      capture obj_col
+        echo '{"@type":"CollectionPage","@id":'
+        echo request.origin | append: collection.url | append: '#webpage' | json
+        echo ',"name":'
+        echo collection.title | json
+        echo ',"url":'
+        echo request.origin | append: collection.url | json
+        echo ',"isPartOf":{"@id":'
+        echo web_id | json
+        echo '}'
+        assign col_desc = collection.description | strip_html | strip | truncatewords: 40
+        if col_desc != blank
+          echo ',"description":'
+          echo col_desc | json
+        endif
+        echo '}'
+      endcapture
+      assign graph_parts = graph_parts | append: '§' | append: obj_col
+    endif
+  -%}
+
+  {%- liquid
+    # VideoObject (product hosted video with a thumbnail)
+    if request.page_type == 'product' and product != blank and product != empty
+      assign pvid = nil
+      for m in product.media
+        if m.media_type == 'video'
+          assign pvid = m
+          break
+        endif
+      endfor
+      if pvid != blank and pvid.preview_image != blank and pvid.sources.first != blank
+        capture obj_vid
+          echo '{"@type":"VideoObject","name":'
+          echo product.title | append: ' — product video' | json
+          echo ',"description":'
+          echo product.title | json
+          echo ',"thumbnailUrl":'
+          echo pvid.preview_image | image_url: width: 1200 | prepend: 'https:' | json
+          echo ',"contentUrl":'
+          echo pvid.sources.first.url | json
+          echo ',"uploadDate":'
+          echo product.published_at | date: '%Y-%m-%d' | json
+          echo '}'
+        endcapture
+        assign graph_parts = graph_parts | append: '§' | append: obj_vid
+      endif
+    endif
+  -%}
+
+  <script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{{ graph_parts | split: '§' | join: ',' }}]}
+  </script>
+
+{%- endcase -%}
