@@ -131,7 +131,7 @@
     {% if section.settings.heading != blank %}aria-labelledby="otodor-dl-title-{{ section.id }}"{% endif %}
   >
     {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
-      <div class="otodor-dl__head" data-otodor-reveal="fade-up">
+      <div class="otodor-dl__head" data-otodor-reveal="blur-in">
         {%- if section.settings.eyebrow != blank -%}
           <span class="otodor-dl__eyebrow">{{ section.settings.eyebrow | escape }}</span>
         {%- endif -%}
@@ -141,7 +141,7 @@
       </div>
     {%- endif -%}
 
-    <ul class="otodor-dl__list" role="list" data-otodor-reveal="fade-up">
+    <ul class="otodor-dl__list" role="list" data-otodor-stagger>
       {%- if docs != blank -%}
         {%- comment -%} Primary: files attached to custom.documents {%- endcomment -%}
         {%- for doc in docs -%}

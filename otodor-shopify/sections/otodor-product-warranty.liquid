@@ -126,7 +126,7 @@
     {% if section.settings.heading != blank %}aria-labelledby="otodor-warr-title-{{ section.id }}"{% endif %}
   >
     {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.intro != blank -%}
-      <div class="otodor-warr__head" data-otodor-reveal="fade-up">
+      <div class="otodor-warr__head" data-otodor-reveal="blur-in">
         {%- if section.settings.eyebrow != blank -%}
           <span class="otodor-warr__eyebrow">{{ section.settings.eyebrow | escape }}</span>
         {%- endif -%}
@@ -144,7 +144,7 @@
         {%- comment -%} Primary: warranty_policy metaobjects {%- endcomment -%}
         {%- for policy in mo_policies -%}
           {%- assign p_icon = policy.icon.value | default: 'warranty' -%}
-          <li class="otodor-warr__card">
+          <li class="otodor-warr__card" data-otodor-tilt data-tilt-max="5">
             <span class="otodor-warr__icon">{% render 'otodor-icon', name: p_icon %}</span>
             {%- if policy.duration.value != blank -%}<p class="otodor-warr__dur">{{ policy.duration.value | escape }}</p>{%- endif -%}
             {%- if policy.title.value != blank -%}<p class="otodor-warr__title">{{ policy.title.value | escape }}</p>{%- endif -%}
@@ -156,7 +156,7 @@
         {%- comment -%} Fallback A: policy blocks {%- endcomment -%}
         {%- for block in section.blocks -%}
           {%- assign p_icon = block.settings.icon | default: 'warranty' -%}
-          <li class="otodor-warr__card" {{ block.shopify_attributes }}>
+          <li class="otodor-warr__card" data-otodor-tilt data-tilt-max="5" {{ block.shopify_attributes }}>
             <span class="otodor-warr__icon">{% render 'otodor-icon', name: p_icon %}</span>
             {%- if block.settings.duration != blank -%}<p class="otodor-warr__dur">{{ block.settings.duration | escape }}</p>{%- endif -%}
             {%- if block.settings.title != blank -%}<p class="otodor-warr__title">{{ block.settings.title | escape }}</p>{%- endif -%}
@@ -168,7 +168,7 @@
         {%- comment -%} Fallback B: two coverage slots — spec metafield overrides the default duration {%- endcomment -%}
         {%- assign p1_dur = spec_lock | default: section.settings.policy_1_duration -%}
         {%- if section.settings.policy_1_title != blank or p1_dur != blank -%}
-          <li class="otodor-warr__card">
+          <li class="otodor-warr__card" data-otodor-tilt data-tilt-max="5">
             <span class="otodor-warr__icon">{% render 'otodor-icon', name: 'warranty' %}</span>
             {%- if p1_dur != blank -%}<p class="otodor-warr__dur">{{ p1_dur | escape }}</p>{%- endif -%}
             {%- if section.settings.policy_1_title != blank -%}<p class="otodor-warr__title">{{ section.settings.policy_1_title | escape }}</p>{%- endif -%}
@@ -177,7 +177,7 @@
         {%- endif -%}
         {%- assign p2_dur = spec_batt | default: section.settings.policy_2_duration -%}
         {%- if section.settings.policy_2_title != blank or p2_dur != blank -%}
-          <li class="otodor-warr__card">
+          <li class="otodor-warr__card" data-otodor-tilt data-tilt-max="5">
             <span class="otodor-warr__icon">{% render 'otodor-icon', name: 'log' %}</span>
             {%- if p2_dur != blank -%}<p class="otodor-warr__dur">{{ p2_dur | escape }}</p>{%- endif -%}
             {%- if section.settings.policy_2_title != blank -%}<p class="otodor-warr__title">{{ section.settings.policy_2_title | escape }}</p>{%- endif -%}

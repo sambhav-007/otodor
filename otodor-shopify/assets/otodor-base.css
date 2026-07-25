@@ -1899,6 +1899,12 @@ body.otodor-light-page {
   gap: 1.5rem;
   padding: 0.85rem 0;
   border-bottom: 1px solid var(--otodor-hairline-light);
+  transition: background var(--otodor-dur-fast) ease, padding-inline var(--otodor-dur-fast) ease;
+}
+/* Motion V2 — hover row illumination */
+.js-fine-pointer .otodor-ledger__row:hover {
+  background: linear-gradient(90deg, rgba(26, 120, 216, 0.05), transparent 80%);
+  padding-inline: 0.75rem;
 }
 .otodor-ledger__key {
   font-family: var(--otodor-font-body);

@@ -31,9 +31,9 @@
 -%}
 
 {%- if specs or has_blocks -%}
-  <div class="otodor-pspecs" data-otodor-reveal="fade-up">
-    <h2 class="otodor-pspecs__heading">{{ section.settings.heading | escape }}</h2>
-    <div class="otodor-ledger">
+  <div class="otodor-pspecs">
+    <h2 class="otodor-pspecs__heading" data-otodor-reveal="blur-in">{{ section.settings.heading | escape }}</h2>
+    <div class="otodor-ledger" data-otodor-stagger>
       {%- if specs -%}
         {%- for group in specs -%}
           <div class="otodor-ledger__group">{{ group[0] | escape }}</div>

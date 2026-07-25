@@ -35,12 +35,38 @@
     margin-top: clamp(2rem, 5vw, 3.5rem);
     padding-bottom: clamp(3rem, 7vw, 5.5rem);
   }
-  .otodor-reveal__media img {
+  /* Tilt stage (Motion V2) — the render reacts in 3D to the cursor */
+  .otodor-reveal__tilt {
+    position: relative;
     width: min(680px, 82%);
-    height: auto;
     margin: 0 auto;
     display: block;
+    border-radius: 18px;
+  }
+  .otodor-reveal__media img {
+    width: 100%;
+    height: auto;
+    display: block;
     filter: drop-shadow(0 40px 70px rgba(0, 0, 0, 0.16));
+  }
+  /* Glass sheen that catches the light on hover */
+  .otodor-reveal__sheen {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 34%, rgba(255, 255, 255, 0.30) 50%, transparent 66%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    transform: translateX(-12%);
+    transition: opacity var(--otodor-dur-base) ease, transform var(--otodor-dur-slow) var(--otodor-ease-out);
+  }
+  .js-fine-pointer .otodor-reveal__tilt:hover .otodor-reveal__sheen {
+    opacity: 0.55;
+    transform: translateX(12%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .otodor-reveal__sheen { display: none; }
   }
   /* Soft plinth ellipse beneath the render */
   .otodor-reveal__media::after {
@@ -64,14 +90,17 @@
 {%- if statement != blank or reveal_image != blank -%}
   <div class="otodor-reveal">
     {%- if statement != blank -%}
-      <h2 class="otodor-reveal__statement" data-otodor-reveal="fade-up">{{ statement | escape }}</h2>
+      <h2 class="otodor-reveal__statement" data-otodor-reveal="mask-up">{{ statement | escape }}</h2>
     {%- endif -%}
     {%- if section.settings.supporting_line != blank -%}
-      <p class="otodor-reveal__sub" data-otodor-reveal="fade-up">{{ section.settings.supporting_line | escape }}</p>
+      <p class="otodor-reveal__sub" data-otodor-reveal="blur-in" data-otodor-reveal-delay="120">{{ section.settings.supporting_line | escape }}</p>
     {%- endif -%}
     {%- if reveal_image != blank -%}
-      <div class="otodor-reveal__media" data-otodor-reveal="scale-in">
-        {{ reveal_image | image_url: width: 1400 | image_tag: loading: 'lazy', widths: '700,1000,1400', sizes: '(min-width: 990px) 680px, 82vw', alt: product.title }}
+      <div class="otodor-reveal__media" data-otodor-reveal="depth">
+        <div class="otodor-reveal__tilt" data-otodor-tilt data-tilt-max="7" data-cursor>
+          {{ reveal_image | image_url: width: 1400 | image_tag: loading: 'lazy', widths: '700,1000,1400', sizes: '(min-width: 990px) 680px, 82vw', alt: product.title }}
+          <span class="otodor-reveal__sheen" aria-hidden="true"></span>
+        </div>
       </div>
     {%- endif -%}
   </div>

@@ -118,7 +118,7 @@
     {% if section.settings.heading != blank %}aria-labelledby="otodor-compat-title-{{ section.id }}"{% endif %}
   >
     {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.intro != blank -%}
-      <div class="otodor-compat__head" data-otodor-reveal="fade-up">
+      <div class="otodor-compat__head" data-otodor-reveal="blur-in">
         {%- if section.settings.eyebrow != blank -%}
           <span class="otodor-compat__eyebrow">{{ section.settings.eyebrow | escape }}</span>
         {%- endif -%}
@@ -133,7 +133,7 @@
 
     {%- if has_tags -%}
       {%- if section.settings.tags_label != blank -%}<p class="otodor-compat__label">{{ section.settings.tags_label | escape }}</p>{%- endif -%}
-      <ul class="otodor-compat__tags" role="list" data-otodor-reveal="fade-up">
+      <ul class="otodor-compat__tags" role="list" data-otodor-stagger>
         {%- if tags != blank -%}
           {%- for tag in tags -%}
             {%- if tag != blank -%}<li class="otodor-compat__tag">{{ tag | escape }}</li>{%- endif -%}
@@ -148,7 +148,7 @@
 
     {%- if has_specs -%}
       {%- if section.settings.specs_label != blank -%}<p class="otodor-compat__label">{{ section.settings.specs_label | escape }}</p>{%- endif -%}
-      <div class="otodor-ledger" data-otodor-reveal="fade-up">
+      <div class="otodor-ledger" data-otodor-stagger>
         {%- if has_auto_specs -%}
           {%- if spec_thick != blank -%}
             <div class="otodor-ledger__row">

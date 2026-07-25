@@ -20,10 +20,10 @@
     </span>
     {%- if current_variant.price == 0 -%}
       {%- assign wa_number = settings.otodor_whatsapp_number | default: '917206895607' -%}
-      <a class="otodor-sticky-atc__btn" style="text-decoration:none; display:inline-flex; align-items:center;" href="https://wa.me/{{ wa_number }}?text={{ 'Hello! I would like pricing for ' | append: product.title | url_encode }}" target="_blank" rel="noopener">Enquire</a>
+      <a class="otodor-sticky-atc__btn otodor-btn--liquid" style="text-decoration:none; display:inline-flex; align-items:center;" href="https://wa.me/{{ wa_number }}?text={{ 'Hello! I would like pricing for ' | append: product.title | url_encode }}" target="_blank" rel="noopener" data-otodor-magnetic data-magnetic-strength="0.3"><span class="otodor-magnetic__inner">Enquire</span></a>
     {%- else -%}
-      <button type="button" class="otodor-sticky-atc__btn" data-sticky-submit {% unless current_variant.available %}disabled{% endunless %}>
-        {%- if current_variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
+      <button type="button" class="otodor-sticky-atc__btn otodor-btn--liquid" data-sticky-submit data-otodor-magnetic data-magnetic-strength="0.3" {% unless current_variant.available %}disabled{% endunless %}>
+        <span class="otodor-magnetic__inner">{%- if current_variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}</span>
       </button>
     {%- endif -%}
   </div>
@@ -68,7 +68,8 @@
         var mainSubmit = document.querySelector('form[data-type="add-to-cart-form"] .product-form__submit');
         if (mainSubmit && submitBtn) {
           submitBtn.disabled = mainSubmit.disabled;
-          submitBtn.textContent = mainSubmit.disabled ? 'Sold out' : 'Add to cart';
+          var lbl = submitBtn.querySelector('.otodor-magnetic__inner') || submitBtn;
+          lbl.textContent = mainSubmit.disabled ? 'Sold out' : 'Add to cart';
         }
       }, 350);
     });
