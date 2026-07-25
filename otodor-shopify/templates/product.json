@@ -100,12 +100,24 @@
         "heading": "Specifications"
       }
     },
+    "compatibility": {
+      "type": "otodor-product-compat",
+      "settings": {}
+    },
     "install": {
       "type": "otodor-product-install",
       "settings": {
         "promise": "We verify compatibility before installation.",
         "estimate": "Most installations completed within 2–4 hours, by certified OTODOR professionals."
       }
+    },
+    "warranty": {
+      "type": "otodor-product-warranty",
+      "settings": {}
+    },
+    "downloads": {
+      "type": "otodor-product-downloads",
+      "settings": {}
     },
     "comparison": {
       "type": "otodor-comparison",
@@ -138,9 +150,12 @@
     "main",
     "reveal",
     "specs",
+    "compatibility",
     "install",
-    "related-products",
+    "warranty",
+    "downloads",
     "comparison",
+    "related-products",
     "sticky-atc"
   ]
 }
