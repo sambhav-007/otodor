@@ -1,0 +1,135 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Specification Registry  (the single source of truth)
+  Part of the Specification Rendering Engine — see OTODOR-SPEC-ENGINE.md.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:   Emit every supported specification as delimited records so any
+             consumer (comparison, highlights, landing, …) renders products
+             against ONE registry — no spec names hardcoded in sections.
+
+  Output:    records separated by ';;;', fields by '|', fixed 10 columns:
+               0 id | 1 label | 2 namespace | 3 key | 4 type | 5 unit
+               | 6 group | 7 default | 8 comparable(yes/no) | 9 filterable(yes/no)
+             (Liquid has no parse_json — records are captured & split by consumers.)
+
+  Sources:   1. built-in canonical set below (from OTODOR-DATA-MODEL.md §1.1)
+             2. optional overlay: comparison_spec metaobjects
+                (shop.metaobjects['comparison_spec'].values) override built-ins
+                by id/key. Never required.
+
+  Params (the requested view):
+    only_comparable  (bool)  → emit only comparable=yes rows
+    group            (text)  → emit only rows in this group
+    ids              (text)  → comma list; emit exactly these ids, in order
+                               (ignores only_comparable/group)
+
+  Usage:
+    {%- capture reg -%}{%- render 'otodor-spec-registry', only_comparable: true -%}{%- endcapture -%}
+    {%- assign specs = reg | strip | split: ';;;' -%}
+    {%- for row in specs -%}{%- assign f = row | strip | split: '|' -%} … {%- endfor -%}
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- comment -%} 1. Built-in canonical registry (capture suppresses output into the var). {%- endcomment -%}
+{%- capture built_in -%}
+face_recognition|Face recognition|specs|face_recognition|boolean||Access||yes|yes;;;
+fingerprint|Fingerprint|specs|fingerprint|boolean||Access||yes|yes;;;
+cards|RFID card|specs|cards|boolean||Access||yes|no;;;
+pin_access|PIN code|specs|pin_access|boolean||Access||yes|no;;;
+app_control|App control|specs|app_control|boolean||Access||yes|no;;;
+auto_lock|Auto-lock|specs|auto_lock|boolean||Access||yes|no;;;
+audit_log|Audit log|specs|audit_log|boolean||Access||yes|no;;;
+deadbolt|Deadbolt|specs|deadbolt|boolean||Hardware||yes|no;;;
+motorised_latch|Motorised latch|specs|motorised_latch|boolean||Hardware||yes|no;;;
+bolts|Locking bolts|specs|bolts|number||Hardware||no|no;;;
+two_way_talk|Two-way talk|specs|two_way_talk|boolean||Video & intercom||yes|no;;;
+doorbell|Doorbell|specs|doorbell|boolean||Video & intercom||yes|no;;;
+inside_screen|Inside screen|specs|inside_screen|text||Video & intercom||yes|no;;;
+door_thickness|Door thickness|specs|door_thickness|range|mm|Fit||yes|yes;;;
+battery_backup|Battery backup|specs|battery_backup|number|months|Power||yes|no;;;
+battery|Battery|specs|battery|text||Power||no|no;;;
+connectivity|Connectivity|specs|connectivity|text||Connectivity||no|yes;;;
+certification|Certification|specs|certification|badge||Build||no|no;;;
+finish|Finish|specs|finish|chip||Build||no|no;;;
+warranty|Warranty|specs|warranty|text||Support|3 years|yes|no;;;
+{%- endcapture -%}
+
+{%- liquid
+  # 2. Optional metaobject overlay → normalise to records, collect overridden ids.
+  assign mo_out = ''
+  assign mo_ids = ''
+  assign mo_specs = shop.metaobjects['comparison_spec'].values
+  if mo_specs != blank
+    for m in mo_specs
+      assign m_key = m.key.value
+      if m_key == blank
+        continue
+      endif
+      assign m_ns = m.namespace.value | default: 'specs'
+      assign m_label = m.label.value | default: m_key
+      assign m_type = m.type.value | default: 'text'
+      assign m_unit = m.unit.value
+      assign m_group = m.group.value
+      assign m_default = m.default.value
+      assign m_cmp = m.comparable.value | default: 'yes'
+      assign m_filt = m.filterable.value | default: 'no'
+      assign rec = m_key | append: '|' | append: m_label | append: '|' | append: m_ns | append: '|' | append: m_key | append: '|' | append: m_type | append: '|' | append: m_unit | append: '|' | append: m_group | append: '|' | append: m_default | append: '|' | append: m_cmp | append: '|' | append: m_filt
+      assign mo_out = mo_out | append: rec | append: ';;;'
+      assign mo_ids = mo_ids | append: ',' | append: m_key
+    endfor
+  endif
+  assign mo_ids_h = mo_ids | append: ','
+
+  # 3. Merge: built-ins not overridden by a metaobject, then metaobject records.
+  assign merged = ''
+  assign built_rows = built_in | strip | split: ';;;'
+  for rec in built_rows
+    assign r = rec | strip
+    if r == blank
+      continue
+    endif
+    assign bf = r | split: '|'
+    assign needle = ',' | append: bf[0] | append: ','
+    unless mo_ids_h contains needle
+      assign merged = merged | append: r | append: ';;;'
+    endunless
+  endfor
+  assign merged = merged | append: mo_out
+  assign all_rows = merged | strip | split: ';;;'
+
+  # 4. Emit the requested view.
+  if ids != blank
+    assign want = ids | split: ','
+    for wid in want
+      assign wid_t = wid | strip
+      for rec in all_rows
+        assign r = rec | strip
+        assign f = r | split: '|'
+        if f[0] == wid_t
+          echo r
+          echo ';;;'
+          break
+        endif
+      endfor
+    endfor
+  else
+    for rec in all_rows
+      assign r = rec | strip
+      if r == blank
+        continue
+      endif
+      assign f = r | split: '|'
+      assign pass = true
+      if only_comparable == true and f[8] != 'yes'
+        assign pass = false
+      endif
+      if group != blank and f[6] != group
+        assign pass = false
+      endif
+      if pass
+        echo r
+        echo ';;;'
+      endif
+    endfor
+  endif
+-%}
