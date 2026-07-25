@@ -87,9 +87,23 @@ recomposed as the lead desk; digital-locks CTAs repointed to `/pages/contact#oto
   recommendation** (still fully functional). Recommendation image/reason come from each collection's
   `custom.menu_image`/`menu_description` (→ collection image → first product → gradient).
 
+### ✅ Done — STEP 9 (SEO expansion, safe scope)
+`OTODOR-SEO-EXPANSION.md`. **Organization entity enriched** in the schema graph — `description` (shop.description),
+`slogan` + `foundingDate` (new optional `settings.otodor_org_*`), `contactPoint` (WhatsApp `telephone` +cc,
+`contactType:customer service`, `areaServed:IN`, `availableLanguage:[en,hi]`) — every field gated, one
+`@id`-anchored Organization (no duplication). **Head/perf:** `preconnect` + `dns-prefetch` to `cdn.shopify.com`
+(LCP; fonts already self-hosted). `theme check` clean vs. baseline.
+- **Decision (user-approved):** the **Product-ownership rewrite is re-deferred** — additionalProperty/`Offer.warranty`
+  need real prices + populated `specs.*` (products are ₹0, specs empty) and can't be verified in-sandbox; replacing
+  Shopify's maintained Product/Offer/rating now would be net-negative. Trigger: real data lands → `build:'product'`
+  mode + remove `main-product.liquid` `structured_data` + live Rich-Results verification (`OTODOR-SEO-EXPANSION.md` §1).
+- **Out of scope (native):** `sitemap.xml` is Shopify-generated (not a theme file); hreflang needs multi-locale routing.
+- **Verify live** (sandbox can't): Google Rich Results Test / Schema Markup Validator once the store is public.
+
 ### Remaining roadmap
-- **STEP 9** — SEO expansion (Product-ownership schema for additionalProperty/warranty, sitemap/meta polish).
-  Optional: real LLM concierge as a hosted micro-service if the deterministic advisor proves the demand.
+- **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
+- Optional: real LLM concierge as a hosted micro-service if the deterministic advisor proves the demand.
+- **Content/data (owner: user)** still blocks real impact — real prices, photography, populated metafields.
 
 ### Admin setup the merchant must do (theme degrades gracefully until done)
 - **Navigation:** build the nested 3-level `main-menu` (Products → Digital Locks → Wooden/Glass/…; see Phase 2 report) so the mega menu shows the hierarchy.

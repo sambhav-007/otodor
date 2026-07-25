@@ -1475,5 +1475,27 @@
         "default": "Hello! I have a question about OTODOR smart locks."
       }
     ]
+  },
+  {
+    "name": "OTODOR Brand Entity (SEO)",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Enriches the Organization structured data (knowledge-graph SEO). Left blank, each field is simply omitted from the schema."
+      },
+      {
+        "type": "text",
+        "id": "otodor_org_slogan",
+        "label": "Brand slogan",
+        "default": "Secure. Smart. Automatic."
+      },
+      {
+        "type": "text",
+        "id": "otodor_org_founding_year",
+        "label": "Founding year",
+        "info": "e.g. 2008. Used as Organization foundingDate. Leave blank to omit.",
+        "default": ""
+      }
+    ]
   }
 ]

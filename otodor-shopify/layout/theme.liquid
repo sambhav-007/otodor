@@ -10,6 +10,10 @@
     <meta name="theme-color" content="#0B0B0B">
     <link rel="canonical" href="{{ canonical_url }}">
 
+    {%- comment -%} SEO/perf: warm the connection to Shopify's asset CDN (LCP). Fonts are self-hosted. {%- endcomment -%}
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.shopify.com">
+
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 128, height: 128 }}">
     {%- endif -%}

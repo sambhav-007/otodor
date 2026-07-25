@@ -149,6 +149,24 @@
         echo ',"logo":'
         echo settings.logo | image_url: width: 500 | prepend: 'https:' | json
       endif
+      if shop.description != blank
+        echo ',"description":'
+        echo shop.description | strip_html | json
+      endif
+      if settings.otodor_org_slogan != blank
+        echo ',"slogan":'
+        echo settings.otodor_org_slogan | json
+      endif
+      if settings.otodor_org_founding_year != blank
+        echo ',"foundingDate":'
+        echo settings.otodor_org_founding_year | json
+      endif
+      if settings.otodor_whatsapp_number != blank
+        assign org_tel = settings.otodor_whatsapp_number | prepend: '+'
+        echo ',"contactPoint":{"@type":"ContactPoint","telephone":'
+        echo org_tel | json
+        echo ',"contactType":"customer service","areaServed":"IN","availableLanguage":["en","hi"]}'
+      endif
       if sameas_inner != blank
         echo ',"sameAs":['
         echo sameas_inner

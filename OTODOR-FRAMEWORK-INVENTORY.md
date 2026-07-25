@@ -58,14 +58,16 @@ data sufficiency. Consumes the same Shopify data the UI renders — no content d
 
 | Snippet / mode | Emits | Source | Gate | Reusable in | Status |
 |---|---|---|---|---|---|
-| **otodor-schema** (`graph`, from `theme.liquid` head) | Organization, WebSite, BreadcrumbList, CollectionPage, VideoObject — one `@graph` | shop/settings, `product.collections`, `collection`, `product.media` | each object only when data exists | every page | ✅ |
+| **otodor-schema** (`graph`, from `theme.liquid` head) | Organization (**enriched STEP 9:** description, slogan, foundingDate, contactPoint), WebSite, BreadcrumbList, CollectionPage, VideoObject — one `@graph` | shop/settings, `product.collections`, `collection`, `product.media` | each object/field only when data exists | every page | ✅ |
 | **otodor-schema** (`build: 'faqpage'`) | FAQPage | a section's `collapsible_row` blocks | ≥1 Q&A | FAQ (product + collection) | ✅ |
 | **otodor-schema** (`build: 'howto'`) | HowTo | `step` blocks | ≥2 steps, opt-in | Install (genuine instructions only) | ✅ |
 
 **Not re-emitted (already native):** Product / Offer / AggregateRating (Shopify `structured_data` in
 `main-product`). **Consumers:** `theme.liquid` (graph), `collapsible-content` (faqpage), `otodor-product-install`
 (howto, opt-in). Deferred: Product `additionalProperty` (from the Spec Registry) + `Offer.warranty` — needs a
-reviewed Product-ownership change (see `OTODOR-STRUCTURED-CONTENT.md` §5).
+reviewed Product-ownership change (see `OTODOR-STRUCTURED-CONTENT.md` §5; **STEP 9 re-deferred** — blocked on
+real prices/specs, `OTODOR-SEO-EXPANSION.md` §1). **STEP 9 also added:** Organization contactPoint/slogan/
+description/foundingDate + `cdn.shopify.com` preconnect in `theme.liquid`.
 
 ## 2. Collection Framework sections
 
