@@ -1,0 +1,245 @@
+/*
+ * ------------------------------------------------------------
+ * Digital Locks — first consumer of the OTODOR collection
+ * framework (OTODOR-COLLECTION-TEMPLATE.md). Configuration only:
+ * the same reusable sections as collection.json, populated with
+ * Digital-Locks data from the Brand PDF. No forked section code.
+ * Assign this template to the `digital-locks` collection in admin.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "otodor-collection-hero",
+      "settings": {
+        "eyebrow": "Digital Locks",
+        "fallback_line": "Secure every entry point — German-engineered smart locks for wooden, glass and metal doors, controlled from a single app.",
+        "show_count": true,
+        "moment_line": "Not every door needs the same lock.",
+        "moment_sub": "OTODOR builds a dedicated range for each — engineered, installed and supported by us."
+      }
+    },
+    "selector": {
+      "type": "otodor-category-selector",
+      "blocks": {
+        "wooden": {
+          "type": "category",
+          "settings": {
+            "collection": "wooden-door-locks",
+            "title": "Wooden Door",
+            "description": "Reinforced smart locks for wooden main and internal doors.",
+            "icon": "fingerprint"
+          }
+        },
+        "glass": {
+          "type": "category",
+          "settings": {
+            "collection": "glass-door-locks",
+            "title": "Glass Door",
+            "description": "Frameless-friendly locks for glass office and home doors.",
+            "icon": "key"
+          }
+        },
+        "metal": {
+          "type": "category",
+          "settings": {
+            "collection": "metal-gate-locks",
+            "title": "Metal Gate",
+            "description": "Weatherproof smart locks built for outer metal gates.",
+            "icon": "shield"
+          }
+        },
+        "padlocks": {
+          "type": "category",
+          "settings": {
+            "collection": "smart-padlocks",
+            "title": "Smart Padlocks",
+            "description": "Portable biometric padlocks for versatile access.",
+            "icon": "tag"
+          }
+        }
+      },
+      "block_order": ["wooden", "glass", "metal", "padlocks"],
+      "settings": {
+        "eyebrow": "Find your fit",
+        "heading": "Which type of lock",
+        "heading_accent": "are you looking for?",
+        "subheading": "Choose your door and we'll show the OTODOR range built for it.",
+        "color_scheme": "light",
+        "columns_desktop": 4,
+        "show_descriptions": true,
+        "show_icons": true,
+        "show_cta": true,
+        "cta_title": "Any other custom?",
+        "cta_text": "Not sure, or need something bespoke? Ask our OTODOR experts.",
+        "cta_button_label": "Ask an expert",
+        "cta_link": "/pages/contact"
+      }
+    },
+    "product-grid": {
+      "type": "otodor-collection-grid",
+      "settings": {
+        "products_per_page": 12,
+        "show_sort": true,
+        "show_cta": true,
+        "cta_title": "Not sure which lock fits your door?",
+        "cta_sub": "We verify compatibility before installation — talk to a specialist.",
+        "cta_button_label": "Talk to us"
+      }
+    },
+    "features": {
+      "type": "otodor-features",
+      "blocks": {
+        "fingerprint": {
+          "type": "feature",
+          "settings": {
+            "tile_size": "large",
+            "motif": "fingerprint",
+            "icon": "fingerprint",
+            "title": "Fingerprint Access",
+            "description": "Unlock instantly with a single touch using advanced biometric recognition."
+          }
+        },
+        "app": {
+          "type": "feature",
+          "settings": {
+            "tile_size": "wide",
+            "motif": "app",
+            "icon": "mobile",
+            "title": "Mobile App Control",
+            "description": "Manage access, issue temporary passcodes and monitor entry from anywhere."
+          }
+        },
+        "pin": {
+          "type": "feature",
+          "settings": {
+            "tile_size": "small",
+            "motif": "keypad",
+            "icon": "keypad",
+            "title": "PIN Access",
+            "description": "Custom codes with anti-peep protection for your password."
+          }
+        },
+        "rfid": {
+          "type": "feature",
+          "settings": {
+            "tile_size": "small",
+            "motif": "rfid",
+            "icon": "tag",
+            "title": "RFID Access",
+            "description": "Tap key cards or smart tags to enter instantly."
+          }
+        }
+      },
+      "block_order": ["fingerprint", "app", "pin", "rfid"],
+      "settings": {
+        "eyebrow": "Core Technology",
+        "heading": "Engineered for",
+        "heading_accent": "everyday security.",
+        "subheading": "Every access point built with next-generation recognition and encrypted control."
+      }
+    },
+    "why": {
+      "type": "otodor-why",
+      "blocks": {
+        "german": {
+          "type": "statement",
+          "settings": { "lead": "German-engineered.", "counter": "Built for Indian conditions." }
+        },
+        "installed": {
+          "type": "statement",
+          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+        },
+        "warranty": {
+          "type": "statement",
+          "settings": { "lead": "3-year warranty.", "counter": "On every lock." }
+        }
+      },
+      "block_order": ["german", "installed", "warranty"],
+      "settings": { "eyebrow": "Why OTODOR Digital Locks" }
+    },
+    "content": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": { "heading": "Digital Locks by OTODOR", "heading_size": "h1" }
+        },
+        "text": {
+          "type": "text",
+          "settings": { "text": "<p>Secure every entry point with OTODOR's premium range of Digital Locks — designed for wooden doors, glass doors, metal gates and smart padlocks, all controllable through a single mobile app. Crafted with precise German engineering and built using highest-grade stainless steel and aluminium, each lock carries a sleek Italian finish and a 3-year warranty. Smart. Secure. Seamlessly controlled.</p>" }
+        }
+      },
+      "block_order": ["heading", "text"],
+      "settings": { "color_scheme": "scheme-1" }
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Which doors are OTODOR digital locks compatible with?", "row_content": "<p>Wooden, glass and metal doors, plus smart padlocks. Each range is engineered for its door type — tell us your door and we'll confirm compatibility before installation.</p>" }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": { "heading": "What access methods are supported?", "row_content": "<p>Face recognition, fingerprint, RFID card, PIN, physical key and the OTODOR app — depending on the model.</p>" }
+        },
+        "q3": {
+          "type": "collapsible_row",
+          "settings": { "heading": "What warranty and support do I get?", "row_content": "<p>A 3-year warranty on the lock and 1-year on the battery, with PAN-India professional installation across 10,000+ PIN codes and 24/7 support.</p>" }
+        },
+        "q4": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Is there an installation clearance requirement?", "row_content": "<p>Yes — keep a minimum 85 mm (3.35&quot;) gap between the safety door and the main door so the lock never contacts the safety door.</p>" }
+        }
+      },
+      "block_order": ["q1", "q2", "q3", "q4"],
+      "settings": {
+        "heading": "Frequently asked questions",
+        "heading_alignment": "center",
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Protect what matters",
+        "heading_accent": "most.",
+        "description": "Book a priority home survey and let a certified OTODOR technician recommend and install the right digital lock.",
+        "cta_primary_label": "Get a Custom Quote",
+        "cta_primary_link": "/pages/contact",
+        "cta_secondary_label": "Talk to us",
+        "cta_secondary_link": "/pages/contact"
+      }
+    },
+    "seo": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": { "heading": "Smart digital door locks, engineered in detail", "heading_size": "h2" }
+        },
+        "text": {
+          "type": "text",
+          "settings": { "text": "<p>OTODOR digital locks combine German engineering with highest-grade stainless steel and aluminium for lasting security in Indian conditions. Choose fingerprint, face recognition, RFID, PIN, app or key access; monitor entry with real-time audit logs; and control everything over Wi-Fi and Bluetooth from one app. Every lock ships with professional installation, a 3-year warranty and 24/7 support.</p>" }
+        }
+      },
+      "block_order": ["heading", "text"],
+      "settings": { "color_scheme": "scheme-1" }
+    }
+  },
+  "order": [
+    "hero",
+    "selector",
+    "product-grid",
+    "features",
+    "why",
+    "content",
+    "faq",
+    "cta",
+    "seo"
+  ]
+}

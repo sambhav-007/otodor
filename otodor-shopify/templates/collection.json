@@ -1,10 +1,11 @@
 /*
  * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
+ * OTODOR generic collection framework (category-agnostic).
+ * Inherited by every collection. Empty slots (selector/features/
+ * why) auto-hide, so a plain collection degrades to hero -> grid.
+ * Category landings (e.g. collection.digital-locks.json) reuse this
+ * same composition with data — see OTODOR-COLLECTION-TEMPLATE.md.
+ * The theme editor / Shopify admin may rewrite this file.
  * ------------------------------------------------------------
  */
 {
@@ -19,43 +20,49 @@
         "moment_sub": "Every OTODOR device is engineered, installed, and supported by us."
       }
     },
+    "selector": {
+      "type": "otodor-category-selector",
+      "settings": {
+        "eyebrow": "Find your fit",
+        "heading": "Choose your",
+        "heading_accent": "category.",
+        "subheading": "",
+        "color_scheme": "light",
+        "show_cta": false
+      }
+    },
     "product-grid": {
       "type": "otodor-collection-grid",
-      "blocks": {
-        "cat_digital": {
-          "type": "category",
-          "settings": { "collection": "door-locks", "label": "Door locks" }
-        },
-        "cat_gate": {
-          "type": "category",
-          "settings": { "collection": "gate-locks", "label": "Gate locks" }
-        },
-        "cat_automation": {
-          "type": "category",
-          "settings": { "collection": "sliding-gate-motors", "label": "Gate automation" }
-        },
-        "cat_security": {
-          "type": "category",
-          "settings": { "collection": "security-system", "label": "Security systems" }
-        },
-        "cat_accessories": {
-          "type": "category",
-          "settings": { "collection": "accessories", "label": "Accessories" }
-        }
-      },
-      "block_order": ["cat_digital", "cat_gate", "cat_automation", "cat_security", "cat_accessories"],
       "settings": {
         "products_per_page": 12,
         "show_sort": true,
         "show_cta": true,
-        "cta_title": "Not sure which lock fits your door?",
+        "cta_title": "Not sure which fits your door?",
         "cta_sub": "We verify compatibility before installation — talk to a specialist.",
         "cta_button_label": "Talk to us"
+      }
+    },
+    "features": {
+      "type": "otodor-features",
+      "settings": {
+        "eyebrow": "Core Technology",
+        "heading": "Built for",
+        "heading_accent": "everyday security.",
+        "subheading": ""
+      }
+    },
+    "why": {
+      "type": "otodor-why",
+      "settings": {
+        "eyebrow": "Why OTODOR"
       }
     }
   },
   "order": [
     "hero",
-    "product-grid"
+    "selector",
+    "product-grid",
+    "features",
+    "why"
   ]
 }
