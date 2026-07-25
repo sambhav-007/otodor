@@ -1,0 +1,245 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Downloads
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Expose the product's manuals, datasheets, certifications
+                      and brochures as downloadable assets.
+  Primary source:     product.metafields.custom.documents (list.file_reference)
+  Fallback order:     custom.documents files → `document` section blocks
+                      (label + url + type + size) → hide
+  Visibility rule:    Renders when ≥1 document exists (metafield OR block).
+                      Hides completely when none.
+  Merchant editable:  YES — heading/eyebrow via settings; manual documents via
+                      `document` blocks (used when the metafield is empty).
+  Required metafields: none
+  Optional metafields: product custom.documents (list.file_reference)
+  Dependencies:       otodor-base.css design tokens. No JS. No snippets.
+  Preset:             Renders 3 example rows (Manual / Datasheet / Warranty
+                      card) so the module is meaningful with zero data.
+  Accessibility:      <section> landmark + aria-labelledby; each row is a real
+                      <a download>; type/size announced via aria-label; visible
+                      focus ring; honours prefers-reduced-motion.
+  Reusable for:       PDP, collection/landing pages — Digital Locks, Gate
+                      Automation, Security, Smart Home, any category with assets.
+
+  Per-row resolution (metafield path): label ← filename (extension stripped);
+  type badge ← file extension (PDF/DOC/…); href ← file url; download attr set.
+  Block path is used ONLY when the metafield has no files (never stacked).
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  # 1. READ primary
+  assign docs = product.metafields.custom.documents.value
+
+  # 2. Fallback → section blocks
+  assign has_blocks = false
+  if section.blocks.size > 0
+    assign has_blocks = true
+  endif
+
+  # 3. VALIDATE → one boolean
+  assign has_content = false
+  if docs != blank or has_blocks
+    assign has_content = true
+  endif
+-%}
+
+{%- if has_content -%}
+  {%- style -%}
+    #shopify-section-{{ section.id }} { background: var(--otodor-bg-light); }
+    #shopify-section-{{ section.id }} .otodor-dl {
+      max-width: var(--otodor-container-sm);
+      margin-inline: auto;
+      padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__head { margin-bottom: clamp(1.5rem, 3vw, 2.25rem); }
+    #shopify-section-{{ section.id }} .otodor-dl__eyebrow {
+      display: block;
+      font-family: var(--otodor-font-display);
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: var(--otodor-tracking-widest);
+      color: var(--otodor-accent-on-light);
+      margin-bottom: 0.9rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__heading {
+      font-family: var(--otodor-font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700;
+      letter-spacing: var(--otodor-tracking-tight);
+      color: var(--otodor-ink); margin: 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__list { list-style: none; margin: 0; padding: 0; }
+    #shopify-section-{{ section.id }} .otodor-dl__row {
+      display: flex; align-items: center; gap: clamp(0.9rem, 2vw, 1.4rem);
+      padding: 1.15rem 0;
+      border-top: 1px solid var(--otodor-hairline-light);
+      color: inherit; text-decoration: none;
+      transition: padding-inline-start var(--otodor-dur-fast) var(--otodor-ease-out);
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__list li:last-child .otodor-dl__row {
+      border-bottom: 1px solid var(--otodor-hairline-light);
+    }
+    #shopify-section-{{ section.id }} a.otodor-dl__row:hover { padding-inline-start: 0.35rem; }
+    #shopify-section-{{ section.id }} a.otodor-dl__row:focus-visible {
+      outline: 2px solid var(--otodor-accent-on-light); outline-offset: 3px; border-radius: var(--otodor-radius-sm);
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__icon {
+      flex: none; width: 40px; height: 40px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--otodor-hairline-light-2); border-radius: var(--otodor-radius-md);
+      color: var(--otodor-accent-on-light);
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__icon svg { width: 19px; height: 19px; }
+    #shopify-section-{{ section.id }} .otodor-dl__text { flex: 1 1 auto; min-width: 0; }
+    #shopify-section-{{ section.id }} .otodor-dl__label {
+      font-family: var(--otodor-font-body); font-size: 1rem; font-weight: 600;
+      color: var(--otodor-ink); margin: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__meta {
+      font-family: var(--otodor-font-body); font-size: 0.8rem;
+      color: var(--otodor-ink-faint); margin: 0.2rem 0 0;
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__type {
+      font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--otodor-accent-on-light);
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__action {
+      flex: none; display: inline-flex; align-items: center;
+      color: var(--otodor-ink-faint);
+      transition: transform var(--otodor-dur-fast) var(--otodor-ease-spring), color var(--otodor-dur-fast) ease;
+    }
+    #shopify-section-{{ section.id }} .otodor-dl__action svg { width: 20px; height: 20px; }
+    #shopify-section-{{ section.id }} a.otodor-dl__row:hover .otodor-dl__action {
+      color: var(--otodor-accent-on-light); transform: translateY(2px);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #shopify-section-{{ section.id }} .otodor-dl__row,
+      #shopify-section-{{ section.id }} .otodor-dl__action { transition: none; }
+      #shopify-section-{{ section.id }} a.otodor-dl__row:hover { padding-inline-start: 0; }
+      #shopify-section-{{ section.id }} a.otodor-dl__row:hover .otodor-dl__action { transform: none; }
+    }
+  {%- endstyle -%}
+
+  {%- capture doc_icon -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/></svg>{%- endcapture -%}
+  {%- capture download_icon -%}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>{%- endcapture -%}
+
+  <section
+    class="otodor-dl"
+    data-otodor-section="downloads"
+    {% if section.settings.heading != blank %}aria-labelledby="otodor-dl-title-{{ section.id }}"{% endif %}
+  >
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+      <div class="otodor-dl__head" data-otodor-reveal="fade-up">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-dl__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="otodor-dl__heading" id="otodor-dl-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <ul class="otodor-dl__list" role="list" data-otodor-reveal="fade-up">
+      {%- if docs != blank -%}
+        {%- comment -%} Primary: files attached to custom.documents {%- endcomment -%}
+        {%- for doc in docs -%}
+          {%- liquid
+            assign href = doc.url | default: doc
+            assign fname = href | split: '?' | first | split: '/' | last
+            assign fparts = fname | split: '.'
+            assign label = fparts | first | replace: '_', ' ' | replace: '-', ' '
+            assign ext = ''
+            if fparts.size > 1
+              assign ext = fparts | last | upcase
+            endif
+          -%}
+          {%- if href != blank -%}
+            <li>
+              <a class="otodor-dl__row" href="{{ href }}" download target="_blank" rel="noopener"
+                 aria-label="{{ label | escape }}{% if ext != blank %} ({{ ext }}){% endif %} — download">
+                <span class="otodor-dl__icon">{{ doc_icon }}</span>
+                <span class="otodor-dl__text">
+                  <span class="otodor-dl__label">{{ label | capitalize | escape }}</span>
+                  {%- if ext != blank -%}<span class="otodor-dl__meta"><span class="otodor-dl__type">{{ ext }}</span></span>{%- endif -%}
+                </span>
+                <span class="otodor-dl__action">{{ download_icon }}</span>
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- comment -%} Fallback: manual document blocks {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign href = block.settings.url
+            if href == blank and block.settings.file != blank
+              assign href = block.settings.file
+            endif
+            assign label = block.settings.label
+            assign dtype = block.settings.doc_type
+            assign dsize = block.settings.file_size
+          -%}
+          {%- if href != blank and label != blank -%}
+            <li {{ block.shopify_attributes }}>
+              <a class="otodor-dl__row" href="{{ href }}" download target="_blank" rel="noopener"
+                 aria-label="{{ label | escape }}{% if dtype != blank %} ({{ dtype | escape }}){% endif %} — download">
+                <span class="otodor-dl__icon">{{ doc_icon }}</span>
+                <span class="otodor-dl__text">
+                  <span class="otodor-dl__label">{{ label | escape }}</span>
+                  {%- if dtype != blank or dsize != blank -%}
+                    <span class="otodor-dl__meta">
+                      {%- if dtype != blank -%}<span class="otodor-dl__type">{{ dtype | escape }}</span>{%- endif -%}
+                      {%- if dsize != blank -%}<span>{{ dsize | escape }}</span>{%- endif -%}
+                    </span>
+                  {%- endif -%}
+                </span>
+                <span class="otodor-dl__action">{{ download_icon }}</span>
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Downloads",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "Primary source: product metafield custom.documents (list.file_reference). When it has files, they render automatically (label from filename, type from extension). The document blocks below are used only when that metafield is empty." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Resources" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Downloads & documents" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 }
+  ],
+  "blocks": [
+    {
+      "type": "document",
+      "name": "Document (fallback)",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "User manual" },
+        { "type": "url", "id": "url", "label": "Link (page or file URL)", "info": "Use this for a linked resource." },
+        { "type": "text", "id": "doc_type", "label": "Type badge", "default": "PDF" },
+        { "type": "text", "id": "file_size", "label": "Size (optional)", "info": "e.g. 2.4 MB" }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "OTODOR Downloads",
+      "blocks": [
+        { "type": "document", "settings": { "label": "User manual", "doc_type": "PDF", "file_size": "2.4 MB" } },
+        { "type": "document", "settings": { "label": "Technical datasheet", "doc_type": "PDF", "file_size": "1.1 MB" } },
+        { "type": "document", "settings": { "label": "Warranty card", "doc_type": "PDF", "file_size": "480 KB" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
