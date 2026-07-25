@@ -1,0 +1,238 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Warranty
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Explain what the product's warranty covers and for how
+                      long, so the buyer trusts the after-sale commitment.
+  Primary source:     product.metafields.custom.warranty_policies (metaobject
+                      list) + specs.warranty / specs.warranty_battery
+  Fallback order:     custom.warranty_policies metaobjects → `policy` section
+                      blocks → specs.warranty/warranty_battery mapped onto the
+                      section's two coverage slots → section setting defaults →
+                      hide (only when everything is explicitly cleared)
+  Visibility rule:    Renders when any coverage exists (metaobject, block,
+                      spec metafield, or non-blank default setting). Hides only
+                      when the merchant clears all sources.
+  Merchant editable:  YES — heading/intro + two default coverage slots via
+                      settings; richer/extra coverage via `policy` blocks.
+  Required metafields: none
+  Optional metafields: product custom.warranty_policies (list.metaobject →
+                       warranty_policy), specs.warranty, specs.warranty_battery
+  Dependencies:       snippets/otodor-icon.liquid; otodor-base.css tokens.
+                      Optional metaobject: warranty_policy (title/duration/
+                      covers/icon). No JS.
+  Preset:             Renders the two default coverage slots immediately.
+  Accessibility:      <section> landmark + aria-labelledby; coverage list is a
+                      <ul role="list">; icons aria-hidden; contrast AA; honours
+                      prefers-reduced-motion.
+  Reusable for:       PDP, comparison, collection/landing — any category.
+
+  Brand copy is NOT hardcoded in markup: the "3-year lock / 1-year battery"
+  defaults live in editable schema settings, so they are overridable Shopify
+  data. Metafields/blocks override the defaults; nothing stacks.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  # 1. READ primary
+  assign mo_policies = product.metafields.custom.warranty_policies.value
+  assign spec_lock = product.metafields.specs.warranty
+  assign spec_batt = product.metafields.specs.warranty_battery
+
+  # 2. Fallbacks
+  assign has_blocks = false
+  if section.blocks.size > 0
+    assign has_blocks = true
+  endif
+  assign has_defaults = false
+  if section.settings.policy_1_title != blank or section.settings.policy_2_title != blank
+    assign has_defaults = true
+  endif
+
+  # 3. VALIDATE
+  assign has_content = false
+  if mo_policies != blank or has_blocks or spec_lock != blank or spec_batt != blank or has_defaults
+    assign has_content = true
+  endif
+-%}
+
+{%- if has_content -%}
+  {%- style -%}
+    #shopify-section-{{ section.id }} { background: var(--otodor-bg-light); }
+    #shopify-section-{{ section.id }} .otodor-warr {
+      max-width: var(--otodor-container);
+      margin-inline: auto;
+      padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+      border-top: 1px solid var(--otodor-hairline-light);
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__head {
+      max-width: 46rem; margin-bottom: clamp(2rem, 4vw, 3rem);
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__eyebrow {
+      display: block;
+      font-family: var(--otodor-font-display);
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: var(--otodor-tracking-widest);
+      color: var(--otodor-accent-on-light); margin-bottom: 0.9rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__heading {
+      font-family: var(--otodor-font-display);
+      font-size: clamp(1.7rem, 3.4vw, 2.6rem); font-weight: 700;
+      letter-spacing: var(--otodor-tracking-tight);
+      color: var(--otodor-ink); margin: 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__intro {
+      font-family: var(--otodor-font-body); font-size: var(--otodor-text-md);
+      line-height: 1.6; color: var(--otodor-ink-soft); margin: 1rem 0 0; max-width: 52ch;
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__grid {
+      list-style: none; margin: 0; padding: 0;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+      gap: clamp(1rem, 2vw, 1.5rem);
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__card {
+      display: flex; flex-direction: column;
+      padding: clamp(1.4rem, 2.4vw, 1.9rem);
+      background: var(--otodor-bg-light-2);
+      border: 1px solid var(--otodor-hairline-light);
+      border-radius: var(--otodor-radius-lg);
+      box-shadow: var(--otodor-shadow-xs);
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__icon {
+      display: inline-flex; color: var(--otodor-accent-on-light); margin-bottom: 1rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__icon svg { width: 26px; height: 26px; }
+    #shopify-section-{{ section.id }} .otodor-warr__dur {
+      font-family: var(--otodor-font-display);
+      font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight: 700; line-height: 1;
+      letter-spacing: var(--otodor-tracking-tight);
+      color: var(--otodor-ink); margin: 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__title {
+      font-family: var(--otodor-font-display); font-size: 1.02rem; font-weight: 600;
+      color: var(--otodor-ink); margin: 0.5rem 0 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__covers {
+      font-family: var(--otodor-font-body); font-size: 0.9rem; line-height: 1.55;
+      color: var(--otodor-ink-soft); margin: 0.55rem 0 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-warr__covers > *:first-child { margin-top: 0; }
+    #shopify-section-{{ section.id }} .otodor-warr__covers > *:last-child { margin-bottom: 0; }
+  {%- endstyle -%}
+
+  <section
+    class="otodor-warr"
+    data-otodor-section="warranty"
+    {% if section.settings.heading != blank %}aria-labelledby="otodor-warr-title-{{ section.id }}"{% endif %}
+  >
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.intro != blank -%}
+      <div class="otodor-warr__head" data-otodor-reveal="fade-up">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-warr__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="otodor-warr__heading" id="otodor-warr-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.intro != blank -%}
+          <p class="otodor-warr__intro">{{ section.settings.intro | escape }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <ul class="otodor-warr__grid" role="list" data-otodor-reveal="fade-up">
+      {%- if mo_policies != blank -%}
+        {%- comment -%} Primary: warranty_policy metaobjects {%- endcomment -%}
+        {%- for policy in mo_policies -%}
+          {%- assign p_icon = policy.icon.value | default: 'warranty' -%}
+          <li class="otodor-warr__card">
+            <span class="otodor-warr__icon">{% render 'otodor-icon', name: p_icon %}</span>
+            {%- if policy.duration.value != blank -%}<p class="otodor-warr__dur">{{ policy.duration.value | escape }}</p>{%- endif -%}
+            {%- if policy.title.value != blank -%}<p class="otodor-warr__title">{{ policy.title.value | escape }}</p>{%- endif -%}
+            {%- if policy.covers.value != blank -%}<div class="otodor-warr__covers">{{ policy.covers.value }}</div>{%- endif -%}
+          </li>
+        {%- endfor -%}
+
+      {%- elsif has_blocks -%}
+        {%- comment -%} Fallback A: policy blocks {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          {%- assign p_icon = block.settings.icon | default: 'warranty' -%}
+          <li class="otodor-warr__card" {{ block.shopify_attributes }}>
+            <span class="otodor-warr__icon">{% render 'otodor-icon', name: p_icon %}</span>
+            {%- if block.settings.duration != blank -%}<p class="otodor-warr__dur">{{ block.settings.duration | escape }}</p>{%- endif -%}
+            {%- if block.settings.title != blank -%}<p class="otodor-warr__title">{{ block.settings.title | escape }}</p>{%- endif -%}
+            {%- if block.settings.covers != blank -%}<p class="otodor-warr__covers">{{ block.settings.covers | escape }}</p>{%- endif -%}
+          </li>
+        {%- endfor -%}
+
+      {%- else -%}
+        {%- comment -%} Fallback B: two coverage slots — spec metafield overrides the default duration {%- endcomment -%}
+        {%- assign p1_dur = spec_lock | default: section.settings.policy_1_duration -%}
+        {%- if section.settings.policy_1_title != blank or p1_dur != blank -%}
+          <li class="otodor-warr__card">
+            <span class="otodor-warr__icon">{% render 'otodor-icon', name: 'warranty' %}</span>
+            {%- if p1_dur != blank -%}<p class="otodor-warr__dur">{{ p1_dur | escape }}</p>{%- endif -%}
+            {%- if section.settings.policy_1_title != blank -%}<p class="otodor-warr__title">{{ section.settings.policy_1_title | escape }}</p>{%- endif -%}
+            {%- if section.settings.policy_1_covers != blank -%}<p class="otodor-warr__covers">{{ section.settings.policy_1_covers | escape }}</p>{%- endif -%}
+          </li>
+        {%- endif -%}
+        {%- assign p2_dur = spec_batt | default: section.settings.policy_2_duration -%}
+        {%- if section.settings.policy_2_title != blank or p2_dur != blank -%}
+          <li class="otodor-warr__card">
+            <span class="otodor-warr__icon">{% render 'otodor-icon', name: 'log' %}</span>
+            {%- if p2_dur != blank -%}<p class="otodor-warr__dur">{{ p2_dur | escape }}</p>{%- endif -%}
+            {%- if section.settings.policy_2_title != blank -%}<p class="otodor-warr__title">{{ section.settings.policy_2_title | escape }}</p>{%- endif -%}
+            {%- if section.settings.policy_2_covers != blank -%}<p class="otodor-warr__covers">{{ section.settings.policy_2_covers | escape }}</p>{%- endif -%}
+          </li>
+        {%- endif -%}
+      {%- endif -%}
+    </ul>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Warranty",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "Priority: product metafield custom.warranty_policies (metaobjects) → policy blocks → specs.warranty / specs.warranty_battery mapped onto the two slots below → these defaults. Nothing stacks. Clear all sources to hide the module." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Peace of mind" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Warranty & coverage" },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Every OTODOR lock is backed end to end — hardware, mechanism and battery — with real support behind it." },
+    { "type": "header", "content": "Default coverage 1" },
+    { "type": "text", "id": "policy_1_duration", "label": "Duration", "default": "3 years" },
+    { "type": "text", "id": "policy_1_title", "label": "Title", "default": "Lock & mechanism" },
+    { "type": "textarea", "id": "policy_1_covers", "label": "Covers", "default": "Electronics, motor and hardware against manufacturing defects." },
+    { "type": "header", "content": "Default coverage 2" },
+    { "type": "text", "id": "policy_2_duration", "label": "Duration", "default": "1 year" },
+    { "type": "text", "id": "policy_2_title", "label": "Title", "default": "Battery" },
+    { "type": "textarea", "id": "policy_2_covers", "label": "Covers", "default": "Rechargeable battery performance and capacity." },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 88 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 88 }
+  ],
+  "blocks": [
+    {
+      "type": "policy",
+      "name": "Coverage (fallback)",
+      "settings": [
+        { "type": "text", "id": "duration", "label": "Duration", "default": "3 years" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Lock & mechanism" },
+        { "type": "textarea", "id": "covers", "label": "Covers", "default": "Electronics, motor and hardware against manufacturing defects." },
+        {
+          "type": "select", "id": "icon", "label": "Icon", "default": "warranty",
+          "options": [
+            { "value": "warranty", "label": "Shield" },
+            { "value": "log", "label": "Clock" },
+            { "value": "smart", "label": "Key" },
+            { "value": "app", "label": "App" },
+            { "value": "wrench", "label": "Installation" }
+          ]
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [{ "name": "OTODOR Warranty" }]
+}
+{% endschema %}
