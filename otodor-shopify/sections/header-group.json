@@ -18,6 +18,8 @@
         "mobile_logo_position": "left",
         "menu": "main-menu",
         "menu_type_desktop": "mega",
+        "mega_show_cta": true,
+        "mega_cta_button_link": "/pages/contact#otodor-lead",
         "sticky_header_type": "on-scroll-up",
         "show_line_separator": false,
         "color_scheme": "scheme-1",
