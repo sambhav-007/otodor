@@ -26,7 +26,7 @@
           "settings": {
             "prompt": "Which door is it for?",
             "o1_label": "Wooden main door", "o1_collection": "wooden-door-locks", "o1_icon": "fingerprint", "o1_weight": 2,
-            "o2_label": "Glass door", "o2_collection": "glass-door-locks", "o2_icon": "key", "o2_weight": 2,
+            "o2_label": "Glass door", "o2_collection": "glass-door-locks", "o2_icon": "pin", "o2_weight": 2,
             "o3_label": "Metal gate", "o3_collection": "metal-gate-locks", "o3_icon": "warranty", "o3_weight": 2,
             "o4_label": "I need a padlock", "o4_collection": "smart-padlocks", "o4_icon": "rfid", "o4_weight": 2
           }

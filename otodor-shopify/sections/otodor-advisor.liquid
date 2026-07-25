@@ -296,7 +296,7 @@
         { "type": "header", "content": "Option 2" },
         { "type": "text", "id": "o2_label", "label": "Label", "default": "Glass door" },
         { "type": "collection", "id": "o2_collection", "label": "Recommends collection" },
-        { "type": "select", "id": "o2_icon", "label": "Icon", "default": "key", "options": [ { "value": "", "label": "None" }, { "value": "fingerprint", "label": "Fingerprint" }, { "value": "pin", "label": "Keypad" }, { "value": "rfid", "label": "RFID" }, { "value": "remote", "label": "Remote" }, { "value": "app", "label": "App" }, { "value": "warranty", "label": "Shield" }, { "value": "installation", "label": "Installation" }, { "value": "smart", "label": "Smart" } ] },
+        { "type": "select", "id": "o2_icon", "label": "Icon", "default": "pin", "options": [ { "value": "", "label": "None" }, { "value": "fingerprint", "label": "Fingerprint" }, { "value": "pin", "label": "Keypad" }, { "value": "rfid", "label": "RFID" }, { "value": "remote", "label": "Remote" }, { "value": "app", "label": "App" }, { "value": "warranty", "label": "Shield" }, { "value": "installation", "label": "Installation" }, { "value": "smart", "label": "Smart" } ] },
         { "type": "range", "id": "o2_weight", "label": "Weight", "min": 1, "max": 5, "step": 1, "default": 2 },
         { "type": "header", "content": "Option 3" },
         { "type": "text", "id": "o3_label", "label": "Label" },
@@ -315,7 +315,7 @@
     {
       "name": "OTODOR Guided Advisor",
       "blocks": [
-        { "type": "question", "settings": { "prompt": "Which door is it for?", "o1_label": "Wooden main door", "o1_icon": "fingerprint", "o2_label": "Glass door", "o2_icon": "key", "o3_label": "Metal gate", "o3_icon": "warranty", "o4_label": "A padlock need", "o4_icon": "rfid" } },
+        { "type": "question", "settings": { "prompt": "Which door is it for?", "o1_label": "Wooden main door", "o1_icon": "fingerprint", "o2_label": "Glass door", "o2_icon": "pin", "o3_label": "Metal gate", "o3_icon": "warranty", "o4_label": "A padlock need", "o4_icon": "rfid" } },
         { "type": "question", "settings": { "prompt": "How do you want to unlock it?", "o1_label": "Fingerprint", "o1_icon": "fingerprint", "o2_label": "PIN keypad", "o2_icon": "pin", "o3_label": "Phone app", "o3_icon": "app", "o4_label": "RFID card", "o4_icon": "rfid" } },
         { "type": "question", "settings": { "prompt": "What matters most?", "o1_label": "Maximum security", "o1_icon": "warranty", "o2_label": "Convenience", "o2_icon": "smart", "o3_label": "Remote access", "o3_icon": "remote", "o4_label": "Easy install", "o4_icon": "installation" } }
       ]
