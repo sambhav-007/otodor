@@ -52,6 +52,7 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 | STEP 4b-0 | **Module contract** (`OTODOR-MODULE-CONTRACT.md`): the standard every module implements — 10-field interface, 5-step lifecycle (read→override→validate→render→hide), canonical Liquid skeleton, orchestrator assembly rule, conformance checklist. |
 | STEP 4b-1…4 | **3 new modules** (`otodor-product-downloads`, `-warranty`, `-compat`) each metafield-primary → block fallback → auto-hide, w/ doc block + preset; **85 mm clearance** added to `otodor-product-install`; **`product.json` assembled** as orchestrator. |
 | STEP 4.5 | **Framework inventory** (`OTODOR-FRAMEWORK-INVENTORY.md`): canonical register of every reusable module (data sources / fallback / visibility / reusable-in / deps / status). |
+| STEP 5 | **Specification Rendering Engine** (`OTODOR-SPEC-ENGINE.md`): `otodor-spec-registry` (single source of truth, 20 specs, 10-col records, optional `comparison_spec` metaobject overlay) + `otodor-spec-value` (value resolver + 10 type renderers). `otodor-comparison` **rewritten as a pure consumer** (products × registry, no hardcoded spec names; resolves blocks → collection → current collection → PDP siblings; empty rows/groups drop; hides < 2 products). Wired into product page + digital-locks collection. Shared `.otodor-spec__*` CSS in `otodor-base.css`. |
 
 **Homepage order** (`index.json`) unchanged: `otodor_hero → otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials → otodor_process → otodor_ecosystem → otodor_cta_banner`.
 
@@ -61,11 +62,11 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 
 ## ⚠️ Next steps
 
-### ✅ Done — STEP 4b (product modules) + STEP 4.5 (inventory)
-Module contract established; Downloads / Warranty / Compatibility modules built (contract-compliant, auto-hiding), 85 mm clearance added to Install, `product.json` assembled as orchestrator, framework inventory written. `shopify theme check` clean vs. baseline (5 pre-existing errors, none from this work).
+### ✅ Done — STEP 4b + 4.5 + STEP 5 (Spec Rendering Engine)
+Module contract + Downloads/Warranty/Compatibility modules + 85 mm clearance + orchestrator + framework inventory (4b/4.5). **STEP 5:** the Specification Rendering Engine (`otodor-spec-registry` + `otodor-spec-value`) and `otodor-comparison` rewritten as its consumer, wired into product + digital-locks collection. `shopify theme check` clean vs. baseline (5 pre-existing errors, none from this work).
+- **Note:** the comparison reads `specs.*` product metafields; until those are defined/populated in admin, only the `warranty` row (which has a registry default) renders — it fills out as spec metafields are added. Add a spec = one registry record; add a renderer type = one `when` in `otodor-spec-value`.
 
 ### Remaining roadmap
-- **STEP 5** — spec-driven Comparison (generalize `otodor-comparison`: product-block columns + spec-row blocks reading `specs.*`).
 - **STEP 6** — FAQ + FAQPage/Product/Breadcrumb JSON-LD.
 - **STEP 7** — Buying guide (pages/articles first). **STEP 8** — Lead capture / AI advisor. **STEP 9** — SEO expansion.
 

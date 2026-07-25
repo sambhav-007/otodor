@@ -30,13 +30,26 @@ Consumed by the `product.json` orchestrator (Gallery → Purchase → **modules*
 | **otodor-product-warranty** | What the warranty covers, for how long | `custom.warranty_policies` metaobjects + `specs.warranty` / `specs.warranty_battery` | metaobjects → `policy` blocks → spec metafields on 2 slots → editable setting defaults → hide | Hidden only when all sources cleared | PDP, comparison, collection | `otodor-icon`, base.css; opt. `warranty_policy` metaobject | ✅ |
 | **otodor-product-downloads** | Manuals, datasheets, certs, brochures | `product.metafields.custom.documents` (list.file_reference) | metafield files → `document` blocks → hide | Hidden if no document exists | PDP, collection, landing | base.css | ✅ |
 | **otodor-product-reveal** | Editorial statement between purchase & specs | section setting (`statement`) | setting → hide when blank | Optional slot | PDP | base.css | ◑ |
-| **otodor-comparison** | Compare models across the range | section blocks (product + spec rows) — *generalises to `specs.*` in STEP 5* | blocks → hide | Per instance | PDP, collection, landing | base.css | ◑ (STEP 5 spec-driven) |
+| **otodor-comparison** | Compare products across the spec set | **Spec Engine**: registry × resolved products (`specs.*`) | product blocks → collection setting → current collection → current product + siblings → hide | Hidden if < 2 products; empty rows drop | PDP, collection, landing, any category | `otodor-spec-registry`, `otodor-spec-value`, `otodor-icon`, base.css | ✅ (engine consumer) |
 | **otodor-sticky-atc** | Persistent purchase bar | `product`, variants, price | always on PDP | Scroll-triggered | PDP | `.otodor-sticky-atc`, base.css, JS | ◑ |
 
 **Reused as-is (Dawn):** Gallery + Purchase (`main-product`), Video (`video`), FAQ (`collapsible-content`),
 Related (`related-products`, self-hides), SEO (`rich-text`). See `OTODOR-PRODUCT-MODULES.md`.
 
 ---
+
+## 1b. Specification Rendering Engine (shared snippets)
+
+The reusable spec system (`OTODOR-SPEC-ENGINE.md`) that powers the comparison and every future spec surface.
+Not sections — snippets consumed by sections. No consumer hardcodes a spec name.
+
+| Snippet | Purpose | Data sources | Fallback chain | Visibility rule | Reusable in | Dependencies | Status |
+|---|---|---|---|---|---|---|---|
+| **otodor-spec-registry** | Single source of truth: every spec definition (10-col records) | built-in canonical set (20 specs) + optional `comparison_spec` metaobjects | metaobject overrides built-in by id → built-in | Emits requested view (`only_comparable` / `group` / `ids`) | Comparison, highlights, landing, search-intent, API | — | ✅ |
+| **otodor-spec-value** | Value resolver + 10 type renderers (the render engine) | `product.metafields[ns][key]` or `raw_value` | raw_value → metafield → default → '—' (comparison) / nothing (inline) | per renderer | Every spec consumer | `otodor-icon`, `.otodor-spec__*` in base.css | ✅ |
+
+**Renderers:** boolean · range · number · text · badge · chip · rating · link · document · image. Add a type =
+one `when` branch; add a spec = one registry record. Zero section edits either way.
 
 ## 2. Collection Framework sections
 
@@ -80,12 +93,14 @@ listed so the inventory is complete.
 
 ## 4. Coverage summary
 
-- **Contract-compliant modules (✅):** 5 — `otodor-product-specs`, `otodor-product-compat`,
-  `otodor-product-warranty`, `otodor-product-downloads`, `otodor-category-selector` (reference).
+- **Contract-compliant modules (✅):** 6 — `otodor-product-specs`, `otodor-product-compat`,
+  `otodor-product-warranty`, `otodor-product-downloads`, `otodor-category-selector` (reference),
+  `otodor-comparison` (spec-engine consumer).
+- **Spec Rendering Engine (✅):** `otodor-spec-registry`, `otodor-spec-value` — reusable across all consumers.
 - **Framework sections pending doc-block retrofit (◑):** `otodor-product-install`, `otodor-product-reveal`,
-  `otodor-comparison`, `otodor-sticky-atc`, `otodor-collection-hero`, `otodor-collection-grid`,
-  `otodor-features`, `otodor-why`. All are already self-hiding/data-driven; retrofit adds the 10-field block.
-- **Genuinely new this phase (STEP 4b):** Compatibility, Warranty, Downloads.
+  `otodor-sticky-atc`, `otodor-collection-hero`, `otodor-collection-grid`, `otodor-features`, `otodor-why`.
+  All are already self-hiding/data-driven; retrofit adds the 10-field block.
+- **Genuinely new (STEP 4b):** Compatibility, Warranty, Downloads. **STEP 5:** the Spec Rendering Engine.
 
 ## 5. Building a new category (recap)
 
