@@ -100,6 +100,23 @@ re-emitted (the article page owns it).
 JSON-LD), `featured-blog`, `article-card`. Content metafields: `custom.buying_guide` / `installation_guide` /
 `compatibility_guide` (article_reference) + `custom.related_guides` (list.article_reference).
 
+## 2c. Lead Capture & Guided Advisor
+
+The conversion layer (`OTODOR-LEAD-CAPTURE.md`, STEP 8). Native-first — the *sink* is Shopify's own
+`{% form 'contact' %}` (leads arrive in the merchant's inbox, no backend); the *source* is a deterministic
+client-side advisor (not an LLM). Composed onto the contact page (`page.contact.json`) as the canonical lead desk
+every CTA already points to.
+
+| Section | Purpose | Data sources (primary) | Fallback chain | Visibility rule | Reusable in | Dependencies | Status |
+|---|---|---|---|---|---|---|---|
+| **otodor-lead-form** | Capture a qualified, attributed lead (quote / survey) | section settings + `reason`/`interest` blocks; native `{% form 'contact' %}` | interest blocks → message-only; reason blocks → no trust rail | Always renders; every sub-part self-hides | Quote/contact page, PDP footer, collection footer, landing, home | `otodor-icon`, base.css, `settings.otodor_whatsapp_*` | ✅ |
+| **otodor-advisor** | Guide an unsure visitor to the right range + a lead | `question` blocks (prompt + ≤4 options → collection + weight) | option → collection → default recommendation | **Auto-hides** with no `question` blocks | Home, quote page, collection landing, PDP cross-sell | `otodor-advisor-rec` snippet, `otodor-advisor.js`, `otodor-icon`, base.css | ✅ |
+
+**Context-capture (native trick):** the lead form injects hidden `contact[Source page]` / `contact[Product]` /
+`contact[Collection]` / `contact[Advisor result]` fields, so each lead lands in the inbox pre-attributed to the
+page/product it came from. **WhatsApp dual-path** on both sections uses `settings.otodor_whatsapp_number`.
+**Handoff:** advisor "Get a quote" → lead form via `?interest=` query param (prefill) or `#otodor-lead` anchor.
+
 ## 3. Cross-cutting brand sections
 
 Homepage/brand narrative. Data-driven where noted, but outside the product/collection data-contract set —
@@ -115,7 +132,7 @@ listed so the inventory is complete.
 | **otodor-ecosystem** | Product ecosystem | blocks | Per instance | ○ |
 | **otodor-smart-living** | Lifestyle band | settings | Per instance | ○ |
 | **otodor-testimonials** | Social proof | blocks | Per instance | ○ |
-| **otodor-cta-banner** | Lead-capture CTA (→ contact-form, STEP 8) | settings | Per instance | ○ |
+| **otodor-cta-banner** | Lead-capture CTA (→ `otodor-lead-form` via `/pages/contact#otodor-lead`) | settings | Per instance | ○ |
 | **otodor-products** | Curated product rail | collection/products | Per instance | ○ |
 | **otodor-search** | Search surface | Shopify search | Route-driven | ○ |
 | **otodor-footer** | Brand footer | settings + navigation | Always | ○ |
@@ -133,8 +150,11 @@ listed so the inventory is complete.
   All are already self-hiding/data-driven; retrofit adds the 10-field block.
 - **Content Experience Layer (✅, STEP 7):** `otodor-content-guide`, `otodor-content-rail` — surface native
   Articles/Pages by reference.
+- **Lead Capture & Advisor (✅, STEP 8):** `otodor-lead-form` (native contact-form lead sink + context capture +
+  WhatsApp), `otodor-advisor` (deterministic guided finder → recommendation → lead). Composed onto
+  `page.contact.json` as the canonical lead desk.
 - **Genuinely new (STEP 4b):** Compatibility, Warranty, Downloads. **STEP 5:** the Spec Rendering Engine.
-  **STEP 6:** the Schema Registry. **STEP 7:** the Content Experience Layer.
+  **STEP 6:** the Schema Registry. **STEP 7:** the Content Experience Layer. **STEP 8:** the Lead Capture layer.
 
 ## 5. Building a new category (recap)
 

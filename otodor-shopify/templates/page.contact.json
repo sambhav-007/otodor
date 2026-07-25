@@ -1,10 +1,12 @@
 /*
  * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
+ * OTODOR lead desk (STEP 8). The contact page is composed as the
+ * canonical lead destination every CTA already points to:
+ *   main-page  → page body (optional)
+ *   advisor    → guided "find your lock" flow (feeds the form)
+ *   lead-form  → native quote / consultation capture (#otodor-lead)
+ * The advisor's "Get a quote" scrolls to #otodor-lead on this page.
+ * See OTODOR-LEAD-CAPTURE.md.
  * ------------------------------------------------------------
  */
 {
@@ -13,22 +15,96 @@
       "type": "main-page",
       "settings": {
         "padding_top": 36,
-        "padding_bottom": 36
+        "padding_bottom": 12
       }
     },
-    "form": {
-      "type": "contact-form",
+    "advisor": {
+      "type": "otodor-advisor",
+      "blocks": {
+        "door": {
+          "type": "question",
+          "settings": {
+            "prompt": "Which door is it for?",
+            "o1_label": "Wooden main door", "o1_collection": "wooden-door-locks", "o1_icon": "fingerprint", "o1_weight": 2,
+            "o2_label": "Glass door", "o2_collection": "glass-door-locks", "o2_icon": "key", "o2_weight": 2,
+            "o3_label": "Metal gate", "o3_collection": "metal-gate-locks", "o3_icon": "warranty", "o3_weight": 2,
+            "o4_label": "I need a padlock", "o4_collection": "smart-padlocks", "o4_icon": "rfid", "o4_weight": 2
+          }
+        },
+        "access": {
+          "type": "question",
+          "settings": {
+            "prompt": "How would you like to unlock it?",
+            "o1_label": "Fingerprint", "o1_collection": "wooden-door-locks", "o1_icon": "fingerprint", "o1_weight": 1,
+            "o2_label": "PIN keypad", "o2_collection": "glass-door-locks", "o2_icon": "pin", "o2_weight": 1,
+            "o3_label": "Phone app", "o3_collection": "wooden-door-locks", "o3_icon": "app", "o3_weight": 1,
+            "o4_label": "RFID card", "o4_collection": "metal-gate-locks", "o4_icon": "rfid", "o4_weight": 1
+          }
+        },
+        "priority": {
+          "type": "question",
+          "settings": {
+            "prompt": "What matters most?",
+            "o1_label": "Maximum security", "o1_collection": "metal-gate-locks", "o1_icon": "warranty", "o1_weight": 1,
+            "o2_label": "Everyday convenience", "o2_collection": "wooden-door-locks", "o2_icon": "smart", "o2_weight": 1,
+            "o3_label": "Remote access", "o3_collection": "glass-door-locks", "o3_icon": "remote", "o3_weight": 1,
+            "o4_label": "Portability", "o4_collection": "smart-padlocks", "o4_icon": "installation", "o4_weight": 1
+          }
+        }
+      },
+      "block_order": ["door", "access", "priority"],
       "settings": {
-        "heading": "",
-        "heading_size": "h1",
-        "color_scheme": "scheme-1",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "color_scheme": "dark",
+        "eyebrow": "Not sure where to start?",
+        "heading": "Find your lock in",
+        "heading_accent": "30 seconds.",
+        "subheading": "Answer three quick questions and we'll point you to the OTODOR system built for your door.",
+        "quote_url": "#otodor-lead",
+        "result_label": "Our recommendation",
+        "default_title": "The full OTODOR range",
+        "default_reason": "Explore every OTODOR smart lock, or send your details below and a specialist will tailor a recommendation."
+      }
+    },
+    "lead-form": {
+      "type": "otodor-lead-form",
+      "blocks": {
+        "warranty": {
+          "type": "reason",
+          "settings": { "icon": "warranty", "title": "3-year warranty", "text": "Every OTODOR lock is covered for three years (1-year battery)." }
+        },
+        "survey": {
+          "type": "reason",
+          "settings": { "icon": "installation", "title": "Free site survey", "text": "A certified technician assesses your door before you buy." }
+        },
+        "heritage": {
+          "type": "reason",
+          "settings": { "icon": "smart", "title": "16 years' heritage", "text": "Backed by NavKar's security-engineering track record and PAN-India support." }
+        },
+        "i-wooden": { "type": "interest", "settings": { "label": "Wooden door lock" } },
+        "i-glass": { "type": "interest", "settings": { "label": "Glass door lock" } },
+        "i-metal": { "type": "interest", "settings": { "label": "Metal gate lock" } },
+        "i-padlock": { "type": "interest", "settings": { "label": "Smart padlock" } },
+        "i-other": { "type": "interest", "settings": { "label": "Something bespoke / not sure" } }
+      },
+      "block_order": ["warranty", "survey", "heritage", "i-wooden", "i-glass", "i-metal", "i-padlock", "i-other"],
+      "settings": {
+        "anchor_id": "otodor-lead",
+        "color_scheme": "light",
+        "eyebrow": "Talk to a specialist",
+        "heading": "Request a",
+        "heading_accent": "custom quote.",
+        "subheading": "Tell us about your door and we'll recommend the right OTODOR system, with a free site survey and installation assessment.",
+        "show_whatsapp": true,
+        "whatsapp_label": "Chat on WhatsApp",
+        "success_title": "Request received.",
+        "success_text": "Thank you — an OTODOR specialist will call you within one business day to arrange your survey.",
+        "padding_top": 64
       }
     }
   },
   "order": [
     "main",
-    "form"
+    "advisor",
+    "lead-form"
   ]
 }

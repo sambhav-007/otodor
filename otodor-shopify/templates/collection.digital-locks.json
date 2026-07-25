@@ -73,7 +73,7 @@
         "cta_title": "Any other custom?",
         "cta_text": "Not sure, or need something bespoke? Ask our OTODOR experts.",
         "cta_button_label": "Ask an expert",
-        "cta_link": "/pages/contact"
+        "cta_link": "/pages/contact#otodor-lead"
       }
     },
     "product-grid": {
@@ -220,9 +220,9 @@
         "heading_accent": "most.",
         "description": "Book a priority home survey and let a certified OTODOR technician recommend and install the right digital lock.",
         "cta_primary_label": "Get a Custom Quote",
-        "cta_primary_link": "/pages/contact",
+        "cta_primary_link": "/pages/contact#otodor-lead",
         "cta_secondary_label": "Talk to us",
-        "cta_secondary_link": "/pages/contact"
+        "cta_secondary_link": "/pages/contact#otodor-lead"
       }
     },
     "buying-guide": {
