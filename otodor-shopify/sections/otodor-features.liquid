@@ -249,6 +249,8 @@
   }
 {%- endstyle -%}
 
+{%- comment -%} Section lifecycle: auto-hide when no feature blocks exist. {%- endcomment -%}
+{%- if section.blocks.size > 0 -%}
 <section
   id="otodor-features-{{ section.id }}"
   class="otodor-features"
@@ -342,6 +344,7 @@
     </div>
   </div>
 </section>
+{%- endif -%}
 
 {% schema %}
 {

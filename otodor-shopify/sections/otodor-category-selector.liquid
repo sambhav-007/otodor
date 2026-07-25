@@ -175,6 +175,8 @@
   }
 {%- endstyle -%}
 
+{%- comment -%} Section lifecycle: auto-hide when no category blocks exist. {%- endcomment -%}
+{%- if section.blocks.size > 0 -%}
 <section
   id="otodor-cat-selector-{{ section.id }}"
   class="otodor-cats otodor-cats--{{ scheme }}"
@@ -277,6 +279,7 @@
     </ul>
   </div>
 </section>
+{%- endif -%}
 
 {% schema %}
 {
