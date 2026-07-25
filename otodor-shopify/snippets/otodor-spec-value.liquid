@@ -1,0 +1,119 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Specification Value  (the rendering engine)
+  Value Resolver + Formatting + Presentation — see OTODOR-SPEC-ENGINE.md.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:   Resolve ONE (product, specification) value and render it via the
+             specification's own renderer. The ONLY place per-type display
+             logic lives — adding a type never touches a section.
+
+  Params:
+    product      product object (optional if raw_value given)
+    namespace    metafield namespace  (e.g. 'specs')
+    key          metafield key        (e.g. 'fingerprint')
+    type         data type (selects renderer if `renderer` unset)
+    renderer     override renderer: boolean|range|text|number|badge|chip|
+                 rating|link|document|image  (defaults to `type`)
+    unit         appended/label used by some renderers
+    spec_default value used when the metafield is empty
+    raw_value    bypass the metafield read (block/manual data, non-product use)
+    context      'comparison' (emit dash for empty) | 'inline' (emit nothing)
+
+  Resolution: raw_value → product.metafields[namespace][key].value → spec_default
+              → empty. Empty renders '—' only in comparison context.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign r_type = renderer | default: type | default: 'text'
+  assign ctx = context | default: 'inline'
+
+  # Value Resolver
+  assign mf = nil
+  assign val = raw_value
+  if val == blank and product != blank and namespace != blank and key != blank
+    assign mf = product.metafields[namespace][key]
+    assign val = mf.value
+  endif
+  assign has_val = true
+  if val == blank
+    assign val = spec_default
+  endif
+  if val == blank
+    assign has_val = false
+  endif
+
+  # Formatting helper: append unit unless the value already contains it.
+  assign display = val | append: ''
+  if unit != blank
+    unless display contains unit
+      assign display = display | append: ' ' | append: unit
+    endunless
+  endif
+-%}
+
+{%- if has_val == false and r_type != 'boolean' -%}
+  {%- if ctx == 'comparison' -%}<span class="otodor-spec__dash" aria-label="Not specified">—</span>{%- endif -%}
+{%- else -%}
+  {%- case r_type -%}
+
+    {%- when 'boolean' -%}
+      {%- assign vl = val | append: '' | downcase | strip -%}
+      {%- if has_val and vl != 'false' and vl != 'no' and vl != '0' and vl != 'none' and vl != '—' -%}
+        <span class="otodor-spec__check" role="img" aria-label="Yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></span>
+      {%- else -%}
+        <span class="otodor-spec__dash" aria-label="No">—</span>
+      {%- endif -%}
+
+    {%- when 'range' or 'number' -%}
+      {{ display | escape }}
+
+    {%- when 'badge' -%}
+      <span class="otodor-spec__badge">{{ val | escape }}</span>
+
+    {%- when 'chip' -%}
+      <span class="otodor-spec__chip">{{ val | escape }}</span>
+
+    {%- when 'rating' -%}
+      {%- assign rating = val | plus: 0.0 -%}
+      {%- assign full = rating | floor -%}
+      <span class="otodor-spec__rating" role="img" aria-label="{{ val }} out of 5">
+        {%- for i in (1..5) -%}
+          {%- if i <= full -%}
+            {%- render 'otodor-icon', name: 'star' -%}
+          {%- else -%}
+            <span class="is-empty">{%- render 'otodor-icon', name: 'star' -%}</span>
+          {%- endif -%}
+        {%- endfor -%}
+        {{ val }}
+      </span>
+
+    {%- when 'link' -%}
+      {%- assign href = val.url | default: val -%}
+      {%- if href != blank -%}
+        <a class="otodor-spec__link" href="{{ href }}" target="_blank" rel="noopener">
+          {{ unit | default: 'View' | escape }}
+          {%- render 'otodor-icon', name: 'arrow-right' -%}
+        </a>
+      {%- endif -%}
+
+    {%- when 'document' -%}
+      {%- assign href = val.url | default: val -%}
+      {%- if href != blank -%}
+        <a class="otodor-spec__link" href="{{ href }}" download target="_blank" rel="noopener">
+          {{ unit | default: 'Download' | escape }}
+        </a>
+      {%- endif -%}
+
+    {%- when 'image' -%}
+      {%- if val.src or val.width -%}
+        {{ val | image_url: width: 192 | image_tag: loading: 'lazy', class: 'otodor-spec__img', widths: '96,192', alt: '' }}
+      {%- elsif val != blank -%}
+        <img class="otodor-spec__img" src="{{ val }}" width="96" height="96" loading="lazy" alt="">
+      {%- endif -%}
+
+    {%- else -%}
+      {{ val | escape }}
+
+  {%- endcase -%}
+{%- endif -%}

@@ -1962,3 +1962,60 @@ body.otodor-light-page {
     radial-gradient(ellipse 80% 60% at 50% 0%, rgba(77, 166, 255, 0.07) 0%, transparent 55%),
     linear-gradient(180deg, #0D0D0D 0%, #080808 100%);
 }
+
+/* ─── Specification Rendering Engine (shared value renderers) ──────
+   Emitted by snippets/otodor-spec-value.liquid. Token-based so the same
+   markup reads correctly in dark (comparison) and light (inline) contexts. */
+.otodor-spec__check {
+  display: inline-flex;
+  color: var(--otodor-success);
+}
+.otodor-spec__check svg { width: 20px; height: 20px; }
+.otodor-spec__dash {
+  color: var(--otodor-faint);
+  font-weight: 500;
+}
+.otodor-spec__badge,
+.otodor-spec__chip {
+  display: inline-block;
+  font-family: var(--otodor-font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.28rem 0.75rem;
+  border-radius: var(--otodor-radius-pill);
+  white-space: nowrap;
+}
+.otodor-spec__badge {
+  color: #FFFFFF;
+  background: var(--otodor-blue);
+}
+.otodor-spec__chip {
+  color: var(--otodor-blue);
+  border: 1px solid var(--otodor-blue);
+  font-weight: 500;
+}
+.otodor-spec__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--otodor-blue);
+  font-weight: 600;
+}
+.otodor-spec__rating svg { width: 15px; height: 15px; }
+.otodor-spec__rating .is-empty { color: var(--otodor-faint); }
+.otodor-spec__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--otodor-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+.otodor-spec__link:hover { text-decoration: underline; }
+.otodor-spec__img {
+  max-width: 96px;
+  height: auto;
+  border-radius: var(--otodor-radius-sm);
+  display: block;
+}
