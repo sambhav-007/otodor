@@ -53,6 +53,7 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 | STEP 4b-1…4 | **3 new modules** (`otodor-product-downloads`, `-warranty`, `-compat`) each metafield-primary → block fallback → auto-hide, w/ doc block + preset; **85 mm clearance** added to `otodor-product-install`; **`product.json` assembled** as orchestrator. |
 | STEP 4.5 | **Framework inventory** (`OTODOR-FRAMEWORK-INVENTORY.md`): canonical register of every reusable module (data sources / fallback / visibility / reusable-in / deps / status). |
 | STEP 5 | **Specification Rendering Engine** (`OTODOR-SPEC-ENGINE.md`): `otodor-spec-registry` (single source of truth, 20 specs, 10-col records, optional `comparison_spec` metaobject overlay) + `otodor-spec-value` (value resolver + 10 type renderers). `otodor-comparison` **rewritten as a pure consumer** (products × registry, no hardcoded spec names; resolves blocks → collection → current collection → PDP siblings; empty rows/groups drop; hides < 2 products). Wired into product page + digital-locks collection. Shared `.otodor-spec__*` CSS in `otodor-base.css`. |
+| STEP 6 | **Structured Content & SEO Foundation** (`OTODOR-STRUCTURED-CONTENT.md`): centralized **Schema Registry** `otodor-schema.liquid` (dispatched: `graph` = Organization + WebSite + BreadcrumbList + CollectionPage + VideoObject as one `@graph`, gated by data; `faqpage` + `howto` builders). Rendered once in `theme.liquid` head; Org/WebSite **moved out of `header.liquid`** (de-dupe). `collapsible-content` extended (auto-hide + opt-in FAQPage). `otodor-product-install` opt-in HowTo (default off). Product/Offer/rating left to Shopify `structured_data` (not duplicated). |
 
 **Homepage order** (`index.json`) unchanged: `otodor_hero → otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials → otodor_process → otodor_ecosystem → otodor_cta_banner`.
 
@@ -62,13 +63,13 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 
 ## ⚠️ Next steps
 
-### ✅ Done — STEP 4b + 4.5 + STEP 5 (Spec Rendering Engine)
-Module contract + Downloads/Warranty/Compatibility modules + 85 mm clearance + orchestrator + framework inventory (4b/4.5). **STEP 5:** the Specification Rendering Engine (`otodor-spec-registry` + `otodor-spec-value`) and `otodor-comparison` rewritten as its consumer, wired into product + digital-locks collection. `shopify theme check` clean vs. baseline (5 pre-existing errors, none from this work).
-- **Note:** the comparison reads `specs.*` product metafields; until those are defined/populated in admin, only the `warranty` row (which has a registry default) renders — it fills out as spec metafields are added. Add a spec = one registry record; add a renderer type = one `when` in `otodor-spec-value`.
+### ✅ Done — STEP 4b + 4.5 + STEP 5 + STEP 6
+Module contract + Downloads/Warranty/Compatibility modules + 85 mm clearance + orchestrator + framework inventory (4b/4.5). **STEP 5:** Specification Rendering Engine (`otodor-spec-registry` + `otodor-spec-value`); `otodor-comparison` rewritten as its consumer. **STEP 6:** centralized **Schema Registry** (`otodor-schema.liquid`) — Organization/WebSite (moved from header) + BreadcrumbList + CollectionPage + VideoObject as one `@graph`, plus FAQPage (collapsible-content) and opt-in HowTo (install). `shopify theme check` clean vs. baseline (5 pre-existing errors, none from this work).
+- **Note (STEP 5):** the comparison reads `specs.*` product metafields; until those are defined/populated in admin, only the `warranty` row (registry default) renders — it fills out as spec metafields are added. Add a spec = one registry record; add a renderer type = one `when` in `otodor-spec-value`.
+- **Note (STEP 6):** Product/Offer/AggregateRating stay with Shopify `structured_data` (never duplicated). FAQPage is opt-in per collapsible-content instance (enabled on digital-locks). Schema is JSON-valid by construction but **verify live** with Google Rich Results Test once the store is public (sandbox can't render Liquid). Product `additionalProperty` (from the Spec Registry) + `Offer.warranty` are deferred to a reviewed Product-ownership change (`OTODOR-STRUCTURED-CONTENT.md` §5).
 
 ### Remaining roadmap
-- **STEP 6** — FAQ + FAQPage/Product/Breadcrumb JSON-LD.
-- **STEP 7** — Buying guide (pages/articles first). **STEP 8** — Lead capture / AI advisor. **STEP 9** — SEO expansion.
+- **STEP 7** — Buying guide (pages/articles first; Article/HowTo schema via the registry). **STEP 8** — Lead capture / AI advisor. **STEP 9** — SEO expansion (Product-ownership schema, sitemap/meta polish).
 
 ### Admin setup the merchant must do (theme degrades gracefully until done)
 - **Navigation:** build the nested 3-level `main-menu` (Products → Digital Locks → Wooden/Glass/…; see Phase 2 report) so the mega menu shows the hierarchy.

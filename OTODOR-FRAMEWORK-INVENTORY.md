@@ -51,6 +51,22 @@ Not sections — snippets consumed by sections. No consumer hardcodes a spec nam
 **Renderers:** boolean · range · number · text · badge · chip · rating · link · document · image. Add a type =
 one `when` branch; add a spec = one registry record. Zero section edits either way.
 
+## 1c. Schema Registry (structured data)
+
+Centralized JSON-LD generation (`OTODOR-STRUCTURED-CONTENT.md`). One dispatched snippet; every object gated by
+data sufficiency. Consumes the same Shopify data the UI renders — no content duplicated for schema.
+
+| Snippet / mode | Emits | Source | Gate | Reusable in | Status |
+|---|---|---|---|---|---|
+| **otodor-schema** (`graph`, from `theme.liquid` head) | Organization, WebSite, BreadcrumbList, CollectionPage, VideoObject — one `@graph` | shop/settings, `product.collections`, `collection`, `product.media` | each object only when data exists | every page | ✅ |
+| **otodor-schema** (`build: 'faqpage'`) | FAQPage | a section's `collapsible_row` blocks | ≥1 Q&A | FAQ (product + collection) | ✅ |
+| **otodor-schema** (`build: 'howto'`) | HowTo | `step` blocks | ≥2 steps, opt-in | Install (genuine instructions only) | ✅ |
+
+**Not re-emitted (already native):** Product / Offer / AggregateRating (Shopify `structured_data` in
+`main-product`). **Consumers:** `theme.liquid` (graph), `collapsible-content` (faqpage), `otodor-product-install`
+(howto, opt-in). Deferred: Product `additionalProperty` (from the Spec Registry) + `Offer.warranty` — needs a
+reviewed Product-ownership change (see `OTODOR-STRUCTURED-CONTENT.md` §5).
+
 ## 2. Collection Framework sections
 
 Composed by `templates/collection.json` (inherited by every category); Digital Locks is instantiated by
