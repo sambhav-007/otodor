@@ -202,6 +202,15 @@
         "container_color_scheme": "scheme-2"
       }
     },
+    "comparison": {
+      "type": "otodor-comparison",
+      "settings": {
+        "eyebrow": "Compare the range",
+        "heading": "Find the right lock for your ",
+        "heading_accent": "door.",
+        "max_products": 4
+      }
+    },
     "cta": {
       "type": "otodor-cta-banner",
       "settings": {
@@ -238,6 +247,7 @@
     "features",
     "why",
     "content",
+    "comparison",
     "faq",
     "cta",
     "seo"
