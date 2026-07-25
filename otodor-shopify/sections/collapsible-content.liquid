@@ -15,6 +15,11 @@
   }
 {%- endstyle -%}
 
+{%- comment -%} OTODOR: auto-hide when empty (no collapsible rows → render nothing). {%- endcomment -%}
+{%- if section.blocks.size > 0 -%}
+{%- if section.settings.emit_faq_schema -%}
+  {%- render 'otodor-schema', build: 'faqpage', faq_section: section -%}
+{%- endif -%}
 <div class="color-{{ section.settings.color_scheme }} gradient">
   <div class="collapsible-content collapsible-{{ section.settings.layout }}-layout isolate{% if section.settings.layout == 'section' %} page-width{% elsif section.settings.layout == 'none' %} content-container content-container--full-width{% endif %}">
     <div class="collapsible-content__wrapper section-{{ section.id }}-padding{% if section.settings.layout == 'section' %} content-container color-{{ section.settings.container_color_scheme }} gradient{% endif %}">
@@ -105,6 +110,7 @@
     </div>
   </div>
 </div>
+{%- endif -%}
 
 {% schema %}
 {
@@ -176,8 +182,19 @@
     },
     {
       "type": "header",
+      "content": "SEO"
+    },
+    {
+      "type": "checkbox",
+      "id": "emit_faq_schema",
+      "label": "Emit FAQ structured data (FAQPage)",
+      "info": "Enable only when the rows are genuine questions & answers. Adds FAQPage JSON-LD via the OTODOR Schema Registry.",
+      "default": false
+    },
+    {
+      "type": "header",
       "content": "t:sections.collapsible_content.settings.layout_header.content"
-    },    
+    },
     {
       "type": "select",
       "id": "layout",

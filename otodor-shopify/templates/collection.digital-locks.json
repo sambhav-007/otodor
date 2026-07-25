@@ -197,6 +197,7 @@
       "settings": {
         "heading": "Frequently asked questions",
         "heading_alignment": "center",
+        "emit_faq_schema": true,
         "layout": "row",
         "color_scheme": "scheme-1",
         "container_color_scheme": "scheme-2"
