@@ -43,6 +43,7 @@
                 tabindex="-1"
               >
                 <div class="otodor-mega page-width" data-otodor-mega>
+                  <div class="otodor-mega__main">
                   {%- comment -%} ── Left: category columns (level-2 → level-3) ── {%- endcomment -%}
                   <div class="otodor-mega__nav">
                     <ul class="otodor-mega__columns" role="list">
@@ -101,6 +102,33 @@
                     </ul>
                   </div>
 
+                  {%- comment -%} ── Quote CTA: left column, beneath the category grid ── {%- endcomment -%}
+                  {%- if section.settings.mega_show_cta -%}
+                    {%- assign mega_cta_url = section.settings.mega_cta_button_link | default: routes.root_url -%}
+                    <aside class="otodor-mega__cta">
+                      {%- if section.settings.mega_cta_image != blank -%}
+                        <span class="otodor-mega__cta-media">
+                          {{ section.settings.mega_cta_image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80,160', sizes: '56px', alt: '', class: 'otodor-mega__cta-img' }}
+                        </span>
+                      {%- endif -%}
+                      <div class="otodor-mega__cta-body">
+                        {%- if section.settings.mega_cta_heading != blank -%}
+                          <p class="otodor-mega__cta-heading">{{ section.settings.mega_cta_heading | escape }}</p>
+                        {%- endif -%}
+                        {%- if section.settings.mega_cta_text != blank -%}
+                          <p class="otodor-mega__cta-text">{{ section.settings.mega_cta_text | escape }}</p>
+                        {%- endif -%}
+                      </div>
+                      {%- if section.settings.mega_cta_button_label != blank -%}
+                        <a href="{{ mega_cta_url }}" class="otodor-mega__cta-button">
+                          {{ section.settings.mega_cta_button_label | escape }}
+                          {% render 'otodor-icon', name: 'arrow-right', class: 'otodor-mega__cta-arrow' %}
+                        </a>
+                      {%- endif -%}
+                    </aside>
+                  {%- endif -%}
+                  </div>
+
                   {%- comment -%} ── Right: featured panel (updates to the hovered category). Decorative — mirrors the column links, so hidden from AT. ── {%- endcomment -%}
                   <div class="otodor-mega__feature-wrap" aria-hidden="true">
                     {%- for childlink in link.links -%}
@@ -122,7 +150,7 @@
                       >
                         <span class="otodor-mega__feature-media">
                           {%- if feat_image != blank -%}
-                            {{ feat_image | image_url: width: 760 | image_tag: loading: 'lazy', widths: '380,570,760', sizes: '360px', alt: '', class: 'otodor-mega__feature-img' }}
+                            {{ feat_image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '400,600,900', sizes: '400px', alt: '', class: 'otodor-mega__feature-img' }}
                           {%- endif -%}
                         </span>
                         <div class="otodor-mega__feature-body">
@@ -138,32 +166,6 @@
                       </div>
                     {%- endfor -%}
                   </div>
-
-                  {%- comment -%} ── Footer: persistent "Get a Custom Quote" CTA ── {%- endcomment -%}
-                  {%- if section.settings.mega_show_cta -%}
-                    {%- assign mega_cta_url = section.settings.mega_cta_button_link | default: routes.root_url -%}
-                    <aside class="otodor-mega__cta">
-                      {%- if section.settings.mega_cta_image != blank -%}
-                        <span class="otodor-mega__cta-media">
-                          {{ section.settings.mega_cta_image | image_url: width: 680 | image_tag: loading: 'lazy', widths: '340,680', sizes: '340px', alt: '', class: 'otodor-mega__cta-img' }}
-                        </span>
-                      {%- endif -%}
-                      <div class="otodor-mega__cta-body">
-                        {%- if section.settings.mega_cta_heading != blank -%}
-                          <p class="otodor-mega__cta-heading">{{ section.settings.mega_cta_heading | escape }}</p>
-                        {%- endif -%}
-                        {%- if section.settings.mega_cta_text != blank -%}
-                          <p class="otodor-mega__cta-text">{{ section.settings.mega_cta_text | escape }}</p>
-                        {%- endif -%}
-                      </div>
-                      {%- if section.settings.mega_cta_button_label != blank -%}
-                        <a href="{{ mega_cta_url }}" class="otodor-mega__cta-button">
-                          {{ section.settings.mega_cta_button_label | escape }}
-                          {% render 'otodor-icon', name: 'arrow-right', class: 'otodor-mega__cta-arrow' %}
-                        </a>
-                      {%- endif -%}
-                    </aside>
-                  {%- endif -%}
                 </div>
               </div>
             </details>
