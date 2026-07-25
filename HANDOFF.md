@@ -1,116 +1,91 @@
 # OTODOR — Session Handoff
 
-Premium brand transformation of the OTODOR Shopify theme (Dawn-based). The goal across this work: make the **entire commerce experience feel like a premium security-technology brand** (Apple / Tesla / Bang & Olufsen energy), not an upgraded Shopify store. The homepage was already strong; the work extended that brand into collection, product, and search pages and rebuilt the homepage narrative.
+Evolving the **Viltrumate** Shopify theme (Dawn-based) into the official **OTODOR** premium
+security-technology brand and a **reusable commerce framework**. The current phase of work has shifted from
+"premium homepage" to **building the OTODOR commerce design system** — reusable, data-driven sections that
+every product category inherits with configuration only.
 
 - **Theme root:** `otodor-shopify/`
-- **Working branch:** `fix/header-nav-footer-polish`
-- **Dev server:** `shopify theme dev --path otodor-shopify --store ttna2m-mh.myshopify.com` → http://127.0.0.1:9292
-- **Design system:** `otodor-shopify/assets/otodor-base.css` (tokens + components). All brand work uses these CSS variables — no new colors/fonts.
-- **Fonts:** Space Grotesk (display) / Inter (body). **Colors:** blue accent `#4DA6FF` (dark) / `#1A78D8` (on light), near-black `#0B0B0B`, warm off-white `#F7F6F3`.
+- **Store:** `ttna2m-mh.myshopify.com` (Shopify CLI 4.5.2, authenticated)
+- **Working branch:** `master`
+- **Dev server (run it yourself):** `shopify theme dev --path otodor-shopify --store ttna2m-mh.myshopify.com` → http://127.0.0.1:9292 (the storefront is password-protected, so this needs an interactive terminal / `--store-password`; it cannot run headless in the agent sandbox).
+- **Design system:** `assets/otodor-base.css` (tokens + components). All work uses these CSS variables.
+- **Fonts:** **Hanken Grotesk** (self-hosted `assets/hankengrotesk-*.woff2`, a BR Sonoma stand-in — one token `--otodor-font-display` swaps it) + **Inter** (body).
+- **Colors:** blue accent `#4DA6FF` (dark) / `#1A78D8` (on light), near-black `#0B0B0B`, warm off-white `#F7F6F3`. **Champagne-gold pivot is deferred** (user chose to keep blue for now; the PDF ultimately wants gold).
 
-## Brand rhythm (non-negotiable direction from the user)
-Light/dark must alternate — never predominantly one:
-`Dark hero → light trust/discovery → light lifestyle/commerce → dark premium CTA → dark footer.`
-Commerce pages are **light-first** (warm off-white, white cards, neutral plinth product shots) with dark header/footer/CTA anchors.
+## Governing direction (from the user — do not violate)
+1. **Evolve, don't rewrite.** Repo must stay recognizably Viltrumate. Improve-before-replace; reuse existing sections; new components only when nothing fits.
+2. **Native Shopify first.** Data priority: products → collections → pages → blogs → navigation → recommendations → Search & Discovery → metafields → section blocks. **Metaobjects only when shared across many places / relational — always optional, never required.**
+3. **Reusable framework, not pages.** Every section must be generic (works for Digital Locks, Gate Automation, Security, Smart Home…), **data-driven with graceful fallback**, and **auto-hide when it has no data** (no broken placeholders). Every reusable section carries an **in-file documentation block** (Purpose/Inputs/Outputs/Dependencies/Reusable-for/Merchant-editable/Required+Optional metafields).
+4. **Use the official logo assets** at repo root (`Logo main.png`, `brand-logo.png`, `Logo Icon.png`, `favicon.png`). Don't recreate the mark by hand.
+5. **Workflow:** Architecture/audit → implement → self-review → **commit per step** (small reviewable increments).
 
-The `.otodor-light` scope and `body.otodor-light-page` class (in `otodor-base.css`) recolor Dawn tokens automatically. `theme.liquid:327` adds `otodor-light-page` to `<body>` for `collection`, `product`, and `search` templates.
-
----
-
-## What was done this session
-
-### 1. Header / footer polish (earlier)
-- Footer logo filename typo fixed (`otodot_` → `otodor_log_bg_removed.png`).
-- Header made full-bleed on desktop (logo flush left), nav forced to one line (`flex-wrap: nowrap`), logo hover-drop fixed (preserve `translateY(-50%)` in the hover transform). See `sections/header.liquid` inline `<style>`.
-- Footer credit line → "Powered by Viltrumate Technologies" (always renders, link optional). `sections/otodor-footer.liquid` + `sections/footer-group.json`.
-
-### 2. Commerce foundation
-- **`otodor-base.css` section 16 "COMMERCE COMPONENTS"** (appended at end): `.otodor-pcard` (product card), `.otodor-rail` (category pills), `.otodor-brand-moment`, `.otodor-ledger` (spec rows), `.otodor-trust-row`, `.otodor-sticky-atc`. Plus a rule making `.otodor-comparison` dark when on a light commerce page.
-- **`snippets/otodor-card-product.liquid`** — technology-first card: product on plinth, name, access-methods line, price. **Zero-price guard:** `product.price == 0` → "Contact for pricing" (WINDSOR/VAULTEX/FREDDY are ₹0 in the live store). Access line source: metafield `custom.access_methods` → fallback `product.type`.
-
-### 3. Collection page → `templates/collection.json`
-- **`sections/otodor-collection-hero.liquid`** — short dark hero (collection name, positioning line from collection description, product count) + light **brand-moment** band ("Security designed around how people actually live.").
-- **`sections/otodor-collection-grid.liquid`** — category rail (pills wired to real collections: `door-locks`, `gate-locks`, `sliding-gate-motors`, `security-system`, `accessories`), 3-col grid using the new card, sort, pagination, dark consult CTA (WhatsApp).
-
-### 4. Product page (mini flagship landing page) → `templates/product.json`
-Storytelling flow, top to bottom:
-1. **Buy module** (`main-product`, light-scoped) — block order: title, positioning (custom_liquid metafield `custom.positioning_line`), price, access_chips (custom_liquid metafield `custom.access_methods`, `·`-split), variant_picker, quantity, buy_buttons, **trust_row** (custom_liquid inline SVGs), description. `image_zoom` changed `lightbox`→`hover`.
-2. **`sections/otodor-product-reveal.liquid`** — large render + one statement (metafield `custom.reveal_statement` / `custom.reveal_image`).
-3. **`sections/otodor-product-benefits.liquid`** — editorial alternating image/statement rows (blocks; no cards/icons).
-4. **`sections/otodor-product-specs.liquid`** — spec ledger from metafield `custom.specs` (JSON: groups→rows) with manual block fallback.
-5. **`sections/otodor-product-lifestyle.liquid`** — one full-bleed image + one line (metafields `custom.lifestyle_image` / `custom.lifestyle_line`).
-6. **`sections/otodor-product-install.liquid`** — compatibility trust section (see #8 below, recently enlarged).
-7. **`otodor-comparison`** (existing section, now deployed) — dark closing band.
-8. **`sections/otodor-sticky-atc.liquid`** — slim bottom bar, appears after buy module scrolls out (IntersectionObserver), clicks the real Dawn submit button so cart logic is untouched. Zero-price → "Enquire" WhatsApp link.
-
-### 5. Search → `templates/search.json`
-- **`sections/otodor-search.liquid`** — dark search hero + light results (products as brand cards, articles/pages as quiet list rows). `theme.liquid` body class extended to `search`.
-
-### 6. Homepage narrative → `templates/index.json`
-User's required story order: **Discover → Imagine → Trust → Understand installation → See ecosystem → Act.**
-- **`sections/otodor-moments.liquid`** (NEW, replaced `otodor-smart-living`) — editorial day-in-the-life: **Leave · Arrive · Welcome · Secure**, one word + one line each. **Now a pinned GSAP scroll-tour** (see #9).
-- **`sections/otodor-why.liquid`** (NEW) — typographic credibility manifesto: "Installed. / Not delivered." etc. No cards/icons/bento.
-- **`sections/otodor-process.liquid`** (REBUILT) — installation: compatibility promise leads, 4 vertical stages with photo slots + duration chips, scroll-drawn progress line, trust row.
-- **`sections/otodor-ecosystem.liquid`** (NEW) — dark, elegant product-relationship diagram (Smart Lock → Access Control → Gate Automation → Mobile Control hub), thin scroll-drawn connector line + single light pulse. Explicitly NOT cyberpunk/HUD.
-
-### 7. Flagship removal (most recent)
-- `sections/otodor-flagship.liquid` **deleted**; removed from `index.json`.
-- **Moments took the flagship's homepage slot AND its pinned scroll-tour mechanics** — on desktop (≥1024px) the section pins and scroll scrubs through opener → 4 moments crossfading (image zoom-out + word/line rise), with progress dots. Mobile/no-JS/reduced-motion = static stacked frames. All flagship stability guards carried over (scrollRestoration reset, ScrollTrigger teardown, `ignoreMobileResize`, refresh on load, rebuild on breakpoint change).
-
-### 8. Install section enlarged (most recent)
-`otodor-product-install.liquid` rebuilt from a thin strip into a full block: big promise (up to 3.4rem), eyebrow, estimate at reading size, **"Check my door" WhatsApp CTA** (pre-fills product name), 4 stages with ghosted numbers + descriptions + duration chips. Stages are now editable blocks with fallback defaults.
+## Brand rhythm (still applies)
+Light/dark alternate — never predominantly one. Commerce pages are light-first (warm off-white, white cards) with dark header/footer/CTA anchors. `body.otodor-light-page` (set in `theme.liquid` for collection/product/search) recolors Dawn tokens.
 
 ---
 
-## Current homepage order (`index.json`)
-```
-otodor_hero → otodor_categories → otodor_moments → otodor_trust_bar →
-otodor_features → otodor_why → otodor_testimonials → otodor_process →
-otodor_ecosystem → otodor_cta_banner
-```
-(CTA banner flipped back to dark — `light_background: false` — to restore the dark tail.)
+## Reference docs (read these first)
+- `OTODOR-AUDIT.md` — Brand-PDF audit + phase plan.
+- `OTODOR-COMMERCE-ARCHITECTURE.md` — Digital Locks section map + reuse audit.
+- `OTODOR-DATA-MODEL.md` — product/collection metafields, metaobjects, Search/Nav/Recommendations, the section doc-block standard.
+- `OTODOR-COLLECTION-TEMPLATE.md` — the generic collection framework API (per-section priority/fallback/hide).
+- `OTODOR-PRODUCT-MODULES.md` — product Information Modules audit + data contracts.
+- `OTODOR-MODULE-CONTRACT.md` — the standard every Information Module implements (interface + lifecycle + checklist).
+- `OTODOR-FRAMEWORK-INVENTORY.md` — canonical register of every reusable module built so far.
+
+The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source of truth for branding, messaging, product hierarchy, specs, warranty (3-yr lock / 1-yr battery), the 85 mm install clearance, and the Anti-"Little Black Box" EMI security story.
 
 ---
 
-## Git state
-Branch `fix/header-nav-footer-polish`. **Uncommitted** working-tree changes (this session's work is NOT committed yet):
-- Modified: `assets/otodor-base.css`, `layout/theme.liquid`, `sections/otodor-process.liquid`, `templates/{collection,index,product,search}.json`
-- Deleted: `sections/otodor-flagship.liquid`
-- New (untracked): `sections/otodor-{collection-grid,collection-hero,ecosystem,moments,product-benefits,product-install,product-lifestyle,product-reveal,specs,search,sticky-atc,why}.liquid`, `snippets/otodor-card-product.liquid`
+## Work done this session (committed on `master`)
+| Commit | What |
+|---|---|
+| `4ceccba` | **Phase 0 — brand foundation:** self-hosted Hanken Grotesk display face (replaces Space Grotesk, one token); warranty corrected to 3-yr lock / 1-yr battery sitewide; transparent monogram assets derived from official `favicon.png` (`otodor-monogram.png` / `-dark.png`) + `snippets/otodor-monogram.liquid`; footer "Secure Smart Automatic" tagline lockup + mark. |
+| `8876ae6` | **Phase 1 — homepage credibility:** "Why" gains German-engineering + 16-yr NavKar heritage lines; unverifiable "Rated 4.9 by 500+ Homes" → "Trusted by 10,000+ Homes". |
+| `1b6a53f` | **Phase 2 — premium mega menu (native):** desktop nav `dropdown→mega`; `header-mega-menu.liquid` premium 3-level layout (category columns w/ icon+description from linked collection, sub-links, product thumbnails, "Get a Custom Quote" CTA); `otodor-mega-menu.css`; header CTA settings. Data stays in Navigation. |
+| `108b091` `6288322` | **Phase 3 architecture + data model** docs. |
+| `e1cf8ab` | **STEP 2 — `otodor-category-selector.liquid`** (Door Type Selector): reference reusable section, collection-driven, zero metaobjects, override→fallback chain, light/dark, accessible, preset renders immediately, in-file doc block. |
+| `22e6312` | **STEP 3a — lifecycle guards** (`otodor-category-selector`, `otodor-features`, `otodor-why` auto-hide when empty) + collection template API doc. |
+| `e300bfa` | **STEP 3b — collection framework:** generic `templates/collection.json` (hero→selector→grid→features→why, empty slots auto-hide) + `templates/collection.digital-locks.json` instance (config-only, PDF data). |
+| `e72dc8b` | **STEP 4a — product Information Modules** audit + data contracts doc. |
+| STEP 4b-0 | **Module contract** (`OTODOR-MODULE-CONTRACT.md`): the standard every module implements — 10-field interface, 5-step lifecycle (read→override→validate→render→hide), canonical Liquid skeleton, orchestrator assembly rule, conformance checklist. |
+| STEP 4b-1…4 | **3 new modules** (`otodor-product-downloads`, `-warranty`, `-compat`) each metafield-primary → block fallback → auto-hide, w/ doc block + preset; **85 mm clearance** added to `otodor-product-install`; **`product.json` assembled** as orchestrator. |
+| STEP 4.5 | **Framework inventory** (`OTODOR-FRAMEWORK-INVENTORY.md`): canonical register of every reusable module (data sources / fallback / visibility / reusable-in / deps / status). |
 
-Note: earlier header/footer commits (`5de3ffd`) were already pushed to `origin/main` (repo `sambhav-007/agents-hero-composition-overhaul`). `gh` CLI is NOT installed locally and no GitHub token is in env — PRs must be created via web URL or after installing `gh`.
+**Homepage order** (`index.json`) unchanged: `otodor_hero → otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials → otodor_process → otodor_ecosystem → otodor_cta_banner`.
+
+**Product page** (`product.json`) current (STEP 4b orchestrator): `main-product → otodor-product-reveal → otodor-product-specs → otodor-product-compat → otodor-product-install → otodor-product-warranty → otodor-product-downloads → otodor-comparison → related-products → otodor-sticky-atc`. Every module auto-hides on no data.
 
 ---
 
-## ⚠️ Outstanding / next steps
+## ⚠️ Next steps
+
+### ✅ Done — STEP 4b (product modules) + STEP 4.5 (inventory)
+Module contract established; Downloads / Warranty / Compatibility modules built (contract-compliant, auto-hiding), 85 mm clearance added to Install, `product.json` assembled as orchestrator, framework inventory written. `shopify theme check` clean vs. baseline (5 pre-existing errors, none from this work).
+
+### Remaining roadmap
+- **STEP 5** — spec-driven Comparison (generalize `otodor-comparison`: product-block columns + spec-row blocks reading `specs.*`).
+- **STEP 6** — FAQ + FAQPage/Product/Breadcrumb JSON-LD.
+- **STEP 7** — Buying guide (pages/articles first). **STEP 8** — Lead capture / AI advisor. **STEP 9** — SEO expansion.
+
+### Admin setup the merchant must do (theme degrades gracefully until done)
+- **Navigation:** build the nested 3-level `main-menu` (Products → Digital Locks → Wooden/Glass/…; see Phase 2 report) so the mega menu shows the hierarchy.
+- **Assign** the `digital-locks` **collection → theme template `digital-locks`**. Optionally create sub-collections `wooden-door-locks`/`glass-door-locks`/`metal-gate-locks`/`smart-padlocks` (selector falls back gracefully if absent).
+- **Custom data:** define product metafields (`specs.*`, `custom.specs`, `custom.access_methods`, `custom.documents`, `custom.door_compatibility`, `custom.positioning_line`) + collection metafields (`custom.menu_icon/description/image`, `hero_*`, `faqs`, `seo_content`); optional metaobjects only if reused (see data model). Flag comparable ones for Search & Discovery filters.
 
 ### Content (owner: user — blocks real impact)
-- **Real product prices** — WINDSOR/VAULTEX/FREDDY are ₹0 (guard shows "Contact for pricing" meanwhile).
-- **Photography** — Moments (4 cinematic frames), installation stages (4 technician photos), product benefit rows, ecosystem node PNGs. All render gracefully without images but depend on them. All are theme-editor image pickers.
-- **Product descriptions** are ~25–50 chars (essentially empty).
+- **Real product prices** — WINDSOR/VAULTEX/FREDDY are ₹0 (card guard shows "Contact for pricing").
+- **Photography / high-res flagship renders** (ONYX/SENTRY/NEXUS/ZION+/ZEAL/OHM); product descriptions are near-empty.
 
-### Metafields to define in Shopify admin (sections degrade cleanly until set)
-- `custom.access_methods` (single-line text, `·`-separated, e.g. "Fingerprint · PIN · App")
-- `custom.positioning_line` (text)
-- `custom.specs` (JSON: `{"Security": {"Unlock methods": "Fingerprint, PIN, App"}, ...}`)
-- `custom.reveal_statement` (text), `custom.reveal_image` (file)
-- `custom.lifestyle_line` (text), `custom.lifestyle_image` (file)
-
-### Deferred (per user — after commerce/brand work)
-- Performance: homepage HTML ~248KB (sections inline full CSS/JS); GSAP loads on every page from cdnjs; `otodor-lifestyle-placeholder.jpg` is 293KB.
-- Accessibility/SEO: verify `--otodor-muted` (55% white) contrast; product JSON-LD price/availability once prices are real; alt text on product images.
+### Deferred (perf/a11y)
+- Sections inline full CSS/JS; GSAP loads per page from CDN. Verify gold/blue contrast (WCAG AA); JSON-LD once prices are real.
 
 ---
 
 ## Verification method (important)
-The user runs their own `shopify theme dev` on port **9292**, which **blocks the `preview_*` MCP screenshot tools** (port-in-use). Verify via `curl http://127.0.0.1:9292<path>` and grep the HTML for rendered classes / Liquid errors. Pages to smoke-test: `/`, `/collections/all`, `/collections/door-locks`, `/products/armour`, `/products/windsor` (zero-price), `/search?q=lock`, `/cart`. All returned 200 with 0 Liquid errors at last check.
-
-The pinned scroll-tours (Moments) and scroll-drawn lines (install, ecosystem) need a **real browser** to feel right — worth a manual desktop scroll-through. Frame durations are tunable in the section `<script>` (`frameDur` in moments).
-
----
+The agent sandbox **cannot run a headless preview** (storefront password + non-interactive). Validation here uses **`shopify theme check`** (currently 5 pre-existing errors / 18 warnings — footer logo `img` dims + translation keys; none from this session's work). **The user QAs visually on their own `shopify theme dev` at :9292.** Pinned scroll-tours (Moments) and scroll-drawn lines need a real browser.
 
 ## User preferences observed
-- Wants **premium storytelling over functional ecommerce energy**; reduce "transactional" feel.
-- Strong dislikes: feature-card grids, icons-as-decoration, bento layouts for credibility/lifestyle content, cyberpunk/HUD/sci-fi/neon aesthetics.
-- Likes: large typography, restraint, real photography, editorial alternating rows, Apple/Tesla/B&O references.
-- Validates structure via wireframes before big builds; iterates with precise per-section direction.
+- Premium storytelling over transactional ecommerce energy. **Dislikes:** feature-card grids, icons-as-decoration, bento layouts for credibility content, cyberpunk/HUD/neon. **Likes:** large type, restraint, real photography, editorial rows, Apple/Tesla/B&O references.
+- Thinks system-by-system (architecture before code); reviews each step; wants high-impact work, not isolated polish.
