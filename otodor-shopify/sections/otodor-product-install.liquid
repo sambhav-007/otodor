@@ -124,6 +124,23 @@
     margin-top: 1rem;
   }
 
+  .otodor-pinstall__clearance {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    padding: 1.2rem 1.4rem;
+    background: var(--otodor-bg-light-2);
+    border: 1px solid var(--otodor-hairline-light);
+    border-radius: var(--otodor-radius-md);
+  }
+  .otodor-pinstall__clearance svg { flex: none; width: 20px; height: 20px; color: var(--otodor-accent-on-light); margin-top: 0.1rem; }
+  .otodor-pinstall__clearance p {
+    font-family: var(--otodor-font-body);
+    font-size: 0.9rem; line-height: 1.6;
+    color: var(--otodor-ink-soft); margin: 0;
+  }
+
   @media (max-width: 989px) {
     .otodor-pinstall__header { grid-template-columns: 1fr; align-items: start; }
     .otodor-pinstall__steps { grid-template-columns: repeat(2, 1fr); }
@@ -183,6 +200,13 @@
       {%- endfor -%}
     {%- endif -%}
   </div>
+
+  {%- if section.settings.clearance_note != blank -%}
+    <div class="otodor-pinstall__clearance" data-otodor-reveal="fade-up">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 6l3-3M3 6l3 3M21 6l-3-3M21 6l-3 3M8 12v9M16 12v9M8 18h8"/></svg>
+      <p>{{ section.settings.clearance_note | escape }}</p>
+    </div>
+  {%- endif -%}
 </div>
 
 {% schema %}
@@ -193,7 +217,9 @@
     { "type": "text", "id": "promise", "label": "Compatibility promise", "default": "We verify compatibility before installation." },
     { "type": "text", "id": "estimate", "label": "Estimate line", "default": "Most installations completed within 2–4 hours, by certified OTODOR professionals." },
     { "type": "checkbox", "id": "show_cta", "label": "Show compatibility-check button", "default": true },
-    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Check my door" }
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Check my door" },
+    { "type": "header", "content": "Clearance guide" },
+    { "type": "textarea", "id": "clearance_note", "label": "Clearance note", "info": "Auto-hides if left blank.", "default": "Requires roughly 85 mm (3.35\") of side clearance from the door edge to any wall or frame for the handle to swing freely. Unsure? We confirm this during the compatibility check." }
   ],
   "blocks": [
     {

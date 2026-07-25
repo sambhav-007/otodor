@@ -1,0 +1,233 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Compatibility
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Help the customer decide whether the product fits their
+                      door (or gate, opening, mount…) before they buy.
+  Primary source:     configurable tag metafield (default custom.door_compatibility)
+                      + specs.door_thickness / specs.installation_type
+  Fallback order:     Fit tags:  tag metafield list → `tag` blocks → hide
+                      Fit specs: specs.* metafields → `spec` blocks → hide
+                      Module hides only when BOTH parts are empty.
+  Visibility rule:    Renders when any fit tag OR any fit spec exists. Hides
+                      completely when neither is present.
+  Merchant editable:  YES — heading/intro + the tag metafield source (namespace
+                      + key) via settings; `tag` and `spec` blocks as fallback.
+  Required metafields: none
+  Optional metafields: product custom.door_compatibility (list.single_line_text,
+                       configurable), specs.door_thickness, specs.installation_type
+  Dependencies:       otodor-base.css tokens (incl. shared .otodor-ledger). No JS.
+  Preset:             Renders 3 fit tags + 2 spec rows immediately.
+  Accessibility:      <section> landmark + aria-labelledby; tags are a
+                      <ul role="list">; spec ledger uses key/value pairs;
+                      contrast AA.
+  Reusable for:       Digital Locks (door types + thickness), Gate Automation
+                      (gate types + weight), Smart Home mounts, any category —
+                      point the tag source at that category's metafield, or use
+                      blocks. The spec metafields auto-appear only when present.
+
+  Generalisation:     the tag source is read via bracket access
+                      product.metafields[namespace][key], so a new category sets
+                      its own list metafield without editing this Liquid.
+                      Primary and fallback never stack (fallback fills a gap).
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  # 1. READ primary
+  assign tag_ns = section.settings.tag_namespace | default: 'custom'
+  assign tag_key = section.settings.tag_key | default: 'door_compatibility'
+  assign tags = product.metafields[tag_ns][tag_key].value
+
+  assign spec_thick = product.metafields.specs.door_thickness
+  assign spec_install = product.metafields.specs.installation_type
+
+  # 2. Fallbacks
+  assign tag_blocks = section.blocks | where: 'type', 'tag'
+  assign spec_blocks = section.blocks | where: 'type', 'spec'
+
+  assign has_auto_specs = false
+  if spec_thick != blank or spec_install != blank
+    assign has_auto_specs = true
+  endif
+
+  # 3. VALIDATE — resolve each part, then the whole
+  assign has_tags = false
+  if tags != blank or tag_blocks.size > 0
+    assign has_tags = true
+  endif
+  assign has_specs = false
+  if has_auto_specs or spec_blocks.size > 0
+    assign has_specs = true
+  endif
+  assign has_content = false
+  if has_tags or has_specs
+    assign has_content = true
+  endif
+-%}
+
+{%- if has_content -%}
+  {%- style -%}
+    #shopify-section-{{ section.id }} { background: var(--otodor-bg-light); }
+    #shopify-section-{{ section.id }} .otodor-compat {
+      max-width: var(--otodor-container-sm);
+      margin-inline: auto;
+      padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+      border-top: 1px solid var(--otodor-hairline-light);
+    }
+    #shopify-section-{{ section.id }} .otodor-compat__head { margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem); max-width: 46rem; }
+    #shopify-section-{{ section.id }} .otodor-compat__eyebrow {
+      display: block;
+      font-family: var(--otodor-font-display);
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: var(--otodor-tracking-widest);
+      color: var(--otodor-accent-on-light); margin-bottom: 0.9rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-compat__heading {
+      font-family: var(--otodor-font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700;
+      letter-spacing: var(--otodor-tracking-tight);
+      color: var(--otodor-ink); margin: 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-compat__intro {
+      font-family: var(--otodor-font-body); font-size: var(--otodor-text-md);
+      line-height: 1.6; color: var(--otodor-ink-soft); margin: 0.9rem 0 0; max-width: 52ch;
+    }
+    #shopify-section-{{ section.id }} .otodor-compat__label {
+      font-family: var(--otodor-font-display); font-size: 0.78rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: var(--otodor-tracking-wider);
+      color: var(--otodor-accent-on-light); margin: 0 0 1rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-compat__tags {
+      list-style: none; margin: 0 0 clamp(1.5rem, 3vw, 2.25rem); padding: 0;
+      display: flex; flex-wrap: wrap; gap: 0.6rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-compat__tag {
+      font-family: var(--otodor-font-body); font-size: 0.86rem; font-weight: 500;
+      color: var(--otodor-ink);
+      background: var(--otodor-bg-light-2);
+      border: 1px solid var(--otodor-hairline-light-2);
+      border-radius: var(--otodor-radius-pill);
+      padding: 0.5rem 1.1rem;
+    }
+  {%- endstyle -%}
+
+  <section
+    class="otodor-compat"
+    data-otodor-section="compatibility"
+    {% if section.settings.heading != blank %}aria-labelledby="otodor-compat-title-{{ section.id }}"{% endif %}
+  >
+    {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.intro != blank -%}
+      <div class="otodor-compat__head" data-otodor-reveal="fade-up">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-compat__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="otodor-compat__heading" id="otodor-compat-title-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.intro != blank -%}
+          <p class="otodor-compat__intro">{{ section.settings.intro | escape }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if has_tags -%}
+      {%- if section.settings.tags_label != blank -%}<p class="otodor-compat__label">{{ section.settings.tags_label | escape }}</p>{%- endif -%}
+      <ul class="otodor-compat__tags" role="list" data-otodor-reveal="fade-up">
+        {%- if tags != blank -%}
+          {%- for tag in tags -%}
+            {%- if tag != blank -%}<li class="otodor-compat__tag">{{ tag | escape }}</li>{%- endif -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in tag_blocks -%}
+            {%- if block.settings.label != blank -%}<li class="otodor-compat__tag" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</li>{%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if has_specs -%}
+      {%- if section.settings.specs_label != blank -%}<p class="otodor-compat__label">{{ section.settings.specs_label | escape }}</p>{%- endif -%}
+      <div class="otodor-ledger" data-otodor-reveal="fade-up">
+        {%- if has_auto_specs -%}
+          {%- if spec_thick != blank -%}
+            <div class="otodor-ledger__row">
+              <div class="otodor-ledger__key">{{ section.settings.thickness_label | default: 'Door thickness' | escape }}</div>
+              <div class="otodor-ledger__val">{{ spec_thick | escape }}</div>
+            </div>
+          {%- endif -%}
+          {%- if spec_install != blank -%}
+            <div class="otodor-ledger__row">
+              <div class="otodor-ledger__key">{{ section.settings.install_label | default: 'Installation' | escape }}</div>
+              <div class="otodor-ledger__val">{{ spec_install | escape }}</div>
+            </div>
+          {%- endif -%}
+        {%- else -%}
+          {%- for block in spec_blocks -%}
+            {%- if block.settings.label != blank and block.settings.value != blank -%}
+              <div class="otodor-ledger__row" {{ block.shopify_attributes }}>
+                <div class="otodor-ledger__key">{{ block.settings.label | escape }}</div>
+                <div class="otodor-ledger__val">{{ block.settings.value | escape }}</div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Compatibility",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "Fit tags come from a product list metafield (default custom.door_compatibility) — falling back to tag blocks. Fit specs come from specs.door_thickness / specs.installation_type — falling back to spec blocks. The module hides when both are empty." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Will it fit?" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Compatibility" },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Check your door before you buy — and if you're unsure, our team confirms fit before installation." },
+    { "type": "header", "content": "Fit tags" },
+    { "type": "text", "id": "tags_label", "label": "Tags label", "default": "Fits these doors" },
+    { "type": "text", "id": "tag_namespace", "label": "Tag metafield namespace", "default": "custom", "info": "Reusable across categories — point at any product list metafield." },
+    { "type": "text", "id": "tag_key", "label": "Tag metafield key", "default": "door_compatibility" },
+    { "type": "header", "content": "Fit specs" },
+    { "type": "text", "id": "specs_label", "label": "Specs label", "default": "Fit details" },
+    { "type": "text", "id": "thickness_label", "label": "Thickness row label", "default": "Door thickness" },
+    { "type": "text", "id": "install_label", "label": "Installation row label", "default": "Installation" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "blocks": [
+    {
+      "type": "tag",
+      "name": "Fit tag (fallback)",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Wooden door" }
+      ]
+    },
+    {
+      "type": "spec",
+      "name": "Fit spec (fallback)",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Door thickness" },
+        { "type": "text", "id": "value", "label": "Value", "default": "45–100 mm" }
+      ]
+    }
+  ],
+  "max_blocks": 16,
+  "presets": [
+    {
+      "name": "OTODOR Compatibility",
+      "blocks": [
+        { "type": "tag", "settings": { "label": "Wooden door" } },
+        { "type": "tag", "settings": { "label": "Glass door" } },
+        { "type": "tag", "settings": { "label": "Metal gate" } },
+        { "type": "spec", "settings": { "label": "Door thickness", "value": "45–100 mm" } },
+        { "type": "spec", "settings": { "label": "Installation", "value": "Professional (included)" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
