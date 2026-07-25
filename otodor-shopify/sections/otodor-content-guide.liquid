@@ -1,0 +1,203 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Content Guide  (single educational-content surface)
+  See OTODOR-CONTENT-LAYER.md. Surfaces ONE native Article or Page as a
+  premium preview + Read More. The full guide lives in Shopify; this only
+  displays a reference — no long-form content is duplicated here.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Surface an educational guide (buying / installation /
+                      compatibility / maintenance …) and link to the full source.
+  Primary source:     a referenced Shopify Article or Page.
+  Fallback order:     section Article pick → section Page pick →
+                      product/collection reference metafield (configurable,
+                      default custom.buying_guide) → hide.
+  Visibility rule:    Renders when a content source resolves; hides completely
+                      when none. (Theme editor shows a hint.)
+  Merchant editable:  YES — pick an article/page, or set the metafield key;
+                      override eyebrow/title/summary/image/CTA.
+  Required metafields: none
+  Optional metafields: product/collection custom.buying_guide (article/page ref)
+                       or any article_reference key set on this section.
+  Dependencies:       otodor-base.css tokens. No JS. No snippets.
+  Preset:             Added empty; renders once a source is chosen/referenced.
+  Accessibility:      <section> landmark + aria-labelledby; real <a> Read More;
+                      image alt from content; visible focus; reduced-motion safe.
+  Reusable for:       PDP, collection, home, article pages — reconfigure the
+                      metafield key to serve any guide type. One section, many roles.
+
+  No Article/BlogPosting JSON-LD is emitted here — the article page owns it
+  (OTODOR-STRUCTURED-CONTENT.md). This surface only references the canonical URL.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  # 1. READ + 2. resolve the content source (first non-blank wins)
+  assign mf_ns = section.settings.metafield_namespace | default: 'custom'
+  assign mf_key = section.settings.metafield_key | default: 'buying_guide'
+  assign ref = nil
+  if product != blank and product != empty
+    assign ref = product.metafields[mf_ns][mf_key].value
+  elsif collection != blank and collection != empty
+    assign ref = collection.metafields[mf_ns][mf_key].value
+  endif
+
+  assign content = section.settings.article
+  if content == blank
+    assign content = section.settings.page
+  endif
+  if content == blank
+    assign content = ref
+  endif
+
+  # 3. VALIDATE
+  assign has_content = false
+  if content != blank and content.url != blank
+    assign has_content = true
+  endif
+
+  # resolved fields
+  if has_content
+    assign c_title = section.settings.heading | default: content.title
+    assign c_image = section.settings.image | default: content.image
+    assign c_summary = section.settings.summary
+    if c_summary == blank
+      assign c_summary = content.excerpt
+    endif
+    if c_summary == blank
+      assign c_summary = content.content | strip_html | truncatewords: 34
+    endif
+  endif
+-%}
+
+{%- if has_content -%}
+  {%- style -%}
+    #shopify-section-{{ section.id }} { background: var(--otodor-bg-light); }
+    #shopify-section-{{ section.id }} .otodor-guide {
+      max-width: var(--otodor-container);
+      margin-inline: auto;
+      padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+    }
+    #shopify-section-{{ section.id }} .otodor-guide__inner {
+      display: grid;
+      grid-template-columns: {% if c_image != blank %}minmax(0, 5fr) minmax(0, 7fr){% else %}1fr{% endif %};
+      gap: clamp(1.5rem, 4vw, 3.5rem);
+      align-items: center;
+    }
+    {% if section.settings.image_position == 'right' %}
+      #shopify-section-{{ section.id }} .otodor-guide__media { order: 2; }
+    {% endif %}
+    #shopify-section-{{ section.id }} .otodor-guide__media {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      border-radius: var(--otodor-radius-lg);
+      overflow: hidden;
+      background: linear-gradient(160deg, var(--otodor-plinth), var(--otodor-bg-light));
+    }
+    #shopify-section-{{ section.id }} .otodor-guide__media img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform var(--otodor-dur-slow) var(--otodor-ease-spring);
+    }
+    #shopify-section-{{ section.id }} .otodor-guide__card:hover .otodor-guide__media img { transform: scale(1.04); }
+    #shopify-section-{{ section.id }} .otodor-guide__eyebrow {
+      display: block;
+      font-family: var(--otodor-font-display);
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: var(--otodor-tracking-widest);
+      color: var(--otodor-accent-on-light); margin-bottom: 1rem;
+    }
+    #shopify-section-{{ section.id }} .otodor-guide__title {
+      font-family: var(--otodor-font-display);
+      font-size: clamp(1.7rem, 3.6vw, 2.7rem); font-weight: 700; line-height: 1.08;
+      letter-spacing: var(--otodor-tracking-tight);
+      color: var(--otodor-ink); margin: 0;
+    }
+    #shopify-section-{{ section.id }} .otodor-guide__summary {
+      font-family: var(--otodor-font-body); font-size: var(--otodor-text-md);
+      line-height: 1.6; color: var(--otodor-ink-soft); margin: 1.1rem 0 0; max-width: 52ch;
+    }
+    #shopify-section-{{ section.id }} .otodor-guide__cta {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      margin-top: 1.8rem;
+      font-family: var(--otodor-font-body); font-size: 0.92rem; font-weight: 600;
+      color: #FFFFFF; background: var(--otodor-ink);
+      text-decoration: none; border-radius: var(--otodor-radius-pill);
+      padding: 0.8rem 1.7rem;
+      transition: background var(--otodor-dur-fast) var(--otodor-ease-out),
+                  transform var(--otodor-dur-fast) var(--otodor-ease-spring);
+    }
+    #shopify-section-{{ section.id }} .otodor-guide__cta:hover { background: #000; transform: translateY(-2px); }
+    #shopify-section-{{ section.id }} .otodor-guide__cta svg { width: 16px; height: 16px; }
+    @media (max-width: 749px) {
+      #shopify-section-{{ section.id }} .otodor-guide__inner { grid-template-columns: 1fr; }
+      #shopify-section-{{ section.id }} .otodor-guide__media { order: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #shopify-section-{{ section.id }} .otodor-guide__media img,
+      #shopify-section-{{ section.id }} .otodor-guide__cta { transition: none; }
+      #shopify-section-{{ section.id }} .otodor-guide__card:hover .otodor-guide__media img { transform: none; }
+    }
+  {%- endstyle -%}
+
+  <section
+    class="otodor-guide"
+    data-otodor-section="content-guide"
+    aria-labelledby="otodor-guide-title-{{ section.id }}"
+  >
+    <div class="otodor-guide__inner otodor-guide__card" data-otodor-reveal="fade-up">
+      {%- if c_image != blank -%}
+        <a class="otodor-guide__media" href="{{ content.url }}" tabindex="-1" aria-hidden="true">
+          {{ c_image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '450,675,900', sizes: '(max-width: 749px) 100vw, 42vw', alt: c_title | escape }}
+        </a>
+      {%- endif -%}
+      <div class="otodor-guide__body">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-guide__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        <h2 class="otodor-guide__title" id="otodor-guide-title-{{ section.id }}">{{ c_title | escape }}</h2>
+        {%- if c_summary != blank -%}
+          <p class="otodor-guide__summary">{{ c_summary | strip_html | escape }}</p>
+        {%- endif -%}
+        <a class="otodor-guide__cta" href="{{ content.url }}">
+          {{ section.settings.cta_label | default: 'Read the guide' | escape }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M14 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+{%- elsif request.design_mode -%}
+  <section class="otodor-guide" style="padding-block: 48px;">
+    <div class="otodor-container">
+      <p style="font-family: var(--otodor-font-body); color: var(--otodor-ink-soft); text-align: center;">
+        <strong>Content Guide</strong> — pick an Article or Page, or set a product/collection guide reference metafield. The full guide lives in Shopify; this surfaces a preview.
+      </p>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Content Guide",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "Surfaces one native Article or Page as a preview + Read More. Priority: Article pick → Page pick → the product/collection reference metafield below. The full guide lives in Shopify — nothing long-form is stored here." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Buying guide" },
+    { "type": "article", "id": "article", "label": "Article", "info": "Preferred. Overrides the metafield reference." },
+    { "type": "page", "id": "page", "label": "Page", "info": "Used if no Article is picked." },
+    { "type": "header", "content": "Reference metafield (product / collection)" },
+    { "type": "text", "id": "metafield_namespace", "label": "Namespace", "default": "custom" },
+    { "type": "text", "id": "metafield_key", "label": "Key", "default": "buying_guide", "info": "e.g. buying_guide, installation_guide, compatibility_guide (article_reference)." },
+    { "type": "header", "content": "Overrides (optional)" },
+    { "type": "text", "id": "heading", "label": "Title override" },
+    { "type": "textarea", "id": "summary", "label": "Summary override", "info": "Defaults to the article excerpt / page body." },
+    { "type": "image_picker", "id": "image", "label": "Image override" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Read the guide" },
+    { "type": "select", "id": "image_position", "label": "Image position", "options": [ { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ], "default": "left" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 88 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 88 }
+  ],
+  "presets": [{ "name": "OTODOR Content Guide" }]
+}
+{% endschema %}
