@@ -209,6 +209,16 @@
   {%- endif -%}
 </div>
 
+{%- comment -%}
+  Optional HowTo structured data. OFF by default: OTODOR's stages describe a
+  professional-install SERVICE, which does not qualify as HowTo (reader-followed
+  instructions). Enable only if the `step` blocks are genuine step-by-step
+  instructions. Emits via the Schema Registry (needs >= 2 step blocks).
+{%- endcomment -%}
+{%- if section.settings.emit_howto_schema and section.blocks.size > 1 -%}
+  {%- render 'otodor-schema', build: 'howto', howto_section: section, howto_name: section.settings.howto_name -%}
+{%- endif -%}
+
 {% schema %}
 {
   "name": "OTODOR Product Install",
@@ -219,7 +229,10 @@
     { "type": "checkbox", "id": "show_cta", "label": "Show compatibility-check button", "default": true },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "Check my door" },
     { "type": "header", "content": "Clearance guide" },
-    { "type": "textarea", "id": "clearance_note", "label": "Clearance note", "info": "Auto-hides if left blank.", "default": "Requires roughly 85 mm (3.35\") of side clearance from the door edge to any wall or frame for the handle to swing freely. Unsure? We confirm this during the compatibility check." }
+    { "type": "textarea", "id": "clearance_note", "label": "Clearance note", "info": "Auto-hides if left blank.", "default": "Requires roughly 85 mm (3.35\") of side clearance from the door edge to any wall or frame for the handle to swing freely. Unsure? We confirm this during the compatibility check." },
+    { "type": "header", "content": "SEO" },
+    { "type": "checkbox", "id": "emit_howto_schema", "label": "Emit HowTo structured data", "info": "Only for genuine step-by-step instructions (needs 2+ stage blocks). OTODOR's professional-install stages usually do NOT qualify — leave off.", "default": false },
+    { "type": "text", "id": "howto_name", "label": "HowTo name", "info": "Defaults to \"How to install <product>\".", "default": "" }
   ],
   "blocks": [
     {
