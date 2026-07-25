@@ -28,6 +28,17 @@
   right: 0;
   width: auto;
   z-index: 5;
+  background-color: rgb(var(--color-background));
+}
+/* The mega <details> must not create its own containing block or box —
+   otherwise the absolute panel is trapped at the nav-item width. */
+.header__inline-menu details.mega-menu {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
 }
 
 /* Panel ---------------------------------------------------- */

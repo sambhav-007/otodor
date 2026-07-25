@@ -1283,8 +1283,12 @@ sticky-header,
   color: #ffffff !important;
 }
 
-/* ── Mega menu / dropdown: dark surface ─────────────────────── */
-.section-header .mega-menu,
+/* ── Dropdown submenu: dark surface ─────────────────────────
+   NOTE: the mega menu (.mega-menu details) is intentionally NOT styled here.
+   Styling the <details> element with backdrop-filter established a containing
+   block that trapped the absolute mega panel at the nav-item width (and added
+   glassmorphism, which the mega spec bans). The mega panel is styled in
+   assets/otodor-mega-menu.css and anchors to the full-width .header-wrapper. */
 .section-header .header__submenu,
 .section-header details-disclosure > .list-menu {
   background-color: rgba(18, 18, 18, 0.98) !important;
