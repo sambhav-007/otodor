@@ -38,6 +38,7 @@
 {%- liquid
   assign scheme = section.settings.color_scheme | default: 'light'
   assign anchor = section.settings.anchor_id | default: 'otodor-lead' | handle
+  assign lead_form_id = 'otodor-lead-form-' | append: section.id
 
   # interest options come from `interest` blocks
   assign interest_blocks = section.blocks | where: 'type', 'interest'
@@ -229,7 +230,7 @@
 
     {%- comment -%} ── Right panel: the native contact form ── {%- endcomment -%}
     <div class="otodor-lead__panel" data-otodor-reveal="fade-up">
-      {%- form 'contact', id: 'otodor-lead-form-' | append: section.id, class: 'otodor-lead__form' -%}
+      {%- form 'contact', id: lead_form_id, class: 'otodor-lead__form' -%}
         {%- if form.posted_successfully? -%}
           <div class="otodor-lead__success" tabindex="-1" autofocus>
             <span class="otodor-lead__success-badge" aria-hidden="true">{% render 'otodor-icon', name: 'warranty' %}</span>
