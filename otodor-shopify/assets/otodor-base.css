@@ -924,6 +924,53 @@
   transform: translateY(0);
 }
 
+/* ── Motion System V2 — extended reveal vocabulary ──────────────
+   Cinematic reveals. All GPU-composited (opacity/transform/filter/
+   clip-path only). No-JS: visible. Reduced-motion: reset below. */
+
+/* blur-in — focus-pull */
+.js-loaded [data-otodor-reveal="blur-in"] {
+  opacity: 0;
+  filter: blur(14px);
+  transform: translateY(18px) scale(1.01);
+  transition:
+    opacity var(--otodor-dur-reveal) var(--otodor-ease-out),
+    filter var(--otodor-dur-reveal) var(--otodor-ease-out),
+    transform var(--otodor-dur-reveal) var(--otodor-ease-spring);
+}
+.js-loaded [data-otodor-reveal="blur-in"].is-revealed {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) scale(1);
+}
+
+/* mask-up — clip-path wipe from below (editorial line reveal) */
+.js-loaded [data-otodor-reveal="mask-up"] {
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(26px);
+  transition:
+    clip-path var(--otodor-dur-reveal) var(--otodor-ease-out),
+    transform var(--otodor-dur-reveal) var(--otodor-ease-spring);
+}
+.js-loaded [data-otodor-reveal="mask-up"].is-revealed {
+  clip-path: inset(0 0 0 0);
+  transform: translateY(0);
+}
+
+/* depth — 3D dolly-in with a slight axial tilt */
+.js-loaded [data-otodor-reveal="depth"] {
+  opacity: 0;
+  transform: perspective(1100px) translateY(56px) translateZ(-90px) rotateX(7deg);
+  transform-origin: 50% 100%;
+  transition:
+    opacity var(--otodor-dur-reveal) var(--otodor-ease-out),
+    transform var(--otodor-dur-long) var(--otodor-ease-spring);
+}
+.js-loaded [data-otodor-reveal="depth"].is-revealed {
+  opacity: 1;
+  transform: perspective(1100px) translateY(0) translateZ(0) rotateX(0);
+}
+
 
 /* ============================================================
    11. KEYFRAME DECLARATIONS
@@ -1116,6 +1163,8 @@
   .js-loaded [data-otodor-stagger] > * {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
     transition: none !important;
   }
 }

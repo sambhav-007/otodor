@@ -1,0 +1,124 @@
+/* ============================================================
+   OTODOR Motion System V2 — interaction layer
+   Cursor · magnetic · tilt · mouse-parallax · liquid CTA.
+   All progressive enhancement:
+   - enabled only on fine pointers (class js-fine-pointer on <html>)
+   - disabled entirely under prefers-reduced-motion
+   - GPU-composited (transform/opacity) only
+   Companion controller: otodor-animations.js
+   ============================================================ */
+
+/* ── Custom cursor (additive: native cursor is retained) ────────
+   Two layers — an instant dot and a lagging ring. Hidden until the
+   controller marks the page cursor-enabled and the pointer moves. */
+.otodor-cursor,
+.otodor-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate3d(-50%, -50%, 0);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.otodor-cursor {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--otodor-blue);
+  transition: opacity var(--otodor-dur-base) ease,
+    width var(--otodor-dur-fast) ease, height var(--otodor-dur-fast) ease,
+    background var(--otodor-dur-fast) ease;
+}
+.otodor-cursor-ring {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(77, 166, 255, 0.55);
+  border-radius: 50%;
+  transition: opacity var(--otodor-dur-base) ease,
+    width var(--otodor-dur-base) var(--otodor-ease-spring),
+    height var(--otodor-dur-base) var(--otodor-ease-spring),
+    border-color var(--otodor-dur-base) ease, background var(--otodor-dur-base) ease;
+}
+html.js-cursor-ready .otodor-cursor,
+html.js-cursor-ready .otodor-cursor-ring { opacity: 1; }
+
+/* over an interactive/marked element */
+html.js-cursor-active .otodor-cursor { width: 3px; height: 3px; }
+html.js-cursor-active .otodor-cursor-ring {
+  width: 58px; height: 58px;
+  border-color: rgba(77, 166, 255, 0.9);
+  background: rgba(77, 166, 255, 0.06);
+}
+/* pressed */
+html.js-cursor-down .otodor-cursor-ring { width: 26px; height: 26px; }
+
+/* Only show the custom cursor on fine pointers */
+html:not(.js-fine-pointer) .otodor-cursor,
+html:not(.js-fine-pointer) .otodor-cursor-ring { display: none; }
+
+/* ── Magnetic elements ──────────────────────────────────────────
+   JS sets --mx/--my (px). CSS eases the pull for a springy feel. */
+.js-fine-pointer [data-otodor-magnetic] {
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0);
+  transition: transform var(--otodor-dur-slow) var(--otodor-ease-spring);
+  will-change: transform;
+}
+/* a magnetic element's inner label can lag less for depth */
+.js-fine-pointer [data-otodor-magnetic] > .otodor-magnetic__inner {
+  display: inline-flex;
+  transform: translate3d(calc(var(--mx, 0px) * 0.35), calc(var(--my, 0px) * 0.35), 0);
+  transition: transform var(--otodor-dur-slow) var(--otodor-ease-spring);
+}
+
+/* ── Tilt (3D hover) ────────────────────────────────────────────
+   JS sets --rx/--ry (deg). */
+.js-fine-pointer [data-otodor-tilt] {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform var(--otodor-dur-base) var(--otodor-ease-out);
+  will-change: transform;
+}
+/* children can be pushed forward on the z-axis for parallax depth */
+[data-otodor-tilt-layer] {
+  transform: translateZ(var(--tz, 40px));
+  transform-style: preserve-3d;
+}
+
+/* ── Mouse-parallax (element drifts with cursor) ────────────────
+   JS sets --px/--py (px). Used by the hero product/media. */
+.js-fine-pointer [data-otodor-mouse-parallax] {
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transition: transform var(--otodor-dur-slow) var(--otodor-ease-out);
+  will-change: transform;
+}
+
+/* ── Liquid CTA hover (sweeping sheen + fill) ───────────────────
+   Opt-in via .otodor-btn--liquid on an .otodor-btn. */
+.otodor-btn--liquid { position: relative; overflow: hidden; isolation: isolate; }
+.otodor-btn--liquid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 140% at var(--liquid-x, 50%) var(--liquid-y, 120%),
+    rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 55%);
+  opacity: 0;
+  transition: opacity var(--otodor-dur-base) ease;
+}
+.otodor-btn--liquid:hover::before,
+.otodor-btn--liquid:focus-visible::before { opacity: 1; }
+
+/* ── Reduced motion: neutralise everything ──────────────────────*/
+@media (prefers-reduced-motion: reduce) {
+  .otodor-cursor,
+  .otodor-cursor-ring { display: none !important; }
+  .js-fine-pointer [data-otodor-magnetic],
+  .js-fine-pointer [data-otodor-tilt],
+  .js-fine-pointer [data-otodor-mouse-parallax] {
+    transform: none !important;
+    transition: none !important;
+  }
+  .otodor-btn--liquid::before { display: none !important; }
+}

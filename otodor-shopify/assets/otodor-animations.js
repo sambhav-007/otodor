@@ -128,45 +128,24 @@
   // Expose to window for Phase 5 integration
   window.OtodorAnimations = OtodorAnimations;
 
-  // ─── Core: Fade-up reveals ────────────────────────────────────
-  function initFadeUpReveals() {
-    const elements = document.querySelectorAll('[data-otodor-reveal="fade-up"]');
+  // ─── Core: Scroll reveals (all types) ─────────────────────────
+  // Handles every [data-otodor-reveal] value (fade-up/fade-in/scale-in/
+  // blur-in/mask-up/depth). CSS owns the per-type transition; JS just
+  // toggles .is-revealed on enter, honouring an optional per-element
+  // data-otodor-reveal-delay (ms) for hand-tuned choreography.
+  function initReveals() {
+    const elements = document.querySelectorAll('[data-otodor-reveal]');
     elements.forEach(function (el) {
       ScrollTrigger.create({
         trigger: el,
         start: CONFIG.scrollTrigger.start,
         onEnter: function () {
-          el.classList.add('is-revealed');
-        },
-        once: true,
-      });
-    });
-  }
-
-  // ─── Core: Fade-in reveals ────────────────────────────────────
-  function initFadeInReveals() {
-    const elements = document.querySelectorAll('[data-otodor-reveal="fade-in"]');
-    elements.forEach(function (el) {
-      ScrollTrigger.create({
-        trigger: el,
-        start: CONFIG.scrollTrigger.start,
-        onEnter: function () {
-          el.classList.add('is-revealed');
-        },
-        once: true,
-      });
-    });
-  }
-
-  // ─── Core: Scale-in reveals ───────────────────────────────────
-  function initScaleInReveals() {
-    const elements = document.querySelectorAll('[data-otodor-reveal="scale-in"]');
-    elements.forEach(function (el) {
-      ScrollTrigger.create({
-        trigger: el,
-        start: CONFIG.scrollTrigger.start,
-        onEnter: function () {
-          el.classList.add('is-revealed');
+          const delay = parseInt(el.getAttribute('data-otodor-reveal-delay'), 10) || 0;
+          if (delay > 0) {
+            setTimeout(function () { el.classList.add('is-revealed'); }, delay);
+          } else {
+            el.classList.add('is-revealed');
+          }
         },
         once: true,
       });
@@ -249,9 +228,7 @@
   function init() {
     // Wait for fonts to ensure no layout shifts affect measurements
     document.fonts.ready.then(function () {
-      initFadeUpReveals();
-      initFadeInReveals();
-      initScaleInReveals();
+      initReveals();
       initStaggerReveals();
       initCounters();
       initParallax();
@@ -279,4 +256,147 @@
     init();
   }
 
+})();
+
+
+/* ═══════════════════════════════════════════════════════════════
+   OTODOR Motion System V2 — pointer interaction layer
+   Independent of GSAP (pure pointer math + CSS custom properties).
+   Progressive enhancement: skipped under prefers-reduced-motion;
+   cursor/magnetic/tilt/mouse-parallax gated to fine pointers.
+   Styling lives in otodor-motion.css.
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  const root = document.documentElement;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const finePointer = window.matchMedia('(pointer: fine)').matches;
+  if (finePointer) root.classList.add('js-fine-pointer');
+
+  const lerp = function (a, b, n) { return a + (b - a) * n; };
+  const INTERACTIVE = 'a, button, input, select, textarea, label, summary, [role="button"], [data-otodor-magnetic], [data-cursor]';
+
+  // ── Custom cursor (fine pointer only; native cursor retained) ──
+  function initCursor() {
+    const dot = document.createElement('div'); dot.className = 'otodor-cursor';
+    const ring = document.createElement('div'); ring.className = 'otodor-cursor-ring';
+    dot.setAttribute('aria-hidden', 'true'); ring.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(dot); document.body.appendChild(ring);
+
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let rx = mx, ry = my, ready = false;
+
+    window.addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0) translate(-50%,-50%)';
+      if (!ready) { ready = true; root.classList.add('js-cursor-ready'); }
+    }, { passive: true });
+
+    document.addEventListener('mouseover', function (e) {
+      if (e.target.closest && e.target.closest(INTERACTIVE)) root.classList.add('js-cursor-active');
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (e.target.closest && e.target.closest(INTERACTIVE)) {
+        const to = e.relatedTarget;
+        if (!to || !(to.closest && to.closest(INTERACTIVE))) root.classList.remove('js-cursor-active');
+      }
+    });
+    window.addEventListener('mousedown', function () { root.classList.add('js-cursor-down'); });
+    window.addEventListener('mouseup', function () { root.classList.remove('js-cursor-down'); });
+    document.addEventListener('mouseleave', function () { root.classList.remove('js-cursor-ready'); });
+    document.addEventListener('mouseenter', function () { if (ready) root.classList.add('js-cursor-ready'); });
+
+    (function raf() {
+      rx = lerp(rx, mx, 0.18); ry = lerp(ry, my, 0.18);
+      ring.style.transform = 'translate3d(' + rx + 'px,' + ry + 'px,0) translate(-50%,-50%)';
+      requestAnimationFrame(raf);
+    })();
+  }
+
+  // ── Magnetic elements ──
+  function bindMagnetic(scope) {
+    if (!finePointer) return;
+    (scope || document).querySelectorAll('[data-otodor-magnetic]').forEach(function (el) {
+      if (el._otodorMag) return; el._otodorMag = true;
+      const strength = parseFloat(el.getAttribute('data-magnetic-strength')) || 0.4;
+      el.addEventListener('pointermove', function (e) {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', ((e.clientX - (r.left + r.width / 2)) * strength) + 'px');
+        el.style.setProperty('--my', ((e.clientY - (r.top + r.height / 2)) * strength) + 'px');
+      });
+      el.addEventListener('pointerleave', function () {
+        el.style.setProperty('--mx', '0px'); el.style.setProperty('--my', '0px');
+      });
+    });
+  }
+
+  // ── Tilt (3D hover) ──
+  function bindTilt(scope) {
+    if (!finePointer) return;
+    (scope || document).querySelectorAll('[data-otodor-tilt]').forEach(function (el) {
+      if (el._otodorTilt) return; el._otodorTilt = true;
+      const max = parseFloat(el.getAttribute('data-tilt-max')) || 8;
+      el.addEventListener('pointermove', function (e) {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.setProperty('--ry', (px * max) + 'deg');
+        el.style.setProperty('--rx', (-py * max) + 'deg');
+      });
+      el.addEventListener('pointerleave', function () {
+        el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg');
+      });
+    });
+  }
+
+  // ── Mouse-parallax (elements drift with the cursor) ──
+  function bindMouseParallax() {
+    if (!finePointer) return;
+    const els = document.querySelectorAll('[data-otodor-mouse-parallax]');
+    if (!els.length) return;
+    window.addEventListener('mousemove', function (e) {
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      const dx = (e.clientX - cx) / cx, dy = (e.clientY - cy) / cy;
+      els.forEach(function (el) {
+        const s = parseFloat(el.getAttribute('data-otodor-mouse-parallax')) || 12;
+        el.style.setProperty('--px', (dx * s) + 'px');
+        el.style.setProperty('--py', (dy * s) + 'px');
+      });
+    }, { passive: true });
+  }
+
+  // ── Liquid CTA hover (sheen follows the pointer) ──
+  function bindLiquid(scope) {
+    (scope || document).querySelectorAll('.otodor-btn--liquid').forEach(function (el) {
+      if (el._otodorLiquid) return; el._otodorLiquid = true;
+      el.addEventListener('pointermove', function (e) {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--liquid-x', ((e.clientX - r.left) / r.width * 100) + '%');
+        el.style.setProperty('--liquid-y', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+  }
+
+  function boot() {
+    if (finePointer) initCursor();
+    bindMagnetic(document);
+    bindTilt(document);
+    bindMouseParallax();
+    bindLiquid(document);
+  }
+
+  // Re-bind interactive elements added by the theme editor.
+  if (window.Shopify && Shopify.designMode) {
+    document.addEventListener('shopify:section:load', function (e) {
+      bindMagnetic(e.target); bindTilt(e.target); bindLiquid(e.target);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })();
