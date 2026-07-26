@@ -86,7 +86,7 @@ export default function initVault(overlay, opts) {
     const soft = (x, y, z, w, h, color, op) => { const mat = M(new THREE.SpriteMaterial({ map: softTex, color: color, blending: THREE.AdditiveBlending, transparent: true, opacity: op, depthWrite: false })); const sp = new THREE.Sprite(mat); sp.position.set(x, y, z); sp.scale.set(w, h, 1); scene.add(sp); return sp; };
 
     // ── Materials — brushed titanium / satin ceramic / anodized (soft) ──
-    const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x000000, metalness: 0.45, roughness: 0.42, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.18, 0.18), clearcoat: 0.9, clearcoatRoughness: 0.14, envMapIntensity: 2.6 }));   // pitch-black doors — form comes from the clearcoat sheen + reflections
+    const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x000000, metalness: 0.15, roughness: 0.55, normalMap: slabNormal, normalScale: new THREE.Vector2(0.12, 0.12), clearcoat: 0.5, clearcoatRoughness: 0.22, envMapIntensity: 0.35 }));   // pitch-black gates — only a faint clearcoat edge sheen
     const bevelMat = M(new THREE.MeshStandardMaterial({ color: 0x262a30, metalness: 0.95, roughness: 0.32, envMapIntensity: 1.6 }));                         // dark-steel cavity accents (guide rails)
     const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0b0d, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove
     const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x0b0d11, metalness: 0.55, roughness: 0.52, roughnessMap: brush, envMapIntensity: 1.4 }));     // black architecture (matte)
@@ -126,19 +126,8 @@ export default function initVault(overlay, opts) {
     wall.add(mesh(box(sideW, OH + 0.9, 1.3), wallMat, (OW / 2 + sideW / 2), 0, -0.08, false, true));        // right jamb
     scene.add(wall);
 
-    // ── Inside reveal walls — the opening's depth (a deep portal, seen when doors open) ──
-    const revealMat = M(new THREE.MeshStandardMaterial({ color: 0x15181c, metalness: 0.7, roughness: 0.5, roughnessMap: brush, envMapIntensity: 1.25 }));
-    const inner = new THREE.Group();
-    const RZ = -0.4, RD = 4.0;   // reveal centre-z + depth → runs from the door plane (z≈1.6) back to ≈-2.4
-    inner.add(mesh(box(0.45, OH, RD), revealMat, -(OW / 2 + 0.18), 0, RZ, false, true));       // left inside wall
-    inner.add(mesh(box(0.45, OH, RD), revealMat, (OW / 2 + 0.18), 0, RZ, false, true));        // right inside wall
-    inner.add(mesh(box(OW + 0.9, 0.45, RD), revealMat, 0, (OH / 2 + 0.18), RZ, false, true));  // top soffit
-    inner.add(mesh(box(OW + 0.9, 0.45, RD), revealMat, 0, -(OH / 2 + 0.18), RZ, false, true)); // bottom
-    scene.add(inner);
-
-    // ── Hidden guide rails (barely-there) + soft internal light leak ──
-    [OH / 2 - 0.25, -(OH / 2 - 0.25)].forEach((yy) => scene.add(mesh(box(OW * 1.4, 0.1, 0.16), bevelMat, 0, yy, -0.5, false, false)));
-    const leak = soft(0, 0.2, -0.5, 2.2, OH * 0.95, 0xeef2ff, 0.0);   // internal light leak, grows as slabs part
+    // soft internal light leak (grows as the gates part) — no inner walls / rails
+    const leak = soft(0, 0.2, -0.5, 2.2, OH * 0.95, 0xeef2ff, 0.0);
 
     // ── OTODOR monogram — planar-mapped so the DIAGONAL cut splits its slant ──
     let monoTex = null, logoMat = null;
