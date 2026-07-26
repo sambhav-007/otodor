@@ -16,8 +16,8 @@ import * as THREE from './three.module.js';
 
 const UNLOCK = 900;         // ms — bolts retract, seams ignite, camera shakes
 const PINS = 1200;          // ms — centre pins retract
-const OPEN_AT = 2000;       // ms — doors begin to part
-const OPEN_DUR = 2300;      // ms — heavy slide
+const OPEN_AT = 2100;       // ms — doors begin to part
+const OPEN_DUR = 2800;      // ms — heavy slide (slow, massive)
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const easeInOutQuart = (t) => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2);
 
@@ -44,23 +44,23 @@ export default function initVault(overlay, opts) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 1.42;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x0a0f16, 10, 30);
-    camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
+    scene.fog = new THREE.Fog(0x2a3644, 16, 52);
+    camera = new THREE.PerspectiveCamera(36, 1, 0.1, 260);
 
     // ── Procedural env map (reflections, no external assets) ──
     const ec = document.createElement('canvas'); ec.width = 512; ec.height = 256;
     const g2 = ec.getContext('2d');
     const grd = g2.createLinearGradient(0, 0, 0, 256);
-    grd.addColorStop(0.0, '#070a10'); grd.addColorStop(0.4, '#131c28');
-    grd.addColorStop(0.5, '#26384c'); grd.addColorStop(0.6, '#101822'); grd.addColorStop(1.0, '#040506');
+    grd.addColorStop(0.0, '#1c2836'); grd.addColorStop(0.4, '#33475c');
+    grd.addColorStop(0.5, '#5a748f'); grd.addColorStop(0.6, '#2e4256'); grd.addColorStop(1.0, '#14181d');
     g2.fillStyle = grd; g2.fillRect(0, 0, 512, 256);
-    g2.fillStyle = 'rgba(190,220,255,0.6)'; g2.fillRect(0, 50, 512, 5); g2.fillRect(0, 82, 512, 2);
-    g2.fillStyle = 'rgba(255,190,120,0.22)'; g2.fillRect(0, 205, 512, 9);
+    g2.fillStyle = 'rgba(210,232,255,0.9)'; g2.fillRect(0, 46, 512, 8); g2.fillRect(0, 80, 512, 3);
+    g2.fillStyle = 'rgba(255,200,140,0.35)'; g2.fillRect(0, 205, 512, 12);
     const envSrc = T(new THREE.CanvasTexture(ec));
     envSrc.mapping = THREE.EquirectangularReflectionMapping; envSrc.colorSpace = THREE.SRGBColorSpace;
     pmrem = new THREE.PMREMGenerator(renderer);
@@ -82,15 +82,15 @@ export default function initVault(overlay, opts) {
     };
 
     // ── Materials ──
-    const titanium = M(new THREE.MeshStandardMaterial({ color: 0x23272c, metalness: 0.95, roughness: 0.34, envMapIntensity: 1.2 }));
-    const armorMat = M(new THREE.MeshStandardMaterial({ color: 0x1b1f24, metalness: 0.9, roughness: 0.42, envMapIntensity: 1.0 }));
-    const plateMat = M(new THREE.MeshStandardMaterial({ color: 0x0f1318, metalness: 0.86, roughness: 0.55, envMapIntensity: 0.85 }));
-    const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x0c1015, metalness: 0.8, roughness: 0.6, envMapIntensity: 0.7 }));
-    const ribMat = M(new THREE.MeshStandardMaterial({ color: 0x161b21, metalness: 0.9, roughness: 0.45 }));
-    const floorMat = M(new THREE.MeshStandardMaterial({ color: 0x080a0d, metalness: 0.55, roughness: 0.42, envMapIntensity: 0.9 }));
-    const pistonMat = M(new THREE.MeshStandardMaterial({ color: 0x474d54, metalness: 1.0, roughness: 0.24, envMapIntensity: 1.3 }));
-    const boltMat = M(new THREE.MeshStandardMaterial({ color: 0x2b2f34, metalness: 1.0, roughness: 0.3 }));
-    const stripMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x4da6ff, emissiveIntensity: 1.2, roughness: 0.5 }));
+    const titanium = M(new THREE.MeshStandardMaterial({ color: 0x5a616b, metalness: 0.92, roughness: 0.38, envMapIntensity: 1.5 }));
+    const armorMat = M(new THREE.MeshStandardMaterial({ color: 0x464d56, metalness: 0.88, roughness: 0.45, envMapIntensity: 1.35 }));
+    const plateMat = M(new THREE.MeshStandardMaterial({ color: 0x333a43, metalness: 0.85, roughness: 0.52, envMapIntensity: 1.2 }));
+    const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x3a434e, metalness: 0.78, roughness: 0.58, envMapIntensity: 1.1 }));
+    const ribMat = M(new THREE.MeshStandardMaterial({ color: 0x525a64, metalness: 0.9, roughness: 0.42, envMapIntensity: 1.3 }));
+    const floorMat = M(new THREE.MeshStandardMaterial({ color: 0x2f353d, metalness: 0.6, roughness: 0.34, envMapIntensity: 1.4 }));
+    const pistonMat = M(new THREE.MeshStandardMaterial({ color: 0x7a828c, metalness: 1.0, roughness: 0.26, envMapIntensity: 1.6 }));
+    const boltMat = M(new THREE.MeshStandardMaterial({ color: 0x565d66, metalness: 1.0, roughness: 0.32, envMapIntensity: 1.4 }));
+    const stripMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x6db8ff, emissiveIntensity: 2.2, roughness: 0.5 }));
 
     const box = (w, h, d) => G(new THREE.BoxGeometry(w, h, d));
     const cyl = (r, l, s) => G(new THREE.CylinderGeometry(r, r, l, s || 20));
@@ -101,7 +101,7 @@ export default function initVault(overlay, opts) {
     };
 
     // ── Corridor (camera is inside it; ends at the vault plane z=0) ──
-    const HALF_W = 5, HALF_H = 4, LEN = 14;
+    const HALF_W = 8, HALF_H = 5, LEN = 22;
     const corridor = new THREE.Group();
     corridor.add(mesh(box(HALF_W * 2, 0.4, LEN), floorMat, 0, -HALF_H, LEN / 2 - 0.5, false, true));   // floor
     corridor.add(mesh(box(HALF_W * 2, 0.4, LEN), wallMat, 0, HALF_H, LEN / 2 - 0.5, false, true));      // ceiling
@@ -121,7 +121,7 @@ export default function initVault(overlay, opts) {
     scene.add(corridor);
 
     // ── Portal frame at the vault plane ──
-    const frameMat = M(new THREE.MeshStandardMaterial({ color: 0x0d1015, metalness: 0.9, roughness: 0.48, envMapIntensity: 0.9 }));
+    const frameMat = M(new THREE.MeshStandardMaterial({ color: 0x3d454f, metalness: 0.9, roughness: 0.46, envMapIntensity: 1.25 }));
     const portal = new THREE.Group();
     portal.add(mesh(box(0.9, HALF_H * 2, 1.6), frameMat, -HALF_W + 0.5, 0, 0, true, true));
     portal.add(mesh(box(0.9, HALF_H * 2, 1.6), frameMat, HALF_W - 0.5, 0, 0, true, true));
@@ -133,7 +133,7 @@ export default function initVault(overlay, opts) {
     const seamMats = [], bolts = [], pins = [], clamps = [], pistons = [], seamGlows = [];
     function makeDoor(side) {
       const grp = new THREE.Group();
-      const W = 4, H = 6, D = 1;
+      const W = 4, H = 7, D = 1.15;
       grp.add(mesh(box(W, H, D), titanium, 0, 0, 0, true, true));                    // body
       grp.add(mesh(box(W * 0.88, H * 0.92, 0.14), armorMat, -side * 0.1, 0, D / 2 + 0.03, true, true)); // armor
       // recessed machined panels (grid)
@@ -184,30 +184,35 @@ export default function initVault(overlay, opts) {
       return grp;
     }
     const leftDoor = makeDoor(-1), rightDoor = makeDoor(1);
-    const LC = leftDoor.position.x, RC = rightDoor.position.x, LO = -12, RO = 12;
+    const LC = leftDoor.position.x, RC = rightDoor.position.x, LO = -17, RO = 17;
 
-    // ── Lights ──
-    scene.add(new THREE.HemisphereLight(0x2a3a4d, 0x060708, 0.5));
-    const key = new THREE.DirectionalLight(0xcfe4ff, 2.1);
-    key.position.set(5, 9, 9); key.castShadow = true;
+    // ── Lights (bright enough to READ the whole facility) ──
+    scene.add(new THREE.HemisphereLight(0x93aecb, 0x2c333c, 1.5));
+    scene.add(new THREE.AmbientLight(0x5a6675, 0.6));
+    const key = new THREE.DirectionalLight(0xe4f0ff, 2.6);
+    key.position.set(6, 11, 12); key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048);
-    key.shadow.camera.near = 1; key.shadow.camera.far = 55;
-    key.shadow.camera.left = -10; key.shadow.camera.right = 10; key.shadow.camera.top = 9; key.shadow.camera.bottom = -9;
+    key.shadow.camera.near = 1; key.shadow.camera.far = 70;
+    key.shadow.camera.left = -13; key.shadow.camera.right = 13; key.shadow.camera.top = 12; key.shadow.camera.bottom = -12;
     key.shadow.bias = -0.0004; key.shadow.radius = 4;
     scene.add(key); scene.add(key.target);
-    const fillB = new THREE.PointLight(0x4da6ff, 40, 26, 2); fillB.position.set(0, 2, 7); scene.add(fillB);
-    const rimL = new THREE.PointLight(0x6db4ff, 8, 12, 2); rimL.position.set(-0.7, 0.6, 2.2); scene.add(rimL);
-    const rimR = new THREE.PointLight(0x6db4ff, 8, 12, 2); rimR.position.set(0.7, -0.6, 2.2); scene.add(rimR);
-    const warm = new THREE.PointLight(0xffb060, 0, 30, 2); warm.position.set(0, 0, -5); scene.add(warm);
+    // Cool fill from the front-left so the door faces + corridor read
+    const fill = new THREE.DirectionalLight(0x9fc4ff, 1.1); fill.position.set(-8, 4, 10); scene.add(fill);
+    // Practical corridor pools + interior lights
+    const fillB = new THREE.PointLight(0x8ec6ff, 120, 40, 2); fillB.position.set(0, 3, 9); scene.add(fillB);
+    const interior = new THREE.PointLight(0xbcd8ff, 60, 26, 2); interior.position.set(0, 0, 3.5); scene.add(interior);
+    const rimL = new THREE.PointLight(0x9fd0ff, 20, 16, 2); rimL.position.set(-1.2, 0.8, 2.6); scene.add(rimL);
+    const rimR = new THREE.PointLight(0x9fd0ff, 20, 16, 2); rimR.position.set(1.2, -0.8, 2.6); scene.add(rimR);
+    const warm = new THREE.PointLight(0xffc078, 0, 40, 2); warm.position.set(0, 0, -6); scene.add(warm);
 
     // ── Camera + resize (aspect-aware) ──
-    let baseCam = new THREE.Vector3(0, 1.2, 12.5);
+    let baseCam = new THREE.Vector3(0, 1.9, 18);
     function resize() {
       const w = overlay.clientWidth || window.innerWidth, h = overlay.clientHeight || window.innerHeight;
       const aspect = w / h;
       camera.aspect = aspect;
-      camera.fov = aspect < 1 ? 52 : 34;
-      baseCam.z = aspect < 1 ? 15 : 12.5;
+      camera.fov = aspect < 1 ? 56 : 38;
+      baseCam.z = aspect < 1 ? 24 : 18;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h, false);
     }
@@ -227,7 +232,7 @@ export default function initVault(overlay, opts) {
       const shakeT = clamp(1 - (t - UNLOCK) / 340, 0, 1);
       if (t > UNLOCK && shakeT > 0) { sx += (Math.random() - 0.5) * 0.14 * shakeT; sy += (Math.random() - 0.5) * 0.14 * shakeT; }
       camera.position.set(baseCam.x + sx, baseCam.y + sy, baseCam.z - dolly);
-      camera.lookAt(0, 0.1, -1);
+      camera.lookAt(0, 0.5, -3);
 
       // Seam pulse → ignite
       const si = t < UNLOCK ? 1.4 + Math.sin(t * 0.006) * 0.6 : 4.2;
