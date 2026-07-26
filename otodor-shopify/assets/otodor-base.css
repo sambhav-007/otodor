@@ -1406,6 +1406,14 @@ html {
   background-color: #0B0B0B;
 }
 
+/* Guard against a stray horizontal scrollbar from any slightly-too-wide section.
+   `clip` (not `hidden`) so it never breaks the hero's pinned GSAP scroll. */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 
 /* ============================================================
    15. DYNAMIC COLOR SCHEME & PRODUCT PAGE OVERRIDES

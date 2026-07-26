@@ -178,6 +178,7 @@ export default function initVault(overlay, opts) {
       // tiny functional indicators
       grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, side * 3.6, 3.4, DD / 2 + 0.08, false, false));
       grp.add(mesh(box(0.07, 0.07, 0.04), ledAmber, side * 3.6, -3.4, DD / 2 + 0.08, false, false));
+      grp.position.z = 1.6;   // whole slab sits in FRONT of the wall face (toward the viewer), not submerged
       scene.add(grp);
       return grp;
     }
