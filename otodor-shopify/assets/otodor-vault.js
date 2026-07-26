@@ -1,21 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   OTODOR Vault Intro — Three.js cinematic blast-door scene (r160, ESM)
-   Lazy-loaded once per session by sections/otodor-vault-intro.liquid.
+   OTODOR Vault Intro — Three.js cinematic blast-door CORRIDOR (r160, ESM)
+   Self-hosted Three (./three.module.js) — no CDN, no CSP dependency.
 
-   A real 3D scene: two thick beveled titanium door volumes inside a portal
-   frame, PBR materials + procedural env-map reflections, a key light with
-   real shadows, blue rim + warm interior lights, a perspective camera that
-   breathes, retracting locking pistons, and a heavy easeInOutQuart slide that
-   reveals the hero through the widening (transparent) gap.
+   The camera sits INSIDE an industrial security corridor (floor, ceiling,
+   ribbed titanium walls, LED strips, fog). At the far end stands a two-part
+   blast door — 6m tall, 4m wide, 1m thick volumes with armor plates, recessed
+   machining, bolts, hydraulic pistons. Locks retract (with a camera shake),
+   then the doors slide apart under heavy easing, revealing the DOM hero through
+   the transparent opening.
 
-   Transparent renderer → the DOM hero behind the canvas shows through the gap.
-   Fully self-disposing. Any failure calls onDone() so the hero shows instantly.
+   Transparent renderer → the hero shows THROUGH the gap. Self-disposing.
+   Any failure calls onDone() so the hero shows instantly.
    ═══════════════════════════════════════════════════════════════════════ */
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import * as THREE from './three.module.js';
 
-const UNLOCK = 850;        // ms — locks disengage / seams ignite
-const OPEN_AT = 1750;      // ms — doors begin to part
-const OPEN_DUR = 2100;     // ms — slide duration (heavy)
+const UNLOCK = 900;         // ms — bolts retract, seams ignite, camera shakes
+const PINS = 1200;          // ms — centre pins retract
+const OPEN_AT = 2000;       // ms — doors begin to part
+const OPEN_DUR = 2300;      // ms — heavy slide
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const easeInOutQuart = (t) => (t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2);
 
@@ -27,9 +29,11 @@ export default function initVault(overlay, opts) {
   if (!canvas) { onDone(); return; }
 
   let renderer, scene, camera, pmrem, envTex, raf = 0;
-  let disposed = false, ended = false, started = 0;
-  const disposables = [];
-  const track = (o) => { disposables.push(o); return o; };
+  let disposed = false, ended = false, started = 0, readyFired = false;
+  const geos = [], mats = [], texs = [];
+  const G = (g) => { geos.push(g); return g; };
+  const M = (m) => { mats.push(m); return m; };
+  const T = (t) => { texs.push(t); return t; };
 
   try {
     renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
@@ -40,148 +44,170 @@ export default function initVault(overlay, opts) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.06;
+    renderer.toneMappingExposure = 1.08;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(32, 1, 0.1, 120);
+    scene.fog = new THREE.Fog(0x0a0f16, 10, 30);
+    camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
 
-    // ── Procedural environment (reflections without external assets) ──
-    const envCanvas = document.createElement('canvas');
-    envCanvas.width = 512; envCanvas.height = 256;
-    const g = envCanvas.getContext('2d');
-    const grd = g.createLinearGradient(0, 0, 0, 256);
-    grd.addColorStop(0.0, '#070a0f');
-    grd.addColorStop(0.42, '#141c26');
-    grd.addColorStop(0.5, '#26384c');
-    grd.addColorStop(0.58, '#131a23');
-    grd.addColorStop(1.0, '#040506');
-    g.fillStyle = grd; g.fillRect(0, 0, 512, 256);
-    g.fillStyle = 'rgba(190,220,255,0.55)'; g.fillRect(0, 54, 512, 5); g.fillRect(0, 84, 512, 2);
-    g.fillStyle = 'rgba(120,170,230,0.35)'; g.fillRect(0, 120, 512, 3);
-    g.fillStyle = 'rgba(255,190,120,0.22)'; g.fillRect(0, 205, 512, 9);
-    const envSrc = track(new THREE.CanvasTexture(envCanvas));
-    envSrc.mapping = THREE.EquirectangularReflectionMapping;
-    envSrc.colorSpace = THREE.SRGBColorSpace;
+    // ── Procedural env map (reflections, no external assets) ──
+    const ec = document.createElement('canvas'); ec.width = 512; ec.height = 256;
+    const g2 = ec.getContext('2d');
+    const grd = g2.createLinearGradient(0, 0, 0, 256);
+    grd.addColorStop(0.0, '#070a10'); grd.addColorStop(0.4, '#131c28');
+    grd.addColorStop(0.5, '#26384c'); grd.addColorStop(0.6, '#101822'); grd.addColorStop(1.0, '#040506');
+    g2.fillStyle = grd; g2.fillRect(0, 0, 512, 256);
+    g2.fillStyle = 'rgba(190,220,255,0.6)'; g2.fillRect(0, 50, 512, 5); g2.fillRect(0, 82, 512, 2);
+    g2.fillStyle = 'rgba(255,190,120,0.22)'; g2.fillRect(0, 205, 512, 9);
+    const envSrc = T(new THREE.CanvasTexture(ec));
+    envSrc.mapping = THREE.EquirectangularReflectionMapping; envSrc.colorSpace = THREE.SRGBColorSpace;
     pmrem = new THREE.PMREMGenerator(renderer);
     envTex = pmrem.fromEquirectangular(envSrc).texture;
     scene.environment = envTex;
 
-    // ── Materials ──
-    const titanium = track(new THREE.MeshStandardMaterial({ color: 0x24282d, metalness: 0.96, roughness: 0.36, envMapIntensity: 1.15 }));
-    const plateMat = track(new THREE.MeshStandardMaterial({ color: 0x11151a, metalness: 0.88, roughness: 0.52, envMapIntensity: 0.9 }));
-    const armorMat = track(new THREE.MeshStandardMaterial({ color: 0x1b1f24, metalness: 0.92, roughness: 0.44, envMapIntensity: 1.0 }));
-    const frameMat = track(new THREE.MeshStandardMaterial({ color: 0x0f1216, metalness: 0.9, roughness: 0.5, envMapIntensity: 0.85 }));
-    const pistonMat = track(new THREE.MeshStandardMaterial({ color: 0x454b52, metalness: 1.0, roughness: 0.26, envMapIntensity: 1.2 }));
-    const boltMat = track(new THREE.MeshStandardMaterial({ color: 0x2a2e33, metalness: 1.0, roughness: 0.3 }));
-    const floorMat = track(new THREE.MeshStandardMaterial({ color: 0x090b0e, metalness: 0.45, roughness: 0.6, envMapIntensity: 0.6 }));
-
-    const boxes = [];
-    const box = (w, h, d) => { const gm = new THREE.BoxGeometry(w, h, d); boxes.push(gm); return gm; };
-    const cyl = (r, len, seg) => { const gm = new THREE.CylinderGeometry(r, r, len, seg || 18); boxes.push(gm); return gm; };
-
-    // ── Floor (grounding + reflection + contact shadow) ──
-    const floor = new THREE.Mesh(track(new THREE.PlaneGeometry(60, 60)), floorMat);
-    floor.rotation.x = -Math.PI / 2; floor.position.y = -3.25; floor.receiveShadow = true;
-    scene.add(floor);
-
-    // ── Portal frame (static — implies a massive facility opening) ──
-    const frameGroup = new THREE.Group();
-    const addFrameBar = (x, y, w, h, d) => {
-      const m = new THREE.Mesh(box(w, h, d), frameMat);
-      m.position.set(x, y, d ? 0 : 0); m.castShadow = true; m.receiveShadow = true;
-      frameGroup.add(m);
+    // ── Additive glow sprite (fake bloom) ──
+    const gc = document.createElement('canvas'); gc.width = gc.height = 128;
+    const gg = gc.getContext('2d');
+    const gr = gg.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(150,200,255,0.7)');
+    gr.addColorStop(1, 'rgba(80,150,255,0)');
+    gg.fillStyle = gr; gg.fillRect(0, 0, 128, 128);
+    const glowTex = T(new THREE.CanvasTexture(gc));
+    const glow = (x, y, z, s, color) => {
+      const mat = M(new THREE.SpriteMaterial({ map: glowTex, color: color || 0x8ec5ff, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false }));
+      const sp = new THREE.Sprite(mat); sp.position.set(x, y, z); sp.scale.set(s, s, s);
+      scene.add(sp); return sp;
     };
-    addFrameBar(-3.55, 0, 0.9, 7.6, 1.7);
-    addFrameBar(3.55, 0, 0.9, 7.6, 1.7);
-    addFrameBar(0, 3.55, 7.9, 0.9, 1.7);
-    addFrameBar(0, -3.55, 7.9, 0.9, 1.7);
-    scene.add(frameGroup);
 
-    // ── Door builder ──
-    const pistons = [];
-    const seamMats = [];
-    function makeDoor(side) {  // side = -1 (left) or +1 (right)
+    // ── Materials ──
+    const titanium = M(new THREE.MeshStandardMaterial({ color: 0x23272c, metalness: 0.95, roughness: 0.34, envMapIntensity: 1.2 }));
+    const armorMat = M(new THREE.MeshStandardMaterial({ color: 0x1b1f24, metalness: 0.9, roughness: 0.42, envMapIntensity: 1.0 }));
+    const plateMat = M(new THREE.MeshStandardMaterial({ color: 0x0f1318, metalness: 0.86, roughness: 0.55, envMapIntensity: 0.85 }));
+    const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x0c1015, metalness: 0.8, roughness: 0.6, envMapIntensity: 0.7 }));
+    const ribMat = M(new THREE.MeshStandardMaterial({ color: 0x161b21, metalness: 0.9, roughness: 0.45 }));
+    const floorMat = M(new THREE.MeshStandardMaterial({ color: 0x080a0d, metalness: 0.55, roughness: 0.42, envMapIntensity: 0.9 }));
+    const pistonMat = M(new THREE.MeshStandardMaterial({ color: 0x474d54, metalness: 1.0, roughness: 0.24, envMapIntensity: 1.3 }));
+    const boltMat = M(new THREE.MeshStandardMaterial({ color: 0x2b2f34, metalness: 1.0, roughness: 0.3 }));
+    const stripMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x4da6ff, emissiveIntensity: 1.2, roughness: 0.5 }));
+
+    const box = (w, h, d) => G(new THREE.BoxGeometry(w, h, d));
+    const cyl = (r, l, s) => G(new THREE.CylinderGeometry(r, r, l, s || 20));
+    const mesh = (geo, mat, x, y, z, cast, rec) => {
+      const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z);
+      if (cast) m.castShadow = true; if (rec) m.receiveShadow = true;
+      return m;
+    };
+
+    // ── Corridor (camera is inside it; ends at the vault plane z=0) ──
+    const HALF_W = 5, HALF_H = 4, LEN = 14;
+    const corridor = new THREE.Group();
+    corridor.add(mesh(box(HALF_W * 2, 0.4, LEN), floorMat, 0, -HALF_H, LEN / 2 - 0.5, false, true));   // floor
+    corridor.add(mesh(box(HALF_W * 2, 0.4, LEN), wallMat, 0, HALF_H, LEN / 2 - 0.5, false, true));      // ceiling
+    corridor.add(mesh(box(0.4, HALF_H * 2, LEN), wallMat, -HALF_W, 0, LEN / 2 - 0.5, false, true));     // L wall
+    corridor.add(mesh(box(0.4, HALF_H * 2, LEN), wallMat, HALF_W, 0, LEN / 2 - 0.5, false, true));      // R wall
+    // structural ribs + ceiling light strips + wall LEDs receding down the corridor
+    for (let z = 1.5; z < LEN; z += 2.4) {
+      corridor.add(mesh(box(HALF_W * 2 + 0.2, 0.5, 0.35), ribMat, 0, HALF_H - 0.25, z, false, false));   // ceiling rib
+      corridor.add(mesh(box(0.5, HALF_H * 2, 0.35), ribMat, -HALF_W + 0.25, 0, z, false, false));        // L rib
+      corridor.add(mesh(box(0.5, HALF_H * 2, 0.35), ribMat, HALF_W - 0.25, 0, z, false, false));         // R rib
+      const strip = mesh(box(2.2, 0.12, 0.12), stripMat, 0, HALF_H - 0.55, z, false, false);
+      corridor.add(strip);
+      glow(0, HALF_H - 0.55, z, 3.2, 0x9ec8ff).material.opacity = 0.5;
+      glow(-HALF_W + 0.35, 1.4, z, 1.4, 0x4da6ff).material.opacity = 0.45;
+      glow(HALF_W - 0.35, -1.4, z, 1.4, 0xff5a48).material.opacity = 0.4; // emergency red
+    }
+    scene.add(corridor);
+
+    // ── Portal frame at the vault plane ──
+    const frameMat = M(new THREE.MeshStandardMaterial({ color: 0x0d1015, metalness: 0.9, roughness: 0.48, envMapIntensity: 0.9 }));
+    const portal = new THREE.Group();
+    portal.add(mesh(box(0.9, HALF_H * 2, 1.6), frameMat, -HALF_W + 0.5, 0, 0, true, true));
+    portal.add(mesh(box(0.9, HALF_H * 2, 1.6), frameMat, HALF_W - 0.5, 0, 0, true, true));
+    portal.add(mesh(box(HALF_W * 2, 0.9, 1.6), frameMat, 0, HALF_H - 0.5, 0, true, true));
+    portal.add(mesh(box(HALF_W * 2, 0.9, 1.6), frameMat, 0, -HALF_H + 0.5, 0, true, true));
+    scene.add(portal);
+
+    // ── Blast doors (6 tall, 4 wide, 1 thick) ──
+    const seamMats = [], bolts = [], pins = [], clamps = [], pistons = [], seamGlows = [];
+    function makeDoor(side) {
       const grp = new THREE.Group();
-      const W = 3.0, H = 6.0, D = 1.25;
-
-      const body = new THREE.Mesh(box(W, H, D), titanium);
-      body.castShadow = true; body.receiveShadow = true;
-      grp.add(body);
-
-      // Raised armor layer + recessed plates on the front face
-      const armor = new THREE.Mesh(box(W * 0.86, H * 0.9, 0.12), armorMat);
-      armor.position.z = D / 2 + 0.02; armor.castShadow = true; armor.receiveShadow = true;
-      grp.add(armor);
-      for (let r = 0; r < 3; r++) {
-        const plate = new THREE.Mesh(box(W * 0.62, 1.35, 0.06), plateMat);
-        plate.position.set(-side * 0.18, 1.7 - r * 1.7, D / 2 - 0.02);
-        plate.receiveShadow = true;
-        grp.add(plate);
+      const W = 4, H = 6, D = 1;
+      grp.add(mesh(box(W, H, D), titanium, 0, 0, 0, true, true));                    // body
+      grp.add(mesh(box(W * 0.88, H * 0.92, 0.14), armorMat, -side * 0.1, 0, D / 2 + 0.03, true, true)); // armor
+      // recessed machined panels (grid)
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 2; c++) {
+        grp.add(mesh(box(W * 0.36, 1.35, 0.06), plateMat, (-side * 0.1) + (c ? 0.55 : -0.55) * side * 0 + (c - 0.5) * W * 0.42, 1.7 - r * 1.7, D / 2 - 0.02, false, true));
       }
-      // Hex bolts down the outer edge
+      // vertical ventilation grooves
+      for (let v = -1; v <= 1; v++) grp.add(mesh(box(0.06, H * 0.8, 0.05), plateMat, -side * (W / 2 - 0.5) + v * 0.28, 0, D / 2 + 0.02, false, false));
+      // outer hex bolts
       for (let b = -2; b <= 2; b++) {
-        const bolt = new THREE.Mesh(cyl(0.09, 0.14, 6), boltMat);
-        bolt.rotation.x = Math.PI / 2;
-        bolt.position.set(side * (W / 2 - 0.28), b * 1.25, D / 2 + 0.04);
-        grp.add(bolt);
+        const bo = mesh(cyl(0.1, 0.14, 6), boltMat, side * (W / 2 - 0.3), b * 1.25, D / 2 + 0.05, true, false);
+        bo.rotation.x = Math.PI / 2; grp.add(bo);
       }
 
-      // Emissive seam strip on the inner edge (glows at unlock)
-      const seamMat = new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x4da6ff, emissiveIntensity: 1.6, metalness: 0.3, roughness: 0.4 });
-      seamMats.push(seamMat); track(seamMat);
-      const seam = new THREE.Mesh(box(0.05, H * 0.94, 0.16), seamMat);
-      seam.position.set(-side * (W / 2 - 0.02), 0, D / 2 - 0.04);
-      grp.add(seam);
+      // Emissive inner-edge seam
+      const seamMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x4da6ff, emissiveIntensity: 1.4, roughness: 0.4 }));
+      seamMats.push(seamMat);
+      grp.add(mesh(box(0.05, H * 0.95, 0.18), seamMat, -side * (W / 2 - 0.02), 0, D / 2 - 0.04, false, false));
+      const sgl = glow(0, 0, 0, 0.9, 0x8ec5ff); sgl.material.opacity = 0.6; sgl._side = side; seamGlows.push(sgl);
 
-      // Locking pistons crossing the inner face (retract before opening)
+      // Locking bolts: top + bottom (retract along Y into frame)
+      [H / 2 - 0.35, -(H / 2 - 0.35)].forEach((yy) => {
+        const bolt = mesh(cyl(0.16, 0.7, 18), boltMat, -side * (W / 2 - 0.15), yy, 0.2, true, false);
+        bolt.rotation.z = Math.PI / 2; bolt.userData = { baseY: yy, dir: yy > 0 ? 1 : -1 };
+        grp.add(bolt); bolts.push(bolt);
+      });
+      // Centre locking pins (retract along X, outward)
+      for (let i = -1; i <= 1; i++) {
+        const pin = mesh(cyl(0.13, 0.6, 18), pistonMat, -side * (W / 2) - side * 0.22, i * 1.0, 0.15, true, false);
+        pin.rotation.z = Math.PI / 2; pin.userData = { baseX: -side * (W / 2) - side * 0.22, side };
+        grp.add(pin); pins.push(pin);
+      }
+      // Magnetic clamps (slide outward on release)
+      [1.9, -1.9].forEach((yy) => {
+        const cl = mesh(box(0.5, 0.7, 0.6), boltMat, -side * (W / 2 - 0.05), yy, -0.15, true, false);
+        cl.userData = { baseX: -side * (W / 2 - 0.05), side }; grp.add(cl); clamps.push(cl);
+      });
+      // Hydraulic pistons + servo housings on the inner side (revealed on open)
       for (let i = -2; i <= 2; i++) {
-        const pis = new THREE.Mesh(cyl(0.13, 0.55, 20), pistonMat);
-        pis.rotation.z = Math.PI / 2;
-        pis.castShadow = true;
-        const baseX = -side * (W / 2) - side * 0.24;
-        pis.position.set(baseX, i * 1.12, 0.12);
-        pis.userData = { baseX, side };
-        grp.add(pis); pistons.push(pis);
-        // servo housing behind each piston
-        const hub = new THREE.Mesh(box(0.4, 0.4, 0.5), boltMat);
-        hub.position.set(-side * (W / 2 - 0.2), i * 1.12, -0.1);
-        grp.add(hub);
+        const pis = mesh(cyl(0.14, 0.8, 20), pistonMat, -side * (W / 2) - side * 0.45, i * 1.1, -0.05, true, false);
+        pis.rotation.z = Math.PI / 2; grp.add(pis);
+        grp.add(mesh(box(0.55, 0.55, 0.7), boltMat, -side * (W / 2 - 0.25), i * 1.1, -0.2, true, false));
+        pistons.push(pis);
       }
 
-      grp.position.x = side * (0.05 + W / 2);
+      grp.position.x = side * (0.04 + W / 2);
       scene.add(grp);
       return grp;
     }
-    const leftDoor = makeDoor(-1);
-    const rightDoor = makeDoor(1);
-    const LEFT_CLOSED = leftDoor.position.x, RIGHT_CLOSED = rightDoor.position.x;
-    const LEFT_OPEN = -9.5, RIGHT_OPEN = 9.5;
+    const leftDoor = makeDoor(-1), rightDoor = makeDoor(1);
+    const LC = leftDoor.position.x, RC = rightDoor.position.x, LO = -12, RO = 12;
 
     // ── Lights ──
-    scene.add(new THREE.HemisphereLight(0x2a3a4d, 0x070809, 0.55));
-    const key = new THREE.DirectionalLight(0xcfe4ff, 2.3);
-    key.position.set(5.5, 9, 7.5);
-    key.castShadow = true;
+    scene.add(new THREE.HemisphereLight(0x2a3a4d, 0x060708, 0.5));
+    const key = new THREE.DirectionalLight(0xcfe4ff, 2.1);
+    key.position.set(5, 9, 9); key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048);
-    key.shadow.camera.near = 1; key.shadow.camera.far = 45;
-    key.shadow.camera.left = -9; key.shadow.camera.right = 9;
-    key.shadow.camera.top = 9; key.shadow.camera.bottom = -9;
-    key.shadow.bias = -0.0004; key.shadow.radius = 3;
+    key.shadow.camera.near = 1; key.shadow.camera.far = 55;
+    key.shadow.camera.left = -10; key.shadow.camera.right = 10; key.shadow.camera.top = 9; key.shadow.camera.bottom = -9;
+    key.shadow.bias = -0.0004; key.shadow.radius = 4;
     scene.add(key); scene.add(key.target);
+    const fillB = new THREE.PointLight(0x4da6ff, 40, 26, 2); fillB.position.set(0, 2, 7); scene.add(fillB);
+    const rimL = new THREE.PointLight(0x6db4ff, 8, 12, 2); rimL.position.set(-0.7, 0.6, 2.2); scene.add(rimL);
+    const rimR = new THREE.PointLight(0x6db4ff, 8, 12, 2); rimR.position.set(0.7, -0.6, 2.2); scene.add(rimR);
+    const warm = new THREE.PointLight(0xffb060, 0, 30, 2); warm.position.set(0, 0, -5); scene.add(warm);
 
-    const rimL = new THREE.PointLight(0x4da6ff, 6, 10, 2); rimL.position.set(-0.6, 0.5, 2.2); scene.add(rimL);
-    const rimR = new THREE.PointLight(0x4da6ff, 6, 10, 2); rimR.position.set(0.6, -0.5, 2.2); scene.add(rimR);
-    const warm = new THREE.PointLight(0xffb060, 0, 22, 2); warm.position.set(0, 0, -4.5); scene.add(warm);
-
-    // ── Camera + sizing (aspect-aware so it fits phones too) ──
+    // ── Camera + resize (aspect-aware) ──
+    let baseCam = new THREE.Vector3(0, 1.2, 12.5);
     function resize() {
-      const w = overlay.clientWidth || window.innerWidth;
-      const h = overlay.clientHeight || window.innerHeight;
+      const w = overlay.clientWidth || window.innerWidth, h = overlay.clientHeight || window.innerHeight;
       const aspect = w / h;
       camera.aspect = aspect;
-      camera.fov = aspect < 1 ? 50 : 31;
+      camera.fov = aspect < 1 ? 52 : 34;
+      baseCam.z = aspect < 1 ? 15 : 12.5;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h, false);
     }
@@ -192,69 +218,69 @@ export default function initVault(overlay, opts) {
     function frame(now) {
       if (disposed) return;
       raf = requestAnimationFrame(frame);
-      if (!started) { started = now; }
+      if (!started) started = now;
       const t = now - started;
 
-      // Camera breathing + subtle push-in as it opens
-      const push = clamp((t - OPEN_AT) / OPEN_DUR, 0, 1);
-      camera.position.set(
-        Math.sin(t * 0.00035) * 0.18,
-        0.85 + Math.sin(t * 0.00055) * 0.09,
-        9.2 - push * 0.7
-      );
-      camera.lookAt(0, 0.05, -0.5);
+      // Camera: breathing + tiny dolly + shake at unlock
+      let sx = Math.sin(t * 0.00035) * 0.18, sy = Math.sin(t * 0.0006) * 0.1;
+      const dolly = clamp((t - UNLOCK) / (OPEN_AT + OPEN_DUR - UNLOCK), 0, 1) * 1.6;
+      const shakeT = clamp(1 - (t - UNLOCK) / 340, 0, 1);
+      if (t > UNLOCK && shakeT > 0) { sx += (Math.random() - 0.5) * 0.14 * shakeT; sy += (Math.random() - 0.5) * 0.14 * shakeT; }
+      camera.position.set(baseCam.x + sx, baseCam.y + sy, baseCam.z - dolly);
+      camera.lookAt(0, 0.1, -1);
 
       // Seam pulse → ignite
-      const si = t < UNLOCK ? 1.5 + Math.sin(t * 0.006) * 0.6 : 4.2;
+      const si = t < UNLOCK ? 1.4 + Math.sin(t * 0.006) * 0.6 : 4.2;
       for (let i = 0; i < seamMats.length; i++) seamMats[i].emissiveIntensity = si;
-
-      // Pistons retract between unlock and open
-      if (t > UNLOCK) {
-        const pr = clamp((t - UNLOCK) / (OPEN_AT - UNLOCK), 0, 1);
-        for (let i = 0; i < pistons.length; i++) {
-          const p = pistons[i];
-          p.position.x = p.userData.baseX + p.userData.side * 0.32 * pr;
-          p.scale.setScalar(1 - 0.35 * pr);
-        }
+      for (let i = 0; i < seamGlows.length; i++) {
+        const s = seamGlows[i]; s.material.opacity = 0.55 + (t > UNLOCK ? 0.35 : Math.sin(t * 0.006) * 0.15);
+        const door = s._side < 0 ? leftDoor : rightDoor;
+        s.position.set(door.position.x + s._side * -1.96, 0, 0.6); s.scale.setScalar(t > UNLOCK ? 2.4 : 1.4);
       }
 
-      // Doors part (heavy easing) + rail micro-vibration
+      // Unlock: bolts up/down, clamps out
+      if (t > UNLOCK) {
+        const u = clamp((t - UNLOCK) / (PINS - UNLOCK), 0, 1);
+        for (let i = 0; i < bolts.length; i++) bolts[i].position.y = bolts[i].userData.baseY + bolts[i].userData.dir * 0.55 * u;
+        for (let i = 0; i < clamps.length; i++) { const c = clamps[i]; c.position.x = c.userData.baseX + c.userData.side * 0.4 * u; }
+      }
+      // Centre pins retract (slightly later)
+      if (t > PINS) {
+        const p = clamp((t - PINS) / (OPEN_AT - PINS), 0, 1);
+        for (let i = 0; i < pins.length; i++) { const pin = pins[i]; pin.position.x = pin.userData.baseX + pin.userData.side * 0.4 * p; pin.scale.y = 1 - 0.5 * p; }
+      }
+
+      // Doors part (heavy easing + decaying vibration)
       if (t > OPEN_AT) {
         const op = clamp((t - OPEN_AT) / OPEN_DUR, 0, 1);
         const e = easeInOutQuart(op);
-        const vib = op < 0.96 ? Math.sin(t * 0.09) * 0.006 : 0;
-        leftDoor.position.x = LEFT_CLOSED + (LEFT_OPEN - LEFT_CLOSED) * e - vib;
-        rightDoor.position.x = RIGHT_CLOSED + (RIGHT_OPEN - RIGHT_CLOSED) * e + vib;
-        warm.intensity = op * 4;
-        rimL.intensity = 6 + op * 2; rimR.intensity = 6 + op * 2;
+        const vib = op < 0.94 ? Math.sin(t * 0.085) * 0.01 * (1 - op) : 0;
+        leftDoor.position.x = LC + (LO - LC) * e - vib;
+        rightDoor.position.x = RC + (RO - RC) * e + vib;
+        warm.intensity = op * 5;
         if (op >= 1 && !ended) { ended = true; finish(); }
       }
 
       renderer.render(scene, camera);
-
-      if (t > 40 && onReady._pending) { onReady._pending = false; onReady(); }
+      if (!readyFired && t > 40) { readyFired = true; onReady(); }
     }
-    onReady._pending = true;
     raf = requestAnimationFrame(frame);
 
     function finish() {
-      if (opts.onEnd) opts.onEnd();          // section fades the overlay
-      window.setTimeout(function () { cleanup(); onDone(); }, 650);
+      if (opts.onEnd) opts.onEnd();
+      window.setTimeout(function () { cleanup(); onDone(); }, 700);
     }
-
     function cleanup() {
-      if (disposed) return;
-      disposed = true;
+      if (disposed) return; disposed = true;
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
-      for (let i = 0; i < boxes.length; i++) boxes[i].dispose();
-      for (let i = 0; i < disposables.length; i++) { try { disposables[i].dispose(); } catch (e) {} }
+      for (let i = 0; i < geos.length; i++) { try { geos[i].dispose(); } catch (e) {} }
+      for (let i = 0; i < mats.length; i++) { try { mats[i].dispose(); } catch (e) {} }
+      for (let i = 0; i < texs.length; i++) { try { texs[i].dispose(); } catch (e) {} }
       try { envTex.dispose(); } catch (e) {}
       try { pmrem.dispose(); } catch (e) {}
       try { renderer.dispose(); } catch (e) {}
     }
-
-    // Expose an emergency cleanup for the safety timeout in the section.
     overlay._vaultCleanup = function () { cleanup(); };
   } catch (err) {
     try { renderer && renderer.dispose(); } catch (e) {}

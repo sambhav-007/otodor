@@ -52,13 +52,18 @@
     display: grid;
     place-items: center;
     opacity: 1;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.6s ease;
     background:
-      linear-gradient(90deg, transparent calc(50% - 1px), rgba(77,166,255,0.35) 50%, transparent calc(50% + 1px)),
-      repeating-linear-gradient(60deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 26px),
-      repeating-linear-gradient(-60deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 26px),
-      linear-gradient(105deg, #171a1f 0%, #0c0e11 50%, #060708 100%);
+      radial-gradient(90% 70% at 50% 44%, #10151c 0%, #0a0d12 45%, #050608 100%);
   }
+  .otodor-vault__poster::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(38% 32% at 50% 46%, rgba(77,166,255,0.12), transparent 70%);
+    pointer-events: none;
+  }
+  .otodor-vault__poster-core { position: relative; z-index: 1; }
   .otodor-vault.is-ready .otodor-vault__poster { opacity: 0; }
   .otodor-vault__poster-core { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
   .otodor-vault__poster-core img { width: clamp(44px, 5vw, 60px); height: auto; opacity: 0.85; filter: drop-shadow(0 0 8px rgba(77,166,255,0.4)); }
