@@ -87,10 +87,10 @@ export default function initVault(overlay, opts) {
 
     // ── Materials — brushed titanium / satin ceramic / anodized (soft) ──
     const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x0f1115, metalness: 0.5, roughness: 0.44, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.18, 0.18), clearcoat: 0.7, clearcoatRoughness: 0.26, envMapIntensity: 2.0 }));   // black ceramic-coated monolith slabs
-    const bevelMat = M(new THREE.MeshStandardMaterial({ color: 0x676d75, metalness: 0.95, roughness: 0.3, envMapIntensity: 1.7 }));                          // micro-bevel
-    const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x141517, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove (near-black)
-    const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x494e55, metalness: 0.6, roughness: 0.5, roughnessMap: brush, envMapIntensity: 1.1 }));       // architecture
-    const floorMat = M(new THREE.MeshStandardMaterial({ color: 0x3a3e44, metalness: 0.55, roughness: 0.28, roughnessMap: brush, envMapIntensity: 1.5 }));    // satin floor (soft reflection)
+    const bevelMat = M(new THREE.MeshStandardMaterial({ color: 0x262a30, metalness: 0.95, roughness: 0.32, envMapIntensity: 1.6 }));                         // dark-steel cavity accents (guide rails)
+    const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0b0d, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove
+    const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x0b0d11, metalness: 0.55, roughness: 0.52, roughnessMap: brush, envMapIntensity: 1.4 }));     // black architecture (matte)
+    const floorMat = M(new THREE.MeshStandardMaterial({ color: 0x090b0e, metalness: 0.6, roughness: 0.26, roughnessMap: brush, envMapIntensity: 1.8 }));     // black reflective floor
     const seamMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x5aa0ff, emissiveIntensity: 0.0, roughness: 0.4 }));
     const ledBlue = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x3d9bff, emissiveIntensity: 2.0, roughness: 0.5 }));
     const ledAmber = M(new THREE.MeshStandardMaterial({ color: 0x241804, emissive: 0xffab30, emissiveIntensity: 2.2, roughness: 0.5 }));
