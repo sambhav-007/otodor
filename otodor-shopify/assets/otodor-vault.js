@@ -48,7 +48,7 @@ export default function initVault(overlay, opts) {
 
     scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x2b2f34, 24, 70);
-    camera = new THREE.PerspectiveCamera(38, 1, 0.1, 260);
+    camera = new THREE.PerspectiveCamera(38, 1, 3, 90);   // tight near/far → strong depth precision (no z-fighting)
 
     // ── Soft neutral softbox env (satin reflections, no colour cast) ──
     const ec = document.createElement('canvas'); ec.width = 512; ec.height = 256;
@@ -102,8 +102,8 @@ export default function initVault(overlay, opts) {
     room.add(mesh(box(0.5, HALF_H * 2, LEN), wallMat, -HALF_W, 0, LEN / 2 - 1.5, false, true));             // L wall
     room.add(mesh(box(0.5, HALF_H * 2, LEN), wallMat, HALF_W, 0, LEN / 2 - 1.5, false, true));              // R wall
     // two thin recessed ceiling light lines (the only practical lights you see)
-    room.add(mesh(box(0.18, 0.06, LEN * 0.7), ceilLine, -2.6, HALF_H - 0.28, LEN / 2 - 1.5, false, false));
-    room.add(mesh(box(0.18, 0.06, LEN * 0.7), ceilLine, 2.6, HALF_H - 0.28, LEN / 2 - 1.5, false, false));
+    room.add(mesh(box(0.18, 0.06, LEN * 0.7), ceilLine, -2.6, HALF_H - 0.5, LEN / 2 - 1.5, false, false));
+    room.add(mesh(box(0.18, 0.06, LEN * 0.7), ceilLine, 2.6, HALF_H - 0.5, LEN / 2 - 1.5, false, false));
     scene.add(room);
 
     // ── Vault opening carved into the far wall (integrated frame) ──
@@ -118,10 +118,10 @@ export default function initVault(overlay, opts) {
     wall.add(mesh(box(OW, topH, 1.4), wallMat, 0, (OH / 2 + topH / 2), 0, false, true));                    // lintel
     wall.add(mesh(box(OW, topH, 1.4), wallMat, 0, -(OH / 2 + topH / 2), 0, false, true));                   // sill
     // micro-bevel reveal lip around the opening (thin, lighter)
-    wall.add(mesh(box(0.12, OH + 0.24, 0.5), bevelMat, -(OW / 2 + 0.06), 0, 0.45, false, false));
-    wall.add(mesh(box(0.12, OH + 0.24, 0.5), bevelMat, (OW / 2 + 0.06), 0, 0.45, false, false));
-    wall.add(mesh(box(OW + 0.24, 0.12, 0.5), bevelMat, 0, (OH / 2 + 0.06), 0.45, false, false));
-    wall.add(mesh(box(OW + 0.24, 0.12, 0.5), bevelMat, 0, -(OH / 2 + 0.06), 0.45, false, false));
+    wall.add(mesh(box(0.14, OH + 0.28, 0.5), bevelMat, -(OW / 2 + 0.07), 0, 0.72, false, false));
+    wall.add(mesh(box(0.14, OH + 0.28, 0.5), bevelMat, (OW / 2 + 0.07), 0, 0.72, false, false));
+    wall.add(mesh(box(OW + 0.28, 0.14, 0.5), bevelMat, 0, (OH / 2 + 0.07), 0.72, false, false));
+    wall.add(mesh(box(OW + 0.28, 0.14, 0.5), bevelMat, 0, -(OH / 2 + 0.07), 0.72, false, false));
     scene.add(wall);
 
     // ── Hidden guide rails (barely-there) + soft internal light leak ──
@@ -137,23 +137,20 @@ export default function initVault(overlay, opts) {
     function makeSlab(side) {
       const grp = new THREE.Group();
       const W = DW, H = DH, D = DD;
-      grp.add(mesh(box(W, H, D), slabMat, 0, 0, 0, true, true));                                   // the slab
-      // micro-bevelled perimeter — a raised face plate leaving a hairline gap
-      grp.add(mesh(box(W - 0.16, H - 0.16, 0.05), slabMat, -side * 0.03, 0, D / 2 + 0.02, false, true));
-      grp.add(mesh(box(W - 0.06, H - 0.06, 0.02), bevelMat, 0, 0, D / 2 + 0.005, false, false));   // thin bevel rim
+      grp.add(mesh(box(W, H, D), slabMat, 0, 0, 0, true, true));                                   // monolithic slab — featureless (no coplanar plates)
       // Large etched OTODOR monogram — this door shows its half (splits on open)
       if (monoTex) {
         const half = monoTex.clone(); half.needsUpdate = true;
         half.wrapS = half.wrapT = THREE.ClampToEdgeWrapping;
         half.repeat.set(0.5, 1); half.offset.set(side < 0 ? 0.0 : 0.5, 0);
         const mMat = M(new THREE.MeshStandardMaterial({ color: 0x14161a, metalness: 0.5, roughness: 0.62, alphaMap: half, transparent: true, opacity: 0.6, envMapIntensity: 0.5, depthWrite: false }));
-        grp.add(mesh(G(new THREE.PlaneGeometry(1.55, 3.1)), mMat, -side * 1.98, 0.4, D / 2 + 0.04, false, false));
+        grp.add(mesh(G(new THREE.PlaneGeometry(1.55, 3.1)), mMat, -side * 1.98, 0.4, D / 2 + 0.12, false, false));
       }
-      // tiny functional indicators (one blue, one amber) — minimal
-      grp.add(mesh(box(0.35, 0.05, 0.03), ledBlue, -side * (W / 2 - 0.9), H / 2 - 0.9, D / 2 + 0.05, false, false));
-      grp.add(mesh(box(0.06, 0.06, 0.03), ledAmber, -side * (W / 2 - 0.9), -H / 2 + 0.9, D / 2 + 0.05, false, false));
-      // thin illuminated seam on the inner edge
-      grp.add(mesh(box(0.03, H - 0.4, 0.06), seamMat, -side * (W / 2 - 0.02), 0, D / 2 - 0.02, false, false));
+      // tiny functional indicators (one blue, one amber) — minimal, clearly proud
+      grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, -side * (W / 2 - 0.9), H / 2 - 0.9, D / 2 + 0.08, false, false));
+      grp.add(mesh(box(0.06, 0.06, 0.04), ledAmber, -side * (W / 2 - 0.9), -H / 2 + 0.9, D / 2 + 0.08, false, false));
+      // thin illuminated seam on the inner edge (recessed)
+      grp.add(mesh(box(0.04, H - 0.5, 0.08), seamMat, -side * (W / 2 - 0.03), 0, D / 2 - 0.05, false, false));
       const sg = soft(0, 0, 0, 0.5, H - 0.5, 0x8ec2ff, 0.0); sg._side = side; seamGlows.push(sg);
       grp.position.x = side * (0.03 + W / 2);
       scene.add(grp);
@@ -170,7 +167,7 @@ export default function initVault(overlay, opts) {
     key.shadow.mapSize.set(2048, 2048);
     key.shadow.camera.near = 1; key.shadow.camera.far = 80;
     key.shadow.camera.left = -14; key.shadow.camera.right = 14; key.shadow.camera.top = 13; key.shadow.camera.bottom = -13;
-    key.shadow.bias = -0.0004; key.shadow.radius = 6;
+    key.shadow.bias = -0.0004; key.shadow.normalBias = 0.03; key.shadow.radius = 2.5;
     scene.add(key); scene.add(key.target);
     const fill = new THREE.DirectionalLight(0xc0c8d2, 1.1); fill.position.set(-8, 3, 13); scene.add(fill);
     const back = new THREE.DirectionalLight(0xaeb6c2, 0.5); back.position.set(0, 6, -10); scene.add(back);   // gentle rim
