@@ -34,7 +34,7 @@ export default function initVault(overlay, opts) {
   const M = (m) => { mats.push(m); return m; };
   const T = (t) => { texs.push(t); return t; };
 
-  try { renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' }); }
+  try { renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance', logarithmicDepthBuffer: true }); }
   catch (e) { onDone(); return; }
 
   try {
@@ -65,11 +65,16 @@ export default function initVault(overlay, opts) {
     envTex = pmrem.fromEquirectangular(envSrc).texture;
     scene.environment = envTex;
 
-    // ── Very subtle brushed grain (anisotropic-ish) ──
+    // ── Brushed-titanium grain (roughness) + micro normal relief ──
     const nc = document.createElement('canvas'); nc.width = 256; nc.height = 256;
-    const nx = nc.getContext('2d'); nx.fillStyle = '#808080'; nx.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 130; i++) { const y = Math.random() * 256; nx.strokeStyle = 'rgba(255,255,255,' + (Math.random() * 0.06) + ')'; nx.beginPath(); nx.moveTo(0, y); nx.lineTo(256, y); nx.stroke(); }
-    const brush = T(new THREE.CanvasTexture(nc)); brush.wrapS = brush.wrapT = THREE.RepeatWrapping; brush.repeat.set(1, 3);
+    const nx = nc.getContext('2d'); nx.fillStyle = '#7d7d7d'; nx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 340; i++) { const x = Math.random() * 256; const light = Math.random() < 0.5; nx.strokeStyle = 'rgba(' + (light ? '255,255,255' : '38,38,38') + ',' + (0.04 + Math.random() * 0.11) + ')'; nx.lineWidth = Math.random() * 1.4; nx.beginPath(); nx.moveTo(x, 0); nx.lineTo(x + (Math.random() - 0.5) * 6, 256); nx.stroke(); }
+    const brush = T(new THREE.CanvasTexture(nc)); brush.wrapS = brush.wrapT = THREE.RepeatWrapping; brush.repeat.set(3, 1);
+    // normal map — fine vertical brushed relief so the metal catches light
+    const nmC = document.createElement('canvas'); nmC.width = 256; nmC.height = 256;
+    const nmX = nmC.getContext('2d'); nmX.fillStyle = 'rgb(128,128,255)'; nmX.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 300; i++) { const x = Math.random() * 256; const d = Math.round((Math.random() - 0.5) * 70); nmX.strokeStyle = 'rgb(' + (128 + d) + ',128,255)'; nmX.lineWidth = Math.random() * 1.6; nmX.beginPath(); nmX.moveTo(x, 0); nmX.lineTo(x, 256); nmX.stroke(); }
+    const slabNormal = T(new THREE.CanvasTexture(nmC)); slabNormal.wrapS = slabNormal.wrapT = THREE.RepeatWrapping; slabNormal.repeat.set(3, 3);
 
     // ── Soft additive sprite (light leak only) ──
     const gc = document.createElement('canvas'); gc.width = gc.height = 128;
@@ -81,7 +86,7 @@ export default function initVault(overlay, opts) {
     const soft = (x, y, z, w, h, color, op) => { const mat = M(new THREE.SpriteMaterial({ map: softTex, color: color, blending: THREE.AdditiveBlending, transparent: true, opacity: op, depthWrite: false })); const sp = new THREE.Sprite(mat); sp.position.set(x, y, z); sp.scale.set(w, h, 1); scene.add(sp); return sp; };
 
     // ── Materials — brushed titanium / satin ceramic / anodized (soft) ──
-    const slabMat = M(new THREE.MeshStandardMaterial({ color: 0x565c64, metalness: 0.72, roughness: 0.46, roughnessMap: brush, envMapIntensity: 1.9 }));   // brushed-titanium satin slabs
+    const slabMat = M(new THREE.MeshStandardMaterial({ color: 0x565c64, metalness: 0.72, roughness: 0.46, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.28, 0.28), envMapIntensity: 1.9 }));   // brushed-titanium satin slabs
     const bevelMat = M(new THREE.MeshStandardMaterial({ color: 0x676d75, metalness: 0.95, roughness: 0.3, envMapIntensity: 1.7 }));                          // micro-bevel
     const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x141517, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove (near-black)
     const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x494e55, metalness: 0.6, roughness: 0.5, roughnessMap: brush, envMapIntensity: 1.1 }));       // architecture
@@ -157,7 +162,10 @@ export default function initVault(overlay, opts) {
       return grp;
     }
     const leftSlab = makeSlab(-1), rightSlab = makeSlab(1);
-    const LC = leftSlab.position.x, RC = rightSlab.position.x, LO = -DW * 2 - HALF_W, RO = DW * 2 + HALF_W;
+    // Park the slabs with their inner edge just past the opening (retracted into
+    // the wall pocket, still visible at the frame edges) — they do NOT fly off.
+    const LC = leftSlab.position.x, RC = rightSlab.position.x;
+    const LO = -(OW / 2 + DW / 2 + 0.35), RO = OW / 2 + DW / 2 + 0.35;
 
     // ── Lights — soft & even (env + directional; NO point-light hotspots) ──
     scene.add(new THREE.HemisphereLight(0xccd4dc, 0x35393f, 1.9));
@@ -209,7 +217,8 @@ export default function initVault(overlay, opts) {
         leak.material.opacity = Math.sin(Math.min(op * 1.5, 1) * Math.PI) * 0.6;   // appears fast, fades as doors clear
         leak.scale.x = 2.0 + op * 7;
         warm.intensity = Math.min(op * 3, 1) * 3.2;
-        if (op >= 1 && !ended) { ended = true; finish(); }
+        // slabs reach the parked position, HOLD so it reads, then cross-fade to the hero
+        if (op >= 1 && !ended) { ended = true; window.setTimeout(finish, 1100); }
       }
 
       renderer.render(scene, camera);

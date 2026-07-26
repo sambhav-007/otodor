@@ -31,7 +31,7 @@
     overflow: hidden;
     opacity: 0;                 /* armed by JS on first play only */
     pointer-events: none;
-    background: radial-gradient(120% 90% at 50% 42%, #0c1016 0%, #070809 55%, #050506 100%);
+    background: transparent;    /* transparent → the WebGL gap reveals the hero behind, not a dark div */
   }
   .otodor-vault.is-playing { opacity: 1; pointer-events: auto; }
   .otodor-vault.is-done { opacity: 0; transition: opacity 0.55s ease; pointer-events: none; }
