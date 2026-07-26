@@ -57,8 +57,8 @@ export default function initVault(overlay, opts) {
     grd.addColorStop(0.0, '#3a3f45'); grd.addColorStop(0.4, '#6c737c');
     grd.addColorStop(0.5, '#8a929c'); grd.addColorStop(0.62, '#5c626b'); grd.addColorStop(1.0, '#232629');
     g2.fillStyle = grd; g2.fillRect(0, 0, 512, 256);
-    g2.fillStyle = 'rgba(248,250,253,0.92)'; g2.fillRect(0, 54, 512, 34);   // soft overhead softbox (main reflection)
-    g2.fillStyle = 'rgba(210,218,228,0.5)'; g2.fillRect(0, 150, 512, 20);   // subtle lower bounce
+    g2.fillStyle = 'rgba(255,255,255,1)'; g2.fillRect(0, 48, 512, 46);      // bright overhead softbox — the door's key reflection band
+    g2.fillStyle = 'rgba(150,175,205,0.6)'; g2.fillRect(0, 150, 512, 24);   // subtle cool lower bounce
     const envSrc = T(new THREE.CanvasTexture(ec));
     envSrc.mapping = THREE.EquirectangularReflectionMapping; envSrc.colorSpace = THREE.SRGBColorSpace;
     pmrem = new THREE.PMREMGenerator(renderer);
@@ -86,7 +86,7 @@ export default function initVault(overlay, opts) {
     const soft = (x, y, z, w, h, color, op) => { const mat = M(new THREE.SpriteMaterial({ map: softTex, color: color, blending: THREE.AdditiveBlending, transparent: true, opacity: op, depthWrite: false })); const sp = new THREE.Sprite(mat); sp.position.set(x, y, z); sp.scale.set(w, h, 1); scene.add(sp); return sp; };
 
     // ── Materials — brushed titanium / satin ceramic / anodized (soft) ──
-    const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x0f1115, metalness: 0.5, roughness: 0.44, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.18, 0.18), clearcoat: 0.7, clearcoatRoughness: 0.26, envMapIntensity: 2.0 }));   // black ceramic-coated monolith slabs
+    const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x0f1115, metalness: 0.5, roughness: 0.44, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.18, 0.18), clearcoat: 0.85, clearcoatRoughness: 0.16, envMapIntensity: 2.4 }));   // black ceramic-coated monolith slabs (defined sheen)
     const bevelMat = M(new THREE.MeshStandardMaterial({ color: 0x262a30, metalness: 0.95, roughness: 0.32, envMapIntensity: 1.6 }));                         // dark-steel cavity accents (guide rails)
     const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0b0d, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove
     const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x0b0d11, metalness: 0.55, roughness: 0.52, roughnessMap: brush, envMapIntensity: 1.4 }));     // black architecture (matte)
@@ -133,12 +133,11 @@ export default function initVault(overlay, opts) {
     // ── OTODOR monogram — planar-mapped so the DIAGONAL cut splits its slant ──
     let monoTex = null, logoMat = null;
     try { monoTex = new THREE.TextureLoader().load(new URL('./otodor-monogram.png', import.meta.url).href); } catch (e) { monoTex = null; }
-    const SLANT = OW * 0.2;   // diagonal offset (bottom-left → top-right, like "/")
+    const SLANT = OW * 0.26;  // diagonal offset (bottom-left → top-right, like "/")
+    const LW = 3.8, LH = 3.8, LY = 0;                 // logo centred on the door centre → the seam runs through the middle of the logo
     if (monoTex) {
       monoTex.colorSpace = THREE.SRGBColorSpace; monoTex.wrapS = monoTex.wrapT = THREE.ClampToEdgeWrapping; monoTex.anisotropy = 8;
-      const LW = 3.7, LH = 3.7, LY = 0.2;               // logo world size + vertical centre
-      monoTex.repeat.set(1 / LW, 1 / LH); monoTex.offset.set(0.5, 0.5 - LY / LH);   // world-planar projection (same on both halves)
-      logoMat = M(new THREE.MeshStandardMaterial({ map: monoTex, emissive: 0x8ec2ff, emissiveMap: monoTex, emissiveIntensity: 0.55, transparent: true, alphaTest: 0.35, depthWrite: false, metalness: 0.4, roughness: 0.5, envMapIntensity: 0.7 }));
+      logoMat = M(new THREE.MeshStandardMaterial({ map: monoTex, emissive: 0x9fd0ff, emissiveMap: monoTex, emissiveIntensity: 1.0, transparent: true, alphaTest: 0.35, depthWrite: false, metalness: 0.4, roughness: 0.5, envMapIntensity: 0.7 }));
     }
 
     // ── Two blast-door halves split along a DIAGONAL, built from extruded shapes ──
@@ -164,8 +163,15 @@ export default function initVault(overlay, opts) {
       const baseGeo = G(new THREE.ExtrudeGeometry(shape, { depth: DD, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 1 }));
       baseGeo.translate(0, 0, -DD / 2);
       grp.add(mesh(baseGeo, slabMat, 0, 0, 0, true, true));
-      // logo clipped to this half's shape (planar map) → the diagonal splits its slant
-      if (logoMat) grp.add(mesh(G(new THREE.ShapeGeometry(shape)), logoMat, 0, 0, DD / 2 + 0.03, false, false));
+      // logo clipped to this half's shape → the diagonal splits its slant.
+      // Bake planar UVs explicitly (ShapeGeometry's default UVs are unreliable here).
+      if (logoMat) {
+        const face = G(new THREE.ShapeGeometry(shape));
+        const pos = face.attributes.position, uvArr = new Float32Array(pos.count * 2);
+        for (let k = 0; k < pos.count; k++) { uvArr[k * 2] = pos.getX(k) / LW + 0.5; uvArr[k * 2 + 1] = (pos.getY(k) - LY) / LH + 0.5; }
+        face.setAttribute('uv', new THREE.BufferAttribute(uvArr, 2));
+        grp.add(mesh(face, logoMat, 0, 0, DD / 2 + 0.16, false, false));
+      }
       // glowing diagonal seam edge
       const seamEl = mesh(box(0.07, diagLen, 0.12), seamMat, side * GAP, 0, DD / 2 + 0.01, false, false);
       seamEl.rotation.z = diagRot; grp.add(seamEl);
