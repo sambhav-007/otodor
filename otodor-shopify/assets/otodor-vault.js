@@ -86,7 +86,7 @@ export default function initVault(overlay, opts) {
     const soft = (x, y, z, w, h, color, op) => { const mat = M(new THREE.SpriteMaterial({ map: softTex, color: color, blending: THREE.AdditiveBlending, transparent: true, opacity: op, depthWrite: false })); const sp = new THREE.Sprite(mat); sp.position.set(x, y, z); sp.scale.set(w, h, 1); scene.add(sp); return sp; };
 
     // ── Materials — brushed titanium / satin ceramic / anodized (soft) ──
-    const slabMat = M(new THREE.MeshStandardMaterial({ color: 0x565c64, metalness: 0.72, roughness: 0.46, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.12, 0.12), envMapIntensity: 1.9 }));   // brushed-titanium satin slabs
+    const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x0f1115, metalness: 0.5, roughness: 0.44, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.18, 0.18), clearcoat: 0.7, clearcoatRoughness: 0.26, envMapIntensity: 2.0 }));   // black ceramic-coated monolith slabs
     const bevelMat = M(new THREE.MeshStandardMaterial({ color: 0x676d75, metalness: 0.95, roughness: 0.3, envMapIntensity: 1.7 }));                          // micro-bevel
     const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x141517, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove (near-black)
     const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x494e55, metalness: 0.6, roughness: 0.5, roughnessMap: brush, envMapIntensity: 1.1 }));       // architecture
@@ -144,8 +144,10 @@ export default function initVault(overlay, opts) {
       if (monoTex) {
         const tx = monoTex.clone(); tx.needsUpdate = true; tx.colorSpace = THREE.SRGBColorSpace;
         tx.wrapS = tx.wrapT = THREE.ClampToEdgeWrapping; tx.repeat.set(0.5, 1); tx.offset.set(side < 0 ? 0.0 : 0.5, 0);
-        const mMat = M(new THREE.MeshStandardMaterial({ map: tx, emissive: 0x8ec2ff, emissiveMap: tx, emissiveIntensity: 0.7, transparent: true, alphaTest: 0.4, depthWrite: false, metalness: 0.4, roughness: 0.5, envMapIntensity: 0.7 }));
-        grp.add(mesh(G(new THREE.PlaneGeometry(1.8, 3.4)), mMat, -side * 1.7, 0.5, D / 2 + 0.07, false, false));
+        tx.anisotropy = 8; tx.minFilter = THREE.LinearMipmapLinearFilter;
+        const mMat = M(new THREE.MeshStandardMaterial({ map: tx, emissive: 0x8ec2ff, emissiveMap: tx, emissiveIntensity: 0.6, transparent: true, alphaTest: 0.4, depthWrite: false, metalness: 0.4, roughness: 0.5, envMapIntensity: 0.7 }));
+        // inner edge sits at the door's inner edge so the two halves meet cleanly across the seam
+        grp.add(mesh(G(new THREE.PlaneGeometry(1.8, 3.4)), mMat, -side * 1.875, 0.5, D / 2 + 0.07, false, false));
       }
       // tiny functional indicators (one blue, one amber) — minimal, clearly proud
       grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, -side * (W / 2 - 0.9), H / 2 - 0.9, D / 2 + 0.08, false, false));
