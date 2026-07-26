@@ -57,7 +57,8 @@ export default function initVault(overlay, opts) {
     grd.addColorStop(0.0, '#3a3f45'); grd.addColorStop(0.4, '#6c737c');
     grd.addColorStop(0.5, '#8a929c'); grd.addColorStop(0.62, '#5c626b'); grd.addColorStop(1.0, '#232629');
     g2.fillStyle = grd; g2.fillRect(0, 0, 512, 256);
-    g2.fillStyle = 'rgba(245,247,250,0.7)'; g2.fillRect(0, 60, 512, 26);   // soft overhead softbox
+    g2.fillStyle = 'rgba(248,250,253,0.92)'; g2.fillRect(0, 54, 512, 34);   // soft overhead softbox (main reflection)
+    g2.fillStyle = 'rgba(210,218,228,0.5)'; g2.fillRect(0, 150, 512, 20);   // subtle lower bounce
     const envSrc = T(new THREE.CanvasTexture(ec));
     envSrc.mapping = THREE.EquirectangularReflectionMapping; envSrc.colorSpace = THREE.SRGBColorSpace;
     pmrem = new THREE.PMREMGenerator(renderer);
@@ -80,7 +81,7 @@ export default function initVault(overlay, opts) {
     const soft = (x, y, z, w, h, color, op) => { const mat = M(new THREE.SpriteMaterial({ map: softTex, color: color, blending: THREE.AdditiveBlending, transparent: true, opacity: op, depthWrite: false })); const sp = new THREE.Sprite(mat); sp.position.set(x, y, z); sp.scale.set(w, h, 1); scene.add(sp); return sp; };
 
     // ── Materials — brushed titanium / satin ceramic / anodized (soft) ──
-    const slabMat = M(new THREE.MeshStandardMaterial({ color: 0x3c4046, metalness: 0.86, roughness: 0.42, roughnessMap: brush, envMapIntensity: 1.4 }));   // slabs
+    const slabMat = M(new THREE.MeshStandardMaterial({ color: 0x565c64, metalness: 0.72, roughness: 0.46, roughnessMap: brush, envMapIntensity: 1.9 }));   // brushed-titanium satin slabs
     const bevelMat = M(new THREE.MeshStandardMaterial({ color: 0x676d75, metalness: 0.95, roughness: 0.3, envMapIntensity: 1.7 }));                          // micro-bevel
     const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x141517, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove (near-black)
     const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x494e55, metalness: 0.6, roughness: 0.5, roughnessMap: brush, envMapIntensity: 1.1 }));       // architecture
@@ -152,21 +153,19 @@ export default function initVault(overlay, opts) {
     const leftSlab = makeSlab(-1), rightSlab = makeSlab(1);
     const LC = leftSlab.position.x, RC = rightSlab.position.x, LO = -DW * 2 - HALF_W, RO = DW * 2 + HALF_W;
 
-    // ── Lights (neutral white, soft; tiny coloured accents only) ──
-    scene.add(new THREE.HemisphereLight(0xc4ccd4, 0x33373c, 1.2));
-    scene.add(new THREE.AmbientLight(0x70767c, 0.5));
-    const key = new THREE.DirectionalLight(0xfff6ec, 2.3);
-    key.position.set(6, 12, 15); key.castShadow = true;
+    // ── Lights — soft & even (env + directional; NO point-light hotspots) ──
+    scene.add(new THREE.HemisphereLight(0xccd4dc, 0x35393f, 1.9));
+    scene.add(new THREE.AmbientLight(0x7c828a, 0.75));
+    const key = new THREE.DirectionalLight(0xfff6ec, 1.7);
+    key.position.set(5, 13, 16); key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048);
     key.shadow.camera.near = 1; key.shadow.camera.far = 80;
     key.shadow.camera.left = -14; key.shadow.camera.right = 14; key.shadow.camera.top = 13; key.shadow.camera.bottom = -13;
-    key.shadow.bias = -0.0004; key.shadow.radius = 5;
+    key.shadow.bias = -0.0004; key.shadow.radius = 6;
     scene.add(key); scene.add(key.target);
-    const fill = new THREE.DirectionalLight(0xb4bcc6, 0.85); fill.position.set(-9, 4, 12); scene.add(fill);
-    const ceilA = new THREE.PointLight(0xfff2e4, 70, 40, 2); ceilA.position.set(-2.6, 5.4, 9); scene.add(ceilA);
-    const ceilB = new THREE.PointLight(0xfff2e4, 60, 40, 2); ceilB.position.set(2.6, 5.4, 4); scene.add(ceilB);
-    const soften = new THREE.PointLight(0xf0f4fa, 30, 26, 2); soften.position.set(0, 0.5, 6); scene.add(soften);
-    const warm = new THREE.PointLight(0xffe6c2, 0, 46, 2); warm.position.set(0, 0, -6); scene.add(warm);   // reveal light
+    const fill = new THREE.DirectionalLight(0xc0c8d2, 1.1); fill.position.set(-8, 3, 13); scene.add(fill);
+    const back = new THREE.DirectionalLight(0xaeb6c2, 0.5); back.position.set(0, 6, -10); scene.add(back);   // gentle rim
+    const warm = new THREE.PointLight(0xffe6c2, 0, 46, 2); warm.position.set(0, 0, -6); scene.add(warm);     // reveal light only (behind slabs)
 
     // ── Camera ──
     let baseCam = new THREE.Vector3(0, 1.4, 16.5);
@@ -193,7 +192,7 @@ export default function initVault(overlay, opts) {
       // seam ignites softly at unlock (the one moment of light)
       const seamI = t < UNLOCK ? 0.0 : clamp((t - UNLOCK) / 500, 0, 1) * 2.2;
       seamMat.emissiveIntensity = seamI;
-      for (let i = 0; i < seamGlows.length; i++) { const s = seamGlows[i]; const slab = s._side < 0 ? leftSlab : rightSlab; s.position.set(slab.position.x + s._side * -(DW / 2 - 0.02), 0, 0.35); s.material.opacity = 0.5 * clamp((t - UNLOCK) / 500, 0, 1); }
+      for (let i = 0; i < seamGlows.length; i++) { const s = seamGlows[i]; const slab = s._side < 0 ? leftSlab : rightSlab; s.position.set(slab.position.x + s._side * -(DW / 2 - 0.02), 0, 0.35); s.material.opacity = 0.22 * clamp((t - UNLOCK) / 500, 0, 1); }
 
       // effortless glide
       if (t > OPEN_AT) {
