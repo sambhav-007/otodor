@@ -115,30 +115,38 @@ export default function initVault(overlay, opts) {
     const DW = 5.4, DH = 9, DD = 1.5;      // slab half-width, height, thickness (massive)
     const OW = DW * 2, OH = DH;            // opening
     const wall = new THREE.Group();
-    // the far wall = large flush panels around the opening (carved, not a separate frame)
+    // Panels OVERLAP (never abut) so no two faces are coplanar → no z-fighting.
     const sideW = (HALF_W - OW / 2);
-    wall.add(mesh(box(sideW, HALF_H * 2, 1.4), wallMat, -(OW / 2 + sideW / 2), 0, 0, false, true));         // left of opening
-    wall.add(mesh(box(sideW, HALF_H * 2, 1.4), wallMat, (OW / 2 + sideW / 2), 0, 0, false, true));          // right of opening
     const topH = (HALF_H - OH / 2);
-    wall.add(mesh(box(OW, topH, 1.4), wallMat, 0, (OH / 2 + topH / 2), 0, false, true));                    // lintel
-    wall.add(mesh(box(OW, topH, 1.4), wallMat, 0, -(OH / 2 + topH / 2), 0, false, true));                   // sill
-    // micro-bevel reveal lip around the opening (thin, lighter)
-    wall.add(mesh(box(0.14, OH + 0.28, 0.5), bevelMat, -(OW / 2 + 0.07), 0, 0.72, false, false));
-    wall.add(mesh(box(0.14, OH + 0.28, 0.5), bevelMat, (OW / 2 + 0.07), 0, 0.72, false, false));
-    wall.add(mesh(box(OW + 0.28, 0.14, 0.5), bevelMat, 0, (OH / 2 + 0.07), 0.72, false, false));
-    wall.add(mesh(box(OW + 0.28, 0.14, 0.5), bevelMat, 0, -(OH / 2 + 0.07), 0.72, false, false));
+    // lintel + sill: full width, in front
+    wall.add(mesh(box(HALF_W * 2, topH, 1.4), wallMat, 0, HALF_H - topH / 2, 0, false, true));              // lintel
+    wall.add(mesh(box(HALF_W * 2, topH, 1.4), wallMat, 0, -(HALF_H - topH / 2), 0, false, true));           // sill
+    // side jambs: opening height + overlap into lintel/sill, recessed so their top/bottom hide behind them
+    wall.add(mesh(box(sideW, OH + 0.9, 1.3), wallMat, -(OW / 2 + sideW / 2), 0, -0.08, false, true));       // left jamb
+    wall.add(mesh(box(sideW, OH + 0.9, 1.3), wallMat, (OW / 2 + sideW / 2), 0, -0.08, false, true));        // right jamb
     scene.add(wall);
 
     // ── Hidden guide rails (barely-there) + soft internal light leak ──
     [OH / 2 - 0.25, -(OH / 2 - 0.25)].forEach((yy) => scene.add(mesh(box(OW * 1.4, 0.1, 0.16), bevelMat, 0, yy, -0.5, false, false)));
     const leak = soft(0, 0.2, -0.5, 2.2, OH * 0.95, 0xeef2ff, 0.0);   // internal light leak, grows as slabs part
 
+    // ── OTODOR monogram (rendered crisp: PNG alpha via map + alphaTest, subtly backlit) ──
+    let monoTex = null;
+    try { monoTex = new THREE.TextureLoader().load(new URL('./otodor-monogram.png', import.meta.url).href); monoTex.colorSpace = THREE.SRGBColorSpace; } catch (e) { monoTex = null; }
+
     // ── Two monolithic slabs (near-featureless, precise gaps) ──
     const seamGlows = [];
     function makeSlab(side) {
       const grp = new THREE.Group();
-      const W = DW, H = DH, D = DD;
-      grp.add(mesh(box(W, H, D), slabMat, 0, 0, 0, true, true));                                   // monolithic slab — featureless (no coplanar plates)
+      const W = DW + 0.15, H = DH + 0.5, D = DD;   // slightly larger than the opening → overlaps the frame in front (no coplanar edges)
+      grp.add(mesh(box(W, H, D), slabMat, 0, 0, 0, true, true));                                   // monolithic slab
+      // Crisp OTODOR monogram — this door carries its half (splits open). map+alphaTest = clean edges.
+      if (monoTex) {
+        const tx = monoTex.clone(); tx.needsUpdate = true; tx.colorSpace = THREE.SRGBColorSpace;
+        tx.wrapS = tx.wrapT = THREE.ClampToEdgeWrapping; tx.repeat.set(0.5, 1); tx.offset.set(side < 0 ? 0.0 : 0.5, 0);
+        const mMat = M(new THREE.MeshStandardMaterial({ map: tx, emissive: 0x8ec2ff, emissiveMap: tx, emissiveIntensity: 0.7, transparent: true, alphaTest: 0.4, depthWrite: false, metalness: 0.4, roughness: 0.5, envMapIntensity: 0.7 }));
+        grp.add(mesh(G(new THREE.PlaneGeometry(1.8, 3.4)), mMat, -side * 1.7, 0.5, D / 2 + 0.07, false, false));
+      }
       // tiny functional indicators (one blue, one amber) — minimal, clearly proud
       grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, -side * (W / 2 - 0.9), H / 2 - 0.9, D / 2 + 0.08, false, false));
       grp.add(mesh(box(0.06, 0.06, 0.04), ledAmber, -side * (W / 2 - 0.9), -H / 2 + 0.9, D / 2 + 0.08, false, false));
