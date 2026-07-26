@@ -107,7 +107,7 @@ export default function initVault(overlay, opts) {
     scene.add(room);
 
     // ── Vault opening carved into the far wall (integrated frame) ──
-    const DW = 5.4, DH = 9, DD = 0.7;      // slab half-width, height, thickness
+    const DW = 5.4, DH = 9, DD = 1.5;      // slab half-width, height, thickness (massive)
     const OW = DW * 2, OH = DH;            // opening
     const wall = new THREE.Group();
     // the far wall = large flush panels around the opening (carved, not a separate frame)
@@ -126,7 +126,11 @@ export default function initVault(overlay, opts) {
 
     // ── Hidden guide rails (barely-there) + soft internal light leak ──
     [OH / 2 - 0.25, -(OH / 2 - 0.25)].forEach((yy) => scene.add(mesh(box(OW * 1.4, 0.1, 0.16), bevelMat, 0, yy, -0.5, false, false)));
-    const leak = soft(0, 0.2, -0.4, 2.2, OH * 0.95, 0xdfeaff, 0.0);   // grows as slabs part
+    const leak = soft(0, 0.2, -0.5, 2.2, OH * 0.95, 0xeef2ff, 0.0);   // internal light leak, grows as slabs part
+
+    // ── OTODOR monogram texture (etched large across the seam) ──
+    let monoTex = null;
+    try { monoTex = new THREE.TextureLoader().load(new URL('./otodor-monogram.png', import.meta.url).href); monoTex.colorSpace = THREE.SRGBColorSpace; } catch (e) { monoTex = null; }
 
     // ── Two monolithic slabs (near-featureless, precise gaps) ──
     const seamGlows = [];
@@ -137,9 +141,14 @@ export default function initVault(overlay, opts) {
       // micro-bevelled perimeter — a raised face plate leaving a hairline gap
       grp.add(mesh(box(W - 0.16, H - 0.16, 0.05), slabMat, -side * 0.03, 0, D / 2 + 0.02, false, true));
       grp.add(mesh(box(W - 0.06, H - 0.06, 0.02), bevelMat, 0, 0, D / 2 + 0.005, false, false));   // thin bevel rim
-      // two precise horizontal panel lines (hairline recessed grooves)
-      grp.add(mesh(box(W - 0.5, 0.03, 0.02), lineMat, -side * 0.03, H * 0.22, D / 2 + 0.045, false, false));
-      grp.add(mesh(box(W - 0.5, 0.03, 0.02), lineMat, -side * 0.03, -H * 0.22, D / 2 + 0.045, false, false));
+      // Large etched OTODOR monogram — this door shows its half (splits on open)
+      if (monoTex) {
+        const half = monoTex.clone(); half.needsUpdate = true;
+        half.wrapS = half.wrapT = THREE.ClampToEdgeWrapping;
+        half.repeat.set(0.5, 1); half.offset.set(side < 0 ? 0.0 : 0.5, 0);
+        const mMat = M(new THREE.MeshStandardMaterial({ color: 0x14161a, metalness: 0.5, roughness: 0.62, alphaMap: half, transparent: true, opacity: 0.6, envMapIntensity: 0.5, depthWrite: false }));
+        grp.add(mesh(G(new THREE.PlaneGeometry(1.55, 3.1)), mMat, -side * 1.98, 0.4, D / 2 + 0.04, false, false));
+      }
       // tiny functional indicators (one blue, one amber) — minimal
       grp.add(mesh(box(0.35, 0.05, 0.03), ledBlue, -side * (W / 2 - 0.9), H / 2 - 0.9, D / 2 + 0.05, false, false));
       grp.add(mesh(box(0.06, 0.06, 0.03), ledAmber, -side * (W / 2 - 0.9), -H / 2 + 0.9, D / 2 + 0.05, false, false));
@@ -165,7 +174,7 @@ export default function initVault(overlay, opts) {
     scene.add(key); scene.add(key.target);
     const fill = new THREE.DirectionalLight(0xc0c8d2, 1.1); fill.position.set(-8, 3, 13); scene.add(fill);
     const back = new THREE.DirectionalLight(0xaeb6c2, 0.5); back.position.set(0, 6, -10); scene.add(back);   // gentle rim
-    const warm = new THREE.PointLight(0xffe6c2, 0, 46, 2); warm.position.set(0, 0, -6); scene.add(warm);     // reveal light only (behind slabs)
+    const warm = new THREE.PointLight(0xffe8cc, 0, 30, 2); warm.position.set(0, 0.4, -1.4); scene.add(warm); // interior light — grazes the revealed thick edges
 
     // ── Camera ──
     let baseCam = new THREE.Vector3(0, 1.4, 16.5);
@@ -200,9 +209,9 @@ export default function initVault(overlay, opts) {
         const e = easeInOutQuart(op);
         leftSlab.position.x = LC + (LO - LC) * e;
         rightSlab.position.x = RC + (RO - RC) * e;
-        leak.material.opacity = Math.sin(op * Math.PI) * 0.5;   // light leak swells then fades
-        leak.scale.x = 2.2 + op * 8;
-        warm.intensity = op * 4;
+        leak.material.opacity = Math.sin(Math.min(op * 1.5, 1) * Math.PI) * 0.6;   // appears fast, fades as doors clear
+        leak.scale.x = 2.0 + op * 7;
+        warm.intensity = Math.min(op * 3, 1) * 3.2;
         if (op >= 1 && !ended) { ended = true; finish(); }
       }
 
