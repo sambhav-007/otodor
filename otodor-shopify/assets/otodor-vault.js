@@ -130,40 +130,56 @@ export default function initVault(overlay, opts) {
     [OH / 2 - 0.25, -(OH / 2 - 0.25)].forEach((yy) => scene.add(mesh(box(OW * 1.4, 0.1, 0.16), bevelMat, 0, yy, -0.5, false, false)));
     const leak = soft(0, 0.2, -0.5, 2.2, OH * 0.95, 0xeef2ff, 0.0);   // internal light leak, grows as slabs part
 
-    // ── OTODOR monogram (rendered crisp: PNG alpha via map + alphaTest, subtly backlit) ──
-    let monoTex = null;
-    try { monoTex = new THREE.TextureLoader().load(new URL('./otodor-monogram.png', import.meta.url).href); monoTex.colorSpace = THREE.SRGBColorSpace; } catch (e) { monoTex = null; }
+    // ── OTODOR monogram — planar-mapped so the DIAGONAL cut splits its slant ──
+    let monoTex = null, logoMat = null;
+    try { monoTex = new THREE.TextureLoader().load(new URL('./otodor-monogram.png', import.meta.url).href); } catch (e) { monoTex = null; }
+    const SLANT = OW * 0.2;   // diagonal offset (bottom-left → top-right, like "/")
+    if (monoTex) {
+      monoTex.colorSpace = THREE.SRGBColorSpace; monoTex.wrapS = monoTex.wrapT = THREE.ClampToEdgeWrapping; monoTex.anisotropy = 8;
+      const LW = 3.7, LH = 3.7, LY = 0.2;               // logo world size + vertical centre
+      monoTex.repeat.set(1 / LW, 1 / LH); monoTex.offset.set(0.5, 0.5 - LY / LH);   // world-planar projection (same on both halves)
+      logoMat = M(new THREE.MeshStandardMaterial({ map: monoTex, emissive: 0x8ec2ff, emissiveMap: monoTex, emissiveIntensity: 0.55, transparent: true, alphaTest: 0.35, depthWrite: false, metalness: 0.4, roughness: 0.5, envMapIntensity: 0.7 }));
+    }
 
-    // ── Two monolithic slabs (near-featureless, precise gaps) ──
+    // ── Two blast-door halves split along a DIAGONAL, built from extruded shapes ──
     const seamGlows = [];
+    const EXT = 0.3, OV = 0.2, GAP = 0.05;   // frame overlap + seam half-gap
+    const diagLen = Math.sqrt((2 * SLANT) * (2 * SLANT) + (OH + 2 * EXT) * (OH + 2 * EXT)) + 0.2;
+    const diagRot = -Math.atan2(2 * SLANT, OH + 2 * EXT);
     function makeSlab(side) {
       const grp = new THREE.Group();
-      const W = DW + 0.15, H = DH + 0.5, D = DD;   // slightly larger than the opening → overlaps the frame in front (no coplanar edges)
-      grp.add(mesh(box(W, H, D), slabMat, 0, 0, 0, true, true));                                   // monolithic slab
-      // Crisp OTODOR monogram — this door carries its half (splits open). map+alphaTest = clean edges.
-      if (monoTex) {
-        const tx = monoTex.clone(); tx.needsUpdate = true; tx.colorSpace = THREE.SRGBColorSpace;
-        tx.wrapS = tx.wrapT = THREE.ClampToEdgeWrapping; tx.repeat.set(0.5, 1); tx.offset.set(side < 0 ? 0.0 : 0.5, 0);
-        tx.anisotropy = 8; tx.minFilter = THREE.LinearMipmapLinearFilter;
-        const mMat = M(new THREE.MeshStandardMaterial({ map: tx, emissive: 0x8ec2ff, emissiveMap: tx, emissiveIntensity: 0.6, transparent: true, alphaTest: 0.4, depthWrite: false, metalness: 0.4, roughness: 0.5, envMapIntensity: 0.7 }));
-        // inner edge sits at the door's inner edge so the two halves meet cleanly across the seam
-        grp.add(mesh(G(new THREE.PlaneGeometry(1.8, 3.4)), mMat, -side * 1.875, 0.5, D / 2 + 0.07, false, false));
+      const shape = new THREE.Shape();
+      if (side < 0) {   // left of the diagonal
+        shape.moveTo(-OW / 2 - OV, -OH / 2 - EXT);
+        shape.lineTo(-SLANT - GAP, -OH / 2 - EXT);
+        shape.lineTo(SLANT - GAP, OH / 2 + EXT);
+        shape.lineTo(-OW / 2 - OV, OH / 2 + EXT);
+      } else {          // right of the diagonal
+        shape.moveTo(-SLANT + GAP, -OH / 2 - EXT);
+        shape.lineTo(OW / 2 + OV, -OH / 2 - EXT);
+        shape.lineTo(OW / 2 + OV, OH / 2 + EXT);
+        shape.lineTo(SLANT + GAP, OH / 2 + EXT);
       }
-      // tiny functional indicators (one blue, one amber) — minimal, clearly proud
-      grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, -side * (W / 2 - 0.9), H / 2 - 0.9, D / 2 + 0.08, false, false));
-      grp.add(mesh(box(0.06, 0.06, 0.04), ledAmber, -side * (W / 2 - 0.9), -H / 2 + 0.9, D / 2 + 0.08, false, false));
-      // thin illuminated seam on the inner edge (recessed)
-      grp.add(mesh(box(0.04, H - 0.5, 0.08), seamMat, -side * (W / 2 - 0.03), 0, D / 2 - 0.05, false, false));
-      const sg = soft(0, 0, 0, 0.5, H - 0.5, 0x8ec2ff, 0.0); sg._side = side; seamGlows.push(sg);
-      grp.position.x = side * (0.03 + W / 2);
+      shape.closePath();
+      const baseGeo = G(new THREE.ExtrudeGeometry(shape, { depth: DD, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 1 }));
+      baseGeo.translate(0, 0, -DD / 2);
+      grp.add(mesh(baseGeo, slabMat, 0, 0, 0, true, true));
+      // logo clipped to this half's shape (planar map) → the diagonal splits its slant
+      if (logoMat) grp.add(mesh(G(new THREE.ShapeGeometry(shape)), logoMat, 0, 0, DD / 2 + 0.03, false, false));
+      // glowing diagonal seam edge
+      const seamEl = mesh(box(0.07, diagLen, 0.12), seamMat, side * GAP, 0, DD / 2 + 0.01, false, false);
+      seamEl.rotation.z = diagRot; grp.add(seamEl);
+      const sg = soft(0, 0, 0, 1.0, diagLen * 0.7, 0x8ec2ff, 0.0); sg._side = side; seamGlows.push(sg);
+      // tiny functional indicators
+      grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, side * 3.6, 3.4, DD / 2 + 0.08, false, false));
+      grp.add(mesh(box(0.07, 0.07, 0.04), ledAmber, side * 3.6, -3.4, DD / 2 + 0.08, false, false));
       scene.add(grp);
       return grp;
     }
     const leftSlab = makeSlab(-1), rightSlab = makeSlab(1);
-    // Park the slabs with their inner edge just past the opening (retracted into
-    // the wall pocket, still visible at the frame edges) — they do NOT fly off.
-    const LC = leftSlab.position.x, RC = rightSlab.position.x;
-    const LO = -(OW / 2 + DW / 2 + 0.35), RO = OW / 2 + DW / 2 + 0.35;
+    // Slabs are built at the opening centre; they part horizontally and park at the edges.
+    const LC = 0, RC = 0;
+    const LO = -(OW / 2 + SLANT + 1.6), RO = OW / 2 + SLANT + 1.6;
 
     // ── Lights — soft & even (env + directional; NO point-light hotspots) ──
     scene.add(new THREE.HemisphereLight(0xccd4dc, 0x35393f, 1.9));
@@ -204,7 +220,7 @@ export default function initVault(overlay, opts) {
       // seam ignites softly at unlock (the one moment of light)
       const seamI = t < UNLOCK ? 0.0 : clamp((t - UNLOCK) / 500, 0, 1) * 2.2;
       seamMat.emissiveIntensity = seamI;
-      for (let i = 0; i < seamGlows.length; i++) { const s = seamGlows[i]; const slab = s._side < 0 ? leftSlab : rightSlab; s.position.set(slab.position.x + s._side * -(DW / 2 - 0.02), 0, 0.35); s.material.opacity = 0.22 * clamp((t - UNLOCK) / 500, 0, 1); }
+      for (let i = 0; i < seamGlows.length; i++) { const s = seamGlows[i]; const slab = s._side < 0 ? leftSlab : rightSlab; s.position.set(slab.position.x + s._side * GAP, 0.2, DD / 2 + 0.2); s.material.opacity = 0.28 * clamp((t - UNLOCK) / 500, 0, 1); }
 
       // effortless glide
       if (t > OPEN_AT) {
