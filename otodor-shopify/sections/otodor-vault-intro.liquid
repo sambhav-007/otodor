@@ -1,363 +1,82 @@
 {%- comment -%}
   ════════════════════════════════════════════════════════════════════════
-  OTODOR Vault Intro — cinematic sci-fi blast-door overlay
+  OTODOR Vault Intro — Three.js cinematic blast-door overlay
   ────────────────────────────────────────────────────────────────────────
-  A one-time, full-screen intro that plays ONCE PER SESSION before the hero,
-  then removes itself forever. It NEVER touches the hero — pure overlay.
+  A one-time, full-screen 3D intro that plays ONCE PER SESSION before the
+  hero, then removes itself forever. It NEVER touches the hero — pure overlay.
 
-  Design:  two symmetrical matte-titanium blast-door panels meet at a glowing
-           seam. Ambient (fog / particles / LEDs) → unlock (locks retract,
-           seam ignites) → the panels slide straight apart (easeInOutQuart) →
-           a warm reveal glow appears → panels exit the viewport → overlay is
-           removed. GPU-only (transform/opacity/filter).
+  The 3D scene lives in assets/otodor-vault.js (Three.js r160, lazy-loaded).
+  This section is a thin host: guards + a CSS "closed-door" poster shown while
+  Three loads (so there's never a hero flash), plus the loader/fallback logic.
 
-  Guards:  prefers-reduced-motion  → skipped entirely (CSS display:none + JS).
-           sessionStorage          → plays once per browser session.
-           no-JS                   → overlay stays invisible (opacity:0), hero
-                                      shows normally.
+  Guards (each independently skips to the hero):
+    prefers-reduced-motion  → CSS display:none + JS skip
+    sessionStorage          → play once per browser session
+    no WebGL / Three fails  → remove overlay, hero shows
+    no-JS                   → overlay stays invisible (opacity:0)
   ════════════════════════════════════════════════════════════════════════
 {%- endcomment -%}
 
 {%- if section.settings.enabled -%}
 {%- style -%}
-  /* Skip for reduced motion before any JS runs — no flash. */
   @media (prefers-reduced-motion: reduce) {
     .otodor-vault { display: none !important; }
   }
-
-  /* Scroll lock while the intro plays (released on finish). */
   html.otodor-vault-lock { overflow: hidden !important; touch-action: none; }
 
   .otodor-vault {
     position: fixed;
     inset: 0;
-    z-index: 2147483000;           /* above header, cursor, everything */
+    z-index: 2147483000;
     overflow: hidden;
-    opacity: 0;                    /* armed by JS on first play; hides replay/no-JS */
+    opacity: 0;                 /* armed by JS on first play only */
     pointer-events: none;
-    background: #050506;
-    contain: layout paint;
+    background: radial-gradient(120% 90% at 50% 42%, #0c1016 0%, #070809 55%, #050506 100%);
   }
   .otodor-vault.is-playing { opacity: 1; pointer-events: auto; }
-  .otodor-vault.is-done {
-    opacity: 0;
-    transition: opacity 0.45s ease;
-    pointer-events: none;
-  }
+  .otodor-vault.is-done { opacity: 0; transition: opacity 0.55s ease; pointer-events: none; }
 
-  /* ── Warm reveal glow behind the doors ──────────────────────── */
-  .otodor-vault__reveal {
+  .otodor-vault__canvas {
     position: absolute;
     inset: 0;
-    z-index: 0;
-    opacity: 0;
-    background:
-      radial-gradient(60% 55% at 50% 48%, rgba(255, 214, 150, 0.22) 0%, rgba(255, 180, 90, 0.10) 34%, transparent 72%),
-      radial-gradient(40% 40% at 50% 50%, rgba(77, 166, 255, 0.16) 0%, transparent 70%),
-      #060607;
-    will-change: opacity;
-  }
-
-  /* ── Hidden machinery revealed in the gap ───────────────────── */
-  .otodor-vault__machinery {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background:
-      /* central vertical light rails */
-      linear-gradient(90deg, transparent calc(50% - 2px), rgba(77, 166, 255, 0.5) 50%, transparent calc(50% + 2px)),
-      /* horizontal rail hints */
-      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 46px);
-    opacity: 0;
-    will-change: opacity;
-  }
-
-  /* ── Blast-door panels ──────────────────────────────────────── */
-  .otodor-vault__panel {
-    position: absolute;
-    top: 0;
+    width: 100%;
     height: 100%;
-    width: 50.6vw;                 /* slight overlap kills the centre seam gap */
-    z-index: 2;
-    transform: translate3d(0, 0, 0);
-    will-change: transform;
-    backface-visibility: hidden;
-    /* Machined matte-titanium surface (all GPU-cheap gradients) */
-    background-color: #0c0d0f;
-    background-image:
-      /* inner-edge cool rim light */
-      linear-gradient(var(--edge-dir, 90deg), rgba(77, 166, 255, 0.14) 0%, transparent 6%),
-      /* machined facet mesh (reads as hex/CNC engraving) */
-      repeating-linear-gradient(60deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 26px),
-      repeating-linear-gradient(-60deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 26px),
-      repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.32) 0 1px, transparent 1px 26px),
-      /* carbon-fibre weave */
-      repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.5) 0 2px, rgba(255, 255, 255, 0.014) 2px 4px),
-      /* brushed sheen + base */
-      linear-gradient(105deg, #191b1f 0%, #0d0e10 46%, #08090a 78%, #050506 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 0 120px rgba(0, 0, 0, 0.8);
-  }
-  .otodor-vault__panel--left  { left: 0;  --edge-dir: 270deg; }
-  .otodor-vault__panel--right { right: 0; --edge-dir: 90deg; }
-
-  /* Glowing inner edge / light strip on each panel */
-  .otodor-vault__edge {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    width: 3px;
-    background: linear-gradient(180deg, transparent, rgba(77, 166, 255, 0.65) 20%, rgba(180, 220, 255, 0.9) 50%, rgba(77, 166, 255, 0.65) 80%, transparent);
-    filter: blur(0.4px) brightness(0.6);
-    opacity: 0.5;
-    will-change: opacity, filter;
-  }
-  .otodor-vault__panel--left  .otodor-vault__edge { right: 0; }
-  .otodor-vault__panel--right .otodor-vault__edge { left: 0; }
-
-  /* Energy pulse that sweeps down the edge at unlock */
-  .otodor-vault__energy {
-    position: absolute;
-    top: 0;
-    height: 32%;
-    width: 3px;
-    background: linear-gradient(180deg, transparent, #bfe2ff, #4da6ff, transparent);
-    filter: blur(1px);
-    opacity: 0;
-    transform: translate3d(0, -120%, 0);
-    will-change: transform, opacity;
-  }
-  .otodor-vault__panel--left  .otodor-vault__energy { right: 0; }
-  .otodor-vault__panel--right .otodor-vault__energy { left: 0; }
-
-  /* Micro-LED column near the inner edge */
-  .otodor-vault__leds {
-    position: absolute;
-    top: 12%;
-    height: 76%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 0;
-  }
-  .otodor-vault__panel--left  .otodor-vault__leds { right: 20px; }
-  .otodor-vault__panel--right .otodor-vault__leds { left: 20px; }
-  .otodor-vault__leds i {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: rgba(120, 140, 160, 0.5);
-    box-shadow: 0 0 3px rgba(120, 140, 160, 0.4);
-    opacity: 0.4;
-  }
-
-  /* Locking pins (bolts crossing the seam) that retract before opening */
-  .otodor-vault__pins {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: clamp(60px, 16vh, 130px);
-  }
-  .otodor-vault__panel--left  .otodor-vault__pins { right: -14px; align-items: flex-end; }
-  .otodor-vault__panel--right .otodor-vault__pins { left: -14px; align-items: flex-start; }
-  .otodor-vault__pins b {
     display: block;
-    width: 30px;
-    height: 10px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, #3a3d42, #1a1c1f 60%, #0e0f11);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 5px rgba(0, 0, 0, 0.6);
-    will-change: transform, opacity;
   }
 
-  /* Small warning light */
-  .otodor-vault__warn {
+  /* ── Poster: a believable closed vault while Three loads (no flash) ── */
+  .otodor-vault__poster {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #ffb020;
-    box-shadow: 0 0 8px rgba(255, 176, 32, 0.8);
-    opacity: 0.5;
-  }
-  .otodor-vault__panel--left  .otodor-vault__warn { right: 46px; top: 8%; }
-  .otodor-vault__panel--right .otodor-vault__warn { left: 46px; bottom: 8%; }
-
-  /* ── Centre core: status ring + monogram (fades before doors open) ── */
-  .otodor-vault__core {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    z-index: 6;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.1rem;
-    text-align: center;
-    will-change: opacity, transform;
-  }
-  .otodor-vault__ring {
-    position: relative;
-    width: clamp(96px, 12vw, 150px);
-    height: clamp(96px, 12vw, 150px);
+    inset: 0;
+    z-index: 2;
     display: grid;
     place-items: center;
-  }
-  .otodor-vault__ring::before,
-  .otodor-vault__ring::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-  }
-  .otodor-vault__ring::before {
-    border: 1px solid rgba(77, 166, 255, 0.25);
-    box-shadow: inset 0 0 22px rgba(77, 166, 255, 0.12);
-  }
-  .otodor-vault__ring::after {
-    inset: -6px;
-    background: conic-gradient(from 0deg, transparent 0 78%, rgba(77, 166, 255, 0.9) 88%, transparent 100%);
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-    will-change: transform;
-  }
-  .otodor-vault__mono {
-    width: clamp(42px, 5vw, 62px);
-    height: auto;
-    filter: drop-shadow(0 0 8px rgba(77, 166, 255, 0.4));
-    opacity: 0.92;
-  }
-  .otodor-vault__status {
-    font-family: var(--otodor-font-display, sans-serif);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.42em;
-    text-transform: uppercase;
-    color: rgba(191, 226, 255, 0.85);
-    padding-left: 0.42em;
-    opacity: 0;
-    will-change: opacity;
-  }
-  .otodor-vault__facility {
-    font-family: var(--otodor-font-body, sans-serif);
-    font-size: 0.62rem;
-    font-weight: 500;
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
-    color: rgba(150, 165, 180, 0.5);
-    padding-left: 0.34em;
-  }
-
-  /* ── Ambient: fog + particles ───────────────────────────────── */
-  .otodor-vault__fog {
-    position: absolute;
-    inset: -10%;
-    z-index: 3;
-    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.5s ease;
     background:
-      radial-gradient(40% 30% at 30% 40%, rgba(77, 166, 255, 0.05), transparent 70%),
-      radial-gradient(45% 35% at 70% 65%, rgba(140, 170, 200, 0.045), transparent 70%);
-    opacity: 0.7;
-    will-change: transform, opacity;
+      linear-gradient(90deg, transparent calc(50% - 1px), rgba(77,166,255,0.35) 50%, transparent calc(50% + 1px)),
+      repeating-linear-gradient(60deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 26px),
+      repeating-linear-gradient(-60deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 26px),
+      linear-gradient(105deg, #171a1f 0%, #0c0e11 50%, #060708 100%);
   }
-  .otodor-vault__particles {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    pointer-events: none;
+  .otodor-vault.is-ready .otodor-vault__poster { opacity: 0; }
+  .otodor-vault__poster-core { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
+  .otodor-vault__poster-core img { width: clamp(44px, 5vw, 60px); height: auto; opacity: 0.85; filter: drop-shadow(0 0 8px rgba(77,166,255,0.4)); }
+  .otodor-vault__poster-core span {
+    font-family: var(--otodor-font-body, sans-serif);
+    font-size: 0.62rem; font-weight: 500; letter-spacing: 0.34em; text-transform: uppercase;
+    color: rgba(150,165,180,0.55); padding-left: 0.34em;
   }
-  .otodor-vault__particles i {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    background: rgba(180, 210, 240, 0.7);
-    box-shadow: 0 0 5px rgba(120, 170, 220, 0.6);
-    opacity: 0;
-  }
-
-  /* ══ Animations — all gated behind .is-playing ══════════════════ */
-  .otodor-vault.is-playing .otodor-vault__fog { animation: vault-fog 9s ease-in-out infinite alternate; }
-  .otodor-vault.is-playing .otodor-vault__leds i { animation: vault-led-idle 2.2s ease-in-out infinite; }
-  .otodor-vault.is-playing .otodor-vault__leds i:nth-child(2n) { animation-delay: 0.4s; }
-  .otodor-vault.is-playing .otodor-vault__leds i:nth-child(3n) { animation-delay: 0.9s; }
-  .otodor-vault.is-playing .otodor-vault__warn { animation: vault-warn 1.3s steps(1) infinite; }
-  .otodor-vault.is-playing .otodor-vault__ring::after { animation: vault-ring-spin 4.5s linear infinite; }
-  .otodor-vault.is-playing .otodor-vault__particles i { animation: vault-particle linear infinite; }
-
-  /* unlock (t ≈ 0.8s) */
-  .otodor-vault.is-playing .otodor-vault__status { animation: vault-status-in 0.5s ease 0.8s forwards; }
-  .otodor-vault.is-playing .otodor-vault__edge { animation: vault-edge-ignite 0.7s ease 0.85s forwards; }
-  .otodor-vault.is-playing .otodor-vault__energy { animation: vault-energy 0.85s ease-in 0.85s forwards; }
-  .otodor-vault.is-playing .otodor-vault__leds i { animation-name: vault-led-idle, vault-led-active; animation-duration: 2.2s, 0.5s; animation-delay: 0s, 0.85s; animation-fill-mode: none, forwards; animation-iteration-count: infinite, 1; }
-  .otodor-vault.is-playing .otodor-vault__panel--left  .otodor-vault__pins b { animation: vault-pin-left 0.55s cubic-bezier(0.5, 0, 0.2, 1) 1.05s forwards; }
-  .otodor-vault.is-playing .otodor-vault__panel--right .otodor-vault__pins b { animation: vault-pin-right 0.55s cubic-bezier(0.5, 0, 0.2, 1) 1.05s forwards; }
-
-  /* core fades out just before the doors move (t ≈ 1.45s) */
-  .otodor-vault.is-playing .otodor-vault__core { animation: vault-core-out 0.5s ease 1.45s forwards; }
-
-  /* doors slide apart (t = 1.7s, easeInOutQuart, 1.9s) */
-  .otodor-vault.is-playing .otodor-vault__panel--left  { animation: vault-open-left  1.9s cubic-bezier(0.77, 0, 0.175, 1) 1.7s forwards; }
-  .otodor-vault.is-playing .otodor-vault__panel--right { animation: vault-open-right 1.9s cubic-bezier(0.77, 0, 0.175, 1) 1.7s forwards; }
-  .otodor-vault.is-playing .otodor-vault__reveal { animation: vault-reveal-in 1.3s ease 1.75s forwards; }
-  .otodor-vault.is-playing .otodor-vault__machinery { animation: vault-machinery-in 1.2s ease 1.75s forwards; }
-
-  @keyframes vault-open-left  { to { transform: translate3d(-101%, 0, 0); } }
-  @keyframes vault-open-right { to { transform: translate3d(101%, 0, 0); } }
-  @keyframes vault-pin-left   { to { transform: translate3d(-42px, 0, 0); opacity: 0; } }
-  @keyframes vault-pin-right  { to { transform: translate3d(42px, 0, 0); opacity: 0; } }
-  @keyframes vault-edge-ignite { to { opacity: 1; filter: blur(0.4px) brightness(1.7); } }
-  @keyframes vault-energy { 0% { opacity: 0; transform: translate3d(0, -120%, 0); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate3d(0, 320%, 0); } }
-  @keyframes vault-status-in { from { opacity: 0; letter-spacing: 0.6em; } to { opacity: 1; letter-spacing: 0.42em; } }
-  @keyframes vault-core-out { to { opacity: 0; transform: translate3d(-50%, -50%, 0) scale(1.06); } }
-  @keyframes vault-reveal-in { to { opacity: 1; } }
-  @keyframes vault-machinery-in { 0% { opacity: 0; } 40% { opacity: 0.8; } 100% { opacity: 0.35; } }
-  @keyframes vault-led-idle { 0%, 100% { opacity: 0.28; } 50% { opacity: 0.6; } }
-  @keyframes vault-led-active { to { background: #bfe2ff; box-shadow: 0 0 8px rgba(77, 166, 255, 0.9); opacity: 1; } }
-  @keyframes vault-warn { 0%, 49% { opacity: 0.85; } 50%, 100% { opacity: 0.18; } }
-  @keyframes vault-ring-spin { to { transform: rotate(360deg); } }
-  @keyframes vault-fog { from { transform: translate3d(-2.5%, 0, 0); } to { transform: translate3d(2.5%, 0, 0); } }
-  @keyframes vault-particle { 0% { transform: translate3d(0, 30px, 0); opacity: 0; } 20% { opacity: 0.7; } 85% { opacity: 0.5; } 100% { transform: translate3d(0, -180px, 0); opacity: 0; } }
 {%- endstyle -%}
 
 <div class="otodor-vault" data-otodor-vault aria-hidden="true" role="presentation">
-  <div class="otodor-vault__reveal"></div>
-  <div class="otodor-vault__machinery"></div>
-
-  <div class="otodor-vault__particles" aria-hidden="true">
-    {%- for i in (1..16) -%}<i></i>{%- endfor -%}
-  </div>
-
-  {%- comment -%} Left blast door {%- endcomment -%}
-  <div class="otodor-vault__panel otodor-vault__panel--left">
-    <span class="otodor-vault__edge"><span class="otodor-vault__energy"></span></span>
-    <span class="otodor-vault__leds">{%- for i in (1..11) -%}<i></i>{%- endfor -%}</span>
-    <span class="otodor-vault__pins"><b></b><b></b><b></b></span>
-    <span class="otodor-vault__warn"></span>
-  </div>
-
-  {%- comment -%} Right blast door {%- endcomment -%}
-  <div class="otodor-vault__panel otodor-vault__panel--right">
-    <span class="otodor-vault__edge"><span class="otodor-vault__energy"></span></span>
-    <span class="otodor-vault__leds">{%- for i in (1..11) -%}<i></i>{%- endfor -%}</span>
-    <span class="otodor-vault__pins"><b></b><b></b><b></b></span>
-    <span class="otodor-vault__warn"></span>
-  </div>
-
-  {%- comment -%} Centre core (fades before the doors part) {%- endcomment -%}
-  <div class="otodor-vault__core">
-    <div class="otodor-vault__ring">
-      <img class="otodor-vault__mono" src="{{ 'otodor-monogram.png' | asset_url }}" alt="" width="62" height="62" aria-hidden="true">
+  <canvas class="otodor-vault__canvas" data-vault-canvas></canvas>
+  <div class="otodor-vault__poster">
+    <div class="otodor-vault__poster-core">
+      <img src="{{ 'otodor-monogram.png' | asset_url }}" alt="" width="60" height="60" aria-hidden="true">
+      <span>{{ section.settings.facility_label | escape }}</span>
     </div>
-    <div class="otodor-vault__status">{{ section.settings.status_text | escape }}</div>
-    <div class="otodor-vault__facility">{{ section.settings.facility_label | escape }}</div>
   </div>
-
-  <div class="otodor-vault__fog" aria-hidden="true"></div>
 </div>
 
 <script>
@@ -366,54 +85,54 @@
     if (!overlay) return;
 
     var KEY = 'otodorVaultIntroPlayed';
-    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var VAULT_JS = {{ 'otodor-vault.js' | asset_url | json }};
 
-    function remove() {
+    function removeOverlay() {
+      try { if (overlay._vaultCleanup) overlay._vaultCleanup(); } catch (e) {}
       if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
       try { document.documentElement.classList.remove('otodor-vault-lock'); } catch (e) {}
     }
 
-    // Skip: reduced motion, already played this session, or no sessionStorage.
+    // ── Guards ──
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var played = false;
     try { played = window.sessionStorage.getItem(KEY) === '1'; } catch (e) {}
-    if (reduce || played) { remove(); return; }
-    try { window.sessionStorage.setItem(KEY, '1'); } catch (e) {}
 
-    // Randomise particle positions/timing for organic drift.
-    var particles = overlay.querySelectorAll('.otodor-vault__particles i');
-    for (var p = 0; p < particles.length; p++) {
-      var s = particles[p].style;
-      s.left = (Math.random() * 100).toFixed(2) + '%';
-      s.bottom = (Math.random() * 60).toFixed(2) + '%';
-      s.animationDuration = (7 + Math.random() * 7).toFixed(2) + 's';
-      s.animationDelay = (-Math.random() * 8).toFixed(2) + 's';
+    function webglOK() {
+      try {
+        var c = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+      } catch (e) { return false; }
     }
 
-    // Lock scroll during the intro so the reveal is clean.
-    document.documentElement.classList.add('otodor-vault-lock');
+    if (reduce || played || !webglOK()) { removeOverlay(); return; }
+    try { window.sessionStorage.setItem(KEY, '1'); } catch (e) {}
 
-    // Arm + play (synchronous class add avoids any hero flash).
+    // Arm immediately (synchronous → poster covers the hero, no flash) + lock scroll.
+    document.documentElement.classList.add('otodor-vault-lock');
     overlay.classList.add('is-playing');
 
-    var TOTAL = 4000;   // 1.7s delay + 1.9s slide + buffer
     var finished = false;
-    function finish() {
+    function endSequence() {
       if (finished) return;
       finished = true;
       overlay.classList.add('is-done');
       document.documentElement.classList.remove('otodor-vault-lock');
-      window.setTimeout(remove, 500);
+      window.setTimeout(removeOverlay, 650);
     }
 
-    // Primary trigger: the left panel finishing its slide.
-    var leftPanel = overlay.querySelector('.otodor-vault__panel--left');
-    if (leftPanel) {
-      leftPanel.addEventListener('animationend', function (e) {
-        if (e.animationName && e.animationName.indexOf('vault-open') === 0) finish();
+    // Safety net: if Three never loads/plays, don't trap the user.
+    var safety = window.setTimeout(function () { removeOverlay(); }, 9000);
+
+    import(VAULT_JS).then(function (mod) {
+      var init = mod && (mod.default || mod.initVault);
+      if (typeof init !== 'function') { window.clearTimeout(safety); removeOverlay(); return; }
+      init(overlay, {
+        onReady: function () { overlay.classList.add('is-ready'); },   // fade the poster
+        onEnd: function () { window.clearTimeout(safety); endSequence(); },
+        onDone: function () { window.clearTimeout(safety); removeOverlay(); }
       });
-    }
-    // Safety fallback in case animationend never fires.
-    window.setTimeout(finish, TOTAL);
+    }).catch(function () { window.clearTimeout(safety); removeOverlay(); });
   })();
 </script>
 {%- endif -%}
@@ -424,7 +143,7 @@
   "tag": "section",
   "class": "shopify-section otodor-vault-section",
   "settings": [
-    { "type": "paragraph", "content": "A one-time cinematic sci-fi blast-door intro that plays once per browser session before the hero, then removes itself. Never modifies the hero. Skipped for reduced-motion users." },
+    { "type": "paragraph", "content": "A one-time cinematic Three.js blast-door intro that plays once per browser session before the hero, then removes itself. Never modifies the hero. Skipped for reduced-motion users and where WebGL is unavailable (hero shows instantly)." },
     { "type": "checkbox", "id": "enabled", "label": "Enable vault intro", "default": true },
     { "type": "text", "id": "status_text", "label": "Unlock status text", "default": "Access Granted" },
     { "type": "text", "id": "facility_label", "label": "Facility label", "default": "OTODOR · Secure Facility" }
