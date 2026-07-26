@@ -68,13 +68,13 @@ export default function initVault(overlay, opts) {
     // ── Brushed-titanium grain (roughness) + micro normal relief ──
     const nc = document.createElement('canvas'); nc.width = 256; nc.height = 256;
     const nx = nc.getContext('2d'); nx.fillStyle = '#7d7d7d'; nx.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 340; i++) { const x = Math.random() * 256; const light = Math.random() < 0.5; nx.strokeStyle = 'rgba(' + (light ? '255,255,255' : '38,38,38') + ',' + (0.04 + Math.random() * 0.11) + ')'; nx.lineWidth = Math.random() * 1.4; nx.beginPath(); nx.moveTo(x, 0); nx.lineTo(x + (Math.random() - 0.5) * 6, 256); nx.stroke(); }
-    const brush = T(new THREE.CanvasTexture(nc)); brush.wrapS = brush.wrapT = THREE.RepeatWrapping; brush.repeat.set(3, 1);
-    // normal map — fine vertical brushed relief so the metal catches light
+    for (let i = 0; i < 420; i++) { const x = Math.random() * 256; const light = Math.random() < 0.5; nx.strokeStyle = 'rgba(' + (light ? '255,255,255' : '54,54,54') + ',' + (0.015 + Math.random() * 0.04) + ')'; nx.lineWidth = Math.random() * 0.9; nx.beginPath(); nx.moveTo(x, 0); nx.lineTo(x + (Math.random() - 0.5) * 4, 256); nx.stroke(); }
+    const brush = T(new THREE.CanvasTexture(nc)); brush.wrapS = brush.wrapT = THREE.RepeatWrapping; brush.repeat.set(6, 2);
+    // normal map — very fine vertical brushed relief so the metal just catches light
     const nmC = document.createElement('canvas'); nmC.width = 256; nmC.height = 256;
     const nmX = nmC.getContext('2d'); nmX.fillStyle = 'rgb(128,128,255)'; nmX.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 300; i++) { const x = Math.random() * 256; const d = Math.round((Math.random() - 0.5) * 70); nmX.strokeStyle = 'rgb(' + (128 + d) + ',128,255)'; nmX.lineWidth = Math.random() * 1.6; nmX.beginPath(); nmX.moveTo(x, 0); nmX.lineTo(x, 256); nmX.stroke(); }
-    const slabNormal = T(new THREE.CanvasTexture(nmC)); slabNormal.wrapS = slabNormal.wrapT = THREE.RepeatWrapping; slabNormal.repeat.set(3, 3);
+    for (let i = 0; i < 340; i++) { const x = Math.random() * 256; const d = Math.round((Math.random() - 0.5) * 30); nmX.strokeStyle = 'rgb(' + (128 + d) + ',128,255)'; nmX.lineWidth = Math.random() * 1.1; nmX.beginPath(); nmX.moveTo(x, 0); nmX.lineTo(x, 256); nmX.stroke(); }
+    const slabNormal = T(new THREE.CanvasTexture(nmC)); slabNormal.wrapS = slabNormal.wrapT = THREE.RepeatWrapping; slabNormal.repeat.set(4, 4);
 
     // ── Soft additive sprite (light leak only) ──
     const gc = document.createElement('canvas'); gc.width = gc.height = 128;
@@ -86,7 +86,7 @@ export default function initVault(overlay, opts) {
     const soft = (x, y, z, w, h, color, op) => { const mat = M(new THREE.SpriteMaterial({ map: softTex, color: color, blending: THREE.AdditiveBlending, transparent: true, opacity: op, depthWrite: false })); const sp = new THREE.Sprite(mat); sp.position.set(x, y, z); sp.scale.set(w, h, 1); scene.add(sp); return sp; };
 
     // ── Materials — brushed titanium / satin ceramic / anodized (soft) ──
-    const slabMat = M(new THREE.MeshStandardMaterial({ color: 0x565c64, metalness: 0.72, roughness: 0.46, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.28, 0.28), envMapIntensity: 1.9 }));   // brushed-titanium satin slabs
+    const slabMat = M(new THREE.MeshStandardMaterial({ color: 0x565c64, metalness: 0.72, roughness: 0.46, roughnessMap: brush, normalMap: slabNormal, normalScale: new THREE.Vector2(0.12, 0.12), envMapIntensity: 1.9 }));   // brushed-titanium satin slabs
     const bevelMat = M(new THREE.MeshStandardMaterial({ color: 0x676d75, metalness: 0.95, roughness: 0.3, envMapIntensity: 1.7 }));                          // micro-bevel
     const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x141517, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove (near-black)
     const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x494e55, metalness: 0.6, roughness: 0.5, roughnessMap: brush, envMapIntensity: 1.1 }));       // architecture
@@ -133,24 +133,12 @@ export default function initVault(overlay, opts) {
     [OH / 2 - 0.25, -(OH / 2 - 0.25)].forEach((yy) => scene.add(mesh(box(OW * 1.4, 0.1, 0.16), bevelMat, 0, yy, -0.5, false, false)));
     const leak = soft(0, 0.2, -0.5, 2.2, OH * 0.95, 0xeef2ff, 0.0);   // internal light leak, grows as slabs part
 
-    // ── OTODOR monogram texture (etched large across the seam) ──
-    let monoTex = null;
-    try { monoTex = new THREE.TextureLoader().load(new URL('./otodor-monogram.png', import.meta.url).href); monoTex.colorSpace = THREE.SRGBColorSpace; } catch (e) { monoTex = null; }
-
     // ── Two monolithic slabs (near-featureless, precise gaps) ──
     const seamGlows = [];
     function makeSlab(side) {
       const grp = new THREE.Group();
       const W = DW, H = DH, D = DD;
       grp.add(mesh(box(W, H, D), slabMat, 0, 0, 0, true, true));                                   // monolithic slab — featureless (no coplanar plates)
-      // Large etched OTODOR monogram — this door shows its half (splits on open)
-      if (monoTex) {
-        const half = monoTex.clone(); half.needsUpdate = true;
-        half.wrapS = half.wrapT = THREE.ClampToEdgeWrapping;
-        half.repeat.set(0.5, 1); half.offset.set(side < 0 ? 0.0 : 0.5, 0);
-        const mMat = M(new THREE.MeshStandardMaterial({ color: 0x14161a, metalness: 0.5, roughness: 0.62, alphaMap: half, transparent: true, opacity: 0.6, envMapIntensity: 0.5, depthWrite: false }));
-        grp.add(mesh(G(new THREE.PlaneGeometry(1.55, 3.1)), mMat, -side * 1.98, 0.4, D / 2 + 0.12, false, false));
-      }
       // tiny functional indicators (one blue, one amber) — minimal, clearly proud
       grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, -side * (W / 2 - 0.9), H / 2 - 0.9, D / 2 + 0.08, false, false));
       grp.add(mesh(box(0.06, 0.06, 0.04), ledAmber, -side * (W / 2 - 0.9), -H / 2 + 0.9, D / 2 + 0.08, false, false));
