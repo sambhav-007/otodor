@@ -127,7 +127,7 @@
     }
 
     // Safety net: if Three never loads/plays, don't trap the user.
-    var safety = window.setTimeout(function () { removeOverlay(); }, 9000);
+    var safety = window.setTimeout(function () { removeOverlay(); }, 11000);
 
     import(VAULT_JS).then(function (mod) {
       var init = mod && (mod.default || mod.initVault);

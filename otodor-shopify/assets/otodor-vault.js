@@ -133,7 +133,7 @@ export default function initVault(overlay, opts) {
     // ── OTODOR monogram — planar-mapped so the DIAGONAL cut splits its slant ──
     let monoTex = null, logoMat = null;
     try { monoTex = new THREE.TextureLoader().load(new URL('./otodor-monogram.png', import.meta.url).href); } catch (e) { monoTex = null; }
-    const SLANT = OW * 0.26;  // diagonal offset (bottom-left → top-right, like "/")
+    const SLANT = OH * 0.52;  // diagonal offset — matched to the logo's ~45° square-diagonal slash
     const LW = 3.8, LH = 3.8, LY = 0;                 // logo centred on the door centre → the seam runs through the middle of the logo
     if (monoTex) {
       monoTex.colorSpace = THREE.SRGBColorSpace; monoTex.wrapS = monoTex.wrapT = THREE.ClampToEdgeWrapping; monoTex.anisotropy = 8;
@@ -173,9 +173,8 @@ export default function initVault(overlay, opts) {
         grp.add(mesh(face, logoMat, 0, 0, DD / 2 + 0.16, false, false));
       }
       // glowing diagonal seam edge
-      const seamEl = mesh(box(0.07, diagLen, 0.12), seamMat, side * GAP, 0, DD / 2 + 0.01, false, false);
+      const seamEl = mesh(box(0.06, diagLen, 0.12), seamMat, side * GAP, 0, DD / 2 + 0.14, false, false);
       seamEl.rotation.z = diagRot; grp.add(seamEl);
-      const sg = soft(0, 0, 0, 1.0, diagLen * 0.7, 0x8ec2ff, 0.0); sg._side = side; seamGlows.push(sg);
       // tiny functional indicators
       grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, side * 3.6, 3.4, DD / 2 + 0.08, false, false));
       grp.add(mesh(box(0.07, 0.07, 0.04), ledAmber, side * 3.6, -3.4, DD / 2 + 0.08, false, false));
@@ -217,16 +216,20 @@ export default function initVault(overlay, opts) {
       if (!started) started = now;
       const t = now - started;
 
-      // gentle breathing + very slow dolly
-      const sx = Math.sin(t * 0.0003) * 0.1, sy = Math.sin(t * 0.00052) * 0.06;
-      const dolly = clamp((t - OPEN_AT) / OPEN_DUR, 0, 1) * 1.1;
-      camera.position.set(baseCam.x + sx, baseCam.y + sy, baseCam.z - dolly);
-      camera.lookAt(0, 0.2, -2);
+      // fly-through: after the doors open + a brief hold, the camera dives through
+      // the opening into the hero (zoom in fully to reach the landing page).
+      const OPEN_END = OPEN_AT + OPEN_DUR;
+      const fly = t > OPEN_END + 500 ? easeInOutQuart(clamp((t - OPEN_END - 500) / 1500, 0, 1)) : 0;
+
+      // breathing + slow pre-open dolly, then FLY forward through the gap
+      const sx = Math.sin(t * 0.0003) * 0.1 * (1 - fly), sy = Math.sin(t * 0.00052) * 0.06 * (1 - fly);
+      const preDolly = clamp((t - OPEN_AT) / OPEN_DUR, 0, 1) * 1.1;
+      const camZ = fly > 0 ? (baseCam.z - 1.1) + fly * (2.4 - (baseCam.z - 1.1)) : baseCam.z - preDolly;
+      camera.position.set(baseCam.x + sx, baseCam.y + sy, camZ);
+      camera.lookAt(0, 0.2 * (1 - fly), -3);
 
       // seam ignites softly at unlock (the one moment of light)
-      const seamI = t < UNLOCK ? 0.0 : clamp((t - UNLOCK) / 500, 0, 1) * 2.2;
-      seamMat.emissiveIntensity = seamI;
-      for (let i = 0; i < seamGlows.length; i++) { const s = seamGlows[i]; const slab = s._side < 0 ? leftSlab : rightSlab; s.position.set(slab.position.x + s._side * GAP, 0.2, DD / 2 + 0.2); s.material.opacity = 0.28 * clamp((t - UNLOCK) / 500, 0, 1); }
+      seamMat.emissiveIntensity = t < UNLOCK ? 0.0 : clamp((t - UNLOCK) / 500, 0, 1) * 2.4;
 
       // effortless glide
       if (t > OPEN_AT) {
@@ -234,12 +237,12 @@ export default function initVault(overlay, opts) {
         const e = easeInOutQuart(op);
         leftSlab.position.x = LC + (LO - LC) * e;
         rightSlab.position.x = RC + (RO - RC) * e;
-        leak.material.opacity = Math.sin(Math.min(op * 1.5, 1) * Math.PI) * 0.6;   // appears fast, fades as doors clear
+        leak.material.opacity = Math.sin(Math.min(op * 1.5, 1) * Math.PI) * 0.5;
         leak.scale.x = 2.0 + op * 7;
         warm.intensity = Math.min(op * 3, 1) * 3.2;
-        // slabs reach the parked position, HOLD so it reads, then cross-fade to the hero
-        if (op >= 1 && !ended) { ended = true; window.setTimeout(finish, 1100); }
       }
+      // fly complete → cross-fade to the hero
+      if (fly >= 1 && !ended) { ended = true; finish(); }
 
       renderer.render(scene, camera);
       if (!readyFired && t > 40) { readyFired = true; onReady(); }
