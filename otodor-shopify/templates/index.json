@@ -9,6 +9,14 @@
  */
 {
   "sections": {
+    "otodor_vault_intro": {
+      "type": "otodor-vault-intro",
+      "settings": {
+        "enabled": true,
+        "status_text": "Access Granted",
+        "facility_label": "OTODOR · Secure Facility"
+      }
+    },
     "otodor_hero": {
       "type": "otodor-hero",
       "settings": {
@@ -495,6 +503,7 @@
           "settings": {
             "name": "Smart Lock",
             "role": "Front door entry",
+            "image": "shopify://shop_images/zion_B_front.png",
             "link": ""
           }
         },
@@ -503,6 +512,7 @@
           "settings": {
             "name": "Access Control",
             "role": "Who gets in",
+            "image": "shopify://shop_images/Screenshot_2026-06-10_100933.png",
             "link": ""
           }
         },
@@ -511,6 +521,7 @@
           "settings": {
             "name": "Gate Automation",
             "role": "Driveway, automated",
+            "image": "shopify://shop_images/flagship1.png",
             "link": ""
           }
         },
@@ -519,6 +530,7 @@
           "settings": {
             "name": "Mobile Control",
             "role": "Everything, anywhere",
+            "image": "shopify://shop_images/support.png",
             "link": ""
           }
         }
@@ -550,6 +562,7 @@
     }
   },
   "order": [
+    "otodor_vault_intro",
     "otodor_hero",
     "otodor_categories",
     "otodor_moments",
