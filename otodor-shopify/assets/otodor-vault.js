@@ -100,7 +100,11 @@ export default function initVault(overlay, opts) {
     const mesh = (geo, mat, x, y, z, cast, rec) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); if (cast) m.castShadow = true; if (rec) m.receiveShadow = true; return m; };
 
     // ── Minimal chamber (large uninterrupted surfaces) ──
-    const HALF_W = 10, HALF_H = 6, LEN = 28;
+    // HALF_W must CONTAIN a fully-parked gate, or the side wall slices it and the gate
+    // reads as sinking into the wall. A parked gate's outer edge reaches
+    //   (OW/2 + SLANT) + (OW/2 + OV) = 10.08 + 5.6 = 15.68
+    // and the wall's inner face sits at HALF_W - 0.25, so HALF_W must exceed 15.93.
+    const HALF_W = 16.5, HALF_H = 6, LEN = 28;
     const room = new THREE.Group();
     room.add(mesh(box(HALF_W * 2, 0.5, LEN), floorMat, 0, -HALF_H, LEN / 2 - 1.5, false, true));            // floor
     room.add(mesh(box(HALF_W * 2, 0.5, LEN), wallMat, 0, HALF_H, LEN / 2 - 1.5, false, true));              // ceiling
@@ -142,8 +146,11 @@ export default function initVault(overlay, opts) {
     // ── Two blast-door halves split along a DIAGONAL, built from extruded shapes ──
     const seamGlows = [];
     const EXT = 0.3, OV = 0.2, GAP = 0.05;   // frame overlap + seam half-gap
-    const diagLen = Math.sqrt((2 * SLANT) * (2 * SLANT) + (OH + 2 * EXT) * (OH + 2 * EXT)) + 0.2;
+    // The seam is drawn ONCE (not per slab) so the two halves can never read as two
+    // offset parallel lines. It spans the exact cut — corner to corner of the gates,
+    // no overshoot — and lives at the split centre (x = 0).
     const diagRot = -Math.atan2(2 * SLANT, OH + 2 * EXT);
+    const diagLen = Math.sqrt((2 * SLANT) * (2 * SLANT) + (OH + 2 * EXT) * (OH + 2 * EXT));
     function makeSlab(side) {
       const grp = new THREE.Group();
       const shape = new THREE.Shape();
@@ -171,8 +178,11 @@ export default function initVault(overlay, opts) {
         face.setAttribute('uv', new THREE.BufferAttribute(uvArr, 2));
         grp.add(mesh(face, logoMat, 0, 0, DD / 2 + 0.16, false, false));
       }
-      // glowing diagonal seam edge
-      const seamEl = mesh(box(0.06, diagLen, 0.12), seamMat, side * GAP, 0, DD / 2 + 0.14, false, false);
+      // Glowing diagonal seam edge — one HALF per slab so it travels with the gate and
+      // stays lit for the whole animation. Each bar fills exactly its side of the 0.1
+      // slot (width GAP, centred at side*GAP/2), so closed they read as ONE continuous
+      // line — not two offset parallel lines.
+      const seamEl = mesh(box(GAP, diagLen, 0.12), seamMat, side * GAP / 2, 0, DD / 2 + 0.14, false, false);
       seamEl.rotation.z = diagRot; grp.add(seamEl);
       // tiny functional indicators
       grp.add(mesh(box(0.35, 0.05, 0.04), ledBlue, side * 3.6, 3.4, DD / 2 + 0.08, false, false));
@@ -182,9 +192,14 @@ export default function initVault(overlay, opts) {
       return grp;
     }
     const leftSlab = makeSlab(-1), rightSlab = makeSlab(1);
+
     // Slabs are built at the opening centre; they part horizontally and park at the edges.
+    // Park EXACTLY where the diagonal's trailing corner clears the opening — no further.
+    // Overshooting (the old +1.6) sailed them past the side walls, where the wall clipped
+    // them into two chunks floating detached from the frame. Flush against the jamb they
+    // stay read as gates parked on the wall.
     const LC = 0, RC = 0;
-    const LO = -(OW / 2 + SLANT + 1.6), RO = OW / 2 + SLANT + 1.6;
+    const LO = -(OW / 2 + SLANT), RO = OW / 2 + SLANT;
 
     // ── Lights — soft & even (env + directional; NO point-light hotspots) ──
     scene.add(new THREE.HemisphereLight(0xccd4dc, 0x35393f, 1.9));
@@ -193,7 +208,7 @@ export default function initVault(overlay, opts) {
     key.position.set(5, 13, 16); key.castShadow = true;
     key.shadow.mapSize.set(2048, 2048);
     key.shadow.camera.near = 1; key.shadow.camera.far = 80;
-    key.shadow.camera.left = -14; key.shadow.camera.right = 14; key.shadow.camera.top = 13; key.shadow.camera.bottom = -13;
+    key.shadow.camera.left = -20; key.shadow.camera.right = 20; key.shadow.camera.top = 13; key.shadow.camera.bottom = -13;   // must span the parked gates (|x| ≈ 15.7) or their shadows clip
     key.shadow.bias = -0.0004; key.shadow.normalBias = 0.03; key.shadow.radius = 2.5;
     scene.add(key); scene.add(key.target);
     const fill = new THREE.DirectionalLight(0xc0c8d2, 1.1); fill.position.set(-8, 3, 13); scene.add(fill);
@@ -201,11 +216,17 @@ export default function initVault(overlay, opts) {
     const warm = new THREE.PointLight(0xffe8cc, 0, 30, 2); warm.position.set(0, 0.4, -1.4); scene.add(warm); // interior light — grazes the revealed thick edges
 
     // ── Camera ──
-    let baseCam = new THREE.Vector3(0, 1.4, 16.5);
+    // Framed as ARCHITECTURE, not as a close-up of a slab: the camera sits far enough
+    // back that the whole chamber reads — jambs, the two recessed ceiling light lines,
+    // and the reflective floor — with the gates as the object inside it. Landscape used
+    // to sit at z 16.5 / fov 38, which cropped to black door and threw the room away.
+    let baseCam = new THREE.Vector3(0, 1.4, 24);
     function resize() {
       const w = overlay.clientWidth || window.innerWidth, h = overlay.clientHeight || window.innerHeight;
-      const aspect = w / h; camera.aspect = aspect; camera.fov = aspect < 1 ? 58 : 38;
-      baseCam.z = aspect < 1 ? 24 : 16.5; camera.updateProjectionMatrix(); renderer.setSize(w, h, false);
+      // landscape fov opens up to keep the (now wider) side walls inside the frame —
+      // pulling further back instead isn't possible, the camera would exit the room
+      const aspect = w / h; camera.aspect = aspect; camera.fov = aspect < 1 ? 58 : 48;
+      baseCam.z = 24; camera.updateProjectionMatrix(); renderer.setSize(w, h, false);
     }
     resize(); window.addEventListener('resize', resize);
 
@@ -219,7 +240,9 @@ export default function initVault(overlay, opts) {
       // fly-through: after the doors open + a brief hold, the camera dives through
       // the opening into the hero (zoom in fully to reach the landing page).
       const OPEN_END = OPEN_AT + OPEN_DUR;
-      const fly = t > OPEN_END + 500 ? easeInOutQuart(clamp((t - OPEN_END - 500) / 1500, 0, 1)) : 0;
+      // (longer than before: the camera now starts further back, so the dive covers more
+      // distance — keep it unhurried rather than a lurch)
+      const fly = t > OPEN_END + 500 ? easeInOutQuart(clamp((t - OPEN_END - 500) / 1800, 0, 1)) : 0;
 
       // breathing + slow pre-open dolly, then FLY forward through the gap
       const sx = Math.sin(t * 0.0003) * 0.1 * (1 - fly), sy = Math.sin(t * 0.00052) * 0.06 * (1 - fly);
@@ -237,7 +260,9 @@ export default function initVault(overlay, opts) {
         const e = easeInOutQuart(op);
         leftSlab.position.x = LC + (LO - LC) * e;
         rightSlab.position.x = RC + (RO - RC) * e;
-        leak.material.opacity = Math.sin(Math.min(op * 1.5, 1) * Math.PI) * 0.5;
+        // hold the interior glow open — the old sin() curve returned to 0 by op≈0.67,
+        // leaving the fully-open portal as a flat black rectangle with no depth
+        leak.material.opacity = Math.min(op * 2.2, 1) * 0.42;
         leak.scale.x = 2.0 + op * 7;
         warm.intensity = Math.min(op * 3, 1) * 3.2;
       }

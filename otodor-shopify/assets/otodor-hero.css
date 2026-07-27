@@ -1,0 +1,1343 @@
+/* ─────────────────────────────────────────────────────────
+   OTODOR Hero Section
+   Cinematic Vault Reveal — Apple/Tesla-style progressive unveil.
+───────────────────────────────────────────────────────── */
+
+
+/* ─ Base layout: Mobile First ──────────────────────────────── */
+.otodor-hero {
+  background-color: #0B0B0B;
+  color: #ffffff;
+  padding: 5rem 1.5rem 4rem;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.otodor-hero__viewport {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* ─ Atmospheric Depth & Fog ────────────────────────────────── */
+.otodor-hero__ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Single ambient light source behind the core — the only large glow we keep. */
+.otodor-hero__glow-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(77, 166, 255, 0.07) 0%, transparent 70%);
+  filter: blur(45px);
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
+}
+
+/* ─ Floating particles (Motion V2, decorative, drifts with cursor) ─ */
+.otodor-hero__particles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+.otodor-hero__particles .p {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(77, 166, 255, 0.55);
+  box-shadow: 0 0 6px rgba(77, 166, 255, 0.55);
+  opacity: 0;
+  animation: hero-particle-rise linear infinite;
+  will-change: transform, opacity;
+}
+@keyframes hero-particle-rise {
+  0%   { transform: translateY(24px) scale(0.55); opacity: 0; }
+  18%  { opacity: 0.7; }
+  82%  { opacity: 0.45; }
+  100% { transform: translateY(-150px) scale(1); opacity: 0; }
+}
+.otodor-hero__particles .p:nth-child(1)  { left: 10%; bottom: 16%; animation-duration: 9.5s;  animation-delay: 0s;    }
+.otodor-hero__particles .p:nth-child(2)  { left: 22%; bottom: 8%;  animation-duration: 11s;   animation-delay: -2s;   width: 2px; height: 2px; }
+.otodor-hero__particles .p:nth-child(3)  { left: 34%; bottom: 22%; animation-duration: 8.5s;  animation-delay: -4s;   }
+.otodor-hero__particles .p:nth-child(4)  { left: 46%; bottom: 6%;  animation-duration: 12s;   animation-delay: -1s;   width: 2px; height: 2px; }
+.otodor-hero__particles .p:nth-child(5)  { left: 58%; bottom: 20%; animation-duration: 10s;   animation-delay: -6s;   }
+.otodor-hero__particles .p:nth-child(6)  { left: 68%; bottom: 12%; animation-duration: 9s;    animation-delay: -3s;   }
+.otodor-hero__particles .p:nth-child(7)  { left: 78%; bottom: 24%; animation-duration: 11.5s; animation-delay: -5s;   width: 2px; height: 2px; }
+.otodor-hero__particles .p:nth-child(8)  { left: 88%; bottom: 10%; animation-duration: 8s;    animation-delay: -2.5s; }
+.otodor-hero__particles .p:nth-child(9)  { left: 16%; bottom: 30%; animation-duration: 13s;   animation-delay: -7s;   width: 2px; height: 2px; }
+.otodor-hero__particles .p:nth-child(10) { left: 40%; bottom: 34%; animation-duration: 10.5s; animation-delay: -1.5s; }
+.otodor-hero__particles .p:nth-child(11) { left: 62%; bottom: 32%; animation-duration: 12.5s; animation-delay: -8s;   width: 2px; height: 2px; }
+.otodor-hero__particles .p:nth-child(12) { left: 84%; bottom: 28%; animation-duration: 9.5s;  animation-delay: -4.5s; }
+
+@keyframes product-premium-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -7px, 0); }
+}
+
+@keyframes product-reflective-pass {
+  0%, 72%, 100% {
+    opacity: 0;
+    transform: translate3d(-62%, 18%, 0) rotate(18deg);
+  }
+  82% {
+    opacity: 0.16;
+  }
+  92% {
+    opacity: 0;
+    transform: translate3d(62%, -18%, 0) rotate(18deg);
+  }
+}
+
+@keyframes core-energy-drift {
+  0%, 100% {
+    opacity: 0.18;
+    transform: translate3d(0, 9%, 0) scaleY(0.82);
+  }
+  50% {
+    opacity: 0.34;
+    transform: translate3d(0, -9%, 0) scaleY(1);
+  }
+}
+
+@keyframes core-seam-breathe {
+  0%, 100% {
+    opacity: 0.18;
+    filter: blur(0.5px);
+  }
+  46%, 58% {
+    opacity: 0.72;
+    filter: blur(1.2px);
+  }
+}
+
+@keyframes core-ambient-pulse {
+  0%, 82%, 100% {
+    opacity: 0;
+    transform: translateZ(20px) scale(0.94);
+  }
+  90% {
+    opacity: 0.16;
+    transform: translateZ(20px) scale(1.04);
+  }
+}
+
+/* ─ Security Core: Symmetrical Layered Obsidian Obelisk ──────── */
+.otodor-hero__core-container {
+  position: relative;
+  width: 150px;
+  height: 250px;
+  perspective: 1000px;
+  margin: 1.5rem auto;
+  z-index: 10;
+}
+
+.centerpiece-obelisk {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(-20deg) rotateX(15deg);
+  will-change: transform, opacity;
+}
+
+.obelisk-pillar {
+  position: absolute;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.pillar-face {
+  position: absolute;
+  background: linear-gradient(152deg, #1d1d20 0%, #101012 42%, #060607 78%, #030304 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 22px rgba(0, 0, 0, 0.9),
+    inset 0 -18px 30px rgba(0, 0, 0, 0.55);
+}
+
+/* Symmetrical plate layering inside front face */
+.pillar-layer-back {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0f0f0f 0%, #040404 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.9);
+}
+
+.pillar-layer-glow {
+  position: absolute;
+  inset: 3px;
+  background: rgba(77, 166, 255, 0.18);
+  filter: blur(4px);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: background 300ms ease, opacity 300ms ease;
+}
+
+.pillar-layer-front {
+  position: absolute;
+  inset: 3px;
+  background: linear-gradient(150deg, #242427 0%, #131315 50%, #0a0a0b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-top-color: rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -10px 22px rgba(0, 0, 0, 0.6);
+  transform: translateZ(8px);
+  transform-style: preserve-3d;
+}
+
+/* Center Pillar */
+.obelisk-pillar--center {
+  width: 48px;
+  height: 260px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) translateZ(0px);
+}
+
+.obelisk-pillar--center .pillar-face {
+  width: 100%;
+  height: 100%;
+}
+
+.obelisk-pillar--center .pillar-face--front {
+  transform: translateZ(10px);
+  border-right: 1.5px solid rgba(77, 166, 255, 0.22);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.12);
+}
+
+.obelisk-pillar--center .pillar-face--right {
+  width: 20px;
+  left: 100%;
+  transform: rotateY(90deg) translateZ(-10px);
+  transform-origin: left center;
+}
+
+.obelisk-pillar--center .pillar-face--left {
+  width: 20px;
+  right: 100%;
+  transform: rotateY(-90deg) translateZ(-10px);
+  transform-origin: right center;
+}
+
+.obelisk-pillar--center .pillar-face--top {
+  height: 20px;
+  bottom: 100%;
+  transform: rotateX(90deg) translateZ(10px);
+  transform-origin: center bottom;
+  background: linear-gradient(180deg, #242424 0%, #0e0e0e 100%);
+}
+
+/* Center Pillar Glowing Seam split around LogoIcon */
+.obelisk-pillar--center .pillar-seam--top {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  height: 32%;
+  background: rgba(77, 166, 255, 0.35);
+  box-shadow: 0 0 6px rgba(77, 166, 255, 0.45);
+  transition: background 300ms, box-shadow 300ms;
+}
+
+.obelisk-pillar--center .pillar-seam--bottom {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  height: 32%;
+  background: rgba(77, 166, 255, 0.35);
+  box-shadow: 0 0 6px rgba(77, 166, 255, 0.45);
+  transition: background 300ms, box-shadow 300ms;
+}
+
+.pillar-logo-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(4px);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.pillar-logo-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 3px rgba(77, 166, 255, 0.3)) brightness(0.85);
+  transition: filter 300ms ease, transform 300ms ease;
+}
+
+/* Left Wing */
+.obelisk-pillar--left-wing {
+  width: 24px;
+  height: 200px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) translateX(-48px) translateZ(-16px);
+  opacity: 0.75;
+}
+
+.obelisk-pillar--left-wing .pillar-face {
+  width: 100%;
+  height: 100%;
+}
+
+.obelisk-pillar--left-wing .pillar-face--front {
+  transform: translateZ(8px);
+}
+
+.obelisk-pillar--left-wing .pillar-face--right {
+  width: 16px;
+  left: 100%;
+  transform: rotateY(90deg) translateZ(-8px);
+  transform-origin: left center;
+}
+
+.obelisk-pillar--left-wing .pillar-face--left {
+  width: 16px;
+  right: 100%;
+  transform: rotateY(-90deg) translateZ(-8px);
+  transform-origin: right center;
+}
+
+/* Left Wing Glowing Seam (Horizontal) */
+.obelisk-pillar--left-wing .pillar-seam {
+  position: absolute;
+  left: 10%;
+  top: 50%;
+  width: 80%;
+  height: 1.5px;
+  transform: translateY(-50%);
+  background: rgba(77, 166, 255, 0.35);
+  box-shadow: 0 0 6px rgba(77, 166, 255, 0.45);
+  transition: background 300ms, box-shadow 300ms;
+}
+
+/* Right Wing */
+.obelisk-pillar--right-wing {
+  width: 24px;
+  height: 200px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) translateX(48px) translateZ(-16px);
+  opacity: 0.75;
+}
+
+.obelisk-pillar--right-wing .pillar-face {
+  width: 100%;
+  height: 100%;
+}
+
+.obelisk-pillar--right-wing .pillar-face--front {
+  transform: translateZ(8px);
+  border-right: 1.2px solid rgba(77, 166, 255, 0.20);
+}
+
+.obelisk-pillar--right-wing .pillar-face--right {
+  width: 16px;
+  left: 100%;
+  transform: rotateY(90deg) translateZ(-8px);
+  transform-origin: left center;
+}
+
+.obelisk-pillar--right-wing .pillar-face--left {
+  width: 16px;
+  right: 100%;
+  transform: rotateY(-90deg) translateZ(-8px);
+  transform-origin: right center;
+}
+
+/* Right Wing Glowing Seam (Horizontal) */
+.obelisk-pillar--right-wing .pillar-seam {
+  position: absolute;
+  left: 10%;
+  top: 50%;
+  width: 80%;
+  height: 1.5px;
+  transform: translateY(-50%);
+  background: rgba(77, 166, 255, 0.35);
+  box-shadow: 0 0 6px rgba(77, 166, 255, 0.45);
+  transition: background 300ms, box-shadow 300ms;
+}
+
+.face-gloss {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 38%),
+    linear-gradient(200deg, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0.04) 100%);
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Internal Glowing Core */
+.centerpiece-internal-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(-20px);
+  width: 180px;
+  height: 250px;
+  background: radial-gradient(ellipse, rgba(77, 166, 255, 0.24) 0%, transparent 65%);
+  filter: blur(12px);
+  z-index: 1;
+  pointer-events: none;
+  /* keep as background fog */
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+.obsidian-monolith__shadow {
+  position: absolute;
+  width: 220px;
+  height: 40px;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.95) 0%, transparent 70%);
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%) rotateX(90deg);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+/* ─ Responsive Product Grid: Stacked on Mobile ───────────── */
+.otodor-hero__products-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+  z-index: 25;
+  margin-left: -30px; /* pull closer to core */
+  margin-right: -30px;
+}
+
+.otodor-hero__product-node {
+  width: 100%;
+  will-change: transform, opacity;
+  overflow: visible;
+  z-index: 35;
+  transform-style: preserve-3d;
+}
+
+/* Mobile: Clean premium list panels */
+.otodor-hero__product-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: rgba(18, 18, 18, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 2.5px solid #4DA6FF;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+  z-index: 20;
+  overflow: visible;
+}
+
+.otodor-hero__product-card:hover {
+  border-color: rgba(77, 166, 255, 0.35);
+  box-shadow: 0 4px 24px rgba(77, 166, 255, 0.06);
+}
+
+.product-card__visual {
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  position: relative;
+  overflow: visible;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55)) drop-shadow(0 4px 12px rgba(77, 166, 255, 0.08));
+}
+
+.product-card__visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.product-card__visual svg.product-icon-svg {
+  width: 32px;
+  height: 32px;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 300ms ease;
+}
+
+.product-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+}
+
+.product-card__feature {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #4DA6FF;
+}
+
+.product-card__title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0.1rem 0 0;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.product-card__desc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0.25rem 0 0;
+  line-height: 1.45;
+}
+
+/* ─ Typography overlay ─────────────────────────────────────── */
+.otodor-hero__text-container {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  z-index: 5;
+}
+
+.otodor-hero__text-frame {
+  margin-bottom: 2rem;
+  will-change: transform, opacity;
+}
+
+.otodor-hero__heading {
+  font-family: var(--otodor-font-display);
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.accent-text {
+  background: linear-gradient(135deg, #4DA6FF 0%, #2E8EEE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #4DA6FF;
+}
+
+.otodor-hero__subheading {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 1rem auto 0;
+  max-width: 500px;
+}
+
+.otodor-hero__actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.875rem;
+  margin-top: 1.5rem;
+}
+
+.otodor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 99px;
+  transition: transform 200ms ease, background-color 200ms ease, border-color 200ms ease;
+}
+
+.otodor-btn--primary {
+  background-color: #ffffff;
+  color: #0b0b0b;
+}
+
+.otodor-btn--primary:hover {
+  background-color: #eaeaea;
+  transform: scale(1.04);
+}
+
+.otodor-btn--secondary {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.otodor-btn--secondary:hover {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: scale(1.04);
+}
+
+/* Magnetic buttons own their transform — keep the pull on hover
+   (don't let the scale rule above clobber the --mx/--my translate). */
+.js-fine-pointer .otodor-btn[data-otodor-magnetic]:hover {
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0);
+}
+
+/* ─ Hidden on mobile — desktop-only cinematic containers ─────── */
+.otodor-hero__vault-pedestal,
+.otodor-hero__connections-svg,
+.product-reveal-caption {
+  display: none;
+}
+
+/* ─ Mobile / tablet centerpiece stage (< 1024px) ─────────────
+   The monolith becomes the focal hero between the intro and
+   final frames. Desktop (>= 1024px) re-governs the stage via
+   the .js-animated cinematic rules further below. */
+@media (max-width: 1023px) {
+  /* Compact vertical rhythm so users reach the content below the
+     hero quickly — the hero should be ~one screen, not a long scroll. */
+  .otodor-hero {
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .otodor-hero__viewport {
+    gap: 0.75rem;
+  }
+
+  .otodor-hero__text-frame {
+    margin-bottom: 0;
+  }
+
+  /* Drop the scroll cue on mobile — the hero is short now,
+     so it only adds vertical bulk. */
+  .otodor-hero__scroll-indicator {
+    display: none;
+  }
+
+  .otodor-hero__actions {
+    margin-top: 1rem;
+  }
+
+  .otodor-hero__stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    padding: 0;
+  }
+
+  /* Soft pedestal halo so the monolith reads as a deliberate
+     centerpiece rather than floating in empty space. */
+  .otodor-hero__stage::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(77, 166, 255, 0.10) 0%, rgba(77, 166, 255, 0.03) 42%, transparent 70%);
+    filter: blur(28px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Product cards are surfaced in the collection sections below;
+     keep the mobile hero clean and centred on the monolith. */
+  .otodor-hero__products-grid {
+    display: none;
+  }
+
+  /* Monolith centerpiece — sized to stay compact on mobile. */
+  .otodor-hero__core-container {
+    width: 120px;
+    height: 165px;
+    margin: 0.5rem auto;
+    z-index: 10;
+  }
+}
+
+/* ─ Scroll guide indicator (Mobile) ────────────────────────── */
+.otodor-hero__scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 2rem auto 0;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: color 250ms ease;
+}
+
+.otodor-hero__scroll-indicator:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.otodor-hero__scroll-indicator .line {
+  width: 1px;
+  height: 30px;
+  background: currentColor;
+  position: relative;
+  overflow: hidden;
+}
+
+.otodor-hero__scroll-indicator .line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, #4DA6FF, transparent);
+  animation: scroll-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes scroll-pulse {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   Desktop — Vault-centric cinematic reveal (>= 1024px)
+   ───────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+
+  .otodor-hero.js-animated {
+    height: 100vh;
+    padding: 0;
+    display: block;
+  }
+
+  .otodor-hero.js-animated .otodor-hero__viewport {
+    height: 100%;
+    position: relative;
+    display: block;
+    max-width: none;
+    perspective: 1400px;
+    transform-style: preserve-3d;
+  }
+
+  /* Concentrated stage — vault + reveal runway */
+  .otodor-hero.js-animated .otodor-hero__stage {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    transform-origin: 50% 46%;
+    will-change: transform;
+  }
+
+  .otodor-hero.js-animated .otodor-hero__vault-pedestal {
+    display: block;
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(32vw, 360px);
+    height: min(38vh, 420px);
+    background: radial-gradient(ellipse 50% 48% at 50% 55%, rgba(77, 166, 255, 0.11) 0%, rgba(77, 166, 255, 0.04) 38%, transparent 72%);
+    pointer-events: none;
+    z-index: 4;
+    will-change: transform, opacity;
+  }
+
+  /* Security core supports the ecosystem without owning the viewport */
+  .otodor-hero.js-animated .otodor-hero__core-container {
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    width: min(40vw, 450px);
+    height: min(54vh, 560px);
+    z-index: 12;
+  }
+
+  .otodor-hero.js-animated .centerpiece-obelisk::after {
+    content: '';
+    position: absolute;
+    inset: 8% 18%;
+    border-radius: 999px;
+    border: 1px solid rgba(77, 166, 255, 0.18);
+    box-shadow: 0 0 28px rgba(77, 166, 255, 0.12);
+    transform: translateZ(20px) scale(0.94);
+    animation: core-ambient-pulse 9s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 7;
+  }
+
+  .otodor-hero.js-animated .obelisk-pillar--center {
+    width: 84px;
+    height: 455px;
+  }
+
+  .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--right,
+  .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--left {
+    width: 32px;
+  }
+
+  .otodor-hero.js-animated .obelisk-pillar--center .pillar-face--top {
+    height: 32px;
+  }
+
+  .otodor-hero.js-animated .pillar-logo-container {
+    width: 52px;
+    height: 52px;
+  }
+
+  .otodor-hero.js-animated .pillar-logo-icon {
+    filter: drop-shadow(0 0 6px rgba(77, 166, 255, 0.36)) brightness(1.08);
+  }
+
+  .otodor-hero.js-animated .obelisk-pillar--left-wing {
+    width: 38px;
+    height: 365px;
+    transform: translate(-50%, -50%) translateX(-124px) translateZ(-26px);
+  }
+
+  .otodor-hero.js-animated .obelisk-pillar--left-wing .pillar-face--right,
+  .otodor-hero.js-animated .obelisk-pillar--left-wing .pillar-face--left,
+  .otodor-hero.js-animated .obelisk-pillar--right-wing .pillar-face--right,
+  .otodor-hero.js-animated .obelisk-pillar--right-wing .pillar-face--left {
+    width: 25px;
+  }
+
+  .otodor-hero.js-animated .obelisk-pillar--right-wing {
+    width: 38px;
+    height: 365px;
+    transform: translate(-50%, -50%) translateX(124px) translateZ(-26px);
+  }
+
+  .otodor-hero.js-animated .centerpiece-internal-glow {
+    width: 300px;
+    height: 410px;
+    opacity: 0.45;
+  }
+
+  .otodor-hero.js-animated .centerpiece-internal-glow::before {
+    content: '';
+    position: absolute;
+    inset: 10% 32%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, transparent 0%, rgba(77, 166, 255, 0.36) 38%, rgba(255, 255, 255, 0.22) 50%, rgba(77, 166, 255, 0.28) 62%, transparent 100%);
+    filter: blur(16px);
+    opacity: 0.22;
+    animation: core-energy-drift 8.8s ease-in-out infinite;
+  }
+
+  .otodor-hero.js-animated .pillar-seam::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 999px;
+    background: rgba(77, 166, 255, 0.42);
+    box-shadow: 0 0 14px rgba(77, 166, 255, 0.34);
+    opacity: 0.22;
+    animation: core-seam-breathe 8.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .otodor-hero.js-animated .obsidian-monolith__shadow {
+    width: 315px;
+    height: 48px;
+    bottom: -34px;
+  }
+
+  .otodor-hero.js-animated .otodor-hero__glow-core {
+    width: min(44vw, 540px);
+    height: min(58vh, 660px);
+    top: 46%;
+  }
+
+  /* Curved ecosystem connections */
+  .otodor-hero.js-animated .otodor-hero__connections-svg {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 8;
+    pointer-events: none;
+  }
+
+  .ecosystem-path {
+    fill: none;
+    stroke: rgba(77, 166, 255, 0.12);
+    stroke-width: 1.8;
+    transition: stroke 600ms ease, stroke-width 600ms ease;
+  }
+
+  .ecosystem-path-active {
+    stroke: rgba(77, 166, 255, 0.42);
+  }
+
+  .ecosystem-path-illuminated {
+    stroke: rgba(77, 166, 255, 0.65);
+    stroke-width: 2.2;
+  }
+
+  .ecosystem-pulse {
+    fill: none;
+    stroke: #4DA6FF;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-dasharray: 80 1200;
+    stroke-dashoffset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Product orbit — wide ring with monolith exclusion zone */
+  .otodor-hero.js-animated .otodor-hero__products-grid {
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(94vw, 1360px);
+    height: min(86vh, 980px);
+    max-width: none;
+    display: block;
+    margin: 0;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .otodor-hero.js-animated .otodor-hero__product-node {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: clamp(280px, 23vw, 360px);
+    pointer-events: auto;
+    opacity: 0;
+    z-index: 26;
+  }
+
+  /* Product sizing per node — primary visual objects in the ecosystem */
+  .otodor-hero.js-animated .product-node--1 .product-card__visual {
+    width: clamp(260px, 22vw, 350px);
+    height: clamp(260px, 22vw, 350px);
+  }
+
+  .otodor-hero.js-animated .product-node--2 .product-card__visual {
+    width: clamp(250px, 21vw, 330px);
+    height: clamp(250px, 21vw, 330px);
+  }
+
+  .otodor-hero.js-animated .product-node--3 .product-card__visual {
+    width: clamp(245px, 20vw, 320px);
+    height: clamp(245px, 20vw, 320px);
+  }
+
+  .otodor-hero.js-animated .product-node--4 .product-card__visual {
+    width: clamp(260px, 22vw, 350px);
+    height: clamp(260px, 22vw, 350px);
+  }
+
+  .otodor-hero.js-animated .otodor-hero__product-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    overflow: visible;
+  }
+
+  .otodor-hero.js-animated .product-card__visual {
+    width: clamp(245px, 20vw, 330px);
+    height: clamp(245px, 20vw, 330px);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    position: relative;
+    filter: drop-shadow(0 24px 46px rgba(0, 0, 0, 0.72)) drop-shadow(0 0 22px rgba(77, 166, 255, 0.14));
+    animation: product-premium-float 8.5s ease-in-out infinite;
+    transition: filter 700ms ease, opacity 700ms ease;
+  }
+
+  .otodor-hero.js-animated .product-node--2 .product-card__visual {
+    animation-delay: -1.7s;
+  }
+
+  .otodor-hero.js-animated .product-node--3 .product-card__visual {
+    animation-delay: -3.1s;
+  }
+
+  .otodor-hero.js-animated .product-node--4 .product-card__visual {
+    animation-delay: -4.4s;
+  }
+
+  .otodor-hero.js-animated .product-card__visual::before,
+  .otodor-hero.js-animated .product-card__visual::after {
+    content: '';
+    position: absolute;
+    inset: 4%;
+    border-radius: 14px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .otodor-hero.js-animated .product-card__visual::before {
+    border: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    opacity: 0.5;
+    transition: opacity 700ms ease, box-shadow 700ms ease;
+  }
+
+  .otodor-hero.js-animated .product-card__visual::after {
+    width: 34%;
+    height: 130%;
+    left: 33%;
+    top: -15%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    filter: blur(12px);
+    opacity: 0;
+    animation: product-reflective-pass 7.5s ease-in-out infinite;
+  }
+
+  .otodor-hero.js-animated .product-card__visual img {
+    filter: saturate(1.04) contrast(1.04);
+  }
+
+  .otodor-hero.js-animated .otodor-hero__product-node.is-ecosystem-active .product-card__visual,
+  .otodor-hero.js-animated .otodor-hero__product-node.is-spotlight .product-card__visual {
+    filter: drop-shadow(0 28px 52px rgba(0, 0, 0, 0.76)) drop-shadow(0 0 28px rgba(77, 166, 255, 0.2));
+  }
+
+  .otodor-hero.js-animated .otodor-hero__product-node.is-ecosystem-active .product-card__visual::before,
+  .otodor-hero.js-animated .otodor-hero__product-node.is-spotlight .product-card__visual::before {
+    opacity: 0.85;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .otodor-hero.js-animated .product-card__visual svg.product-icon-svg {
+    width: 68%;
+    height: 68%;
+    color: rgba(255, 255, 255, 0.78);
+    filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 22px rgba(77, 166, 255, 0.16));
+  }
+
+  .otodor-hero.js-animated .otodor-hero__product-card:hover .product-card__visual {
+    filter: drop-shadow(0 30px 54px rgba(0, 0, 0, 0.78)) drop-shadow(0 0 30px rgba(77, 166, 255, 0.22));
+  }
+
+  .otodor-hero.js-animated .product-card__content {
+    display: none;
+  }
+
+  /* Single active narrative — positioned beside/below product (animation-controlled) */
+  .otodor-hero.js-animated .product-reveal-caption {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 260px;
+    opacity: 0;
+    will-change: transform, opacity;
+    pointer-events: none;
+    margin: 0;
+    z-index: 46;
+  }
+
+  .otodor-hero.js-animated .product-node--1 .product-reveal-caption {
+    top: auto;
+    bottom: 4px;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    text-align: center;
+    align-items: center;
+    width: 280px;
+  }
+
+  .otodor-hero.js-animated .product-node--2 .product-reveal-caption {
+    top: auto;
+    bottom: 4px;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    text-align: center;
+    align-items: center;
+    width: 280px;
+  }
+
+  .otodor-hero.js-animated .product-node--3 .product-reveal-caption {
+    top: auto;
+    bottom: 4px;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    text-align: center;
+    align-items: center;
+    width: 280px;
+  }
+
+  .otodor-hero.js-animated .product-node--4 .product-reveal-caption {
+    top: auto;
+    bottom: 4px;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    text-align: center;
+    align-items: center;
+    width: 280px;
+  }
+
+  .product-reveal-caption__tag {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #4DA6FF;
+  }
+
+  .product-reveal-caption__title {
+    font-family: var(--otodor-font-display);
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 5px 0 0;
+    letter-spacing: -0.02em;
+  }
+
+  .product-reveal-caption__desc {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.58);
+    line-height: 1.4;
+    margin: 5px 0 0;
+  }
+
+  /* Intro text — top of frame, vault is hero */
+  .otodor-hero.js-animated .otodor-hero__text-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 720px;
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  .otodor-hero.js-animated .otodor-hero__text-container:first-of-type {
+    top: 6%;
+    bottom: auto;
+    height: auto;
+  }
+
+  .otodor-hero.js-animated .otodor-hero__text-container:last-of-type {
+    bottom: 6%;
+    top: auto;
+    height: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    max-width: min(62vw, 660px);
+    text-align: center;
+  }
+
+  .otodor-hero.js-animated .otodor-hero__text-frame {
+    position: relative;
+    inset: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    margin-bottom: 0;
+  }
+
+  .otodor-hero.js-animated .frame--intro {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .otodor-hero.js-animated .frame--final {
+    pointer-events: auto;
+    align-items: center;
+    text-align: center;
+  }
+
+  .otodor-hero.js-animated .frame--final .otodor-hero__actions {
+    justify-content: center;
+  }
+
+  .otodor-hero.js-animated .otodor-hero__heading {
+    font-size: clamp(2.4rem, 4vw, 3.4rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .otodor-hero.js-animated .frame--intro .otodor-hero__heading {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+  }
+
+  .otodor-hero.js-animated .otodor-hero__subheading {
+    font-size: 1rem;
+    margin-top: 0.75rem;
+  }
+}
+
+/* ─ Reduced Motion: Deactivate desktop animations ────────── */
+@media (prefers-reduced-motion: reduce) {
+  .otodor-hero__particles { display: none !important; }
+  .otodor-hero.js-animated {
+    height: auto !important;
+    padding: 5rem 1.5rem !important;
+  }
+  .otodor-hero.js-animated .otodor-hero__viewport {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3rem !important;
+    transform: none !important;
+  }
+  .otodor-hero.js-animated .otodor-hero__products-grid {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+  }
+  .otodor-hero.js-animated .otodor-hero__product-node {
+    position: static !important;
+    opacity: 1 !important;
+    transform: none !important;
+    width: 100% !important;
+  }
+  .otodor-hero.js-animated .otodor-hero__stage,
+  .otodor-hero.js-animated .otodor-hero__vault-pedestal,
+  .otodor-hero.js-animated .otodor-hero__connections-svg {
+    display: none !important;
+  }
+  .otodor-hero.js-animated .product-card__content {
+    display: flex !important;
+  }
+  .otodor-hero.js-animated .product-reveal-caption {
+    display: none !important;
+  }
+  .otodor-hero.js-animated .otodor-hero__text-container {
+    position: static !important;
+    transform: none !important;
+    height: auto !important;
+    margin: 2rem auto 0 !important;
+  }
+  .otodor-hero.js-animated .otodor-hero__text-frame {
+    position: static !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  .otodor-hero.js-animated .frame--intro {
+    display: none !important;
+  }
+}
+
+/* ─ Mobile purpose-built pinned scroll (<1024, js-mobile-animated) ─
+   The monolith reveals and "powers on" as you scroll, with the
+   intro heading handing off to the final heading + CTA. Runs on all
+   phone widths down to 320px. Products stay surfaced in the
+   sections below, keeping the small-screen hero clean. */
+@media (max-width: 1023px) {
+  .otodor-hero.js-mobile-animated {
+    height: 100vh;
+    min-height: 600px;
+    padding: 0;
+    overflow: hidden;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__viewport {
+    height: 100%;
+    position: relative;
+    display: block;
+    gap: 0;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__stage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__core-container {
+    width: 150px;
+    height: 250px;
+    margin: 0;
+    z-index: 10;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__products-grid {
+    display: none !important;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__text-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 88%;
+    max-width: 420px;
+    text-align: center;
+    z-index: 40;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__text-container:first-of-type {
+    top: 9%;
+    bottom: auto;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__text-container:last-of-type {
+    bottom: 9%;
+    top: auto;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__text-frame {
+    position: relative;
+    opacity: 0;
+    margin: 0;
+  }
+  .otodor-hero.js-mobile-animated .frame--intro {
+    opacity: 1;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__actions {
+    justify-content: center;
+  }
+  .otodor-hero.js-mobile-animated .otodor-hero__scroll-indicator {
+    display: none;
+  }
+}

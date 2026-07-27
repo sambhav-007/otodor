@@ -33,6 +33,7 @@ Light/dark alternate — never predominantly one. Commerce pages are light-first
 - `OTODOR-PRODUCT-MODULES.md` — product Information Modules audit + data contracts.
 - `OTODOR-MODULE-CONTRACT.md` — the standard every Information Module implements (interface + lifecycle + checklist).
 - `OTODOR-FRAMEWORK-INVENTORY.md` — canonical register of every reusable module built so far.
+- `OTODOR-HERO-MOTION.md` — hero monolith scroll redesign: motion diagnosis, choreography, binding motion standards, 4-phase plan.
 
 The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source of truth for branding, messaging, product hierarchy, specs, warranty (3-yr lock / 1-yr battery), the 85 mm install clearance, and the Anti-"Little Black Box" EMI security story.
 
