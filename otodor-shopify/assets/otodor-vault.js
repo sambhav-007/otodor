@@ -91,6 +91,7 @@ export default function initVault(overlay, opts) {
     const lineMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0b0d, metalness: 0.4, roughness: 0.7 }));                                                  // hairline groove
     const wallMat = M(new THREE.MeshStandardMaterial({ color: 0x0b0d11, metalness: 0.55, roughness: 0.52, roughnessMap: brush, envMapIntensity: 1.4 }));     // black architecture (matte)
     const floorMat = M(new THREE.MeshStandardMaterial({ color: 0x090b0e, metalness: 0.6, roughness: 0.26, roughnessMap: brush, envMapIntensity: 1.8 }));     // black reflective floor
+    const revealMat = M(new THREE.MeshStandardMaterial({ color: 0x05070a, metalness: 0.25, roughness: 0.88, envMapIntensity: 0.12 }));                        // near-black aperture lining (swallows light, reads as depth)
     const seamMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x5aa0ff, emissiveIntensity: 0.0, roughness: 0.4 }));
     const ledBlue = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x3d9bff, emissiveIntensity: 2.0, roughness: 0.5 }));
     const ledAmber = M(new THREE.MeshStandardMaterial({ color: 0x241804, emissive: 0xffab30, emissiveIntensity: 2.2, roughness: 0.5 }));
@@ -130,8 +131,26 @@ export default function initVault(overlay, opts) {
     wall.add(mesh(box(sideW, OH + 0.9, 1.3), wallMat, (OW / 2 + sideW / 2), 0, -0.08, false, true));        // right jamb
     scene.add(wall);
 
-    // soft internal light leak (grows as the gates part) — no inner walls / rails
-    const leak = soft(0, 0.2, -0.5, 2.2, OH * 0.95, 0xeef2ff, 0.0);
+    // ── Reveal sleeve — the WALL'S THICKNESS, seen through the opening ──
+    // Without this the aperture is edged by the lit side faces of the lintel/jambs,
+    // which read as a bright bezel: a screen set into a wall, not a way through it.
+    // Four near-black panels line the aperture and run back into darkness, so the
+    // portal reads as a deep shaft — and the interior `warm` light finally has a
+    // surface to graze, which is what sells the depth once the gates are open.
+    // Each panel straddles its opening edge (half buried in the wall) so no two
+    // faces are ever coplanar — same anti-z-fighting rule as the wall panels above.
+    const RVD = 2.7, RVZ = 0.72 - RVD / 2, RT = 0.12;   // depth, centre-z, panel thickness
+    const sleeve = new THREE.Group();
+    sleeve.add(mesh(box(OW + 0.24, RT, RVD), revealMat, 0, OH / 2, RVZ, false, true));    // head
+    sleeve.add(mesh(box(OW + 0.24, RT, RVD), revealMat, 0, -OH / 2, RVZ, false, true));   // threshold
+    sleeve.add(mesh(box(RT, OH, RVD), revealMat, -OW / 2, 0, RVZ, false, true));          // left return
+    sleeve.add(mesh(box(RT, OH, RVD), revealMat, OW / 2, 0, RVZ, false, true));           // right return
+    scene.add(sleeve);
+
+    // Soft internal light leak. Parked at the BACK of the sleeve, not in front of it:
+    // sitting forward it hung over the opening as a grey oval — fog on the glass
+    // rather than light at the end of a shaft — and washed out the hero behind.
+    const leak = soft(0, 0.1, -2.3, 2.2, OH * 0.8, 0xdfe8ff, 0.0);
 
     // ── OTODOR monogram — planar-mapped so the DIAGONAL cut splits its slant ──
     let monoTex = null, logoMat = null;
@@ -260,10 +279,11 @@ export default function initVault(overlay, opts) {
         const e = easeInOutQuart(op);
         leftSlab.position.x = LC + (LO - LC) * e;
         rightSlab.position.x = RC + (RO - RC) * e;
-        // hold the interior glow open — the old sin() curve returned to 0 by op≈0.67,
-        // leaving the fully-open portal as a flat black rectangle with no depth
-        leak.material.opacity = Math.min(op * 2.2, 1) * 0.42;
-        leak.scale.x = 2.0 + op * 7;
+        // Hold the interior glow open — a sin() curve returning to 0 would leave the
+        // fully-open portal a flat black rectangle. Kept dim: the sleeve now carries
+        // the depth, so this only has to suggest light beyond, not manufacture it.
+        leak.material.opacity = Math.min(op * 2.2, 1) * 0.2;
+        leak.scale.x = 1.6 + op * 4.5;
         warm.intensity = Math.min(op * 3, 1) * 3.2;
       }
       // fly complete → cross-fade to the hero
