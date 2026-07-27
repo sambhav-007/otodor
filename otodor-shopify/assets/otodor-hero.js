@@ -81,6 +81,11 @@
           scrub: 1,
           pin: true,
           anticipatePin: 1,
+          // First pinned section on the page, so it must refresh FIRST: its pin
+          // spacer adds ~280vh to the document and every later trigger's position
+          // depends on that. Without this, later pins (otodor-moments) measure a
+          // document that doesn't yet contain this spacer and start far too early.
+          refreshPriority: 1,
           // Compositor promotion is granted only while the timeline is live.
           onToggle: function (self) {
             section.classList.toggle('is-motion-live', self.isActive);
@@ -455,6 +460,7 @@
           scrub: 1,
           pin: true,
           anticipatePin: 1,
+          refreshPriority: 1,   // same ordering rule as the desktop pin above
           onToggle: function (self) {
             section.classList.toggle('is-motion-live', self.isActive);
           }

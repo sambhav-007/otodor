@@ -260,7 +260,14 @@
         end: '+=' + (moments.length * 110) + '%',
         scrub: 1,
         pin: true,
-        anticipatePin: 1
+        anticipatePin: 1,
+        /* Refresh AFTER the hero (refreshPriority: 1). ScrollTrigger measures in
+           creation order by default, and this section is created before the hero's
+           trigger — so it measured its own `top top` without the hero's pin spacer
+           in the document, landing ~2520px too early and pinning while the hero was
+           still pinned, which drew this section over the categories below it.
+           A plain ScrollTrigger.refresh() does NOT fix that; only the ordering does. */
+        refreshPriority: 0
       }
     });
 
