@@ -54,7 +54,7 @@
       ScrollTrigger.getAll().forEach(function (st) {
         if (st.trigger === section) st.kill(true);
       });
-      section.classList.remove('js-animated', 'js-mobile-animated');
+      section.classList.remove('js-animated', 'js-mobile-animated', 'is-motion-live');
       gsap.set(section.querySelectorAll(
         '.centerpiece-obelisk, .obelisk-pillar--left-wing, .obelisk-pillar--right-wing, ' +
         '.otodor-hero__product-node, .product-reveal-caption, .otodor-hero__text-frame, ' +
@@ -80,7 +80,11 @@
           end: '+=280%', // Pinned scroll track height — shorter scroll to clear the hero
           scrub: 1,
           pin: true,
-          anticipatePin: 1
+          anticipatePin: 1,
+          // Compositor promotion is granted only while the timeline is live.
+          onToggle: function (self) {
+            section.classList.toggle('is-motion-live', self.isActive);
+          }
         }
       });
 
@@ -450,7 +454,10 @@
           end: '+=140%',
           scrub: 1,
           pin: true,
-          anticipatePin: 1
+          anticipatePin: 1,
+          onToggle: function (self) {
+            section.classList.toggle('is-motion-live', self.isActive);
+          }
         }
       });
 
@@ -534,6 +541,29 @@
     } else if (heroMq.addListener) {
       heroMq.addListener(heroMqHandler);
     }
+
+    /* Rebuild on resize within a breakpoint.
+       The desktop orbit slots bake window.innerWidth/innerHeight into pixel
+       offsets, and the timeline holds those baked values — so without this the
+       products sit at stale coordinates after any resize that does not cross
+       1024px.
+
+       Height is only honoured past a threshold: on mobile the browser URL bar
+       collapsing on scroll changes innerHeight continuously, and rebuilding a
+       pinned timeline mid-scroll would fight the user. Width changes are
+       always honoured (a real resize, never scroll jitter). */
+    var lastW = window.innerWidth;
+    var lastH = window.innerHeight;
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      if (w === lastW && Math.abs(h - lastH) < 120) return;
+      lastW = w;
+      lastH = h;
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(initHeroAnimation, 200);
+    });
   }
 
   function boot(root) {

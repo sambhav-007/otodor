@@ -1,8 +1,35 @@
 /* ─────────────────────────────────────────────────────────
    OTODOR Hero Section
    Cinematic Vault Reveal — Apple/Tesla-style progressive unveil.
+
+   Motion plan of record: OTODOR-HERO-MOTION.md
 ───────────────────────────────────────────────────────── */
 
+/* ─ Static fallback composition ────────────────────────────
+   With no JS, no GSAP, or prefers-reduced-motion, neither animated class is
+   applied and BOTH text frames render — which duplicates the subheading
+   verbatim and shows two headings. Compose one readable block instead:
+   the intro heading + subheading, plus the final frame's CTAs. Needs no
+   JavaScript, so it holds even when scripts never run at all. */
+.otodor-hero:not(.js-animated):not(.js-mobile-animated) .frame--final .otodor-hero__heading,
+.otodor-hero:not(.js-animated):not(.js-mobile-animated) .frame--final .otodor-hero__subheading,
+.otodor-hero:not(.js-animated):not(.js-mobile-animated) .otodor-hero__scroll-indicator {
+  display: none;
+}
+
+/* ─ will-change lifecycle ──────────────────────────────────
+   Promotion is granted only while a pinned timeline is actually live
+   (added on ScrollTrigger enter, removed on leave). Declaring it statically
+   holds compositor layers for the life of the page for no benefit. */
+.otodor-hero.is-motion-live .otodor-hero__viewport,
+.otodor-hero.is-motion-live .otodor-hero__stage,
+.otodor-hero.is-motion-live .otodor-hero__vault-pedestal,
+.otodor-hero.is-motion-live .otodor-hero__text-frame,
+.otodor-hero.is-motion-live .otodor-hero__product-node,
+.otodor-hero.is-motion-live .centerpiece-obelisk,
+.otodor-hero.is-motion-live .centerpiece-internal-glow {
+  will-change: transform, opacity;
+}
 
 /* ─ Base layout: Mobile First ──────────────────────────────── */
 .otodor-hero {
@@ -21,7 +48,6 @@
   align-items: center;
   gap: 3rem;
   transform-origin: center center;
-  will-change: transform;
 }
 
 /* ─ Atmospheric Depth & Fog ────────────────────────────────── */
@@ -45,7 +71,6 @@
   filter: blur(45px);
   pointer-events: none;
   z-index: 1;
-  will-change: transform, opacity;
 }
 
 /* ─ Floating particles (Motion V2, decorative, drifts with cursor) ─ */
@@ -65,7 +90,6 @@
   box-shadow: 0 0 6px rgba(77, 166, 255, 0.55);
   opacity: 0;
   animation: hero-particle-rise linear infinite;
-  will-change: transform, opacity;
 }
 @keyframes hero-particle-rise {
   0%   { transform: translateY(24px) scale(0.55); opacity: 0; }
@@ -154,13 +178,11 @@
   position: relative;
   transform-style: preserve-3d;
   transform: rotateY(-20deg) rotateX(15deg);
-  will-change: transform, opacity;
 }
 
 .obelisk-pillar {
   position: absolute;
   transform-style: preserve-3d;
-  will-change: transform, opacity;
 }
 
 .pillar-face {
@@ -413,7 +435,6 @@
   pointer-events: none;
   /* keep as background fog */
   mix-blend-mode: screen;
-  will-change: transform, opacity;
 }
 
 .obsidian-monolith__shadow {
@@ -442,7 +463,6 @@
 
 .otodor-hero__product-node {
   width: 100%;
-  will-change: transform, opacity;
   overflow: visible;
   z-index: 35;
   transform-style: preserve-3d;
@@ -538,7 +558,6 @@
 
 .otodor-hero__text-frame {
   margin-bottom: 2rem;
-  will-change: transform, opacity;
 }
 
 .otodor-hero__heading {
@@ -766,7 +785,6 @@
     inset: 0;
     z-index: 6;
     transform-origin: 50% 46%;
-    will-change: transform;
   }
 
   .otodor-hero.js-animated .otodor-hero__vault-pedestal {
@@ -780,7 +798,6 @@
     background: radial-gradient(ellipse 50% 48% at 50% 55%, rgba(77, 166, 255, 0.11) 0%, rgba(77, 166, 255, 0.04) 38%, transparent 72%);
     pointer-events: none;
     z-index: 4;
-    will-change: transform, opacity;
   }
 
   /* Security core supports the ecosystem without owning the viewport */
@@ -1080,7 +1097,6 @@
     transform: translateY(-50%);
     width: 260px;
     opacity: 0;
-    will-change: transform, opacity;
     pointer-events: none;
     margin: 0;
     z-index: 46;
@@ -1222,55 +1238,31 @@
 }
 
 /* ─ Reduced Motion: Deactivate desktop animations ────────── */
+/* ─ Reduced motion ─────────────────────────────────────────
+   Under prefers-reduced-motion the JS never builds a timeline, so neither
+   `js-animated` nor `js-mobile-animated` is ever applied and the section
+   renders the mobile-first static layout — which is exactly the reduced-motion
+   layout we want (plus the static-fallback composition at the top of this file).
+
+   This block previously carried ~45 lines all qualified with `.js-animated`.
+   Every one of them was unreachable: the class is only added AFTER the
+   reduced-motion early return. They are deleted rather than retargeted,
+   because the base layout already produces the intended result.
+
+   What still needs saying here is the decoration that is NOT class-gated: */
 @media (prefers-reduced-motion: reduce) {
   .otodor-hero__particles { display: none !important; }
-  .otodor-hero.js-animated {
-    height: auto !important;
-    padding: 5rem 1.5rem !important;
-  }
-  .otodor-hero.js-animated .otodor-hero__viewport {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 3rem !important;
-    transform: none !important;
-  }
-  .otodor-hero.js-animated .otodor-hero__products-grid {
-    position: static !important;
-    display: flex !important;
-    flex-direction: column !important;
-    max-width: 480px !important;
-    margin: 0 auto !important;
-  }
-  .otodor-hero.js-animated .otodor-hero__product-node {
-    position: static !important;
-    opacity: 1 !important;
-    transform: none !important;
-    width: 100% !important;
-  }
-  .otodor-hero.js-animated .otodor-hero__stage,
-  .otodor-hero.js-animated .otodor-hero__vault-pedestal,
-  .otodor-hero.js-animated .otodor-hero__connections-svg {
-    display: none !important;
-  }
-  .otodor-hero.js-animated .product-card__content {
-    display: flex !important;
-  }
-  .otodor-hero.js-animated .product-reveal-caption {
-    display: none !important;
-  }
-  .otodor-hero.js-animated .otodor-hero__text-container {
-    position: static !important;
-    transform: none !important;
-    height: auto !important;
-    margin: 2rem auto 0 !important;
-  }
-  .otodor-hero.js-animated .otodor-hero__text-frame {
-    position: static !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-  .otodor-hero.js-animated .frame--intro {
-    display: none !important;
+
+  /* The hero runs seven infinite CSS keyframe loops (particle rise, scroll
+     pulse, core ambient pulse, energy drift, seam breathe, product float,
+     reflective pass). None of them go through GSAP, so the early return does
+     not stop them — they must be disabled here or reduced-motion visitors
+     still get perpetual motion. */
+  .otodor-hero,
+  .otodor-hero *,
+  .otodor-hero *::before,
+  .otodor-hero *::after {
+    animation: none !important;
   }
 }
 
