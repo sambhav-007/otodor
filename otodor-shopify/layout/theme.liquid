@@ -438,22 +438,17 @@
       OTODOR — Animation Layer (Progressive Enhancement)
       ─────────────────────────────────────────────────────────────
       Loading strategy:
-      1. GSAP core + ScrollTrigger via CDN (defer = non-blocking)
+      1. GSAP core + ScrollTrigger, SELF-HOSTED from assets (defer = non-blocking).
+         Same 3.12.5 build that was previously pulled from cdnjs. Self-hosting
+         matches the decision already taken for three.module.js (assets/): no
+         third-party origin in the critical path, nothing to allow-list in CSP,
+         and no dependency on a CDN staying up for the hero to animate.
       2. otodor-animations.js loads after GSAP is ready
       3. If GSAP fails to load, CSS transitions serve as graceful fallback
       4. 'defer' ensures DOM is parsed before script executes
-      5. Future: Three.js / R3F will be appended here in Phase 5
     {%- endcomment -%}
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
-      defer="defer"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
-      defer="defer"
-      crossorigin="anonymous"
-    ></script>
+    <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'scrolltrigger.min.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'otodor-border-glow.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'otodor-animations.js' | asset_url }}" defer="defer"></script>
 
