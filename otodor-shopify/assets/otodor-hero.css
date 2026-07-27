@@ -27,11 +27,7 @@
 .otodor-hero.is-motion-live .otodor-hero__text-frame,
 .otodor-hero.is-motion-live .otodor-hero__product-node,
 .otodor-hero.is-motion-live .centerpiece-obelisk,
-.otodor-hero.is-motion-live .centerpiece-internal-glow,
-/* The two heavily-blurred layers matter most: promoting them lets the
-   compositor scale an already-rasterized texture instead of re-blurring
-   (12px and 45px radii) every frame the stage scales. */
-.otodor-hero.is-motion-live .otodor-hero__glow-core {
+.otodor-hero.is-motion-live .centerpiece-internal-glow {
   will-change: transform, opacity;
 }
 
@@ -208,18 +204,14 @@
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.9);
 }
 
-/* Plate glow. The background is fixed at its LIT value and only `opacity` is
-   scrubbed — 0.13 reproduces the old dim state (0.18 alpha x 0.5 opacity), 0.85
-   is the old lit state. Animating `background` instead repainted every frame.
-   No `transition` here: GSAP writes inline styles on every scrub tick, and a
-   transition would lag and re-tween each one. */
 .pillar-layer-glow {
   position: absolute;
   inset: 3px;
-  background: rgba(77, 166, 255, 0.7);
+  background: rgba(77, 166, 255, 0.18);
   filter: blur(4px);
-  opacity: 0.13;
+  opacity: 0.5;
   pointer-events: none;
+  transition: background 300ms ease, opacity 300ms ease;
 }
 
 .pillar-layer-front {
@@ -289,6 +281,7 @@
   height: 32%;
   background: rgba(77, 166, 255, 0.35);
   box-shadow: 0 0 6px rgba(77, 166, 255, 0.45);
+  transition: background 300ms, box-shadow 300ms;
 }
 
 .obelisk-pillar--center .pillar-seam--bottom {
@@ -300,6 +293,7 @@
   height: 32%;
   background: rgba(77, 166, 255, 0.35);
   box-shadow: 0 0 6px rgba(77, 166, 255, 0.45);
+  transition: background 300ms, box-shadow 300ms;
 }
 
 .pillar-logo-container {
@@ -321,6 +315,7 @@
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 0 3px rgba(77, 166, 255, 0.3)) brightness(0.85);
+  transition: filter 300ms ease, transform 300ms ease;
 }
 
 /* Left Wing */
@@ -366,6 +361,7 @@
   transform: translateY(-50%);
   background: rgba(77, 166, 255, 0.35);
   box-shadow: 0 0 6px rgba(77, 166, 255, 0.45);
+  transition: background 300ms, box-shadow 300ms;
 }
 
 /* Right Wing */
@@ -412,37 +408,7 @@
   transform: translateY(-50%);
   background: rgba(77, 166, 255, 0.35);
   box-shadow: 0 0 6px rgba(77, 166, 255, 0.45);
-}
-
-/* Seam ignition layer.
-   The seam goes blue -> white, so unlike the plate glow a single opacity ramp
-   cannot express it. Instead every .pillar-seam carries a child pinned to its
-   box, pre-painted in the LIT state at opacity 0; the timeline scrubs only that
-   child's opacity. box-shadow is declared once and never animated, so the
-   expensive shadow raster happens at composite time, not every frame. */
-.pillar-seam__lit {
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 10px rgba(77, 166, 255, 0.85);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Logo ignition halo.
-   Replaces a scrubbed `filter: drop-shadow()` on the logo image — the single
-   most expensive tween in the old timeline, since drop-shadow re-blurs the
-   image's alpha channel on every frame. A static radial behind the mark gives
-   the same read for one opacity ramp. */
-.pillar-logo-halo {
-  position: absolute;
-  inset: -45%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(77, 166, 255, 0.75) 0%, rgba(77, 166, 255, 0.28) 42%, transparent 72%);
-  filter: blur(6px);
-  opacity: 0;
-  pointer-events: none;
-  z-index: -1;
+  transition: background 300ms, box-shadow 300ms;
 }
 
 .face-gloss {
@@ -467,14 +433,8 @@
   filter: blur(12px);
   z-index: 1;
   pointer-events: none;
-  /* No mix-blend-mode here.
-     This element is blurred AND sits inside `.otodor-hero__stage`, which scales
-     1 -> 1.08 across the whole timeline. `mix-blend-mode: screen` forces the
-     browser to re-blend against its backdrop on every frame that any ancestor
-     moves, and blending defeats the layer isolation that would otherwise let
-     the compositor just scale an already-rasterized texture.
-     Over the near-black hero background (#0B0B0B) `screen` is visually almost
-     identical to normal blending, so this costs nothing to look at. */
+  /* keep as background fog */
+  mix-blend-mode: screen;
 }
 
 .obsidian-monolith__shadow {
@@ -959,22 +919,20 @@
     pointer-events: none;
   }
 
-  /* Connector strokes only ever changed ALPHA (0.12 -> 0.42 -> 0.65), never
-     hue — so the stroke colour is declared once at full alpha and the states
-     are expressed as element opacity, which does not repaint the path. */
   .ecosystem-path {
     fill: none;
-    stroke: rgb(77, 166, 255);
+    stroke: rgba(77, 166, 255, 0.12);
     stroke-width: 1.8;
-    opacity: 0.12;
+    transition: stroke 600ms ease, stroke-width 600ms ease;
   }
 
   .ecosystem-path-active {
-    opacity: 0.42;
+    stroke: rgba(77, 166, 255, 0.42);
   }
 
   .ecosystem-path-illuminated {
-    opacity: 0.65;
+    stroke: rgba(77, 166, 255, 0.65);
+    stroke-width: 2.2;
   }
 
   .ecosystem-pulse {

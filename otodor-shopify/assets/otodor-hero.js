@@ -58,24 +58,10 @@
       gsap.set(section.querySelectorAll(
         '.centerpiece-obelisk, .obelisk-pillar--left-wing, .obelisk-pillar--right-wing, ' +
         '.otodor-hero__product-node, .product-reveal-caption, .otodor-hero__text-frame, ' +
-        '.centerpiece-internal-glow, .pillar-seam, .pillar-seam__lit, .pillar-layer-glow, ' +
-        '.pillar-logo-icon, .pillar-logo-halo, ' +
+        '.centerpiece-internal-glow, .pillar-seam, .pillar-layer-glow, .pillar-logo-icon, ' +
         '.otodor-hero__glow-core, .otodor-hero__core-container, .otodor-hero__products-grid, ' +
-        '.otodor-hero__vault-pedestal, .otodor-hero__connections-svg, .otodor-hero__stage, ' +
-        '.ecosystem-path, .ecosystem-pulse'
+        '.otodor-hero__vault-pedestal, .otodor-hero__connections-svg, .otodor-hero__stage'
       ), { clearProps: 'all' });
-
-      // The timeline also drives state via classes; a rebuild must reset those
-      // too or a re-entered hero starts already lit.
-      Array.prototype.forEach.call(
-        section.querySelectorAll('.ecosystem-path, .otodor-hero__product-node'),
-        function (el) {
-          el.classList.remove(
-            'ecosystem-path-active', 'ecosystem-path-illuminated',
-            'is-spotlight', 'is-ecosystem-active'
-          );
-        }
-      );
 
       var isDesktop = window.matchMedia('(min-width: 1024px)').matches;
       if (!isDesktop) {
@@ -110,11 +96,8 @@
       var leftWing = section.querySelector('.obelisk-pillar--left-wing');
       var rightWing = section.querySelector('.obelisk-pillar--right-wing');
       var internalGlow = section.querySelector('.centerpiece-internal-glow');
-      // Ignition targets are the pre-painted LIT layers, not the seams
-      // themselves — see the motion standard at the top of this file.
-      var seams = centerpiece.querySelectorAll('.pillar-seam__lit');
+      var seams = centerpiece.querySelectorAll('.pillar-seam');
       var plateGlows = centerpiece.querySelectorAll('.pillar-layer-glow');
-      var logoHalo = centerpiece.querySelector('.pillar-logo-halo');
       
       var node1 = section.querySelector('.product-node--1');
       var node2 = section.querySelector('.product-node--2');
@@ -230,9 +213,8 @@
         }, time + 0.45);
 
         if (paths[slotIndex]) {
-          // Stroke colour is static now (full-alpha blue); the state is opacity.
           tl.to(paths[slotIndex], {
-            opacity: 0.46,
+            stroke: 'rgba(77, 166, 255, 0.46)',
             duration: 0.85,
             ease: 'power3.out'
           }, time + 0.5);
@@ -247,13 +229,10 @@
           node.classList.remove('is-spotlight');
         }, null, time);
 
-        // z-index is discrete, not something to interpolate — tweening it made
-        // GSAP write a new stacking value (and force a stacking recalc) every
-        // frame for 0.8s. Set it once instead.
-        tl.set(node, { zIndex: 28 }, time);
         tl.to(node, {
           opacity: 0.68,
           scale: settledScale,
+          zIndex: 28,
           duration: 0.8,
           ease: 'power3.inOut'
         }, time);
@@ -349,33 +328,41 @@
       tl.to(rightWing, { x: 112, duration: 1.65, ease: 'power4.out' }, s6);
 
       if (internalGlow) {
-        // The gradient swap this used to scrub is now baked into the element's
-        // static background; scale + opacity carry the whole read.
         tl.to(internalGlow, {
           scale: 1.16,
           opacity: 0.65,
+          background: 'radial-gradient(circle, rgba(77, 166, 255, 0.62) 0%, transparent 70%)',
           duration: 1.7,
           ease: 'power4.out'
         }, s6);
       }
 
-      // Ignition — three opacity ramps where there used to be background,
-      // boxShadow and drop-shadow tweens. Same read, no per-frame paint.
       if (plateGlows.length) {
-        tl.to(plateGlows, { opacity: 0.85, duration: 1.6, ease: 'power3.out' }, s6);
+        tl.to(plateGlows, {
+          background: 'rgba(77, 166, 255, 0.7)',
+          opacity: 0.85,
+          duration: 1.6,
+          ease: 'power3.out'
+        }, s6);
       }
 
       if (seams.length) {
-        tl.to(seams, { opacity: 1, duration: 1.6, ease: 'power3.out' }, s6);
-      }
-
-      if (logoHalo) {
-        tl.to(logoHalo, { opacity: 1, duration: 1.6, ease: 'power3.out' }, s6);
+        tl.to(seams, {
+          background: 'rgba(255, 255, 255, 0.95)',
+          boxShadow: '0 0 10px rgba(77, 166, 255, 0.85)',
+          duration: 1.6,
+          ease: 'power3.out'
+        }, s6);
       }
 
       var logoIcon = centerpiece.querySelector('.pillar-logo-icon');
       if (logoIcon) {
-        tl.to(logoIcon, { scale: 1.08, duration: 1.6, ease: 'power3.out' }, s6);
+        tl.to(logoIcon, {
+          filter: 'drop-shadow(0 0 8px rgba(77, 166, 255, 0.8)) brightness(1.15)',
+          scale: 1.08,
+          duration: 1.6,
+          ease: 'power3.out'
+        }, s6);
       }
 
       tl.to(vaultPedestal, { opacity: 0.86, scale: 1.0, duration: 1.55, ease: 'power3.out' }, s6);
@@ -392,7 +379,7 @@
       paths.forEach(function (path) {
         if (path) {
           tl.to(path, {
-            opacity: 0.68,
+            stroke: 'rgba(77, 166, 255, 0.68)',
             duration: 1.25,
             ease: 'sine.inOut'
           }, s6);
@@ -402,12 +389,7 @@
         }
       });
 
-      // Pulse travels through all connections once.
-      // NOTE: strokeDashoffset is the one paint property still scrubbed here.
-      // It is the pulse's whole reason to exist, so it cannot become an opacity
-      // ramp — and the entire connector network (paths + pulses) is deleted in
-      // Phase 2's restraint pass, so converting it would be throwaway work.
-      // It animates 4 thin paths for 1.3s at the very end of the timeline.
+      // Pulse travels through all connections once
       if (pulses.length) {
         tl.set(pulses, { opacity: 1 }, s6 + 0.15);
         tl.fromTo(pulses,
@@ -420,13 +402,13 @@
 
       // All four products at full orbit presence
       nodes.forEach(function (node, i) {
-        tl.set(node, { zIndex: 34 }, s6 + 0.25 + i * 0.06);
         tl.to(node, {
           opacity: 1,
           scale: lineupScale,
           x: finalSlots[i].x,
           y: finalSlots[i].y,
           rotation: 0,
+          zIndex: 34,
           duration: 1.25,
           ease: 'power4.out'
         }, s6 + 0.25 + i * 0.06);
@@ -455,10 +437,9 @@
 
       var centerpiece = section.querySelector('.centerpiece-obelisk');
       var internalGlow = section.querySelector('.centerpiece-internal-glow');
-      var seams = section.querySelectorAll('.pillar-seam__lit');
+      var seams = section.querySelectorAll('.pillar-seam');
       var plateGlows = section.querySelectorAll('.pillar-layer-glow');
       var logoIcon = section.querySelector('.pillar-logo-icon');
-      var logoHalo = section.querySelector('.pillar-logo-halo');
       var glowCore = section.querySelector('.otodor-hero__glow-core');
       var frameIntro = section.querySelector('.frame--intro');
       var frameFinal = section.querySelector('.frame--final');
@@ -495,12 +476,9 @@
       // Becomes CLEAR — glow + seams ignite
       if (glowCore) tl.fromTo(glowCore, { opacity: 0.2, scale: 0.9 }, { opacity: 0.55, scale: 1.02, duration: 2, ease: 'power3.out' }, 0);
       if (internalGlow) tl.fromTo(internalGlow, { opacity: 0.18, scale: 0.85 }, { opacity: 0.6, scale: 1.12, duration: 2, ease: 'power3.out' }, 0.3);
-      // Ignition — opacity ramps on the pre-painted lit layers (same standard
-      // as the desktop timeline; phones are where paint cost hurts most).
-      if (plateGlows.length) tl.to(plateGlows, { opacity: 0.85, duration: 1.3, ease: 'power3.out' }, 0.8);
-      if (seams.length) tl.to(seams, { opacity: 1, duration: 1.3, ease: 'power3.out' }, 0.8);
-      if (logoHalo) tl.to(logoHalo, { opacity: 1, duration: 1.3, ease: 'power3.out' }, 0.8);
-      if (logoIcon) tl.to(logoIcon, { scale: 1.08, duration: 1.3, ease: 'power3.out' }, 0.8);
+      if (plateGlows.length) tl.to(plateGlows, { background: 'rgba(77, 166, 255, 0.7)', opacity: 0.85, duration: 1.3, ease: 'power3.out' }, 0.8);
+      if (seams.length) tl.to(seams, { background: 'rgba(255, 255, 255, 0.95)', boxShadow: '0 0 10px rgba(77, 166, 255, 0.85)', duration: 1.3, ease: 'power3.out' }, 0.8);
+      if (logoIcon) tl.to(logoIcon, { filter: 'drop-shadow(0 0 8px rgba(77, 166, 255, 0.8)) brightness(1.15)', scale: 1.08, duration: 1.3, ease: 'power3.out' }, 0.8);
 
       // Heading hand-off (intro → final + CTA)
       if (frameIntro) tl.to(frameIntro, { opacity: 0, y: -20, duration: 0.9, ease: 'power2.inOut' }, 1.7);
