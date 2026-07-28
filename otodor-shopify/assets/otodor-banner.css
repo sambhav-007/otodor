@@ -1,0 +1,403 @@
+/* ─────────────────────────────────────────────────────────
+   OTODOR Banner — minimal 16:9 slideshow hero
+   Apple / Tesla register: full-bleed image, one line of copy,
+   two pill actions, hairline progress indicators. Nothing else.
+
+   Motion is opacity + a slow transform only (composited).
+   Reduced motion → first slide, static, indicators still navigate.
+───────────────────────────────────────────────────────── */
+
+.otodor-banner {
+  position: relative;
+  background-color: #0B0B0B;
+  overflow: hidden;
+}
+
+.otodor-banner--contained {
+  padding-inline: clamp(0.75rem, 2vw, 1.5rem);
+  padding-block: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+/* ─ Viewport — the 16:9 frame ──────────────────────────── */
+.otodor-banner__viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--banner-ratio, 16 / 9);
+  overflow: hidden;
+  background-color: #0B0B0B;
+}
+
+.otodor-banner--contained .otodor-banner__viewport {
+  border-radius: clamp(10px, 1.4vw, 20px);
+}
+
+.otodor-banner--cap-height .otodor-banner__viewport {
+  max-height: calc(100vh - var(--banner-header-offset, 0px));
+  max-height: calc(100svh - var(--banner-header-offset, 0px));
+}
+
+@media screen and (max-width: 749px) {
+  .otodor-banner__viewport {
+    aspect-ratio: var(--banner-ratio-mobile, var(--banner-ratio, 16 / 9));
+    /* A true 16:9 frame is ~210 px tall on a phone — too short to hold a
+       heading and two actions. The floor crops the image instead of
+       squeezing the copy; taller mobile ratios never reach it. */
+    min-height: 300px;
+  }
+}
+
+/* ─ Slides ─────────────────────────────────────────────── */
+.otodor-banner__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--banner-fade, 800ms) var(--otodor-ease-inout, cubic-bezier(0.4, 0, 0.2, 1)),
+    visibility 0s linear var(--banner-fade, 800ms);
+}
+
+.otodor-banner__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--banner-fade, 800ms) var(--otodor-ease-inout, cubic-bezier(0.4, 0, 0.2, 1)),
+    visibility 0s;
+  z-index: 2;
+}
+
+/* No-JS / first paint: the first slide is visible on its own. */
+.otodor-banner:not(.is-ready) .otodor-banner__slide:first-child {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ─ Media ──────────────────────────────────────────────── */
+.otodor-banner__media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.otodor-banner__media img,
+.otodor-banner__media svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--banner-focal, center center);
+  display: block;
+}
+
+/* Placeholder when a slide has no image yet */
+.otodor-banner__media--empty {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 30%, rgba(77, 166, 255, 0.14) 0%, transparent 62%),
+    linear-gradient(180deg, #14171C 0%, #0B0B0B 100%);
+}
+
+/* Slow drift — the only ambient motion, composited, off by default */
+.otodor-banner--drift .otodor-banner__slide.is-active .otodor-banner__media img {
+  animation: otodor-banner-drift 14s var(--otodor-ease-out, ease-out) forwards;
+}
+
+@keyframes otodor-banner-drift {
+  from { transform: scale(1.0); }
+  to   { transform: scale(1.06); }
+}
+
+/* ─ Scrim — legibility only, never a mood filter ───────── */
+.otodor-banner__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.otodor-banner__slide--light .otodor-banner__scrim {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, calc(var(--banner-scrim, 0.25) * 0.55)) 0%, transparent 34%),
+    linear-gradient(0deg, rgba(0, 0, 0, var(--banner-scrim, 0.25)) 0%, transparent 52%);
+}
+
+.otodor-banner__slide--dark .otodor-banner__scrim {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, calc(var(--banner-scrim, 0.25) * 0.5)) 0%, transparent 34%),
+    linear-gradient(0deg, rgba(255, 255, 255, var(--banner-scrim, 0.25)) 0%, transparent 52%);
+}
+
+/* ─ Content ────────────────────────────────────────────── */
+.otodor-banner__content {
+  --banner-pad-y: clamp(1.5rem, 4vw, 4.5rem);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  padding: var(--banner-pad-y) clamp(1.25rem, 5vw, 5rem);
+  z-index: 2;
+}
+
+/* Bottom-aligned copy must clear the indicator row, not sit on it. */
+.otodor-banner--has-nav .otodor-banner__content--bottom-center,
+.otodor-banner--has-nav .otodor-banner__content--bottom-left {
+  padding-bottom: calc(var(--banner-pad-y) + clamp(1.6rem, 2.8vw, 2.4rem));
+}
+
+.otodor-banner__inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.6rem, 1.2vw, 1rem);
+  max-width: min(46rem, 100%);
+}
+
+/* Placement — Tesla bottom-centre by default, Apple top-centre available */
+.otodor-banner__content--bottom-center { place-items: end center; text-align: center; }
+.otodor-banner__content--bottom-left   { place-items: end start;  text-align: left; }
+.otodor-banner__content--center        { place-items: center;     text-align: center; }
+.otodor-banner__content--middle-left   { place-items: center start; text-align: left; }
+.otodor-banner__content--top-center    { place-items: start center; text-align: center; }
+
+.otodor-banner__content--bottom-center .otodor-banner__actions,
+.otodor-banner__content--center .otodor-banner__actions,
+.otodor-banner__content--top-center .otodor-banner__actions {
+  justify-content: center;
+}
+
+/* Colour — one set of variables flips the whole slide light/dark */
+.otodor-banner__slide--light {
+  --banner-fg: #FFFFFF;
+  --banner-fg-inverse: #0B0B0B;
+  --banner-btn-bg: rgba(11, 11, 11, 0.22);
+  --banner-btn-bg-hover: rgba(11, 11, 11, 0.36);
+  --banner-btn-border: rgba(255, 255, 255, 0.38);
+}
+
+.otodor-banner__slide--dark {
+  --banner-fg: #0B0B0B;
+  --banner-fg-inverse: #FFFFFF;
+  --banner-btn-bg: rgba(255, 255, 255, 0.28);
+  --banner-btn-bg-hover: rgba(255, 255, 255, 0.44);
+  --banner-btn-border: rgba(11, 11, 11, 0.30);
+}
+
+.otodor-banner__eyebrow {
+  font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
+  font-size: clamp(0.62rem, 1vw, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--banner-fg);
+  opacity: 0.75;
+  margin: 0;
+}
+
+.otodor-banner__heading {
+  font-family: var(--otodor-font-display, 'Hanken Grotesk', system-ui, sans-serif);
+  font-size: clamp(1.5rem, 3.6vw, 3.5rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--banner-fg);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.otodor-banner__text {
+  font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
+  font-size: clamp(0.82rem, 1.25vw, 1.05rem);
+  line-height: 1.5;
+  color: var(--banner-fg);
+  opacity: 0.82;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ─ Actions — two pills, nothing louder ────────────────── */
+.otodor-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: clamp(0.4rem, 1vw, 0.9rem);
+}
+
+.otodor-banner__btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(9rem, 14vw, 12rem);
+  min-height: 44px;
+  padding: 0.7rem 1.9rem;
+  border: 1px solid transparent;
+  border-radius: var(--otodor-radius-pill, 999px);
+  font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
+  font-size: clamp(0.78rem, 1vw, 0.9rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--otodor-dur-fast, 160ms) var(--otodor-ease-out, ease-out),
+    color var(--otodor-dur-fast, 160ms) var(--otodor-ease-out, ease-out),
+    transform var(--otodor-dur-fast, 160ms) var(--otodor-ease-spring, ease-out);
+}
+
+.otodor-banner__btn--primary {
+  background: var(--banner-fg);
+  color: var(--banner-fg-inverse);
+}
+
+.otodor-banner__btn--secondary {
+  background: var(--banner-btn-bg, rgba(11, 11, 11, 0.22));
+  color: var(--banner-fg);
+  border-color: var(--banner-btn-border, rgba(255, 255, 255, 0.38));
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+}
+
+.otodor-banner__btn:hover {
+  transform: translateY(-1px);
+}
+
+.otodor-banner__btn--secondary:hover {
+  background: var(--banner-btn-bg-hover, rgba(11, 11, 11, 0.36));
+}
+
+.otodor-banner__btn:focus-visible {
+  outline: 2px solid var(--banner-fg);
+  outline-offset: 3px;
+}
+
+/* ─ Indicators — hairline progress bars ────────────────── */
+.otodor-banner__nav {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(0.85rem, 2vw, 1.6rem);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 4;
+  padding: 0.4rem 0.5rem;
+}
+
+.otodor-banner__dot {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: clamp(28px, 4vw, 48px);
+  height: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.otodor-banner__dot::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  background: var(--banner-nav-track, rgba(255, 255, 255, 0.32));
+}
+
+.otodor-banner__dot-fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 2px;
+  width: 100%;
+  transform: translateY(-50%) scaleX(0);
+  transform-origin: left center;
+  border-radius: 2px;
+  background: var(--banner-nav-fill, #FFFFFF);
+}
+
+.otodor-banner__dot[aria-current='true'] .otodor-banner__dot-fill {
+  transform: translateY(-50%) scaleX(1);
+}
+
+/* While autoplaying, the active bar fills across the dwell time. */
+.otodor-banner.is-autoplaying .otodor-banner__dot[aria-current='true'] .otodor-banner__dot-fill {
+  animation: otodor-banner-progress var(--banner-interval, 6000ms) linear forwards;
+}
+
+.otodor-banner.is-paused .otodor-banner__dot[aria-current='true'] .otodor-banner__dot-fill {
+  animation-play-state: paused;
+}
+
+@keyframes otodor-banner-progress {
+  from { transform: translateY(-50%) scaleX(0); }
+  to   { transform: translateY(-50%) scaleX(1); }
+}
+
+.otodor-banner__dot:focus-visible {
+  outline: 2px solid var(--banner-nav-fill, #FFFFFF);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Nav colour follows the active slide's text colour */
+.otodor-banner:has(.otodor-banner__slide.is-active.otodor-banner__slide--dark) .otodor-banner__nav {
+  --banner-nav-track: rgba(11, 11, 11, 0.28);
+  --banner-nav-fill: #0B0B0B;
+}
+
+.otodor-banner__nav[hidden] { display: none; }
+
+/* ─ Phones — the same composition, compressed ──────────── */
+@media screen and (max-width: 749px) {
+  .otodor-banner__content {
+    --banner-pad-y: 1.1rem;
+    padding-inline: 1.15rem;
+  }
+
+  .otodor-banner--has-nav .otodor-banner__content--bottom-center,
+  .otodor-banner--has-nav .otodor-banner__content--bottom-left {
+    padding-bottom: calc(var(--banner-pad-y) + 2.6rem);
+  }
+
+  .otodor-banner__inner {
+    gap: 0.45rem;
+  }
+
+  .otodor-banner__heading {
+    font-size: clamp(1.25rem, 6.4vw, 1.8rem);
+  }
+
+  .otodor-banner__text {
+    font-size: 0.82rem;
+  }
+
+  .otodor-banner__actions {
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+  }
+
+  /* Two pills, side by side, still 44 px tall for touch. */
+  .otodor-banner__btn {
+    min-width: 0;
+    flex: 0 1 auto;
+    padding: 0.55rem 1.05rem;
+    min-height: 44px;
+    font-size: 0.78rem;
+  }
+}
+
+/* ─ Reduced motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .otodor-banner__slide {
+    transition: none;
+  }
+  .otodor-banner--drift .otodor-banner__slide.is-active .otodor-banner__media img {
+    animation: none;
+  }
+  .otodor-banner.is-autoplaying .otodor-banner__dot[aria-current='true'] .otodor-banner__dot-fill {
+    animation: none;
+  }
+  .otodor-banner__btn:hover {
+    transform: none;
+  }
+}

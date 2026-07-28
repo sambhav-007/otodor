@@ -17,6 +17,127 @@
         "facility_label": "OTODOR · Secure Facility"
       }
     },
+    "otodor_promo_strip": {
+      "type": "otodor-promo-strip",
+      "blocks": {
+        "promo_1": {
+          "type": "message",
+          "settings": {
+            "text": "Limited-time launch pricing on smart locks",
+            "code": "",
+            "link": "/collections/all"
+          }
+        },
+        "promo_2": {
+          "type": "message",
+          "settings": {
+            "text": "Free professional installation on every lock",
+            "code": "",
+            "link": ""
+          }
+        },
+        "promo_3": {
+          "type": "message",
+          "settings": {
+            "text": "3-year lock warranty · 1-year battery",
+            "code": "",
+            "link": ""
+          }
+        },
+        "promo_4": {
+          "type": "message",
+          "settings": {
+            "text": "Free home survey & compatibility check",
+            "code": "",
+            "link": "/pages/contact#otodor-lead"
+          }
+        }
+      },
+      "block_order": [
+        "promo_1",
+        "promo_2",
+        "promo_3",
+        "promo_4"
+      ],
+      "settings": {
+        "direction": "ltr",
+        "speed": 30,
+        "color_scheme": "dark",
+        "pause_on_hover": true,
+        "aria_label": "Current offers"
+      }
+    },
+    "otodor_banner": {
+      "type": "otodor-banner",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/flagship1.png",
+            "focal_point": "center center",
+            "eyebrow": "",
+            "heading": "Security, redesigned.",
+            "text": "Smart locks engineered for modern Indian homes.",
+            "content_position": "bottom-center",
+            "text_color": "light",
+            "cta_primary_label": "Shop smart locks",
+            "cta_primary_link": "/collections/all",
+            "cta_secondary_label": "Book a free survey",
+            "cta_secondary_link": "/pages/contact#otodor-lead"
+          }
+        },
+        "slide_2": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/leave.png",
+            "focal_point": "center center",
+            "eyebrow": "",
+            "heading": "Every entry point. Protected.",
+            "text": "Doors, gates and access — one ecosystem, one app.",
+            "content_position": "bottom-center",
+            "text_color": "light",
+            "cta_primary_label": "Explore the range",
+            "cta_primary_link": "/collections/all",
+            "cta_secondary_label": "Talk to an expert",
+            "cta_secondary_link": "/pages/contact#otodor-lead"
+          }
+        },
+        "slide_3": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/secure.png",
+            "focal_point": "center center",
+            "eyebrow": "",
+            "heading": "Installed. Not delivered.",
+            "text": "Certified technicians, a 3-year warranty, and real people on call.",
+            "content_position": "bottom-center",
+            "text_color": "light",
+            "cta_primary_label": "Book a home survey",
+            "cta_primary_link": "/pages/contact#otodor-lead",
+            "cta_secondary_label": "See the collection",
+            "cta_secondary_link": "/collections/digital-locks"
+          }
+        }
+      },
+      "block_order": [
+        "slide_1",
+        "slide_2",
+        "slide_3"
+      ],
+      "settings": {
+        "autoplay": true,
+        "interval": 6,
+        "fade_duration": 800,
+        "pause_on_hover": true,
+        "show_indicators": true,
+        "drift": false,
+        "width": "full",
+        "mobile_ratio": "16 / 9",
+        "cap_height": true,
+        "scrim": 25,
+        "aria_label": "Featured"
+      }
+    },
     "otodor_hero": {
       "type": "otodor-hero",
       "settings": {
@@ -563,6 +684,8 @@
   },
   "order": [
     "otodor_vault_intro",
+    "otodor_promo_strip",
+    "otodor_banner",
     "otodor_hero",
     "otodor_categories",
     "otodor_moments",

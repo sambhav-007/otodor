@@ -126,7 +126,9 @@ listed so the inventory is complete.
 
 | Section | Purpose | Data sources | Visibility | Status |
 |---|---|---|---|---|
-| **otodor-hero** | Homepage hero | section settings | Always | ○ |
+| **otodor-banner** | Minimal 16:9 slideshow hero (first section on the homepage) | `slide` blocks (image / mobile image / copy / 2 CTAs) | Hidden with no slide that has an image or heading | ✅ |
+| **otodor-promo-strip** | Infinite offer/discount ribbon above the banner | `message` blocks (text / code / link) | Hidden with no message | ✅ |
+| **otodor-hero** | Pinned monolith scroll story (now *below* the banner) | section settings | Always | ○ |
 | **otodor-categories** | Homepage category grid | blocks / collections | Per instance | ○ |
 | **otodor-moments** | Pinned scroll storytelling | blocks | Per instance | ○ |
 | **otodor-trust-bar** | Credibility strip | settings/blocks | Per instance | ○ |

@@ -1,0 +1,445 @@
+{%- comment -%}
+  ─────────────────────────────────────────────────────────────────────────
+  OTODOR Banner — minimal 16:9 slideshow hero
+
+  Purpose      The first thing on the page: a full-bleed 16:9 image slideshow
+               in the Apple / Tesla register — one image, one line, two pills.
+               It sits above the pinned monolith hero and carries the offer of
+               the moment; the hero still tells the product story below it.
+  Inputs       `slide` blocks (image, optional mobile image, eyebrow, heading,
+               text, two CTAs, placement, light/dark text) + section settings.
+  Outputs      Crossfading 16:9 banner with hairline progress indicators.
+  Dependencies assets/otodor-banner.css, assets/otodor-banner.js (vanilla,
+               no GSAP), assets/otodor-base.css tokens.
+  Reusable for Any template — homepage, collection landing, campaign pages.
+  Merchant     Every image, line of copy, link, ratio, dwell time and colour
+               is a section/block setting. No metafields, no code.
+  Required     None.
+  Optional     None (section settings only).
+  Degrades     No slides → renders nothing. No JS → first slide renders fully
+               readable with working links. Reduced motion → no autoplay,
+               no drift, indicators still navigate.
+  ─────────────────────────────────────────────────────────────────────────
+{%- endcomment -%}
+
+{%- comment -%} Lifecycle guard — a slide needs at least an image or a heading. {%- endcomment -%}
+{%- assign slide_count = 0 -%}
+{%- for block in section.blocks -%}
+  {%- if block.settings.image != blank or block.settings.heading != blank -%}
+    {%- assign slide_count = slide_count | plus: 1 -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if slide_count > 0 -%}
+
+{{ 'otodor-banner.css' | asset_url | stylesheet_tag }}
+
+{%- assign scrim = section.settings.scrim | divided_by: 100.0 -%}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    display: block;
+    background-color: #0B0B0B;
+  }
+
+  #shopify-section-{{ section.id }} .otodor-banner {
+    --banner-ratio: 16 / 9;
+    --banner-ratio-mobile: {{ section.settings.mobile_ratio | default: '16 / 9' }};
+    --banner-scrim: {{ scrim }};
+    --banner-interval: {{ section.settings.interval | times: 1000 }}ms;
+    --banner-fade: {{ section.settings.fade_duration | default: 800 }}ms;
+  }
+{%- endstyle -%}
+
+<section
+  class="otodor-banner{% if section.settings.width == 'contained' %} otodor-banner--contained{% endif %}{% if section.settings.cap_height %} otodor-banner--cap-height{% endif %}{% if section.settings.drift %} otodor-banner--drift{% endif %}{% if section.settings.show_indicators and slide_count > 1 %} otodor-banner--has-nav{% endif %}"
+  data-otodor-section="banner"
+  data-otodor-banner
+  data-autoplay="{% if section.settings.autoplay %}true{% else %}false{% endif %}"
+  data-pause-on-hover="{% if section.settings.pause_on_hover %}true{% else %}false{% endif %}"
+  data-interval="{{ section.settings.interval | times: 1000 }}"
+  role="region"
+  aria-roledescription="carousel"
+  aria-label="{{ section.settings.aria_label | default: 'Featured' | escape }}"
+>
+  <div class="otodor-banner__viewport" data-banner-viewport>
+
+    {%- assign slide_index = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.settings.image == blank and block.settings.heading == blank -%}{%- continue -%}{%- endif -%}
+
+      {%- assign is_first = false -%}
+      {%- if slide_index == 0 -%}{%- assign is_first = true -%}{%- endif -%}
+
+      <article
+        class="otodor-banner__slide otodor-banner__slide--{{ block.settings.text_color | default: 'light' }}{% if is_first %} is-active{% endif %}"
+        data-banner-slide
+        data-slide-index="{{ slide_index }}"
+        role="group"
+        aria-roledescription="slide"
+        aria-label="{{ slide_index | plus: 1 }} of {{ slide_count }}"
+        aria-hidden="{% if is_first %}false{% else %}true{% endif %}"
+        style="--banner-focal: {{ block.settings.focal_point | default: 'center center' }};"
+        {{ block.shopify_attributes }}
+      >
+        <div class="otodor-banner__media{% if block.settings.image == blank %} otodor-banner__media--empty{% endif %}">
+          {%- if block.settings.image != blank -%}
+            {%- comment -%} The first slide is the page's LCP — everything after it waits. {%- endcomment -%}
+            {%- if is_first -%}
+              {%- assign img_loading = 'eager' -%}
+              {%- assign img_priority = 'high' -%}
+            {%- else -%}
+              {%- assign img_loading = 'lazy' -%}
+              {%- assign img_priority = 'auto' -%}
+            {%- endif -%}
+            {%- assign alt_text = block.settings.image.alt | default: block.settings.heading -%}
+            {%- if block.settings.image_mobile != blank -%}
+              <picture>
+                <source
+                  media="(max-width: 749px)"
+                  srcset="
+                    {{ block.settings.image_mobile | image_url: width: 500 }} 500w,
+                    {{ block.settings.image_mobile | image_url: width: 750 }} 750w,
+                    {{ block.settings.image_mobile | image_url: width: 1100 }} 1100w,
+                    {{ block.settings.image_mobile | image_url: width: 1500 }} 1500w
+                  "
+                  sizes="100vw"
+                >
+                {{
+                  block.settings.image
+                  | image_url: width: 3000
+                  | image_tag:
+                    widths: '750, 1100, 1500, 1900, 2400, 3000',
+                    sizes: '100vw',
+                    loading: img_loading,
+                    fetchpriority: img_priority,
+                    alt: alt_text
+                }}
+              </picture>
+            {%- else -%}
+              {{
+                block.settings.image
+                | image_url: width: 3000
+                | image_tag:
+                  widths: '750, 1100, 1500, 1900, 2400, 3000',
+                  sizes: '100vw',
+                  loading: img_loading,
+                  fetchpriority: img_priority,
+                  alt: alt_text
+              }}
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+
+        <div class="otodor-banner__scrim" aria-hidden="true"></div>
+
+        {%- if block.settings.eyebrow != blank
+          or block.settings.heading != blank
+          or block.settings.text != blank
+          or block.settings.cta_primary_label != blank
+          or block.settings.cta_secondary_label != blank -%}
+          <div class="otodor-banner__content otodor-banner__content--{{ block.settings.content_position | default: 'bottom-center' }}">
+            <div class="otodor-banner__inner">
+              {%- if block.settings.eyebrow != blank -%}
+                <p class="otodor-banner__eyebrow">{{ block.settings.eyebrow | escape }}</p>
+              {%- endif -%}
+
+              {%- if block.settings.heading != blank -%}
+                <h2 class="otodor-banner__heading">{{ block.settings.heading | escape }}</h2>
+              {%- endif -%}
+
+              {%- if block.settings.text != blank -%}
+                <p class="otodor-banner__text">{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+
+              {%- if block.settings.cta_primary_label != blank or block.settings.cta_secondary_label != blank -%}
+                <div class="otodor-banner__actions">
+                  {%- if block.settings.cta_primary_label != blank -%}
+                    <a
+                      class="otodor-banner__btn otodor-banner__btn--primary"
+                      href="{{ block.settings.cta_primary_link | default: '/collections/all' }}"
+                    >
+                      {{- block.settings.cta_primary_label | escape -}}
+                    </a>
+                  {%- endif -%}
+                  {%- if block.settings.cta_secondary_label != blank -%}
+                    <a
+                      class="otodor-banner__btn otodor-banner__btn--secondary"
+                      href="{{ block.settings.cta_secondary_link | default: '/collections/all' }}"
+                    >
+                      {{- block.settings.cta_secondary_label | escape -}}
+                    </a>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </article>
+
+      {%- assign slide_index = slide_index | plus: 1 -%}
+    {%- endfor -%}
+
+    {%- if section.settings.show_indicators and slide_count > 1 -%}
+      <div class="otodor-banner__nav" data-banner-nav>
+        {%- for i in (1..slide_count) -%}
+          <button
+            type="button"
+            class="otodor-banner__dot"
+            data-banner-dot
+            aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+            aria-label="{{ 'sections.slideshow.load_slide' | t }} {{ i }}"
+          >
+            <span class="otodor-banner__dot-fill"></span>
+          </button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script src="{{ 'otodor-banner.js' | asset_url }}" defer="defer"></script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Banner",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "A minimal full-bleed 16:9 slideshow. Upload 16:9 images (2400 × 1350 px or larger). Hides itself when it has no slides."
+    },
+    {
+      "type": "header",
+      "content": "Playback"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "interval",
+      "label": "Time per slide",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "fade_duration",
+      "label": "Crossfade duration",
+      "min": 200,
+      "max": 1600,
+      "step": 100,
+      "unit": "ms",
+      "default": 800
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_indicators",
+      "label": "Show progress indicators",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "drift",
+      "label": "Slow image drift",
+      "info": "A barely-there zoom on the active slide. Off for the strictest, stillest look.",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Frame"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "full",
+      "options": [
+        { "value": "full", "label": "Full bleed" },
+        { "value": "contained", "label": "Inset (rounded)" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "mobile_ratio",
+      "label": "Mobile aspect ratio",
+      "info": "Desktop is always 16:9. A taller mobile ratio crops the same image for phones.",
+      "default": "16 / 9",
+      "options": [
+        { "value": "16 / 9", "label": "16:9 (same as desktop)" },
+        { "value": "4 / 3", "label": "4:3" },
+        { "value": "1 / 1", "label": "1:1" },
+        { "value": "4 / 5", "label": "4:5" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "cap_height",
+      "label": "Never taller than the viewport",
+      "info": "On very wide screens a true 16:9 frame can exceed the screen height. This crops instead of overflowing.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "scrim",
+      "label": "Text legibility scrim",
+      "info": "Darkens (or lightens) the image behind the copy only.",
+      "min": 0,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "default": 25
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Accessibility label",
+      "default": "Featured"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (16:9)",
+          "info": "2400 × 1350 px or larger."
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile image",
+          "info": "Optional. Used below 750 px — otherwise the 16:9 image is cropped."
+        },
+        {
+          "type": "select",
+          "id": "focal_point",
+          "label": "Image focus",
+          "default": "center center",
+          "options": [
+            { "value": "center center", "label": "Centre" },
+            { "value": "center top", "label": "Top" },
+            { "value": "center bottom", "label": "Bottom" },
+            { "value": "left center", "label": "Left" },
+            { "value": "right center", "label": "Right" }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Copy"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Security, redesigned."
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Supporting line",
+          "info": "One line. The banner is deliberately quiet."
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Copy placement",
+          "default": "bottom-center",
+          "options": [
+            { "value": "bottom-center", "label": "Bottom centre (Tesla)" },
+            { "value": "top-center", "label": "Top centre (Apple)" },
+            { "value": "center", "label": "Centre" },
+            { "value": "bottom-left", "label": "Bottom left" },
+            { "value": "middle-left", "label": "Middle left" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "text_color",
+          "label": "Text colour",
+          "default": "light",
+          "options": [
+            { "value": "light", "label": "Light (on dark images)" },
+            { "value": "dark", "label": "Dark (on light images)" }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Actions"
+        },
+        {
+          "type": "text",
+          "id": "cta_primary_label",
+          "label": "Primary button label"
+        },
+        {
+          "type": "url",
+          "id": "cta_primary_link",
+          "label": "Primary button link"
+        },
+        {
+          "type": "text",
+          "id": "cta_secondary_label",
+          "label": "Secondary button label"
+        },
+        {
+          "type": "url",
+          "id": "cta_secondary_link",
+          "label": "Secondary button link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Banner",
+      "blocks": [
+        {
+          "type": "slide",
+          "settings": {
+            "heading": "Security, redesigned.",
+            "text": "Smart locks engineered for modern Indian homes.",
+            "cta_primary_label": "Shop smart locks",
+            "cta_secondary_label": "Book a survey"
+          }
+        },
+        {
+          "type": "slide",
+          "settings": {
+            "heading": "Every entry point. Protected.",
+            "text": "Doors, gates and access — one ecosystem.",
+            "cta_primary_label": "Explore the range",
+            "cta_secondary_label": "Talk to us"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

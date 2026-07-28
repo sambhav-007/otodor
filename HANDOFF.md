@@ -57,10 +57,14 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 | STEP 6 | **Structured Content & SEO Foundation** (`OTODOR-STRUCTURED-CONTENT.md`): centralized **Schema Registry** `otodor-schema.liquid` (dispatched: `graph` = Organization + WebSite + BreadcrumbList + CollectionPage + VideoObject as one `@graph`, gated by data; `faqpage` + `howto` builders). Rendered once in `theme.liquid` head; Org/WebSite **moved out of `header.liquid`** (de-dupe). `collapsible-content` extended (auto-hide + opt-in FAQPage). `otodor-product-install` opt-in HowTo (default off). Product/Offer/rating left to Shopify `structured_data` (not duplicated). |
 | STEP 7 | **Content Experience Layer** (`OTODOR-CONTENT-LAYER.md`): native-first — guides authored as Shopify **Articles/Pages**, surfaced by reference (no long-form duplicated). `otodor-content-guide` (single guide surface: Article/Page pick → product/collection ref metafield → hide) + `otodor-content-rail` (related reading: `custom.related_guides` list → blog latest → hide). Reference model added to the data model (`custom.buying_guide`/`installation_guide`/`compatibility_guide` = article_reference, `related_guides` = list; `buying_guide_block` metaobject deprecated). Wired into product + digital-locks collection (auto-hide until guides exist). |
 | STEP 8 | **Lead Capture & Guided Advisor** (`OTODOR-LEAD-CAPTURE.md`): the conversion layer every CTA was routing toward with no destination. **`otodor-lead-form`** — reusable quote/consultation capture on native `{% form 'contact' %}` (no backend); editorial split (trust `reason` rail + form card), phone/email/`interest`/message, **hidden context-capture** fields (`contact[Source page]`/`[Product]`/`[Collection]`/`[Advisor result]` → each lead lands pre-attributed in the inbox), **WhatsApp dual-path**, OTODOR success/error, `?interest=/?product=/?msg=` prefill. **`otodor-advisor`** — deterministic client-side guided finder (**not an LLM**): `question` blocks (prompt + ≤4 options → collection + weight), scores answers, reveals the winning collection's hidden recommendation card (View range / Get a quote / WhatsApp), auto-hides with no questions; scoped `otodor-advisor.js` (per-instance, single choice-stack, Back/restart, a11y, reduced-motion) + `otodor-advisor-rec` snippet. **Wiring:** `page.contact.json` recomposed as the canonical lead desk (main → advisor → lead-form); digital-locks CTAs repointed to `/pages/contact#otodor-lead`. `shopify theme check` clean vs. baseline (5 errors / 18 warnings, none from this work). |
+| STEP 10 | **Homepage top rebuilt: banner slideshow + promo strip; the monolith hero moves down.** New **`otodor-banner`** — a minimal Apple/Tesla-register **16:9 slideshow**: crossfade, hairline progress indicators, swipe, arrow keys, autoplay that pauses on hover / focus / hidden tab / off-screen; per-slide image + optional mobile image + focal point + eyebrow / heading / one line + two pills + light-or-dark text + 5 copy placements; `assets/otodor-banner.css` + `assets/otodor-banner.js` (vanilla, **no GSAP**); auto-hides with no slides; first slide is the LCP (`eager` + `fetchpriority=high`), the rest lazy. New **`otodor-promo-strip`** — CSS-only infinite offer ribbon (default **left → right**), `message` blocks with optional discount-code pill + link, 3 colour schemes, pause on hover/focus, auto-hides when empty, reduced-motion → static row. **`otodor-hero` (pinned monolith scroll) now sits below both** and gave up its eager/high-priority product image (the banner owns the LCP); its pin/choreography is otherwise untouched — it still pins with `start: 'top top'` + `refreshPriority: 1`, which holds anywhere on the page. `theme check` clean vs. baseline. |
 
 **Desktop Mega Menu (UI milestone, `snippets/header-mega-menu.liquid` + `assets/otodor-mega-menu.css`):** enterprise-grade, editorial. Full-width panel = category columns (level-2 collections → level-3 links, icon/description from `custom.menu_icon`/`menu_description`) **+ a featured panel that updates to the hovered/focused category** (image from `custom.menu_image` → collection image → first product image; cross-fades via opacity/translateY/scale, ~200ms) **+ a full-width "Get a Custom Quote" CTA**. Data = Shopify Navigation + collection metafields (single source of truth; no parallel menu). Minimal scoped inline JS only swaps the active featured panel (no AJAX). Open/ESC/keyboard stay with Dawn's `<header-menu>`. Mobile drawer untouched. Merchant-editable: Navigation (structure), Collections (image/description/url), `custom.menu_*` (icon/description/image), header settings (`mega_featured_label`, `mega_cta_*`).
 
-**Homepage order** (`index.json`) unchanged: `otodor_hero → otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials → otodor_process → otodor_ecosystem → otodor_cta_banner`.
+**Homepage order** (`index.json`), STEP 10 onward: `otodor_vault_intro → otodor_promo_strip → otodor_banner →
+otodor_hero → otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why →
+otodor_testimonials → otodor_process → otodor_ecosystem → otodor_cta_banner`. The pinned monolith hero is no
+longer the first thing on the page — the banner slideshow is.
 
 **Product page** (`product.json`) current (STEP 4b orchestrator): `main-product → otodor-product-reveal → otodor-product-specs → otodor-product-compat → otodor-product-install → otodor-product-warranty → otodor-product-downloads → otodor-comparison → related-products → otodor-sticky-atc`. Every module auto-hides on no data.
 
@@ -100,6 +104,24 @@ recomposed as the lead desk; digital-locks CTAs repointed to `/pages/contact#oto
   mode + remove `main-product.liquid` `structured_data` + live Rich-Results verification (`OTODOR-SEO-EXPANSION.md` §1).
 - **Out of scope (native):** `sitemap.xml` is Shopify-generated (not a theme file); hreflang needs multi-locale routing.
 - **Verify live** (sandbox can't): Google Rich Results Test / Schema Markup Validator once the store is public.
+
+### ✅ Done — STEP 10 (Banner slideshow + promo strip)
+`otodor-banner` + `otodor-promo-strip` inserted above `otodor-hero` on `index.json`.
+- **Placeholder art (owner: user):** the three seeded slides reuse existing shop images
+  (`flagship1.png`, `leave.png`, `secure.png`) so the banner reads as finished in QA. **Replace with dedicated
+  16:9 campaign art (2400 × 1350 px or larger)** — that is the one thing standing between this and a Tesla-grade
+  first screen. Per-slide "Mobile image" exists for phone-specific crops.
+- **Offer copy:** the strip ships with *true* claims only (launch pricing, free installation, 3-yr warranty,
+  free survey) — **no invented discount code**. The merchant sets the real offer + code in the theme editor;
+  the code pill renders only when filled.
+- **Mobile ratio:** desktop is always 16:9. On phones a true 16:9 frame is ~210 px tall, too short for a heading
+  plus two actions, so the frame has a **300 px floor** (crops the image, never squeezes the copy). Taller mobile
+  ratios (4:3 / 1:1 / 4:5) are a section setting and never hit the floor.
+- **Verified headlessly** (the storefront still can't run in the sandbox): the real `otodor-banner.css/js` were
+  driven in a static harness — 16:9 frame confirmed (1.778), crossfade/aria/tabindex state correct, autoplay
+  advances and pauses when the tab is hidden, dots + wrap-around work, strip loop measured **left→right and
+  seamless** (track 2× viewport). Two layout bugs found and fixed there: bottom-centre copy colliding with the
+  indicators (desktop **and** mobile), and the mobile actions overflowing the frame.
 
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).

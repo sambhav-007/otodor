@@ -1,0 +1,349 @@
+{%- comment -%}
+  ─────────────────────────────────────────────────────────────────────────
+  OTODOR Promo Strip — infinite offer ribbon
+
+  Purpose      A thin, always-moving announcement ribbon that carries offer /
+               discount lines. Sits directly above the banner slideshow.
+  Inputs       `message` blocks (text, optional code pill, optional link).
+  Outputs      A seamless CSS-only marquee (no JS), direction + speed settable.
+  Dependencies assets/otodor-base.css (tokens only). No JS, no GSAP.
+  Reusable for Any template — homepage, collection, product (offer ribbons).
+  Merchant     Message text, discount code, link, direction, speed, colour
+               scheme, pause-on-hover — all section settings.
+  Required     None.
+  Optional     None (section settings only — no metafields).
+  Degrades     No blocks → section renders nothing. Reduced motion → static,
+               centred, wrapped row (clone hidden). No JS needed at any point.
+  ─────────────────────────────────────────────────────────────────────────
+{%- endcomment -%}
+
+{%- comment -%} Lifecycle guard — nothing to say, nothing to render. {%- endcomment -%}
+{%- assign has_message = false -%}
+{%- for block in section.blocks -%}
+  {%- if block.settings.text != blank -%}
+    {%- assign has_message = true -%}
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if has_message -%}
+
+{%- comment -%}
+  The track must be at least twice the viewport wide for the -50% loop to look
+  seamless. Few messages = repeat them more times inside each half.
+{%- endcomment -%}
+{%- assign message_count = section.blocks.size -%}
+{%- if message_count <= 1 -%}
+  {%- assign copies = 6 -%}
+{%- elsif message_count <= 3 -%}
+  {%- assign copies = 4 -%}
+{%- else -%}
+  {%- assign copies = 2 -%}
+{%- endif -%}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 6;
+  }
+
+  .otodor-strip-{{ section.id }} {
+    --strip-bg: #0B0B0B;
+    --strip-fg: rgba(255, 255, 255, 0.82);
+    --strip-accent: var(--otodor-blue, #4DA6FF);
+    --strip-rule: rgba(255, 255, 255, 0.09);
+  }
+
+  {%- case section.settings.color_scheme -%}
+    {%- when 'accent' -%}
+      .otodor-strip-{{ section.id }} {
+        --strip-bg: linear-gradient(90deg, #1A78D8 0%, #4DA6FF 50%, #1A78D8 100%);
+        --strip-fg: #FFFFFF;
+        --strip-accent: rgba(255, 255, 255, 0.95);
+        --strip-rule: rgba(255, 255, 255, 0.28);
+      }
+    {%- when 'light' -%}
+      .otodor-strip-{{ section.id }} {
+        --strip-bg: var(--otodor-bg-light, #F7F6F3);
+        --strip-fg: rgba(26, 26, 26, 0.78);
+        --strip-accent: var(--otodor-accent-on-light, #1A78D8);
+        --strip-rule: rgba(0, 0, 0, 0.10);
+      }
+  {%- endcase -%}
+
+  .otodor-strip {
+    position: relative;
+    background: var(--strip-bg);
+    border-block: 1px solid var(--strip-rule);
+    overflow: hidden;
+  }
+
+  .otodor-strip__viewport {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  }
+
+  .otodor-strip__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: otodor-strip-{{ section.id }} {{ section.settings.speed | default: 30 }}s linear infinite;
+  }
+
+  {%- if section.settings.pause_on_hover -%}
+  .otodor-strip:hover .otodor-strip__track,
+  .otodor-strip:focus-within .otodor-strip__track {
+    animation-play-state: paused;
+  }
+  {%- endif -%}
+
+  .otodor-strip__group {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .otodor-strip__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding-block: clamp(0.6rem, 1.1vw, 0.8rem);
+    padding-inline: clamp(1rem, 2vw, 1.6rem);
+    white-space: nowrap;
+  }
+
+  .otodor-strip__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .otodor-strip__link:hover .otodor-strip__text {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  .otodor-strip__link:focus-visible {
+    outline: 2px solid var(--strip-accent);
+    outline-offset: 3px;
+    border-radius: var(--otodor-radius-xs, 4px);
+  }
+
+  .otodor-strip__text {
+    font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
+    font-size: clamp(0.68rem, 1.05vw, 0.78rem);
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--strip-fg);
+  }
+
+  .otodor-strip__code {
+    font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
+    font-size: clamp(0.62rem, 1vw, 0.72rem);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--strip-accent);
+    border: 1px dashed var(--strip-accent);
+    border-radius: var(--otodor-radius-xs, 4px);
+    padding: 0.12rem 0.45rem;
+    opacity: 0.95;
+  }
+
+  .otodor-strip__sep {
+    flex: 0 0 auto;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--strip-accent);
+    opacity: 0.5;
+  }
+
+  @keyframes otodor-strip-{{ section.id }} {
+    {%- if section.settings.direction == 'ltr' -%}
+    from { transform: translate3d(-50%, 0, 0); }
+    to   { transform: translate3d(0, 0, 0); }
+    {%- else -%}
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+    {%- endif -%}
+  }
+
+  /* ─ Reduced motion — static, centred, single readable row ── */
+  @media (prefers-reduced-motion: reduce) {
+    .otodor-strip__viewport {
+      -webkit-mask-image: none;
+              mask-image: none;
+    }
+    .otodor-strip__track {
+      animation: none;
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .otodor-strip__group--clone {
+      display: none;
+    }
+    .otodor-strip__group {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .otodor-strip__item--dup,
+    .otodor-strip__sep--dup {
+      display: none;
+    }
+  }
+{%- endstyle -%}
+
+<section
+  class="otodor-strip otodor-strip-{{ section.id }}"
+  data-otodor-section="promo-strip"
+  aria-label="{{ section.settings.aria_label | default: 'Current offers' | escape }}"
+>
+  <div class="otodor-strip__viewport">
+    <div class="otodor-strip__track">
+
+      {%- comment -%} Two halves: the first is read by assistive tech, the clone is not. {%- endcomment -%}
+      {%- for half in (1..2) -%}
+        <ul
+          class="otodor-strip__group{% if half == 2 %} otodor-strip__group--clone{% endif %}"
+          {% if half == 2 %}aria-hidden="true"{% endif %}
+        >
+          {%- for copy in (1..copies) -%}
+            {%- for block in section.blocks -%}
+              {%- if block.settings.text == blank -%}{%- continue -%}{%- endif -%}
+              <li
+                class="otodor-strip__item{% unless copy == 1 %} otodor-strip__item--dup{% endunless %}"
+                {% if half == 1 and copy == 1 %}{{ block.shopify_attributes }}{% endif %}
+              >
+                {%- if block.settings.link != blank -%}
+                  <a
+                    class="otodor-strip__link"
+                    href="{{ block.settings.link }}"
+                    {% if half == 2 or copy > 1 %}tabindex="-1"{% endif %}
+                  >
+                    <span class="otodor-strip__text">{{ block.settings.text | escape }}</span>
+                    {%- if block.settings.code != blank -%}
+                      <span class="otodor-strip__code">{{ block.settings.code | escape }}</span>
+                    {%- endif -%}
+                  </a>
+                {%- else -%}
+                  <span class="otodor-strip__text">{{ block.settings.text | escape }}</span>
+                  {%- if block.settings.code != blank -%}
+                    <span class="otodor-strip__code">{{ block.settings.code | escape }}</span>
+                  {%- endif -%}
+                {%- endif -%}
+              </li>
+              <li class="otodor-strip__sep{% unless copy == 1 %} otodor-strip__sep--dup{% endunless %}" aria-hidden="true"></li>
+            {%- endfor -%}
+          {%- endfor -%}
+        </ul>
+      {%- endfor -%}
+
+    </div>
+  </div>
+</section>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Promo Strip",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "A thin, continuously moving offer ribbon. Hides itself when it has no messages."
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "default": "ltr",
+      "options": [
+        { "value": "ltr", "label": "Left to right" },
+        { "value": "rtl", "label": "Right to left" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Loop duration",
+      "info": "Seconds per full loop. Higher = slower / calmer.",
+      "min": 15,
+      "max": 90,
+      "step": 5,
+      "unit": "s",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "dark",
+      "options": [
+        { "value": "dark", "label": "Dark (near-black)" },
+        { "value": "accent", "label": "Accent (blue)" },
+        { "value": "light", "label": "Light (off-white)" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover / focus",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Accessibility label",
+      "default": "Current offers"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Message",
+          "default": "Flat 20% off on all smart locks"
+        },
+        {
+          "type": "text",
+          "id": "code",
+          "label": "Discount code",
+          "info": "Optional. Rendered as a dashed pill after the message."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Promo Strip",
+      "blocks": [
+        { "type": "message", "settings": { "text": "Flat 20% off on all smart locks", "code": "OTODOR20" } },
+        { "type": "message", "settings": { "text": "Free professional installation" } },
+        { "type": "message", "settings": { "text": "3-year lock warranty on every order" } },
+        { "type": "message", "settings": { "text": "No-cost EMI available" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

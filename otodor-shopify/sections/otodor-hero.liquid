@@ -93,7 +93,7 @@
             <div class="pillar-layer-front">
               <div class="face-gloss"></div>
               <div class="pillar-logo-container">
-                <img class="pillar-logo-icon" src="{{ 'LogoIcon.png' | file_img_url: '80x80' }}" alt="OTODOR Logo" loading="eager" fetchpriority="high" width="80" height="80">
+                <img class="pillar-logo-icon" src="{{ 'LogoIcon.png' | file_img_url: '80x80' }}" alt="OTODOR Logo" loading="eager" width="80" height="80">
               </div>
               <div class="pillar-seam pillar-seam--top"></div>
               <div class="pillar-seam pillar-seam--bottom"></div>
@@ -141,10 +141,14 @@
       <div class="otodor-hero__product-node product-node--1" data-product-id="digital-lock" data-3d-slot="product-1">
         <a href="{{ section.settings.p1_link | default: '#' }}" class="otodor-hero__product-card" id="otodor-hero-p1-card">
           <div class="product-card__visual">
+            {%- comment -%}
+              The banner slideshow above this section owns the LCP now, so the
+              hero's product art loads lazily like every other node below it.
+            {%- endcomment -%}
             {%- if section.settings.p1_image != blank -%}
-              {{ section.settings.p1_image | image_url: width: 400 | image_tag: loading: 'eager', fetchpriority: 'high', alt: section.settings.p1_title }}
+              {{ section.settings.p1_image | image_url: width: 400 | image_tag: loading: 'lazy', alt: section.settings.p1_title }}
             {%- else -%}
-              <img src="{{ 'zion_front_45.png' | file_img_url: '400x400' }}" loading="eager" fetchpriority="high" alt="{{ section.settings.p1_title | escape }}" class="product-visual-image" width="400" height="400">
+              <img src="{{ 'zion_front_45.png' | file_img_url: '400x400' }}" loading="lazy" alt="{{ section.settings.p1_title | escape }}" class="product-visual-image" width="400" height="400">
             {%- endif -%}
           </div>
           <div class="product-card__content">
