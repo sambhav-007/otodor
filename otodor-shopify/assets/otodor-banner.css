@@ -1,7 +1,10 @@
 /* ─────────────────────────────────────────────────────────
-   OTODOR Banner — minimal 16:9 slideshow hero
+   OTODOR Banner — minimal cinematic slideshow hero
    Apple / Tesla register: full-bleed image, one line of copy,
    two pill actions, hairline progress indicators. Nothing else.
+
+   Height comes from --banner-ratio (a section setting, 2.4:1 by
+   default) — the band is meant to read as a wide strip, not a screen.
 
    Motion is opacity + a slow transform only (composited).
    Reduced motion → first slide, static, indicators still navigate.
@@ -22,7 +25,7 @@
 .otodor-banner__viewport {
   position: relative;
   width: 100%;
-  aspect-ratio: var(--banner-ratio, 16 / 9);
+  aspect-ratio: var(--banner-ratio, 12 / 5);
   overflow: hidden;
   background-color: #0B0B0B;
 }
@@ -38,10 +41,11 @@
 
 @media screen and (max-width: 749px) {
   .otodor-banner__viewport {
-    aspect-ratio: var(--banner-ratio-mobile, var(--banner-ratio, 16 / 9));
-    /* A true 16:9 frame is ~210 px tall on a phone — too short to hold a
-       heading and two actions. The floor crops the image instead of
-       squeezing the copy; taller mobile ratios never reach it. */
+    aspect-ratio: var(--banner-ratio-mobile, var(--banner-ratio, 12 / 5));
+    /* A 16:9 frame is ~210 px tall on a phone — too short to hold a heading
+       and two actions, and the cinematic desktop ratios are shorter still.
+       The floor crops the image instead of squeezing the copy; taller mobile
+       ratios never reach it. */
     min-height: 300px;
   }
 }

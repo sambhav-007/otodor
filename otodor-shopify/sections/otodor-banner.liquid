@@ -1,14 +1,16 @@
 {%- comment -%}
   ─────────────────────────────────────────────────────────────────────────
-  OTODOR Banner — minimal 16:9 slideshow hero
+  OTODOR Banner — minimal cinematic slideshow hero
 
-  Purpose      The first thing on the page: a full-bleed 16:9 image slideshow
-               in the Apple / Tesla register — one image, one line, two pills.
-               It sits above the pinned monolith hero and carries the offer of
-               the moment; the hero still tells the product story below it.
+  Purpose      The first thing on the page: a full-bleed, deliberately short
+               image slideshow in the Apple / Tesla register — one image, one
+               line, two pills. It sits above the pinned monolith hero and
+               carries the offer of the moment; the hero tells the product
+               story below it.
   Inputs       `slide` blocks (image, optional mobile image, eyebrow, heading,
                text, two CTAs, placement, light/dark text) + section settings.
-  Outputs      Crossfading 16:9 banner with hairline progress indicators.
+  Outputs      Crossfading banner with hairline progress indicators. Desktop
+               ratio is a setting (2.4:1 default — wider = shorter band).
   Dependencies assets/otodor-banner.css, assets/otodor-banner.js (vanilla,
                no GSAP), assets/otodor-base.css tokens.
   Reusable for Any template — homepage, collection landing, campaign pages.
@@ -43,7 +45,7 @@
   }
 
   #shopify-section-{{ section.id }} .otodor-banner {
-    --banner-ratio: 16 / 9;
+    --banner-ratio: {{ section.settings.desktop_ratio | default: '12 / 5' }};
     --banner-ratio-mobile: {{ section.settings.mobile_ratio | default: '16 / 9' }};
     --banner-scrim: {{ scrim }};
     --banner-interval: {{ section.settings.interval | times: 1000 }}ms;
@@ -212,7 +214,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "A minimal full-bleed 16:9 slideshow. Upload 16:9 images (2400 × 1350 px or larger). Hides itself when it has no slides."
+      "content": "A minimal full-bleed banner slideshow. Upload art at the desktop ratio you pick below — 2880 × 1200 px for the default 2.4:1. Hides itself when it has no slides."
     },
     {
       "type": "header",
@@ -279,12 +281,25 @@
     },
     {
       "type": "select",
+      "id": "desktop_ratio",
+      "label": "Desktop aspect ratio",
+      "info": "Wider = shorter banner. 2.4:1 is the cinematic default (2880 × 1200 px art).",
+      "default": "12 / 5",
+      "options": [
+        { "value": "12 / 5", "label": "2.4:1 — cinematic (2880 × 1200)" },
+        { "value": "21 / 9", "label": "21:9 — ultrawide (2520 × 1080)" },
+        { "value": "2 / 1", "label": "2:1 (2880 × 1440)" },
+        { "value": "16 / 9", "label": "16:9 — tallest (2400 × 1350)" }
+      ]
+    },
+    {
+      "type": "select",
       "id": "mobile_ratio",
       "label": "Mobile aspect ratio",
-      "info": "Desktop is always 16:9. A taller mobile ratio crops the same image for phones.",
+      "info": "Phones crop the same art. The frame never goes below 300 px tall.",
       "default": "16 / 9",
       "options": [
-        { "value": "16 / 9", "label": "16:9 (same as desktop)" },
+        { "value": "16 / 9", "label": "16:9" },
         { "value": "4 / 3", "label": "4:3" },
         { "value": "1 / 1", "label": "1:1" },
         { "value": "4 / 5", "label": "4:5" }
@@ -323,14 +338,14 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Image (16:9)",
-          "info": "2400 × 1350 px or larger."
+          "label": "Image",
+          "info": "Match the section's desktop ratio — 2880 × 1200 px for the 2.4:1 default."
         },
         {
           "type": "image_picker",
           "id": "image_mobile",
           "label": "Mobile image",
-          "info": "Optional. Used below 750 px — otherwise the 16:9 image is cropped."
+          "info": "Optional. Used below 750 px — otherwise the desktop image is cropped."
         },
         {
           "type": "select",

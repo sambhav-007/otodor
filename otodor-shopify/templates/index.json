@@ -132,6 +132,7 @@
         "show_indicators": true,
         "drift": false,
         "width": "full",
+        "desktop_ratio": "12 / 5",
         "mobile_ratio": "16 / 9",
         "cap_height": true,
         "scrim": 25,
