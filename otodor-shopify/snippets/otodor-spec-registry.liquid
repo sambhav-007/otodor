@@ -12,6 +12,14 @@
                | 6 group | 7 default | 8 comparable(yes/no) | 9 filterable(yes/no)
              (Liquid has no parse_json — records are captured & split by consumers.)
 
+  Row order = table row order. Rows are emitted grouped (Access → Hardware →
+  Video & intercom → Fit → Power → Connectivity → Build → Support) because
+  consumers print a group header whenever column 6 changes.
+
+  Most access/hardware rows are type `yesno`, not `boolean`: real OTODOR values
+  are qualified ("Yes (up to 20)", "No, 4 AA batteries"), and `yesno` keeps the
+  tick/dash while showing the qualifier. `boolean` remains for true booleans.
+
   Sources:   1. built-in canonical set below (from OTODOR-DATA-MODEL.md §1.1)
              2. optional overlay: comparison_spec metaobjects
                 (shop.metaobjects['comparison_spec'].values) override built-ins
@@ -32,23 +40,27 @@
 
 {%- comment -%} 1. Built-in canonical registry (capture suppresses output into the var). {%- endcomment -%}
 {%- capture built_in -%}
-face_recognition|Face recognition|specs|face_recognition|boolean||Access||yes|yes;;;
-fingerprint|Fingerprint|specs|fingerprint|boolean||Access||yes|yes;;;
-cards|RFID card|specs|cards|boolean||Access||yes|no;;;
-pin_access|PIN code|specs|pin_access|boolean||Access||yes|no;;;
-app_control|App control|specs|app_control|boolean||Access||yes|no;;;
-auto_lock|Auto-lock|specs|auto_lock|boolean||Access||yes|no;;;
-audit_log|Audit log|specs|audit_log|boolean||Access||yes|no;;;
-deadbolt|Deadbolt|specs|deadbolt|boolean||Hardware||yes|no;;;
-motorised_latch|Motorised latch|specs|motorised_latch|boolean||Hardware||yes|no;;;
-bolts|Locking bolts|specs|bolts|number||Hardware||no|no;;;
-two_way_talk|Two-way talk|specs|two_way_talk|boolean||Video & intercom||yes|no;;;
-doorbell|Doorbell|specs|doorbell|boolean||Video & intercom||yes|no;;;
-inside_screen|Inside screen|specs|inside_screen|text||Video & intercom||yes|no;;;
-door_thickness|Door thickness|specs|door_thickness|range|mm|Fit||yes|yes;;;
-battery_backup|Battery backup|specs|battery_backup|number|months|Power||yes|no;;;
-battery|Battery|specs|battery|text||Power||no|no;;;
+face_recognition|Face recognition|specs|face_recognition|yesno||Access||yes|yes;;;
+fingerprint|Fingerprint|specs|fingerprint|yesno||Access||yes|yes;;;
+cards|RFID card|specs|cards|yesno||Access||yes|no;;;
+pin_access|PIN code|specs|pin_access|yesno||Access||yes|no;;;
+app_control|App control|specs|app_control|yesno||Access||yes|no;;;
+auto_lock|Auto-lock|specs|auto_lock|yesno||Access||yes|no;;;
+audit_log|Audit log|specs|audit_log|yesno||Access||yes|no;;;
+deadbolt|Deadbolt lock|specs|deadbolt|yesno||Hardware||yes|no;;;
+motorised_latch|Motorised latch|specs|motorised_latch|yesno||Hardware||yes|no;;;
+bolts|Locking bolts|specs|bolts|text||Hardware||yes|no;;;
+two_way_talk|Two-way talk|specs|two_way_talk|yesno||Video & intercom||yes|no;;;
+doorbell|Doorbell|specs|doorbell|yesno||Video & intercom||yes|no;;;
+inside_screen|Inside screen for video monitoring|specs|inside_screen|yesno||Video & intercom||yes|no;;;
+mini_screen|Mini screen for configuration|specs|mini_screen|yesno||Video & intercom||yes|no;;;
+door_thickness|Door thickness|specs|door_thickness|range||Fit||yes|yes;;;
+battery|Inbuilt battery|specs|battery|yesno||Power||yes|no;;;
+battery_backup|Battery backup|specs|battery_backup|text||Power||yes|no;;;
+backup_port|Emergency backup port|specs|backup_port|text||Power||yes|no;;;
 connectivity|Connectivity|specs|connectivity|text||Connectivity||no|yes;;;
+dimensions|Size|specs|dimensions|text||Build||yes|no;;;
+weight|Weight|specs|weight|number|kg|Build||yes|no;;;
 certification|Certification|specs|certification|badge||Build||no|no;;;
 finish|Finish|specs|finish|chip||Build||no|no;;;
 warranty|Warranty|specs|warranty|text||Support|3 years|yes|no;;;

@@ -2042,6 +2042,17 @@ body.otodor-light-page {
   color: var(--otodor-faint);
   font-weight: 500;
 }
+/* The qualifier that rides along with a yes/no mark ("up to 100",
+   "4 AA batteries"). Sits under the mark so a column still scans. */
+.otodor-spec__qual {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--otodor-font-body);
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: currentColor;
+  opacity: 0.6;
+}
 .otodor-spec__badge,
 .otodor-spec__chip {
   display: inline-block;

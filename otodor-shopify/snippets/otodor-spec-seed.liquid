@@ -1,0 +1,55 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Specification Seed lookup
+  Part of the Specification Rendering Engine — see OTODOR-SPEC-ENGINE.md.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:   Read ONE value out of a column's seed block — a plain
+             `spec_id = value` list a merchant can paste into the theme
+             editor before the product's specs.* metafields exist.
+
+  The seed is the LOWEST-priority source. Consumers pass the result as
+  `spec_default` to otodor-spec-value, so a real metafield always wins and
+  the seed silently retires as admin data lands. It is a bridge, not a
+  data model — never read it in place of a metafield.
+
+  Params:
+    seed  multiline text: one `spec_id = value` per line.
+          Blank lines and lines starting with `#` are ignored.
+    id    registry spec id to look up (e.g. `door_thickness`).
+
+  Echoes the matching value, or nothing.
+
+  Example seed:
+    # SENTRY
+    dimensions = 41.5 × 7 cm
+    face_recognition = Yes (up to 20)
+    door_thickness = 45–100 mm
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  if seed != blank and id != blank
+    assign want = id | strip | downcase
+    assign lines = seed | newline_to_br | split: '<br />'
+    for ln in lines
+      assign l = ln | strip
+      if l == blank
+        continue
+      endif
+      assign first_char = l | slice: 0
+      if first_char == '#'
+        continue
+      endif
+      assign parts = l | split: '='
+      if parts.size < 2
+        continue
+      endif
+      assign k = parts[0] | strip | downcase
+      if k == want
+        assign v = l | remove_first: parts[0] | remove_first: '=' | strip
+        echo v
+        break
+      endif
+    endfor
+  endif
+-%}

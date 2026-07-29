@@ -12,7 +12,7 @@
     namespace    metafield namespace  (e.g. 'specs')
     key          metafield key        (e.g. 'fingerprint')
     type         data type (selects renderer if `renderer` unset)
-    renderer     override renderer: boolean|range|text|number|badge|chip|
+    renderer     override renderer: boolean|yesno|range|text|number|badge|chip|
                  rating|link|document|image  (defaults to `type`)
     unit         appended/label used by some renderers
     spec_default value used when the metafield is empty
@@ -64,6 +64,63 @@
       {%- else -%}
         <span class="otodor-spec__dash" aria-label="No">—</span>
       {%- endif -%}
+
+    {%- comment -%}
+      `yesno` — a tick or a dash, plus the qualifier the value carries.
+      OTODOR spec sheets rarely say plain "Yes": they say "Yes (up to 100)" or
+      "No, 4 AA batteries (1 year backup)". Scanning a column still wants the
+      mark, so render both: mark from the leading Yes/No, qualifier from the
+      remainder (leading comma/space and wrapping parens stripped).
+      A value with no leading Yes/No is treated as a Yes with that qualifier.
+    {%- endcomment -%}
+    {%- when 'yesno' -%}
+      {%- liquid
+        assign vraw = val | append: '' | strip
+        assign vl = vraw | downcase
+        assign is_yes = true
+        assign qual = ''
+        if vl == 'no' or vl == 'false' or vl == '0' or vl == 'none' or vl == '—'
+          assign is_yes = false
+        elsif vl == 'yes' or vl == 'true' or vl == '1'
+          assign is_yes = true
+        else
+          # A leading Yes/No only counts when a separator follows it —
+          # otherwise "Nordic build" would read as a No.
+          assign head3 = vraw | slice: 0, 3 | downcase
+          assign head2 = vraw | slice: 0, 2 | downcase
+          assign sep2 = vraw | slice: 2, 1
+          assign sep3 = vraw | slice: 3, 1
+          if head2 == 'no' and ', (' contains sep2
+            assign is_yes = false
+            assign qual = vraw | slice: 2, 500
+          elsif head3 == 'yes' and ', (' contains sep3
+            assign is_yes = true
+            assign qual = vraw | slice: 3, 500
+          else
+            assign qual = vraw
+          endif
+        endif
+        # Trim the separator the value used ("No, 4 AA…" / "Yes (up to 20)")
+        # without touching commas inside the qualifier itself.
+        assign qual = qual | strip
+        if qual != blank
+          assign qfirst = qual | slice: 0
+          if qfirst == ','
+            assign qual = qual | slice: 1, 500 | strip
+            assign qfirst = qual | slice: 0
+          endif
+          assign qlast = qual | slice: -1
+          if qfirst == '(' and qlast == ')'
+            assign qual = qual | slice: 1, 500 | replace_last: ')', '' | strip
+          endif
+        endif
+      -%}
+      {%- if is_yes -%}
+        <span class="otodor-spec__check" role="img" aria-label="Yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></span>
+      {%- else -%}
+        <span class="otodor-spec__dash" aria-label="No">—</span>
+      {%- endif -%}
+      {%- if qual != blank -%}<span class="otodor-spec__qual">{{ qual | escape }}</span>{%- endif -%}
 
     {%- when 'range' or 'number' -%}
       {{ display | escape }}
