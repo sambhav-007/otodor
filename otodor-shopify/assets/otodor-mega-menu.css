@@ -58,6 +58,42 @@
   transform: translateY(0) scale(1);
 }
 
+/* "View all <category>" — the parent as a destination ------- */
+.otodor-mega__viewall {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: clamp(1.25rem, 2vw, 1.75rem);
+  font-family: var(--otodor-font-display, inherit);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: var(--otodor-tracking-wider, 0.08em);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(var(--color-foreground), 0.62);
+  transition: color 160ms ease;
+}
+.otodor-mega__viewall:hover {
+  color: var(--otodor-blue, #4da6ff);
+}
+.otodor-mega__viewall-arrow {
+  width: 14px;
+  height: 14px;
+  transition: transform 160ms ease;
+}
+.otodor-mega__viewall:hover .otodor-mega__viewall-arrow {
+  transform: translateX(3px);
+}
+
+/* …and its counterpart in the mobile drawer ----------------- */
+.otodor-drawer__viewall {
+  font-size: 0.82rem;
+  letter-spacing: var(--otodor-tracking-wide, 0.02em);
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.otodor-drawer__viewall:hover { opacity: 1; }
+
 /* Sub-category tile grid ----------------------------------- */
 .otodor-mega__grid {
   list-style: none;
@@ -191,4 +227,6 @@
   .otodor-mega__card:hover .otodor-mega__card-img { transform: none; }
   .otodor-mega__card-img { transition: none; }
   .otodor-mega__cta-button:hover { transform: none; }
+  .otodor-mega__viewall-arrow { transition: none; }
+  .otodor-mega__viewall:hover .otodor-mega__viewall-arrow { transform: none; }
 }

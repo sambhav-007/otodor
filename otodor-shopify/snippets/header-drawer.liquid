@@ -49,6 +49,19 @@
                             </span>
                             {{ link.title | escape }}
                           </button>
+                          {%- comment -%}
+                            OTODOR: a parent with children is a <summary>, so
+                            Dawn never offers the parent's own page. This makes
+                            the category itself reachable on touch, mirroring the
+                            desktop mega menu's "View all" link.
+                          {%- endcomment -%}
+                          <a
+                            href="{{ link.url }}"
+                            class="menu-drawer__menu-item link link--text list-menu__item focus-inset otodor-drawer__viewall"
+                          >
+                            {{ section.settings.mega_view_all_label | default: 'View all' | escape }}
+                            {{ link.title | escape }}
+                          </a>
                           <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
                             {%- for childlink in link.links -%}
                               <li>

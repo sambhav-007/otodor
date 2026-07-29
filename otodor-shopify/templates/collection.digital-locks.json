@@ -61,6 +61,7 @@
       },
       "block_order": ["wooden", "glass", "metal", "padlocks"],
       "settings": {
+        "source": "blocks",
         "eyebrow": "Find your fit",
         "heading": "Which type of lock",
         "heading_accent": "are you looking for?",

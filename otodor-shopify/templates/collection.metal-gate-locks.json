@@ -1,0 +1,96 @@
+/*
+ * ------------------------------------------------------------
+ * Metal Gate Locks — leaf instance of the OTODOR collection
+ * framework (OTODOR-COLLECTION-TEMPLATE.md). Configuration only.
+ * Assign this template to the `metal-gate-locks` collection.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "otodor-collection-hero",
+      "settings": {
+        "eyebrow": "Digital Locks · Metal Gate",
+        "fallback_line": "Weatherproof smart locks built for outer metal gates — sun, dust and monsoon rated, on narrow-stile frames.",
+        "show_count": true,
+        "moment_line": "The outermost door takes the weather.",
+        "moment_sub": "Sealed electronics and treated hardware, engineered for a gate that lives outdoors."
+      }
+    },
+    "product-grid": {
+      "type": "otodor-collection-grid",
+      "settings": {
+        "products_per_page": 12,
+        "show_sort": true,
+        "show_cta": true,
+        "cta_title": "Narrow stile or box section?",
+        "cta_sub": "Send us the frame width and we'll confirm which model mounts cleanly.",
+        "cta_button_label": "Talk to us"
+      }
+    },
+    "comparison": {
+      "type": "otodor-comparison",
+      "settings": {
+        "eyebrow": "Compare the range",
+        "heading": "Every metal-gate model, ",
+        "heading_accent": "side by side.",
+        "max_products": 5
+      }
+    },
+    "why": {
+      "type": "otodor-why",
+      "blocks": {
+        "weather": {
+          "type": "statement",
+          "settings": { "lead": "Weather-sealed.", "counter": "Not weather-resistant." }
+        },
+        "installed": {
+          "type": "statement",
+          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+        },
+        "warranty": {
+          "type": "statement",
+          "settings": { "lead": "3-year warranty.", "counter": "On every lock." }
+        }
+      },
+      "block_order": ["weather", "installed", "warranty"],
+      "settings": { "eyebrow": "Why OTODOR Metal Gate Locks" }
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Will it survive direct rain and sun?", "row_content": "<p>Gate models use sealed electronics and treated hardware for outdoor mounting. A small canopy or recessed mounting still extends service life, and the technician advises on placement during the survey.</p>" }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": { "heading": "My gate frame is very narrow — will it fit?", "row_content": "<p>Narrow-stile gates need a model sized for the frame rather than a door leaf. Send us the stile width and we'll confirm the model before you order.</p>" }
+        }
+      },
+      "block_order": ["q1", "q2"],
+      "settings": {
+        "heading": "Frequently asked questions",
+        "heading_alignment": "center",
+        "emit_faq_schema": true,
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Book a free gate",
+        "heading_accent": "survey.",
+        "description": "A certified OTODOR technician measures the stile, checks the swing and installs — usually in a single visit.",
+        "cta_primary_label": "Get a Custom Quote",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Talk to us",
+        "cta_secondary_link": "/pages/contact#otodor-lead"
+      }
+    }
+  },
+  "order": ["hero", "product-grid", "comparison", "why", "faq", "cta"]
+}

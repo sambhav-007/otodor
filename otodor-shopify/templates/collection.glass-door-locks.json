@@ -1,0 +1,96 @@
+/*
+ * ------------------------------------------------------------
+ * Glass Door Locks — leaf instance of the OTODOR collection
+ * framework (OTODOR-COLLECTION-TEMPLATE.md). Configuration only.
+ * Assign this template to the `glass-door-locks` collection.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "otodor-collection-hero",
+      "settings": {
+        "eyebrow": "Digital Locks · Glass Door",
+        "fallback_line": "Frameless-friendly smart locks for glass office and home doors — no drilling through the pane, no compromise on access control.",
+        "show_count": true,
+        "moment_line": "Glass shouldn't mean a visible lock.",
+        "moment_sub": "Slim patch-fitting hardware that reads as part of the door, not bolted onto it."
+      }
+    },
+    "product-grid": {
+      "type": "otodor-collection-grid",
+      "settings": {
+        "products_per_page": 12,
+        "show_sort": true,
+        "show_cta": true,
+        "cta_title": "Framed or frameless glass?",
+        "cta_sub": "Send us a photo of the door edge and we'll confirm the right fitting.",
+        "cta_button_label": "Talk to us"
+      }
+    },
+    "comparison": {
+      "type": "otodor-comparison",
+      "settings": {
+        "eyebrow": "Compare the range",
+        "heading": "Every glass-door model, ",
+        "heading_accent": "side by side.",
+        "max_products": 5
+      }
+    },
+    "why": {
+      "type": "otodor-why",
+      "blocks": {
+        "fit": {
+          "type": "statement",
+          "settings": { "lead": "Surveyed first.", "counter": "Then fitted." }
+        },
+        "installed": {
+          "type": "statement",
+          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+        },
+        "warranty": {
+          "type": "statement",
+          "settings": { "lead": "3-year warranty.", "counter": "On every lock." }
+        }
+      },
+      "block_order": ["fit", "installed", "warranty"],
+      "settings": { "eyebrow": "Why OTODOR Glass Door Locks" }
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Does the glass need to be cut or drilled?", "row_content": "<p>Toughened glass cannot be cut after manufacture. Frameless doors normally need a factory cut-out; where none exists we fit a patch-fitting model that clamps the door edge. The survey establishes which applies before you buy.</p>" }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Will it work on a framed glass door?", "row_content": "<p>Yes — a framed glass door is fitted like a standard door, using the frame profile. Send us the profile width and we'll confirm the model.</p>" }
+        }
+      },
+      "block_order": ["q1", "q2"],
+      "settings": {
+        "heading": "Frequently asked questions",
+        "heading_alignment": "center",
+        "emit_faq_schema": true,
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Book a free glass-door",
+        "heading_accent": "survey.",
+        "description": "Glass fittings are unforgiving of guesswork. A certified OTODOR technician measures first, then installs.",
+        "cta_primary_label": "Get a Custom Quote",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Talk to us",
+        "cta_secondary_link": "/pages/contact#otodor-lead"
+      }
+    }
+  },
+  "order": ["hero", "product-grid", "comparison", "why", "faq", "cta"]
+}

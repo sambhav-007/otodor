@@ -7,11 +7,13 @@
                       of category cards that link to collections. Used as the
                       Digital Locks door-type selector (Wooden / Glass / Metal
                       / Padlocks) and for any other category set.
-  Inputs:             `category` blocks (one per card). Each references a
-                      Collection and may override any field.
+  Inputs:             `category` blocks, OR — with no blocks — the category's
+                      own sub-categories, discovered from Shopify Navigation or
+                      from child collections. See CARD SOURCES below.
   Outputs:            Accessible links to collections (or custom URLs), plus an
                       optional "custom / ask an expert" CTA card.
-  Dependencies:       snippets/otodor-icon.liquid; otodor-base.css design tokens.
+  Dependencies:       snippets/otodor-category-card.liquid (the override chain),
+                      snippets/otodor-icon.liquid; otodor-base.css design tokens.
                       No JS. No metaobjects. No external assets.
   Supported sources:  Collection (title, url, image, description) +
                       collection metafields custom.menu_image / menu_description
@@ -21,26 +23,101 @@
   Merchant editable:  YES — everything via theme-editor settings + blocks.
   Required metafields: none.
   Optional metafields: collection custom.menu_image, custom.menu_description,
-                       custom.menu_icon.
+                       custom.menu_icon, custom.parent_collection.
 
-  Per-field OVERRIDE PRIORITY (first non-blank wins) → FALLBACK:
-    title       block.title        → collection.title            → (card skipped)
-    url         block.custom_url   → collection.url              → /collections/all
-    image       block.image        → collection.metafields.custom.menu_image
-                                    → collection.image
-                                    → collection.featured_image
-                                    → first product image        → gradient placeholder
-    description block.description   → collection.metafields.custom.menu_description
-                                    → collection.description      → (omitted)
-    icon        block.icon         → collection.metafields.custom.menu_icon
-                                    → (omitted)
-    badge       block.badge        → (omitted)
+  CARD SOURCES (setting `source`, default `auto` = try each in turn):
+    1. blocks     `category` blocks — the merchant names the cards explicitly.
+    2. menu       Shopify Navigation (setting `menu`, default Main menu). Finds
+                  the link pointing at the CURRENT collection and renders its
+                  child links as cards. Navigation stays the one source of
+                  truth — the same data the mega menu draws (no parallel menu).
+                  Off a collection page it renders the menu's top level.
+    3. children   Collections whose `custom.parent_collection` is the current
+                  collection. Native fallback when the menu isn't built yet.
+    → none of the above resolve: the section renders NOTHING.
+
+  Per-field override → fallback is implemented once, in otodor-category-card:
+    title / url / image / description / icon — block override wins, then the
+    linked collection's metafields, then its own fields, then omitted.
   ════════════════════════════════════════════════════════════════════════
 {%- endcomment -%}
 
 {%- liquid
   assign scheme = section.settings.color_scheme | default: 'light'
   assign cols = section.settings.columns_desktop | default: 4
+  assign source = section.settings.source | default: 'auto'
+
+  # ── Card Source Resolver ────────────────────────────────────────────────
+  # Each branch sets `resolved` to the source it will actually render with.
+  assign resolved = ''
+  assign cat_blocks = section.blocks | where: 'type', 'category'
+
+  if source == 'blocks' or source == 'auto'
+    if cat_blocks.size > 0
+      assign resolved = 'blocks'
+    endif
+  endif
+
+  # 2. Navigation — the link whose collection IS this page, then its children.
+  assign nav_children = ''
+  if resolved == blank and source != 'blocks' and source != 'children'
+    assign nav_menu = section.settings.menu
+    if nav_menu != blank
+      if collection != blank and collection != empty
+        for l in nav_menu.links
+          if l.links != blank
+            if l.type == 'collection_link' and l.object.handle == collection.handle
+              assign nav_children = l.links
+              break
+            endif
+            if l.url == collection.url
+              assign nav_children = l.links
+              break
+            endif
+            # one level deeper: a sub-category that itself has children
+            for l2 in l.links
+              if l2.links != blank
+                if l2.type == 'collection_link' and l2.object.handle == collection.handle
+                  assign nav_children = l2.links
+                  break
+                endif
+                if l2.url == collection.url
+                  assign nav_children = l2.links
+                  break
+                endif
+              endif
+            endfor
+            if nav_children != blank
+              break
+            endif
+          endif
+        endfor
+      else
+        # No collection context (homepage, page): show the menu's top level.
+        assign nav_children = nav_menu.links
+      endif
+    endif
+    if nav_children != blank
+      assign resolved = 'menu'
+    endif
+  endif
+
+  # 3. Child collections — custom.parent_collection points back at this page.
+  assign child_handles = ''
+  if resolved == blank and source != 'blocks' and source != 'menu'
+    if collection != blank and collection != empty
+      for c in collections limit: 50
+        assign parent = c.metafields.custom.parent_collection.value
+        if parent != blank and parent.handle == collection.handle
+          assign child_handles = child_handles | append: ',' | append: c.handle
+        endif
+      endfor
+      assign child_handles = child_handles | remove_first: ','
+    endif
+    if child_handles != blank
+      assign resolved = 'children'
+    endif
+  endif
 -%}
 
 {%- style -%}
@@ -175,8 +252,8 @@
   }
 {%- endstyle -%}
 
-{%- comment -%} Section lifecycle: auto-hide when no category blocks exist. {%- endcomment -%}
-{%- if section.blocks.size > 0 -%}
+{%- comment -%} Section lifecycle: auto-hide when no source resolves any card. {%- endcomment -%}
+{%- if resolved != blank -%}
 <section
   id="otodor-cat-selector-{{ section.id }}"
   class="otodor-cats otodor-cats--{{ scheme }}"
@@ -201,68 +278,57 @@
     {%- endif -%}
 
     <ul class="otodor-cats__grid" role="list">
-      {%- for block in section.blocks -%}
-        {%- liquid
-          assign col = block.settings.collection
+      {%- comment -%}
+        One card implementation (otodor-category-card), three ways of arriving
+        at it. Only the resolved source renders — sources never stack.
+      {%- endcomment -%}
+      {%- case resolved -%}
+        {%- when 'blocks' -%}
+          {%- for block in cat_blocks -%}
+            {%- render 'otodor-category-card',
+              col: block.settings.collection,
+              title: block.settings.title,
+              url: block.settings.custom_url,
+              image: block.settings.image,
+              description: block.settings.description,
+              icon: block.settings.icon,
+              badge: block.settings.badge,
+              link_label: section.settings.card_link_label,
+              show_icons: section.settings.show_icons,
+              show_descriptions: section.settings.show_descriptions,
+              attrs: block.shopify_attributes
+            -%}
+          {%- endfor -%}
 
-          # title
-          assign card_title = block.settings.title | default: col.title
+        {%- when 'menu' -%}
+          {%- for childlink in nav_children -%}
+            {%- liquid
+              assign nav_col = nil
+              if childlink.type == 'collection_link'
+                assign nav_col = childlink.object
+              endif
+            -%}
+            {%- render 'otodor-category-card',
+              col: nav_col,
+              title: childlink.title,
+              url: childlink.url,
+              link_label: section.settings.card_link_label,
+              show_icons: section.settings.show_icons,
+              show_descriptions: section.settings.show_descriptions
+            -%}
+          {%- endfor -%}
 
-          # url
-          assign card_url = block.settings.custom_url
-          if card_url == blank and col != blank
-            assign card_url = col.url
-          endif
-          if card_url == blank
-            assign card_url = routes.all_products_collection_url
-          endif
-
-          # image
-          assign card_image = block.settings.image
-          if card_image == blank and col != blank
-            assign card_image = col.metafields.custom.menu_image.value | default: col.image
-            if card_image == blank and col.products.first != blank
-              assign card_image = col.products.first.featured_image
-            endif
-          endif
-
-          # description
-          assign card_desc = block.settings.description
-          if card_desc == blank and col != blank
-            assign card_desc = col.metafields.custom.menu_description.value | default: col.description
-          endif
-
-          # icon
-          assign card_icon = block.settings.icon
-          if card_icon == blank and col != blank
-            assign card_icon = col.metafields.custom.menu_icon.value
-          endif
-        -%}
-        {%- if card_title != blank -%}
-          <li {{ block.shopify_attributes }}>
-            <a class="otodor-cats__card" href="{{ card_url }}" data-otodor-reveal="fade-up">
-              <span class="otodor-cats__media">
-                {%- if card_image != blank -%}
-                  {{ card_image | image_url: width: 720 | image_tag: loading: 'lazy', widths: '360,540,720', sizes: '(max-width: 560px) 100vw, 25vw', alt: '' }}
-                {%- endif -%}
-                {%- if block.settings.badge != blank -%}<span class="otodor-cats__badge">{{ block.settings.badge | escape }}</span>{%- endif -%}
-              </span>
-              <span class="otodor-cats__body">
-                <span class="otodor-cats__card-top">
-                  {%- if card_icon != blank and section.settings.show_icons -%}
-                    <span class="otodor-cats__icon">{% render 'otodor-icon', name: card_icon %}</span>
-                  {%- endif -%}
-                  <span class="otodor-cats__name">{{ card_title | escape }}</span>
-                </span>
-                {%- if card_desc != blank and section.settings.show_descriptions -%}
-                  <span class="otodor-cats__desc">{{ card_desc | strip_html | truncatewords: 14 }}</span>
-                {%- endif -%}
-                <span class="otodor-cats__go">{{ section.settings.card_link_label | default: 'Explore' | escape }}{% render 'otodor-icon', name: 'arrow-right' %}</span>
-              </span>
-            </a>
-          </li>
-        {%- endif -%}
-      {%- endfor -%}
+        {%- when 'children' -%}
+          {%- assign child_list = child_handles | split: ',' -%}
+          {%- for h in child_list -%}
+            {%- render 'otodor-category-card',
+              col: collections[h],
+              link_label: section.settings.card_link_label,
+              show_icons: section.settings.show_icons,
+              show_descriptions: section.settings.show_descriptions
+            -%}
+          {%- endfor -%}
+      {%- endcase -%}
 
       {%- if section.settings.show_cta -%}
         {%- assign cta_url = section.settings.cta_link | default: routes.root_url -%}
@@ -287,7 +353,20 @@
   "tag": "section",
   "class": "shopify-section otodor-section",
   "settings": [
-    { "type": "paragraph", "content": "A generic, collection-driven category chooser. Add a block per category and pick a collection — title, image and description are pulled automatically. No metaobjects required." },
+    { "type": "paragraph", "content": "A generic, collection-driven category chooser. Add a block per category and pick a collection — title, image and description are pulled automatically. With no blocks it finds the current collection's sub-categories from your Navigation, then from child collections, and hides if neither exists. No metaobjects required." },
+    { "type": "header", "content": "Cards come from" },
+    {
+      "type": "select", "id": "source", "label": "Source", "default": "auto",
+      "info": "Auto tries each in turn: category blocks → Navigation → child collections → hide.",
+      "options": [
+        { "value": "auto", "label": "Auto (blocks → navigation → child collections)" },
+        { "value": "blocks", "label": "Category blocks only" },
+        { "value": "menu", "label": "Navigation only" },
+        { "value": "children", "label": "Child collections only" }
+      ]
+    },
+    { "type": "link_list", "id": "menu", "label": "Navigation menu", "default": "main-menu", "info": "The section finds the link pointing at this collection and renders its child links as cards — the same data as the mega menu." },
+    { "type": "header", "content": "Content" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Find your fit" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Which type of lock" },
     { "type": "text", "id": "heading_accent", "label": "Heading accent (coloured)", "default": "are you looking for?" },
@@ -339,6 +418,7 @@
   "presets": [
     {
       "name": "OTODOR Category Selector",
+      "settings": { "source": "blocks" },
       "blocks": [
         { "type": "category", "settings": { "title": "Wooden Door", "description": "Smart locks engineered for wooden main and internal doors.", "icon": "fingerprint" } },
         { "type": "category", "settings": { "title": "Glass Door", "description": "Frameless-friendly locks for glass office and home doors.", "icon": "key" } },

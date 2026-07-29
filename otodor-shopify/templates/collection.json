@@ -3,6 +3,9 @@
  * OTODOR generic collection framework (category-agnostic).
  * Inherited by every collection. Empty slots (selector/features/
  * why) auto-hide, so a plain collection degrades to hero -> grid.
+ * The selector runs in `auto` mode: any parent collection shows its
+ * sub-categories straight from Navigation (or from child collections
+ * via custom.parent_collection) with no per-collection template.
  * Category landings (e.g. collection.digital-locks.json) reuse this
  * same composition with data — see OTODOR-COLLECTION-TEMPLATE.md.
  * The theme editor / Shopify admin may rewrite this file.
@@ -23,6 +26,8 @@
     "selector": {
       "type": "otodor-category-selector",
       "settings": {
+        "source": "auto",
+        "menu": "main-menu",
         "eyebrow": "Find your fit",
         "heading": "Choose your",
         "heading_accent": "category.",

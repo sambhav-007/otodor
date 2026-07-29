@@ -1,0 +1,104 @@
+/*
+ * ------------------------------------------------------------
+ * Wooden Door Locks — leaf instance of the OTODOR collection
+ * framework (OTODOR-COLLECTION-TEMPLATE.md). Configuration only,
+ * no forked section code. A leaf carries no category selector:
+ * it has no sub-categories of its own.
+ * The comparison resolves products from THIS collection, so it
+ * fills out as wooden-door models and their specs.* land.
+ * Assign this template to the `wooden-door-locks` collection.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "otodor-collection-hero",
+      "settings": {
+        "eyebrow": "Digital Locks · Wooden Door",
+        "fallback_line": "Reinforced smart locks engineered for wooden main and internal doors — face, fingerprint, card, PIN and app access on a 45–100 mm door.",
+        "show_count": true,
+        "moment_line": "Your main door does the most work.",
+        "moment_sub": "So it gets the deepest bolt throw, the widest access set and the strongest motor in the range."
+      }
+    },
+    "product-grid": {
+      "type": "otodor-collection-grid",
+      "settings": {
+        "products_per_page": 12,
+        "show_sort": true,
+        "show_cta": true,
+        "cta_title": "Not sure which model fits your door?",
+        "cta_sub": "Send us the door thickness and we'll confirm fit before installation.",
+        "cta_button_label": "Talk to us"
+      }
+    },
+    "comparison": {
+      "type": "otodor-comparison",
+      "settings": {
+        "eyebrow": "Compare the range",
+        "heading": "Every wooden-door model, ",
+        "heading_accent": "side by side.",
+        "max_products": 5
+      }
+    },
+    "why": {
+      "type": "otodor-why",
+      "blocks": {
+        "german": {
+          "type": "statement",
+          "settings": { "lead": "German-engineered.", "counter": "Built for Indian conditions." }
+        },
+        "installed": {
+          "type": "statement",
+          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+        },
+        "warranty": {
+          "type": "statement",
+          "settings": { "lead": "3-year warranty.", "counter": "On every lock." }
+        }
+      },
+      "block_order": ["german", "installed", "warranty"],
+      "settings": { "eyebrow": "Why OTODOR Wooden Door Locks" }
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": { "heading": "What door thickness do these locks fit?", "row_content": "<p>Most OTODOR wooden-door models fit 45–100 mm; the compact models fit 30–80 mm. The exact range is listed on every product page and confirmed during the free compatibility check.</p>" }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Is there an installation clearance requirement?", "row_content": "<p>Yes — keep a minimum 85 mm (3.35&quot;) gap between the safety door and the main door so the lock never contacts the safety door.</p>" }
+        },
+        "q3": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Will installation damage my door?", "row_content": "<p>A certified OTODOR technician cuts to template and finishes the mortise. On a standard wooden door the lock body sits entirely inside the leaf, with no visible modification beyond the lock face.</p>" }
+        }
+      },
+      "block_order": ["q1", "q2", "q3"],
+      "settings": {
+        "heading": "Frequently asked questions",
+        "heading_alignment": "center",
+        "emit_faq_schema": true,
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Book a free door",
+        "heading_accent": "survey.",
+        "description": "A certified OTODOR technician measures your door, confirms the model and installs it — usually in a single visit.",
+        "cta_primary_label": "Get a Custom Quote",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Talk to us",
+        "cta_secondary_link": "/pages/contact#otodor-lead"
+      }
+    }
+  },
+  "order": ["hero", "product-grid", "comparison", "why", "faq", "cta"]
+}

@@ -17,6 +17,17 @@
   plus a tiny scoped script that opens the panel on hover (Dawn opens on click
   only) and closes it after a short delay. Mobile uses Dawn's drawer — untouched.
 
+  PARENTS ARE DESTINATIONS. A top-level item with children is a <summary>, so
+  Dawn never navigates to the parent's own URL (e.g. "Digital Locks" only
+  toggled the panel). Two additive fixes, no markup rewrite:
+    • a "View all <title>" link is the first thing inside the panel — the
+      accessible, always-available path (mouse, touch, keyboard, no JS);
+    • on hover-capable desktop only, a CLICK on the summary follows the
+      parent's URL (the panel is already open from hover, so the click has no
+      other job). Keyboard Enter/Space still toggles the disclosure, so the
+      panel remains reachable without a pointer. The URL travels on
+      data-otodor-link — no Liquid inside <script>.
+
   Usage: {% render 'header-mega-menu' %}
 {% endcomment %}
 
@@ -30,6 +41,7 @@
               <summary
                 id="HeaderMenu-{{ link.handle }}"
                 class="header__menu-item list-menu__item link focus-inset"
+                data-otodor-link="{{ link.url }}"
               >
                 <span {%- if link.child_active %} class="header__active-menu-item"{% endif %}>
                   {{- link.title | escape -}}
@@ -42,6 +54,17 @@
                 tabindex="-1"
               >
                 <div class="otodor-mega page-width" data-otodor-mega>
+                  {%- comment -%}
+                    The parent as a destination. Present for every input method,
+                    which is why the desktop click-through below is a bonus and
+                    never the only way in.
+                  {%- endcomment -%}
+                  {%- assign view_all = section.settings.mega_view_all_label | default: 'View all' -%}
+                  <a href="{{ link.url }}" class="otodor-mega__viewall">
+                    {{- view_all | escape }} {{ link.title | escape -}}
+                    {% render 'otodor-icon', name: 'arrow-right', class: 'otodor-mega__viewall-arrow' %}
+                  </a>
+
                   {%- comment -%} Sub-category tiles: small portrait image + title. {%- endcomment -%}
                   <ul class="otodor-mega__grid" role="list">
                     {%- for childlink in link.links -%}
@@ -151,6 +174,23 @@
           if (summary) summary.setAttribute('aria-expanded', 'false');
         }, 200);
       };
+      // Parent as destination: on hover-capable desktop the panel is already
+      // open, so a pointer click on the summary follows the parent's own URL
+      // instead of collapsing the panel. Pointer only — keyboard activation
+      // reports detail 0 and is left to Dawn's disclosure. Modified clicks
+      // (new tab/window) and the middle button are passed through.
+      if (summary) {
+        summary.addEventListener('click', function (e) {
+          if (!desktop.matches) return;
+          if (e.detail === 0) return;
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          var href = summary.dataset.otodorLink;
+          if (!href) return;
+          e.preventDefault();
+          window.location.href = href;
+        });
+      }
+
       menu.addEventListener('mouseenter', open);
       menu.addEventListener('mouseleave', scheduleClose);
       menu.addEventListener('focusin', function () { clearTimeout(timer); });

@@ -1,0 +1,87 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Category Card
+  The single implementation of the category-card override → fallback chain.
+  Extracted from otodor-category-selector so every source (blocks, navigation,
+  child collections) resolves identically — one card, one set of rules.
+  ────────────────────────────────────────────────────────────────────────
+  Params:
+    col           collection object (optional — everything falls back without it)
+    title         title override
+    url           url override
+    image         image override
+    description   description override
+    icon          icon name override (snippets/otodor-icon)
+    badge         optional corner badge
+    link_label    card CTA label (default "Explore")
+    show_icons    bool
+    show_descriptions bool
+    attrs         raw shopify_attributes string (theme-editor block targeting)
+
+  Per-field OVERRIDE PRIORITY (first non-blank wins) → FALLBACK:
+    title       param       → col.title                        → (card skipped)
+    url         param       → col.url                          → all products
+    image       param       → col.metafields.custom.menu_image  → col.image
+                            → col.featured_image → first product image → gradient
+    description param       → col.metafields.custom.menu_description
+                            → col.description                  → (omitted)
+    icon        param       → col.metafields.custom.menu_icon   → (omitted)
+
+  Renders nothing when no title can be resolved.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign card_title = title | default: col.title
+
+  assign card_url = url
+  if card_url == blank and col != blank
+    assign card_url = col.url
+  endif
+  if card_url == blank
+    assign card_url = routes.all_products_collection_url
+  endif
+
+  assign card_image = image
+  if card_image == blank and col != blank
+    assign card_image = col.metafields.custom.menu_image.value | default: col.image
+    if card_image == blank and col.products.first != blank
+      assign card_image = col.products.first.featured_image
+    endif
+  endif
+
+  assign card_desc = description
+  if card_desc == blank and col != blank
+    assign card_desc = col.metafields.custom.menu_description.value | default: col.description
+  endif
+
+  assign card_icon = icon
+  if card_icon == blank and col != blank
+    assign card_icon = col.metafields.custom.menu_icon.value
+  endif
+-%}
+
+{%- if card_title != blank -%}
+  <li {{ attrs }}>
+    <a class="otodor-cats__card" href="{{ card_url }}" data-otodor-reveal="fade-up">
+      <span class="otodor-cats__media">
+        {%- if card_image != blank -%}
+          {{ card_image | image_url: width: 720 | image_tag: loading: 'lazy', widths: '360,540,720', sizes: '(max-width: 560px) 100vw, 25vw', alt: '' }}
+        {%- endif -%}
+        {%- if badge != blank -%}<span class="otodor-cats__badge">{{ badge | escape }}</span>{%- endif -%}
+      </span>
+      <span class="otodor-cats__body">
+        <span class="otodor-cats__card-top">
+          {%- if card_icon != blank and show_icons -%}
+            <span class="otodor-cats__icon">{% render 'otodor-icon', name: card_icon %}</span>
+          {%- endif -%}
+          <span class="otodor-cats__name">{{ card_title | escape }}</span>
+        </span>
+        {%- if card_desc != blank and show_descriptions -%}
+          <span class="otodor-cats__desc">{{ card_desc | strip_html | truncatewords: 14 }}</span>
+        {%- endif -%}
+        <span class="otodor-cats__go">{{ link_label | default: 'Explore' | escape }}{% render 'otodor-icon', name: 'arrow-right' %}</span>
+      </span>
+    </a>
+  </li>
+{%- endif -%}

@@ -1,0 +1,105 @@
+/*
+ * ------------------------------------------------------------
+ * Smart Padlocks — leaf instance of the OTODOR collection
+ * framework (OTODOR-COLLECTION-TEMPLATE.md). Configuration only.
+ *
+ * NOTE: a padlock is not fitted to a door, so this instance
+ * deliberately carries NO installation, door-clearance or door-
+ * compatibility content — the same relevance rule the product
+ * modules enforce via `except_collections: smart-padlocks`.
+ * Assign this template to the `smart-padlocks` collection.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "otodor-collection-hero",
+      "settings": {
+        "eyebrow": "Digital Locks · Smart Padlocks",
+        "fallback_line": "Portable biometric padlocks — fingerprint access for shutters, lockers, luggage and storage. No wiring, no fitting, no keys to lose.",
+        "show_count": true,
+        "moment_line": "Not everything worth locking is a door.",
+        "moment_sub": "Shackle in, thumb on, open. Nothing to install and nothing to remember."
+      }
+    },
+    "product-grid": {
+      "type": "otodor-collection-grid",
+      "settings": {
+        "products_per_page": 12,
+        "show_sort": true,
+        "show_cta": true,
+        "cta_title": "Which shackle size do you need?",
+        "cta_sub": "Tell us what you're locking and we'll point you at the right model.",
+        "cta_button_label": "Talk to us"
+      }
+    },
+    "comparison": {
+      "type": "otodor-comparison",
+      "settings": {
+        "eyebrow": "Compare the range",
+        "heading": "Every padlock, ",
+        "heading_accent": "side by side.",
+        "max_products": 5
+      }
+    },
+    "why": {
+      "type": "otodor-why",
+      "blocks": {
+        "noinstall": {
+          "type": "statement",
+          "settings": { "lead": "No installation.", "counter": "Charge it and go." }
+        },
+        "keyless": {
+          "type": "statement",
+          "settings": { "lead": "No keys.", "counter": "Nothing to lose." }
+        },
+        "warranty": {
+          "type": "statement",
+          "settings": { "lead": "3-year warranty.", "counter": "On every lock." }
+        }
+      },
+      "block_order": ["noinstall", "keyless", "warranty"],
+      "settings": { "eyebrow": "Why OTODOR Smart Padlocks" }
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Do padlocks need installation?", "row_content": "<p>No. A smart padlock ships charged and ready — enrol a fingerprint and it works. There is no fitting visit and no clearance requirement.</p>" }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": { "heading": "What happens if the battery runs out?", "row_content": "<p>Charge it over the emergency backup port with any power bank; the lock opens as soon as it has power. Fingerprints stay enrolled through a full discharge.</p>" }
+        },
+        "q3": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Can it be used outdoors?", "row_content": "<p>Yes, for shutters and gates in sheltered positions. Check each model's weather rating on its product page — prolonged direct rain shortens service life.</p>" }
+        }
+      },
+      "block_order": ["q1", "q2", "q3"],
+      "settings": {
+        "heading": "Frequently asked questions",
+        "heading_alignment": "center",
+        "emit_faq_schema": true,
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Need a few for the",
+        "heading_accent": "whole site?",
+        "description": "Bulk fingerprint padlocks for shutters, warehouses and staff lockers — with a single point of contact for support.",
+        "cta_primary_label": "Get a Custom Quote",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Talk to us",
+        "cta_secondary_link": "/pages/contact#otodor-lead"
+      }
+    }
+  },
+  "order": ["hero", "product-grid", "comparison", "why", "faq", "cta"]
+}
