@@ -146,6 +146,10 @@
   }
   .otodor-cats--light .otodor-cats__eyebrow { color: var(--otodor-accent-on-light); }
   .otodor-cats--dark  .otodor-cats__eyebrow { color: var(--cats-accent); }
+  /* The colour MUST be declared here, not inherited from the section:
+     Dawn's `h1,h2,…` rule sets `color: rgb(var(--color-foreground))`
+     directly on the element, and a declared value always beats an
+     inherited one — which printed this heading white on the light band. */
   #otodor-cat-selector-{{ section.id }} .otodor-cats__title {
     font-family: var(--otodor-font-display);
     font-size: clamp(1.9rem, 4.5vw, 3rem);
@@ -153,7 +157,10 @@
     line-height: 1.05;
     letter-spacing: var(--otodor-tracking-tight);
     margin: 0;
+    color: inherit;
   }
+  #otodor-cat-selector-{{ section.id }}.otodor-cats--light .otodor-cats__title { color: var(--otodor-ink); }
+  #otodor-cat-selector-{{ section.id }}.otodor-cats--dark  .otodor-cats__title { color: var(--otodor-white); }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__title .accent { color: var(--cats-accent); }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__sub {
     margin: 0.9rem 0 0;

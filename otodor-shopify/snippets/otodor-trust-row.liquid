@@ -19,20 +19,28 @@
 
   Params (all optional):
     product              the product to judge (pass `product: product`)
-    except_collections   comma list of collection handles that are not
-                         installed (default: smart-padlocks)
+    except_collections / except_types / except_tags
+                         comma lists identifying products nobody fits
+                         (defaults cover padlocks by handle, type and tag,
+                         so the rule holds however the catalogue is organised)
     install_label / warranty_label / technicians_label — copy overrides
 
   Renders nothing when no claim survives.
   ════════════════════════════════════════════════════════════════════════
 {%- endcomment -%}
 
-{%- assign not_installed = except_collections | default: 'smart-padlocks' -%}
+{%- liquid
+  assign not_installed_cols = except_collections | default: 'smart-padlocks'
+  assign not_installed_types = except_types | default: 'Smart Padlock, Padlock'
+  assign not_installed_tags = except_tags | default: 'padlock, padlocks, smart-padlock'
+-%}
 {%- capture trust_install -%}
   {%- render 'otodor-module-applies',
     module_id: 'install',
     product: product,
-    except_collections: not_installed -%}
+    except_collections: not_installed_cols,
+    except_types: not_installed_types,
+    except_tags: not_installed_tags -%}
 {%- endcapture -%}
 
 {%- liquid

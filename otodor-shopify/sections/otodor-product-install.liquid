@@ -149,11 +149,31 @@
     margin-top: 1rem;
   }
 
+  .otodor-pinstall__diagram {
+    margin: clamp(2.5rem, 5vw, 3.75rem) 0 0;
+    padding: 0;
+  }
+  .otodor-pinstall__diagram img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--otodor-radius-lg);
+    border: 1px solid var(--otodor-hairline-light);
+    background: #FFFFFF;
+  }
+  .otodor-pinstall__diagram figcaption {
+    font-family: var(--otodor-font-body);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--otodor-ink-soft);
+    margin-top: 0.85rem;
+  }
+
   .otodor-pinstall__clearance {
     display: flex;
     align-items: flex-start;
     gap: 0.9rem;
-    margin-top: clamp(2rem, 4vw, 3rem);
+    margin-top: clamp(1.25rem, 2.5vw, 1.75rem);
     padding: 1.2rem 1.4rem;
     background: var(--otodor-bg-light-2);
     border: 1px solid var(--otodor-hairline-light);
@@ -226,7 +246,29 @@
     {%- endif -%}
   </div>
 
-  {%- assign clearance = product.metafields.custom.install_clearance.value | default: section.settings.clearance_note -%}
+  {%- comment -%}
+    Clearance guidance. Both halves resolve product metafield → section
+    setting → omitted, so a door type that differs (or a product with a
+    dedicated diagram) says so without a second section. The diagram is
+    merchant-uploaded — it is artwork, so it lives in Shopify Files, not
+    in the theme.
+  {%- endcomment -%}
+  {%- liquid
+    assign clearance = product.metafields.custom.install_clearance.value | default: section.settings.clearance_note
+    assign clearance_img = product.metafields.custom.install_clearance_image.value | default: section.settings.clearance_image
+  -%}
+  {%- if clearance_img != blank -%}
+    <figure class="otodor-pinstall__diagram" data-otodor-reveal="fade-up">
+      {{ clearance_img | image_url: width: 2000 | image_tag:
+        loading: 'lazy',
+        widths: '600,900,1200,1600,2000',
+        sizes: '(max-width: 989px) 100vw, min(100vw, 1200px)',
+        alt: section.settings.clearance_image_alt | default: 'OTODOR installation clearance guide' }}
+      {%- if section.settings.clearance_image_caption != blank -%}
+        <figcaption>{{ section.settings.clearance_image_caption | escape }}</figcaption>
+      {%- endif -%}
+    </figure>
+  {%- endif -%}
   {%- if clearance != blank -%}
     <div class="otodor-pinstall__clearance" data-otodor-reveal="fade-up">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 6l3-3M3 6l3 3M21 6l-3-3M21 6l-3 3M8 12v9M16 12v9M8 18h8"/></svg>
@@ -256,7 +298,10 @@
     { "type": "checkbox", "id": "show_cta", "label": "Show compatibility-check button", "default": true },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "Check my door" },
     { "type": "header", "content": "Clearance guide" },
-    { "type": "textarea", "id": "clearance_note", "label": "Clearance note", "info": "Overridden per product by custom.install_clearance. Auto-hides if both are blank.", "default": "Requires roughly 85 mm (3.35\") of side clearance from the door edge to any wall or frame for the handle to swing freely. Unsure? We confirm this during the compatibility check." },
+    { "type": "image_picker", "id": "clearance_image", "label": "Clearance diagram", "info": "The correct/incorrect installation infographic. Overridden per product by custom.install_clearance_image. Auto-hides if both are blank." },
+    { "type": "text", "id": "clearance_image_alt", "label": "Diagram alt text", "default": "Minimum 85 mm gap between the safety door and the main door" },
+    { "type": "text", "id": "clearance_image_caption", "label": "Diagram caption", "info": "Optional line under the diagram." },
+    { "type": "textarea", "id": "clearance_note", "label": "Clearance note", "info": "Overridden per product by custom.install_clearance. Auto-hides if both are blank.", "default": "Keep a minimum 85 mm (3.35\") gap between the safety door and the main door. Too little clearance lets the lock contact the safety door, which can damage the lock or stop the door closing properly. Unsure? We confirm this during the compatibility check." },
     { "type": "header", "content": "Relevance" },
     { "type": "paragraph", "content": "This module is about fitting a device to a door. Leave every field blank to show it on all products; list product types, tags or collection handles (comma separated) to limit it. A product's custom.hidden_modules / custom.shown_modules metafield overrides everything here." },
     { "type": "text", "id": "only_types", "label": "Only these product types" },

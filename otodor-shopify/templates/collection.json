@@ -47,6 +47,15 @@
         "cta_button_label": "Talk to us"
       }
     },
+    "comparison": {
+      "type": "otodor-comparison",
+      "settings": {
+        "eyebrow": "Compare the range",
+        "heading": "Every model, ",
+        "heading_accent": "side by side.",
+        "max_products": 5
+      }
+    },
     "features": {
       "type": "otodor-features",
       "settings": {
@@ -67,6 +76,7 @@
     "hero",
     "selector",
     "product-grid",
+    "comparison",
     "features",
     "why"
   ]

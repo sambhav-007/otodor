@@ -107,12 +107,16 @@
     flex-wrap: wrap;
     padding: clamp(2.5rem, 5vw, 3.5rem) 0;
   }
+  /* Declared, not inherited: Dawn's `h1,h2,…` rule sets colour directly on
+     the element, so on the light collection page this dark CTA band would
+     otherwise get an ink heading it cannot be read against. */
   .otodor-cgrid-cta__title {
     font-family: var(--otodor-font-display);
     font-size: clamp(1.3rem, 2.6vw, 1.8rem);
     font-weight: 600;
     letter-spacing: var(--otodor-tracking-tight);
     margin: 0;
+    color: #FFFFFF;
   }
   .otodor-cgrid-cta__sub {
     font-family: var(--otodor-font-body);
