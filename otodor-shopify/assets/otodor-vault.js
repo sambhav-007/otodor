@@ -79,14 +79,17 @@ export default function initVault(overlay, opts) {
     envTex = pmrem.fromEquirectangular(envSrc).texture;
     scene.environment = envTex;
 
-    // ── Brushed-titanium micro relief so the metal just catches light ──
-    const nmC = document.createElement('canvas'); nmC.width = 256; nmC.height = 256;
-    const nmX = nmC.getContext('2d'); nmX.fillStyle = 'rgb(128,128,255)'; nmX.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 340; i++) { const x = Math.random() * 256; const d = Math.round((Math.random() - 0.5) * 30); nmX.strokeStyle = 'rgb(' + (128 + d) + ',128,255)'; nmX.lineWidth = Math.random() * 1.1; nmX.beginPath(); nmX.moveTo(x, 0); nmX.lineTo(x, 256); nmX.stroke(); }
-    const slabNormal = T(new THREE.CanvasTexture(nmC)); slabNormal.wrapS = slabNormal.wrapT = THREE.RepeatWrapping; slabNormal.repeat.set(6, 6);
-
     // ── Materials — brushed titanium / anodized accents ──
-    const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x000000, metalness: 0.15, roughness: 0.55, normalMap: slabNormal, normalScale: new THREE.Vector2(0.12, 0.12), clearcoat: 0.5, clearcoatRoughness: 0.22, envMapIntensity: 0.35 }));   // pitch-black gates — only a faint clearcoat edge sheen
+    // The relief (normalMap) and the lit channels (emissiveMap) are generated
+    // per rebuild in makeDetailTextures(), because they are drawn for the exact
+    // door the viewport needs — see buildSlabs().
+    /* A black gate shows relief through its LACQUER, not its metal. Albedo stays
+       at zero and metalness low — raising either just turns the softbox env into a
+       big grey reflection and the door stops being black. The engraving reads
+       because the same relief map drives `clearcoatNormalMap`, so the clear layer's
+       sheen breaks along every rib while the surface underneath stays pitch dark. */
+    const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x000000, metalness: 0.2, roughness: 0.52, normalScale: new THREE.Vector2(0.4, 0.4), clearcoat: 0.6, clearcoatRoughness: 0.3, clearcoatNormalScale: new THREE.Vector2(0.75, 0.75), envMapIntensity: 0.28 }));   // gate face — the border frame around the engraved panel
+    const plateMat = M(new THREE.MeshPhysicalMaterial({ color: 0x020204, metalness: 0.24, roughness: 0.5, normalScale: new THREE.Vector2(0.55, 0.55), clearcoat: 0.56, clearcoatRoughness: 0.28, clearcoatNormalScale: new THREE.Vector2(0.9, 0.9), envMapIntensity: 0.32, emissive: 0xffffff, emissiveIntensity: 0.0 }));   // the engraved panel — carries the machined ribs and the light channels cut into them
     const seamMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x5aa0ff, emissiveIntensity: 0.0, roughness: 0.4 }));
     const ledBlue = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x3d9bff, emissiveIntensity: 2.0, roughness: 0.5 }));
     const ledAmber = M(new THREE.MeshStandardMaterial({ color: 0x241804, emissive: 0xffab30, emissiveIntensity: 2.2, roughness: 0.5 }));
@@ -118,7 +121,7 @@ export default function initVault(overlay, opts) {
     // on a big screen. Tied to the frame it stays a ~3 px hairline everywhere.
     let GAP = 0.08;
     let leftSlab = null, rightSlab = null;
-    let slabGeos = [];
+    let slabGeos = [], slabTexs = [];
     let parkL = 0, parkR = 0, clearX = 0;
 
     function visibleHalf() {
@@ -132,8 +135,121 @@ export default function initVault(overlay, opts) {
         scene.remove(grp);
       });
       for (let i = 0; i < slabGeos.length; i++) { try { slabGeos[i].dispose(); } catch (e) {} }
-      slabGeos = [];
+      for (let i = 0; i < slabTexs.length; i++) { try { slabTexs[i].dispose(); } catch (e) {} }
+      slabGeos = []; slabTexs = [];
       leftSlab = rightSlab = null;
+    }
+
+    /* ── Engraving ───────────────────────────────────────────────────────
+       The gate face is machined with fine ribs running PARALLEL TO THE CUT —
+       the same 45° language as the monogram's slash — and a few of those
+       channels are cut deeper and carry light. Both are drawn per rebuild
+       into canvases mapped over the exact door, so the shape clips them for
+       free and nothing has to be tiled or hand-fitted per aspect.
+
+       ExtrudeGeometry's UVs are the raw x/y positions, so `repeat = 1/(2·half)`
+       plus `offset = 0.5` maps world [-half, half] onto [0, 1] exactly. */
+    function makeDetailTextures(XW, HH, m) {
+      const aspect = XW / HH;
+      let cw, ch;
+      if (aspect >= 1) { cw = 1536; ch = Math.max(384, Math.round(1536 / aspect)); }
+      else { ch = 1536; cw = Math.max(384, Math.round(1536 * aspect)); }
+      const s = cw / (2 * XW);                       // px per world unit (uniform — ch/(2·HH) is the same)
+      const toC = (x, y) => [(x + XW) * s, (HH - y) * s];
+
+      // Rib direction in canvas space, and a length that always crosses the canvas.
+      const p0 = toC(m * -HH, -HH), p1 = toC(m * HH, HH);
+      const ang = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]);
+      const len = Math.hypot(cw, ch) * 1.5;
+
+      // A rotated band, filled with a gradient across its width. Used for both
+      // the relief grooves and the light channels — same geometry, different paint.
+      function band(ctx, cx, cy, width, stops) {
+        ctx.save();
+        ctx.translate(cx, cy); ctx.rotate(ang);
+        const g = ctx.createLinearGradient(0, -width / 2, 0, width / 2);
+        stops.forEach(function (st) { g.addColorStop(st[0], st[1]); });
+        ctx.fillStyle = g;
+        ctx.fillRect(-len / 2, -width / 2, len, width);
+        ctx.restore();
+      }
+
+      /* ── Relief ── */
+      const nc = document.createElement('canvas'); nc.width = cw; nc.height = ch;
+      const n = nc.getContext('2d');
+      n.fillStyle = 'rgb(128,128,255)'; n.fillRect(0, 0, cw, ch);
+
+      // Tangent-space normals for the two walls of a groove. The wall on one side
+      // tilts toward +cross, the other toward -cross; green is flipped because
+      // canvas y runs down and the OpenGL convention has +Y up.
+      const wall = (amp) => {
+        const sx = -Math.sin(ang), cy2 = Math.cos(ang);
+        const a = 'rgb(' + Math.round(128 + amp * sx) + ',' + Math.round(128 - amp * cy2) + ',245)';
+        const b = 'rgb(' + Math.round(128 - amp * sx) + ',' + Math.round(128 + amp * cy2) + ',245)';
+        return [a, b];
+      };
+      const flat = 'rgb(128,128,255)';
+      const fine = wall(34), deep = wall(74);
+
+      // Rib family: constant PERPENDICULAR spacing, so the pattern stays even.
+      const step = HH * 0.085;                       // rib pitch, in world units
+      const dc = step * Math.sqrt(1 + m * m);        // ... as an x-intercept step
+      const cMax = XW + m * HH + dc;
+      const ribs = [];
+      for (let c = -cMax; c <= cMax; c += dc) ribs.push(c);
+
+      // Every fourth rib is a deeper channel; two of those carry light.
+      const lit = [];
+      ribs.forEach(function (c, i) {
+        const p = toC(c, 0);
+        const deepRib = i % 4 === 0;
+        const w = (deepRib ? 0.055 : 0.03) * HH * s;
+        const col = deepRib ? deep : fine;
+        band(n, p[0], p[1], w, [[0, col[0]], [0.5, flat], [1, col[1]]]);
+        if (deepRib) lit.push({ c: c, p: p, w: w });
+      });
+
+      // Micro brushed grain across the whole face — keeps the black from going dead
+      // flat between the ribs without reading as noise.
+      for (let i = 0; i < 520; i++) {
+        const x = Math.random() * cw, d = Math.round((Math.random() - 0.5) * 9);
+        n.strokeStyle = 'rgba(' + (128 + d) + ',128,255,0.5)';
+        n.lineWidth = Math.random() * 1.2;
+        n.beginPath(); n.moveTo(x, 0); n.lineTo(x + (Math.random() - 0.5) * 6, ch); n.stroke();
+      }
+
+      /* ── Light channels ── */
+      const lc = document.createElement('canvas'); lc.width = cw; lc.height = ch;
+      const l = lc.getContext('2d');
+      l.fillStyle = '#000'; l.fillRect(0, 0, cw, ch);
+      // Light sits INSIDE the deep channels — a bright core with a painted halo,
+      // which is how the glow survives without a bloom pass.
+      const litPicks = lit.filter(function (o, i) { return i % 3 === 1; });
+      litPicks.forEach(function (o) {
+        const halo = o.w * 5.5, core = o.w * 0.42;
+        const k = core / halo / 2;
+        band(l, o.p[0], o.p[1], halo, [
+          [0, 'rgba(10,40,90,0)'],
+          [Math.max(0.001, 0.5 - k * 3), 'rgba(45,120,220,0.22)'],
+          [0.5 - k, 'rgba(77,166,255,0.75)'],
+          [0.5, 'rgba(214,236,255,1)'],
+          [0.5 + k, 'rgba(77,166,255,0.75)'],
+          [Math.min(0.999, 0.5 + k * 3), 'rgba(45,120,220,0.22)'],
+          [1, 'rgba(10,40,90,0)']
+        ]);
+      });
+
+      const relief = new THREE.CanvasTexture(nc);
+      const glow = new THREE.CanvasTexture(lc);
+      [relief, glow].forEach(function (t) {
+        t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+        t.repeat.set(1 / (2 * XW), 1 / (2 * HH));
+        t.offset.set(0.5, 0.5);
+        t.anisotropy = 4;
+        slabTexs.push(t);
+      });
+      glow.colorSpace = THREE.SRGBColorSpace;
+      return { relief: relief, glow: glow };
     }
 
     function buildSlabs() {
@@ -154,8 +270,38 @@ export default function initVault(overlay, opts) {
       GAP = v.h * 0.008;                                // ~3 px hairline at any viewport height
       const diagRot = -Math.atan2(2 * SLANT, HH * 2);
       const diagLen = Math.sqrt(4 * SLANT * SLANT + 4 * HH * HH);
+      const m = SLANT / HH;                             // the cut's dx per dy
       const G = (g) => { slabGeos.push(g); return g; };
-      const mesh = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); return m; };
+      const mesh = (geo, mat, x, y, z) => { const mm = new THREE.Mesh(geo, mat); mm.position.set(x, y, z); return mm; };
+
+      // Relief + light channels, drawn for this exact door.
+      const detail = makeDetailTextures(XW, HH, m);
+      slabMat.normalMap = slabMat.clearcoatNormalMap = detail.relief;
+      plateMat.normalMap = plateMat.clearcoatNormalMap = detail.relief;
+      plateMat.emissiveMap = detail.glow;
+      slabMat.needsUpdate = plateMat.needsUpdate = true;
+
+      // The panel is the gate's face inset by a border. Its outer edges pull in by
+      // `pad`; the diagonal edge moves along its own normal by the same amount,
+      // which is a horizontal shift of pad·√(1+m²).
+      const PAD = HH * 0.055;
+      function panelShape(side) {
+        const px = XW - PAD, py = HH - PAD, dx = PAD * Math.sqrt(1 + m * m) + GAP;
+        const sh = new THREE.Shape();
+        if (side < 0) {
+          sh.moveTo(-px, -py);
+          sh.lineTo(-m * py - dx, -py);
+          sh.lineTo(m * py - dx, py);
+          sh.lineTo(-px, py);
+        } else {
+          sh.moveTo(-m * py + dx, -py);
+          sh.lineTo(px, -py);
+          sh.lineTo(px, py);
+          sh.lineTo(m * py + dx, py);
+        }
+        sh.closePath();
+        return sh;
+      }
 
       function makeSlab(side) {
         const grp = new THREE.Group();
@@ -177,6 +323,14 @@ export default function initVault(overlay, opts) {
         baseGeo.translate(0, 0, -DD / 2);
         grp.add(mesh(baseGeo, slabMat, 0, 0, 0));
 
+        // The engraved panel — a real step above the face, so the border catches a
+        // true highlight instead of a painted one. Everything on the gate reads off
+        // this plate: the ribs, the light channels, the monogram.
+        const plateD = Math.max(HH * 0.012, 0.1);
+        const plateGeo = G(new THREE.ExtrudeGeometry(panelShape(side), { depth: plateD, bevelEnabled: true, bevelThickness: plateD * 0.45, bevelSize: plateD * 0.45, bevelSegments: 1 }));
+        plateGeo.translate(0, 0, DD / 2);
+        grp.add(mesh(plateGeo, plateMat, 0, 0, 0));
+
         // logo clipped to this half's shape → the diagonal splits its slant.
         // Bake planar UVs explicitly (ShapeGeometry's default UVs are unreliable here).
         if (logoMat) {
@@ -184,19 +338,19 @@ export default function initVault(overlay, opts) {
           const pos = face.attributes.position, uvArr = new Float32Array(pos.count * 2);
           for (let k = 0; k < pos.count; k++) { uvArr[k * 2] = pos.getX(k) / LOGO + 0.5; uvArr[k * 2 + 1] = pos.getY(k) / LOGO + 0.5; }
           face.setAttribute('uv', new THREE.BufferAttribute(uvArr, 2));
-          grp.add(mesh(face, logoMat, 0, 0, DD / 2 + 0.16));
+          grp.add(mesh(face, logoMat, 0, 0, DD / 2 + plateD + 0.18));
         }
 
         // Glowing diagonal seam edge — one HALF per slab so it travels with the gate
         // and stays lit for the whole animation. Each bar fills exactly its side of
         // the slot, so closed they read as ONE continuous line.
-        const seamEl = mesh(G(new THREE.BoxGeometry(GAP, diagLen, 0.12)), seamMat, (side * GAP) / 2, 0, DD / 2 + 0.14);
+        const seamEl = mesh(G(new THREE.BoxGeometry(GAP, diagLen, 0.12)), seamMat, (side * GAP) / 2, 0, DD / 2 + plateD + 0.06);
         seamEl.rotation.z = diagRot; grp.add(seamEl);
 
         // tiny functional indicators, placed off the frame's proportions
         const ledX = side * HW * 0.55, ledY = HH * 0.6, ledS = Math.max(HH * 0.045, 0.22);
-        grp.add(mesh(G(new THREE.BoxGeometry(ledS * 1.6, ledS * 0.22, 0.04)), ledBlue, ledX, ledY, DD / 2 + 0.08));
-        grp.add(mesh(G(new THREE.BoxGeometry(ledS * 0.32, ledS * 0.32, 0.04)), ledAmber, ledX, -ledY, DD / 2 + 0.08));
+        grp.add(mesh(G(new THREE.BoxGeometry(ledS * 1.6, ledS * 0.22, 0.04)), ledBlue, ledX, ledY, DD / 2 + plateD + 0.06));
+        grp.add(mesh(G(new THREE.BoxGeometry(ledS * 0.32, ledS * 0.32, 0.04)), ledAmber, ledX, -ledY, DD / 2 + plateD + 0.06));
 
         scene.add(grp);
         return grp;
@@ -235,6 +389,11 @@ export default function initVault(overlay, opts) {
 
       // seam ignites softly at unlock (the one moment of light)
       seamMat.emissiveIntensity = t < UNLOCK ? 0.0 : clamp((t - UNLOCK) / 500, 0, 1) * 2.4;
+
+      // the channels engraved into the panel come up with it, a beat slower, then
+      // breathe — barely — so the gate reads as powered rather than printed
+      const ignite = t < UNLOCK ? 0 : clamp((t - UNLOCK) / 900, 0, 1);
+      plateMat.emissiveIntensity = ignite * (1.35 + Math.sin(t * 0.0012) * 0.1);
 
       // effortless glide — straight off both sides of the screen
       if (t > OPEN_AT && leftSlab && rightSlab) {
