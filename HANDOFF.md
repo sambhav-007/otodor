@@ -189,6 +189,26 @@ block** in `main-product` rendering `otodor-trust-row`, which asks for the same 
 module uses — one answer, not two that can disagree. `product.json` marks install + compat as not applying to
 `smart-padlocks`.
 
+**STEP 12 QA round (from the user's dev store):**
+- **White heading on a light band** — the section's `color` was right; **Dawn's `h1,h2,…` rule sets colour
+  *directly* on the element**, and a declared value always beats an inherited one, so the light scheme never
+  reached the `<h2>`. Fixed by declaring it on `.otodor-cats__title` per scheme (and on the collection grid's
+  dark CTA band, where the same bug pointed the other way). **Watch for this in any new section** whose
+  heading is an `<h2>` with no `color` of its own.
+- **Compare table reach** — the client's sheet is the *wooden-door* range, so it is now seeded on
+  `collection.wooden-door-locks.json` as well; the **generic `collection.json` gained a comparison** too
+  (resolves from the collection's own products, auto-hides below two columns), so every category gets one
+  without a bespoke template.
+- **Clearance infographic** — artwork belongs in **Shopify Files**, not the repo. `otodor-product-install`
+  gained a *Clearance diagram* image slot (+ alt, caption), overridable per product by
+  `custom.install_clearance_image`. The default clearance **note was also factually wrong** (it described side
+  clearance from the door edge to a wall); it now states the real spec — a minimum 85 mm gap **between the
+  safety door and the main door**.
+- **Padlocks** — the exclusion was keyed on collection membership alone, which only fires if the product is
+  actually in `smart-padlocks`. Install, Warranty, Compatibility and the trust row now exclude by
+  **collection AND product type AND tag**. Warranty is excluded for padlocks too (a setting — hand it back
+  without a code change if that turns out to be wrong).
+
 - **Data still owed by the client:** the sheet leaves **Size blank for NEXUS / ONYX / ZION+** and truncates
   **Inbuilt battery to "Yes," for NEXUS / ONYX**. Those cells render "—"; nothing was invented.
 - **Verified headlessly:** `theme check` at baseline (5 errors / 16 warnings); every template + section schema
@@ -203,6 +223,8 @@ module uses — one answer, not two that can disagree. `product.json` marks inst
 ### Admin setup the merchant must do (theme degrades gracefully until done)
 - **Navigation:** build the nested 3-level `main-menu` (Products → Digital Locks → Wooden/Glass/…; see Phase 2 report) so the mega menu shows the hierarchy.
 - **Assign five collection templates** (Online Store → Collections → *collection* → Theme template): `digital-locks`, `wooden-door-locks`, `glass-door-locks`, `metal-gate-locks`, `smart-padlocks`. Until assigned, each collection still gets the generic `collection.json` — which now shows its sub-categories automatically from Navigation, so nothing is broken meanwhile.
+- **Upload the clearance infographic** (Content → Files), then set it on the product page's **OTODOR Product Install → Clearance diagram** setting. Per-product art goes on `custom.install_clearance_image` instead.
+- **Tag or type your padlocks** if they aren't in a `smart-padlocks` collection — product type `Smart Padlock` or tag `padlock` also switches off Installation / Warranty / Compatibility on those PDPs.
 - **Optional (STEP 12):** set `custom.parent_collection` on each sub-collection → the selector finds them even where the menu isn't built. And set `custom.menu_image` / `menu_description` / `menu_icon` on the four sub-collections — those are what give the sub-category cards their art and blurb.
 - **Custom data:** define product metafields (`specs.*`, `custom.specs`, `custom.access_methods`, `custom.documents`, `custom.door_compatibility`, `custom.positioning_line`) + collection metafields (`custom.menu_icon/description/image`, `hero_*`, `faqs`, `seo_content`); optional metaobjects only if reused (see data model). Flag comparable ones for Search & Discovery filters.
 - **Leads (STEP 8):** confirm the store **contact/notification email** (Settings → Notifications) — that is where lead-form submissions arrive. Ensure a page with handle `contact` uses the `page.contact` template (the lead desk). Optionally repoint the **homepage CTA banner** and **mega-menu "Get a Custom Quote"** link settings to `/pages/contact#otodor-lead` (they're merchant URL settings; the digital-locks collection is already wired).

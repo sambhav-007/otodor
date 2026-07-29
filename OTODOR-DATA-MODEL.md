@@ -75,6 +75,7 @@ qualifier the value carries** ("Yes (up to 20)" → ✓ *up to 20*); text/number
 | `custom.compatibility_guide` | article_reference | fit / requirements guide | Content Guide |
 | `custom.related_guides` | list.article_reference | educational reading set | Content Rail |
 | `custom.install_clearance` | multi_line_text | per-product clearance note (overrides the Install section's default) | Install |
+| `custom.install_clearance_image` | file_reference (image) | per-product clearance diagram (overrides the Install section's image) | Install |
 | `custom.hidden_modules` | list.single_line_text | module ids to force OFF for this product (`install`, `warranty`, `compat`, `downloads`) | Module applicability |
 | `custom.shown_modules` | list.single_line_text | module ids to force ON, beating any section allow/deny list | Module applicability |
 
