@@ -91,15 +91,108 @@ export default function initVault(overlay, opts) {
     const slabMat = M(new THREE.MeshPhysicalMaterial({ color: 0x000000, metalness: 0.2, roughness: 0.52, normalScale: new THREE.Vector2(0.4, 0.4), clearcoat: 0.6, clearcoatRoughness: 0.3, clearcoatNormalScale: new THREE.Vector2(0.75, 0.75), envMapIntensity: 0.28 }));   // gate face — the border frame around the engraved panel
     const plateMat = M(new THREE.MeshPhysicalMaterial({ color: 0x020204, metalness: 0.24, roughness: 0.5, normalScale: new THREE.Vector2(0.55, 0.55), clearcoat: 0.56, clearcoatRoughness: 0.28, clearcoatNormalScale: new THREE.Vector2(0.9, 0.9), envMapIntensity: 0.32, emissive: 0xffffff, emissiveIntensity: 0.0 }));   // the engraved panel — carries the machined ribs and the light channels cut into them
     const seamMat = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x5aa0ff, emissiveIntensity: 0.0, roughness: 0.4 }));
-    const ledBlue = M(new THREE.MeshStandardMaterial({ color: 0x0a0d12, emissive: 0x3d9bff, emissiveIntensity: 2.0, roughness: 0.5 }));
-    const ledAmber = M(new THREE.MeshStandardMaterial({ color: 0x241804, emissive: 0xffab30, emissiveIntensity: 2.2, roughness: 0.5 }));
 
-    // ── OTODOR monogram — planar-mapped so the DIAGONAL cut splits its slant ──
-    let monoTex = null, logoMat = null;
-    try { monoTex = new THREE.TextureLoader().load(new URL('./otodor-monogram.png', import.meta.url).href); } catch (e) { monoTex = null; }
-    if (monoTex) {
+    /* ── OTODOR monogram — a machined inlay, not a decal ──────────────────
+       Planar-mapped so the DIAGONAL cut splits its slant.
+
+       The mark reads as solid because its EDGES are bevelled: a height field
+       is taken from the artwork's alpha, blurred to round the bevel off, and
+       differentiated into a normal map. Actually extruding it would be wasted
+       work — the logo sits dead centre on the camera axis, so real depth
+       projects to nothing; all the volume anyone can see comes from how the
+       bevel catches the key light. */
+    let monoTex = null, logoMat = null, logoShadowMat = null;
+
+    function buildLogoRelief(img) {
+      // A wide blur is the point: a tight one leaves a flat plateau with a hairline
+      // rim, which still reads as a sticker. This rounds the bevel well into the
+      // body of each stroke, so the light falls across the mark instead of round it.
+      const S = 256, R = 9, PASSES = 4;
+      const c = document.createElement('canvas'); c.width = c.height = S;
+      const x2 = c.getContext('2d', { willReadFrequently: true });
+      x2.drawImage(img, 0, 0, S, S);
+      const src = x2.getImageData(0, 0, S, S).data;   // throws if the asset is cross-origin without CORS
+
+      let h = new Float32Array(S * S), tmp = new Float32Array(S * S);
+      for (let i = 0; i < S * S; i++) h[i] = src[i * 4 + 3] / 255;
+
+      // separable box blur — turns the alpha's cliff edge into a rounded bevel
+      for (let p = 0; p < PASSES; p++) {
+        for (let y = 0; y < S; y++) {
+          let acc = 0;
+          for (let k = -R; k <= R; k++) acc += h[y * S + Math.min(S - 1, Math.max(0, k))];
+          for (let xx = 0; xx < S; xx++) {
+            tmp[y * S + xx] = acc / (2 * R + 1);
+            acc += h[y * S + Math.min(S - 1, xx + R + 1)] - h[y * S + Math.max(0, xx - R)];
+          }
+        }
+        for (let xx = 0; xx < S; xx++) {
+          let acc = 0;
+          for (let k = -R; k <= R; k++) acc += tmp[Math.min(S - 1, Math.max(0, k)) * S + xx];
+          for (let y = 0; y < S; y++) {
+            h[y * S + xx] = acc / (2 * R + 1);
+            acc += tmp[Math.min(S - 1, y + R + 1) * S + xx] - tmp[Math.max(0, y - R) * S + xx];
+          }
+        }
+      }
+
+      // normal = normalize(-dh/dx, -dh/dy_world, 1); canvas y runs down, so the
+      // world-space vertical derivative flips sign.
+      const out = x2.createImageData(S, S), K = 10.0;
+      for (let y = 0; y < S; y++) {
+        for (let xx = 0; xx < S; xx++) {
+          const l = h[y * S + Math.max(0, xx - 1)], r = h[y * S + Math.min(S - 1, xx + 1)];
+          const u = h[Math.max(0, y - 1) * S + xx], d = h[Math.min(S - 1, y + 1) * S + xx];
+          let nx = -(r - l) * 0.5 * K, ny = (d - u) * 0.5 * K, nz = 1;
+          const len = Math.hypot(nx, ny, nz) || 1;
+          const i = (y * S + xx) * 4;
+          out.data[i] = Math.round((nx / len * 0.5 + 0.5) * 255);
+          out.data[i + 1] = Math.round((ny / len * 0.5 + 0.5) * 255);
+          out.data[i + 2] = Math.round((nz / len * 0.5 + 0.5) * 255);
+          out.data[i + 3] = 255;
+        }
+      }
+      x2.putImageData(out, 0, 0);
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+      return tex;
+    }
+
+    try {
+      const logoImg = new Image();
+      logoImg.crossOrigin = 'anonymous';
+      monoTex = T(new THREE.Texture(logoImg));
       monoTex.colorSpace = THREE.SRGBColorSpace; monoTex.wrapS = monoTex.wrapT = THREE.ClampToEdgeWrapping; monoTex.anisotropy = 8;
-      logoMat = M(new THREE.MeshStandardMaterial({ map: monoTex, emissive: 0x9fd0ff, emissiveMap: monoTex, emissiveIntensity: 1.0, transparent: true, alphaTest: 0.35, depthWrite: false, metalness: 0.4, roughness: 0.5, envMapIntensity: 0.7 }));
+      logoImg.onload = function () {
+        monoTex.needsUpdate = true;
+        // Reading the pixels can fail — the asset is served from a different
+        // origin than the document, so this depends on the CDN's CORS headers.
+        // Fall back to bump mapping off the artwork itself, which needs no pixel
+        // access: a shallower emboss, but the mark still has an edge.
+        try {
+          const relief = T(buildLogoRelief(logoImg));
+          if (logoMat) { logoMat.normalMap = relief; logoMat.needsUpdate = true; }
+        } catch (e) {
+          if (logoMat) { logoMat.bumpMap = monoTex; logoMat.bumpScale = 0.5; logoMat.needsUpdate = true; }
+        }
+      };
+      logoImg.src = new URL('./otodor-monogram.png', import.meta.url).href;
+    } catch (e) { monoTex = null; }
+
+    if (monoTex) {
+      logoMat = M(new THREE.MeshPhysicalMaterial({
+        map: monoTex, color: 0xe9eff6,
+        normalScale: new THREE.Vector2(2.0, 2.0),
+        // Emissive is kept low on purpose — a bright fill flattens the shading
+        // back out; it is here only so the mark stays legible before the
+        // channels come up.
+        emissive: 0x86b8ea, emissiveMap: monoTex, emissiveIntensity: 0.2,
+        alphaTest: 0.4, metalness: 0.7, roughness: 0.26,
+        clearcoat: 0.5, clearcoatRoughness: 0.16, envMapIntensity: 1.5
+      }));
+      // A dark twin set just behind and offset — the contact shadow that tells
+      // the eye the inlay stands off the panel.
+      logoShadowMat = M(new THREE.MeshBasicMaterial({ map: monoTex, color: 0x000000, alphaTest: 0.4, transparent: true, opacity: 0.5, depthWrite: false }));
     }
 
     // ── Lights — soft & even (env + directional; NO point-light hotspots) ──
@@ -338,7 +431,12 @@ export default function initVault(overlay, opts) {
           const pos = face.attributes.position, uvArr = new Float32Array(pos.count * 2);
           for (let k = 0; k < pos.count; k++) { uvArr[k * 2] = pos.getX(k) / LOGO + 0.5; uvArr[k * 2 + 1] = pos.getY(k) / LOGO + 0.5; }
           face.setAttribute('uv', new THREE.BufferAttribute(uvArr, 2));
-          grp.add(mesh(face, logoMat, 0, 0, DD / 2 + plateD + 0.18));
+          const logoZ = DD / 2 + plateD + 0.18;
+          if (logoShadowMat) {
+            const drop = LOGO * 0.02;
+            grp.add(mesh(face, logoShadowMat, drop, -drop, logoZ - 0.03));
+          }
+          grp.add(mesh(face, logoMat, 0, 0, logoZ));
         }
 
         // Glowing diagonal seam edge — one HALF per slab so it travels with the gate
@@ -346,11 +444,6 @@ export default function initVault(overlay, opts) {
         // the slot, so closed they read as ONE continuous line.
         const seamEl = mesh(G(new THREE.BoxGeometry(GAP, diagLen, 0.12)), seamMat, (side * GAP) / 2, 0, DD / 2 + plateD + 0.06);
         seamEl.rotation.z = diagRot; grp.add(seamEl);
-
-        // tiny functional indicators, placed off the frame's proportions
-        const ledX = side * HW * 0.55, ledY = HH * 0.6, ledS = Math.max(HH * 0.045, 0.22);
-        grp.add(mesh(G(new THREE.BoxGeometry(ledS * 1.6, ledS * 0.22, 0.04)), ledBlue, ledX, ledY, DD / 2 + plateD + 0.06));
-        grp.add(mesh(G(new THREE.BoxGeometry(ledS * 0.32, ledS * 0.32, 0.04)), ledAmber, ledX, -ledY, DD / 2 + plateD + 0.06));
 
         scene.add(grp);
         return grp;
