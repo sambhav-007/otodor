@@ -201,8 +201,17 @@ module uses — one answer, not two that can disagree. `product.json` marks inst
   template wasn't assigned. The client's sheet now lives **once**, in `snippets/otodor-spec-model-seed.liquid`,
   and every comparison consults it — models matched on handle *or* title, normalised and prefix-tested, so
   `ZION+ Rose Gold` and `ZION+ Galaxy Black` both resolve to ZION+. Precedence is unchanged:
-  `metafield → column seed → model seed → registry default → —`. **`OHM` is not in the client's sheet**, so its
-  column is empty until either the client supplies its figures or its `specs.*` are populated.
+  `metafield → column seed → model seed → registry default → —`.
+- **Which columns** — collection order was wrong twice: it included `OHM` (in the range, never in the client's
+  sheet) and excluded `NEXUS` / `ONYX` (in the sheet, not yet products). Two rules: an **empty-column drop**
+  (no metafield and no seed anywhere in the registry ⇒ the column goes, while ≥ 2 survive) and a **model
+  lineup** — section setting `models`, falling back to collection metafield `custom.compare_models`, e.g.
+  `SENTRY, NEXUS, ONYX, ZION+, ZEAL`. Names match products by handle or title; a name with no product still
+  gets a seed-filled column. Pinned on the digital-locks and wooden-door-locks templates. On an unassigned
+  collection the drop rule alone removes OHM; type the lineup into the section's **Model lineup** field (or
+  set `custom.compare_models`) to add NEXUS/ONYX there too.
+- **Still outstanding:** `OHM` has no published specs, and **ZION+ Rose Gold / Galaxy Black are two separate
+  products** with identical specs — as variants of one ZION+ they would stop occupying two columns.
 - **Clearance infographic** — artwork belongs in **Shopify Files**, not the repo. `otodor-product-install`
   gained a *Clearance diagram* image slot (+ alt, caption), overridable per product by
   `custom.install_clearance_image`. The default clearance **note was also factually wrong** (it described side

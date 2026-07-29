@@ -159,6 +159,20 @@ metafield, and never treat it as the data model — it is a bridge.
 A comparison **column** likewise no longer requires a product: a block may stand alone with a title, image
 and link, which is what makes a pre-catalogue range comparable at all.
 
+### Model lineup — which columns, in what order
+
+Left to itself the comparison shows whatever products the collection happens to hold, in collection order.
+That is wrong twice over for a published range: it includes models the spec sheet never covered (`OHM`) and
+excludes models not yet in the catalogue (`NEXUS`, `ONYX`). Two rules fix it:
+
+- **Lineup** — the section setting `models` (falling back to the collection metafield
+  `custom.compare_models`) names the columns in order, e.g. `SENTRY, NEXUS, ONYX, ZION+, ZEAL`. Each name is
+  matched to a product by handle **or** title using the same normalised prefix rule as the model seed; a name
+  with no product still gets a column, filled from the seed and carrying no Explore link.
+- **Empty-column drop** — a column with no metafield and no seed value across the entire comparable registry
+  is removed. A column of dashes is noise, and this is the column-wise twin of the existing empty-row rule.
+  Applied only while **at least two columns survive**, so a category with no data yet still gets its table.
+
 ---
 
 ## 5. Consumer API (the contract every consumer follows)

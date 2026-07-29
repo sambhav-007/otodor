@@ -102,6 +102,7 @@ qualifier the value carries** ("Yes (up to 20)" → ✓ *up to 20*); text/number
 | `custom.menu_description` | multi_line_text | short blurb | mega menu, category grid |
 | `custom.menu_image` | file_reference (image) | card/CTA image | mega menu, category grid |
 | `custom.parent_collection` | collection_reference | this collection's parent category | category selector (`children` source) |
+| `custom.compare_models` | single_line_text | ordered model lineup for the compare table, e.g. `SENTRY, NEXUS, ONYX, ZION+, ZEAL` | comparison |
 | `custom.category_intro` | rich_text | premium hero/intro copy | collection hero |
 | `custom.hero_image` | file_reference (image) | hero background | collection hero |
 | `custom.hero_video` | file_reference (video) or url | hero motion | collection hero |

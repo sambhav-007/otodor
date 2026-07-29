@@ -45,6 +45,7 @@
         "eyebrow": "Compare the range",
         "heading": "Every wooden-door model, ",
         "heading_accent": "side by side.",
+        "models": "SENTRY, NEXUS, ONYX, ZION+, ZEAL",
         "color_scheme": "dark",
         "use_model_seed": true,
         "show_explore": true,

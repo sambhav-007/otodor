@@ -262,6 +262,7 @@
         "eyebrow": "Compare the range",
         "heading": "Find the right lock for your ",
         "heading_accent": "door.",
+        "models": "SENTRY, NEXUS, ONYX, ZION+, ZEAL",
         "color_scheme": "dark",
         "use_model_seed": true,
         "show_explore": true,

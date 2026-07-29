@@ -6,11 +6,14 @@
   ────────────────────────────────────────────────────────────────────────
   Purpose:            Compare products across the OTODOR specification set.
   Primary source:     otodor-spec-registry (rows) × resolved columns (specs.*)
-  Column Resolver:    `product` blocks → `collection` setting → current
-                      collection → current product + its siblings (PDP) → hide
-  Cell priority:      product metafield → column seed → registry default → '—'
+  Column Resolver:    `product` blocks → **model lineup** (section setting or
+                      collection `custom.compare_models`) → the pool's products
+                      (collection setting → current collection → PDP siblings)
+                      → hide
+  Cell priority:      metafield → column seed → model seed → registry default → '—'
   Visibility rule:    Hidden when < 2 columns resolve; empty spec rows are
-                      dropped; empty groups print no header. (Editor shows a hint.)
+                      dropped; **columns carrying no data at all are dropped**
+                      (while ≥ 2 survive); empty groups print no header.
   Merchant editable:  YES — heading, colour scheme, and the columns (product
                       picker or a manual title/image/link + seed values).
                       NOT the spec list — that lives in the registry.
@@ -36,8 +39,11 @@
              a `spec_id = value` list used only where the product metafield
              is empty, which means real specs.* data always overrides it and
              the seed retires on its own.
-  `handles`  no blocks: columns are resolved from a collection or the PDP
-             context, exactly as before. No seeds in this mode.
+  `list`     no blocks: columns are `Title::handle` entries, either the
+             MODEL LINEUP (a category pins the published order and can name
+             models that are not in the catalogue yet — those get a column
+             with a blank handle, filled from the model seed) or simply the
+             pool's products. Cells fall back to the model seed either way.
   ════════════════════════════════════════════════════════════════════════
 {%- endcomment -%}
 
@@ -52,6 +58,13 @@
   if section.settings.use_model_seed == false
     assign use_model_seed = false
   endif
+
+  # ── Registry (comparable view) — resolved first, because the column
+  #    resolver needs it to tell an empty column from a populated one.
+  capture reg
+    render 'otodor-spec-registry', only_comparable: true
+  endcapture
+  assign specs = reg | strip | split: ';;;'
 
   # ── Column Resolver ─────────────────────────────────────────────────
   # 1. Blocks win when any of them carries a product or a manual title.
@@ -68,44 +81,116 @@
     endif
   endfor
 
-  # 2. Otherwise fall back to a handle list: explicit collection → current
-  #    collection page → current product + its first collection's siblings.
-  assign handles = ''
+  # 2. Otherwise build a COLUMN LIST — entries are `Title::handle`, joined
+  #    by ';;'. A blank handle is a model that has no product yet; it still
+  #    gets a column, filled from the seed. One list, so the header, the
+  #    rows and the action row all walk the same thing.
+  assign col_entries = ''
   if mode == blank
-    assign mode = 'handles'
-    if section.settings.collection != blank
-      for p in section.settings.collection.products limit: max_products
-        assign handles = handles | append: ',' | append: p.handle
-      endfor
+    assign mode = 'list'
+
+    # The pool a model name is matched against.
+    assign pool = section.settings.collection.products
+    if pool == blank and collection != blank and collection != empty
+      assign pool = collection.products
     endif
-    if handles == blank and collection != blank and collection != empty
-      for p in collection.products limit: max_products
-        assign handles = handles | append: ',' | append: p.handle
-      endfor
+    if pool == blank and product != blank and product != empty
+      assign pool = product.collections.first.products
     endif
-    if handles == blank and product != blank and product != empty
-      assign handles = ',' | append: product.handle
-      assign sib = product.collections.first
-      if sib != blank
-        for p in sib.products limit: 8
-          unless p.handle == product.handle
-            assign handles = handles | append: ',' | append: p.handle
-          endunless
+
+    # 2a. An explicit lineup — section setting, else the collection's own
+    #     custom.compare_models. This is how a category pins the published
+    #     model order and includes models that are not in the catalogue yet.
+    assign lineup = section.settings.models
+    if lineup == blank
+      assign lineup = collection.metafields.custom.compare_models.value
+    endif
+
+    if lineup != blank
+      assign wanted = lineup | split: ','
+      for w in wanted
+        assign disp = w | strip
+        if disp == blank
+          continue
+        endif
+        assign key = disp | upcase | replace: '-', '' | replace: ' ', '' | replace: '+', '' | replace: '_', ''
+        assign klen = key | size
+        assign found = ''
+        for p in pool limit: 40
+          assign ph = p.handle | upcase | replace: '-', '' | replace: ' ', '' | replace: '+', '' | replace: '_', ''
+          assign pt = p.title | upcase | replace: '-', '' | replace: ' ', '' | replace: '+', '' | replace: '_', ''
+          assign ha = ph | slice: 0, klen
+          assign hb = pt | slice: 0, klen
+          if ha == key or hb == key
+            assign found = p.handle
+            break
+          endif
         endfor
-      endif
+        assign col_entries = col_entries | append: ';;' | append: disp | append: '::' | append: found
+      endfor
     endif
-    assign cols = handles | remove_first: ',' | split: ','
+
+    # 2b. No lineup → the products themselves (collection page, or the
+    #     current product plus its siblings on a PDP).
+    if col_entries == blank and pool != blank
+      for p in pool limit: max_products
+        assign col_entries = col_entries | append: ';;' | append: p.title | append: '::' | append: p.handle
+      endfor
+    endif
+    if col_entries == blank and product != blank and product != empty
+      assign col_entries = ';;' | append: product.title | append: '::' | append: product.handle
+    endif
+
+    assign cols = col_entries | remove_first: ';;' | split: ';;'
     if cols.size > max_products
       assign cols = cols | slice: 0, max_products
     endif
+
+    # 2c. Drop columns that carry NOTHING — no metafield, no seed. A column
+    #     of dashes is noise (OHM is in the range but not in the published
+    #     sheet). Only applied while at least two columns survive, so a
+    #     category with no data yet still gets its table.
+    assign kept = ''
+    assign kept_n = 0
+    for e in cols
+      assign parts = e | split: '::'
+      assign e_handle = parts[1]
+      assign e_prod = nil
+      if e_handle != blank
+        assign e_prod = all_products[e_handle]
+      endif
+      assign has_any = false
+      for row in specs
+        assign pf = row | strip | split: '|'
+        if pf[0] == blank
+          continue
+        endif
+        assign mv = e_prod.metafields[pf[2]][pf[3]].value
+        if mv != blank
+          assign has_any = true
+          break
+        endif
+        if use_model_seed
+          capture sv
+            render 'otodor-spec-model-seed', product: e_prod, title: parts[0], id: pf[0]
+          endcapture
+          if sv != blank
+            assign has_any = true
+            break
+          endif
+        endif
+      endfor
+      if has_any
+        assign kept = kept | append: ';;' | append: e
+        assign kept_n = kept_n | plus: 1
+      endif
+    endfor
+    if kept_n >= 2
+      assign cols = kept | remove_first: ';;' | split: ';;'
+    endif
+
     assign col_count = cols.size
   endif
-
-  # ── Registry (comparable view) ──
-  capture reg
-    render 'otodor-spec-registry', only_comparable: true
-  endcapture
-  assign specs = reg | strip | split: ';;;'
 -%}
 
 {%- if col_count >= 2 -%}
@@ -269,19 +354,29 @@
                   {%- endif -%}
                 {%- endfor -%}
               {%- else -%}
-                {%- for h in cols -%}
-                  {%- assign p = all_products[h] -%}
-                  {%- if p != empty -%}
-                    <th class="otodor-comparison__prod" scope="col">
-                      <a href="{{ p.url }}">
-                        {%- if p.featured_image -%}
-                          {{ p.featured_image | image_url: width: 128 | image_tag: loading: 'lazy', class: 'otodor-comparison__thumb', widths: '64,128', alt: p.title | escape }}
-                        {%- endif -%}
-                        <span class="otodor-comparison__name">{{ p.title | escape }}</span>
-                        {%- if p.price > 0 -%}<span class="otodor-comparison__price">{{ p.price | money }}</span>{%- endif -%}
-                      </a>
-                    </th>
-                  {%- endif -%}
+                {%- for e in cols -%}
+                  {%- liquid
+                    assign parts = e | split: '::'
+                    assign c_title = parts[0]
+                    assign p = nil
+                    if parts[1] != blank
+                      assign p = all_products[parts[1]]
+                    endif
+                    if p != blank and p != empty
+                      assign c_title = p.title
+                    else
+                      assign p = nil
+                    endif
+                  -%}
+                  <th class="otodor-comparison__prod" scope="col">
+                    {%- if p -%}<a href="{{ p.url }}">{%- endif -%}
+                      {%- if p.featured_image -%}
+                        {{ p.featured_image | image_url: width: 128 | image_tag: loading: 'lazy', class: 'otodor-comparison__thumb', widths: '64,128', alt: c_title | escape }}
+                      {%- endif -%}
+                      <span class="otodor-comparison__name">{{ c_title | escape }}</span>
+                      {%- if p.price > 0 -%}<span class="otodor-comparison__price">{{ p.price | money }}</span>{%- endif -%}
+                    {%- if p -%}</a>{%- endif -%}
+                  </th>
                 {%- endfor -%}
               {%- endif -%}
             </tr>
@@ -324,8 +419,12 @@
                       endif
                     endfor
                   else
-                    for h in cols
-                      assign p = all_products[h]
+                    for e in cols
+                      assign parts = e | split: '::'
+                      assign p = nil
+                      if parts[1] != blank
+                        assign p = all_products[parts[1]]
+                      endif
                       assign mv = p.metafields[s_ns][s_key].value
                       if mv != blank
                         assign row_has = true
@@ -333,7 +432,7 @@
                       endif
                       if use_model_seed
                         capture sv
-                          render 'otodor-spec-model-seed', product: p, id: f[0]
+                          render 'otodor-spec-model-seed', product: p, title: parts[0], id: f[0]
                         endcapture
                         if sv != blank
                           assign row_has = true
@@ -377,13 +476,17 @@
                       {%- endif -%}
                     {%- endfor -%}
                   {%- else -%}
-                    {%- for h in cols -%}
-                      {%- assign p = all_products[h] -%}
-                      {%- if p != empty -%}
-                        {%- capture seed_val -%}{%- if use_model_seed -%}{%- render 'otodor-spec-model-seed', product: p, id: f[0] -%}{%- endif -%}{%- endcapture -%}
-                        {%- assign cell_default = seed_val | strip | default: f[7] -%}
-                        <td>{%- render 'otodor-spec-value', product: p, namespace: f[2], key: f[3], type: f[4], unit: f[5], spec_default: cell_default, context: 'comparison' -%}</td>
-                      {%- endif -%}
+                    {%- for e in cols -%}
+                      {%- liquid
+                        assign parts = e | split: '::'
+                        assign p = nil
+                        if parts[1] != blank
+                          assign p = all_products[parts[1]]
+                        endif
+                      -%}
+                      {%- capture seed_val -%}{%- if use_model_seed -%}{%- render 'otodor-spec-model-seed', product: p, title: parts[0], id: f[0] -%}{%- endif -%}{%- endcapture -%}
+                      {%- assign cell_default = seed_val | strip | default: f[7] -%}
+                      <td>{%- render 'otodor-spec-value', product: p, namespace: f[2], key: f[3], type: f[4], unit: f[5], spec_default: cell_default, context: 'comparison' -%}</td>
                     {%- endfor -%}
                   {%- endif -%}
                 </tr>
@@ -415,17 +518,23 @@
                     {%- endif -%}
                   {%- endfor -%}
                 {%- else -%}
-                  {%- for h in cols -%}
-                    {%- assign p = all_products[h] -%}
-                    {%- if p != empty -%}
-                      <td>
+                  {%- for e in cols -%}
+                    {%- liquid
+                      assign parts = e | split: '::'
+                      assign p = nil
+                      if parts[1] != blank
+                        assign p = all_products[parts[1]]
+                      endif
+                    -%}
+                    <td>
+                      {%- if p != blank and p != empty -%}
                         <a class="otodor-comparison__explore" href="{{ p.url }}">
                           {{ section.settings.explore_label | escape }}
                           <span class="visually-hidden">{{ p.title | escape }}</span>
                           {%- render 'otodor-icon', name: 'arrow-right' -%}
                         </a>
-                      </td>
-                    {%- endif -%}
+                      {%- endif -%}
+                    </td>
                   {%- endfor -%}
                 {%- endif -%}
               </tr>
@@ -471,6 +580,7 @@
     { "type": "checkbox", "id": "show_explore", "label": "Show an action under each column", "default": true },
     { "type": "text", "id": "explore_label", "label": "Action label", "default": "Explore" },
     { "type": "header", "content": "Columns" },
+    { "type": "text", "id": "models", "label": "Model lineup", "info": "Comma separated, in order — e.g. SENTRY, NEXUS, ONYX, ZION+, ZEAL. Each name is matched to a product by handle or title; a model with no product yet still gets a column from the spec sheet. Leave blank to use the collection's products. Falls back to the collection metafield custom.compare_models." },
     { "type": "collection", "id": "collection", "label": "Collection", "info": "Used when no columns are added below." },
     { "type": "range", "id": "max_products", "label": "Max products (collection / product page)", "min": 2, "max": 5, "step": 1, "default": 4 }
   ],
