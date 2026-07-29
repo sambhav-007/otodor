@@ -20,7 +20,12 @@ Two namespaces: **`specs`** (the comparable matrix — powers both the product p
 comparison section from one source) and **`custom`** (content, media, relationships).
 
 ### 1.1 `specs.*` — Specification matrix
-Types chosen so a generic comparison can render any row. `boolean` → ✓/—; text/number → value.
+Types chosen so a generic comparison can render any row. `boolean` → ✓/—; `yesno` → ✓/— **plus the
+qualifier the value carries** ("Yes (up to 20)" → ✓ *up to 20*); text/number → value.
+
+> Most access/hardware rows are registered as **`yesno`**, not `boolean`, because the real OTODOR sheet
+> qualifies its answers ("Yes (up to 100)", "No, 4 AA batteries"). Store them as `single_line_text`; a true
+> `boolean` metafield still renders correctly through the same renderer.
 
 | Key | Type | Example (PDF) | Purpose |
 |---|---|---|---|
@@ -69,6 +74,15 @@ Types chosen so a generic comparison can render any row. `boolean` → ✓/—; 
 | `custom.installation_guide` | article_reference | canonical install walkthrough | Content Guide |
 | `custom.compatibility_guide` | article_reference | fit / requirements guide | Content Guide |
 | `custom.related_guides` | list.article_reference | educational reading set | Content Rail |
+| `custom.install_clearance` | multi_line_text | per-product clearance note (overrides the Install section's default) | Install |
+| `custom.hidden_modules` | list.single_line_text | module ids to force OFF for this product (`install`, `warranty`, `compat`, `downloads`) | Module applicability |
+| `custom.shown_modules` | list.single_line_text | module ids to force ON, beating any section allow/deny list | Module applicability |
+
+> **Module applicability (STEP 12):** a module that ships non-blank defaults — Install, Warranty — can never
+> auto-hide on "no data", because it is never empty. `snippets/otodor-module-applies.liquid` answers the
+> second question (*should* this render for this product?) from **product type + tags + collection handles**,
+> configured per section, with `custom.hidden_modules` / `custom.shown_modules` overriding everything.
+> All lists blank = shows. See `OTODOR-MODULE-CONTRACT.md` §Relevance.
 
 > **Content Experience Layer (STEP 7):** guides are authored as **Articles** (preferred) or **Pages** — the
 > canonical, single-URL source — and products/collections link to them by reference. The theme surfaces a
@@ -86,6 +100,7 @@ Types chosen so a generic comparison can render any row. `boolean` → ✓/—; 
 | `custom.menu_icon` | single_line_text (otodor-icon name) | nav/category icon | mega menu, category grid, door selector |
 | `custom.menu_description` | multi_line_text | short blurb | mega menu, category grid |
 | `custom.menu_image` | file_reference (image) | card/CTA image | mega menu, category grid |
+| `custom.parent_collection` | collection_reference | this collection's parent category | category selector (`children` source) |
 | `custom.category_intro` | rich_text | premium hero/intro copy | collection hero |
 | `custom.hero_image` | file_reference (image) | hero background | collection hero |
 | `custom.hero_video` | file_reference (video) or url | hero motion | collection hero |
@@ -199,8 +214,15 @@ Each is defined once in **Settings → Custom data → Metaobjects**, then refer
 3. **Custom data → Collections:** create `custom.*` collection definitions (§2).
 4. **Search & Discovery:** add filters from §4.
 5. Populate the flagship (`digital-locks` + ONYX/SENTRY/NEXUS/ZION+/ZEAL) first; other categories follow the same shape.
+6. **Online Store → Themes → Customize / Collections:** assign the five collection templates —
+   `digital-locks`, `wooden-door-locks`, `glass-door-locks`, `metal-gate-locks`, `smart-padlocks`.
+7. **Optional:** set `custom.parent_collection` on each sub-collection → the category selector finds them
+   even where the navigation menu isn't built.
 
 > Sections ship with sensible **defaults/blocks**, so the site looks complete before step 5 is done.
+> The Digital Locks comparison additionally ships **seed values** in its template (see
+> `OTODOR-SPEC-ENGINE.md` §Seed layer). Populating `specs.*` in step 2 silently overrides them — the seed
+> never competes with admin data, and can be deleted once the metafields are in.
 
 ---
 

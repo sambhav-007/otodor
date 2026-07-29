@@ -32,7 +32,7 @@ instance where editorial content exists (its Dawn implementation doesn't self-hi
 | # | Slot | Section | Core? | Data-source priority | Auto-hide when |
 |---|---|---|---|---|---|
 | 1 | Collection Hero | `otodor-collection-hero` | Core | collection metafields (`hero_*`, `category_intro`) → collection title/description/count → theme defaults | never (always has collection title) |
-| 2 | Category Selector | `otodor-category-selector` | Core | `category` blocks (collection-driven) → per-block overrides | no `category` blocks |
+| 2 | Category Selector | `otodor-category-selector` | Core | `category` blocks → **Navigation** (this collection's child links) → **child collections** (`custom.parent_collection`) | no source resolves a card |
 | 3 | Product Grid | `otodor-collection-grid` | Core | collection products | collection has 0 products |
 | 4 | Feature Highlights | `otodor-features` | Core | `feature` blocks → *(ext: collection `custom.feature_highlights`)* → hide | no `feature` blocks |
 | 5 | Why OTODOR | `otodor-why` | Core | `statement` blocks | no `statement` blocks |
@@ -48,9 +48,32 @@ Hero → Grid → Related.
 
 ---
 
+## Sub-categories without a bespoke template
+
+A parent category (Digital Locks) must open as a **page** that offers its sub-categories, not as a dropdown.
+Two things make that work with no per-collection template:
+
+1. **The nav parent is a destination.** A menu item with children renders as `<summary>` in Dawn, so it never
+   navigated. Both the mega menu and the mobile drawer now carry a *"View all &lt;category&gt;"* link, and on
+   hover-capable desktop a click on the parent follows its own URL.
+2. **The selector finds its own children.** In its default `auto` mode it resolves cards from
+   `category` blocks → **Shopify Navigation** (the link pointing at the current collection, rendering *its*
+   children) → **child collections** (`custom.parent_collection` = this collection) → hide.
+
+Because the generic `collection.json` runs the selector in `auto`, **any** parent collection shows its
+sub-categories with zero template work. Navigation stays the single source of truth — the same data the mega
+menu draws — and the per-card override chain lives once, in `snippets/otodor-category-card.liquid`.
+
+Leaf categories get config-only instances (`collection.wooden-door-locks.json`, `…glass-door-locks`,
+`…metal-gate-locks`, `…smart-padlocks`) with no selector: they have no children. The padlock instance
+deliberately carries no door-install or clearance content, matching the product modules' relevance rule.
+
+---
+
 ## Section lifecycle (guarantee)
 Each reusable OTODOR section now guards its own render:
-- `otodor-category-selector`, `otodor-features`, `otodor-why` → render **nothing** when they have no blocks.
+- `otodor-category-selector` → renders **nothing** when no source (blocks / navigation / child collections)
+  produces a card; `otodor-features`, `otodor-why` → nothing when they have no blocks.
 - `otodor-collection-grid` → shows products or the collection's empty state.
 - `related-products` (Dawn) → self-hides when recommendations are unavailable.
 

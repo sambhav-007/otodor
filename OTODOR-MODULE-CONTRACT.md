@@ -29,6 +29,7 @@ Every module must define these, in its **in-file documentation block** (see §4)
 | 8 | **Dependencies** | Snippets, CSS/JS assets, Dawn features, metaobject definitions. |
 | 9 | **Preset** | The theme-editor preset that renders meaningful content immediately with zero data. |
 | 10 | **Accessibility notes** | Landmarks, labelling, focus, reduced-motion, contrast commitments. |
+| 11 | **Relevance** | Which products this module is *about* — see §2.5. |
 
 **Golden rule (inherited from the data model):** `Required metafields = none`. A module must render *something*
 sensible from settings/blocks alone, then get richer as metafields are populated — or hide cleanly if it has
@@ -39,9 +40,11 @@ nothing meaningful to say. No module ever requires custom data to avoid a broken
 ## 2. The rendering lifecycle — every module follows the same five steps
 
 ```
+0. APPLIES   Ask otodor-module-applies: is this module ABOUT this product?
 1. READ      Read the primary Shopify data (product metafield).
 2. OVERRIDE  Apply the fallback chain (metaobject → section blocks → setting defaults).
 3. VALIDATE  Resolve everything into ONE boolean: does meaningful content exist?
+             (Step 0 false ⇒ has_content false, whatever the data says.)
 4. RENDER    If yes → render the module.
 5. HIDE      If no  → output nothing at all. No wrapper, no heading, no empty spacing.
 ```
@@ -89,6 +92,42 @@ Notes:
 - **Parse once.** All metafield parsing happens in the module's opening `{%- liquid -%}` block, never in the
   template and never repeated inline.
 - **Escape output.** All merchant/metafield text passes through `| escape` (or `| strip_html` for rich fields).
+
+---
+
+## 2.5 Relevance — `snippets/otodor-module-applies.liquid`
+
+Hide-on-empty is necessary but **not sufficient**. A module can be fully populated and still be wrong:
+"Professional installation", the 85 mm door clearance and "Fits these doors" are all true, well-sourced
+content — and all nonsense on a **smart padlock**, which nobody fits to a door. Worse, the modules that carry
+this content ship non-blank schema defaults, so step 3 can never hide them: they are never empty.
+
+Two different questions, and every module must pass both:
+
+| Question | Answered by | Fails when |
+|---|---|---|
+| *Can* I render this? | step 3, `has_content` | no metafield, no block, no default |
+| *Should* I render this? | step 0, `otodor-module-applies` | the module isn't about this kind of product |
+
+**Decision order** (first match wins):
+
+```
+1. product custom.hidden_modules contains module_id   → false
+2. product custom.shown_modules  contains module_id   → true
+3. any except_types / except_tags / except_collections matches → false
+4. any only_* list is set and none matches            → false
+5. otherwise                                          → true
+```
+
+- Configured per section as six comma-list settings under a **"Relevance"** schema header; **all blank = shows**,
+  so adopting the contract never changes an existing module's behaviour.
+- Matching is case-insensitive. Tags and collection handles are matched inside comma-fenced haystacks, so
+  `lock` never matches `padlock` and `digital-lock` never matches `digital-locks`.
+- The per-product metafields are the escape hatch for the one product that breaks the rule.
+- A module and any buy-box copy that repeats its claim must share **one** answer — `otodor-trust-row` asks for
+  `module_id: 'install'`, the same id the Install module uses, so the two can never disagree.
+
+Current wiring: `install` and `compat` declare `except_collections: smart-padlocks` in `templates/product.json`.
 
 ---
 

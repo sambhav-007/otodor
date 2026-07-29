@@ -108,6 +108,7 @@ if value is blank → empty state: "—" in comparison context, nothing inline
 | Renderer | Input shape | Output |
 |---|---|---|
 | **boolean** | true/'yes'/'true'/1 → true; false/'no'/blank → false; other non-blank text → true | ✓ check / — dash (truthy text keeps the check; detail lives in the specs ledger) |
+| **yesno** | a qualified answer: `Yes (up to 20)`, `No, 4 AA batteries (1 year backup)`, `Yes`, `No`, or a real boolean | ✓ check / — dash **plus** the qualifier under it (`.otodor-spec__qual`). A leading Yes/No only counts when `,`, ` ` or `(` follows it, so "Nordic build" is not read as a No; a value with no leading Yes/No is a Yes carrying that text |
 | **range** | text range | `value` + ` unit` if unit set and absent → `35–65 mm` |
 | **number** | number/text | `value` + ` unit` → `12 months`, `5` |
 | **text** | text | escaped text |
@@ -121,6 +122,26 @@ if value is blank → empty state: "—" in comparison context, nothing inline
 
 Empty/absent values obey the **module contract's** hide-on-empty spirit: renderers emit the dash only in
 comparison context (where a column must exist); inline contexts emit nothing.
+
+### Seed layer — `snippets/otodor-spec-seed.liquid`
+
+A spec sheet usually exists long before the metafields do. The seed layer lets a comparison column carry a
+plain `spec_id = value` list (blank lines and `#` comments ignored) so a range can be published before its
+products or their `specs.*` exist.
+
+**It is deliberately the weakest source.** Consumers pass the looked-up value as `spec_default`, which the
+Value Resolver only reaches when the metafield is empty:
+
+```
+product metafield  →  column seed  →  registry default  →  "—"
+```
+
+So admin data always wins, no merge logic is needed, and the seed retires by itself as `specs.*` is
+populated. Never read a seed in place of a metafield, and never treat it as the data model — it is a bridge.
+Live example: the five wooden-door models seeded on `templates/collection.digital-locks.json`.
+
+A comparison **column** likewise no longer requires a product: a block may stand alone with a title, image
+and link, which is what makes a pre-catalogue range comparable at all.
 
 ---
 

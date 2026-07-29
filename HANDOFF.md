@@ -66,7 +66,11 @@ otodor_hero → otodor_categories → otodor_moments → otodor_trust_bar → ot
 otodor_testimonials → otodor_process → otodor_ecosystem → otodor_cta_banner`. The pinned monolith hero is no
 longer the first thing on the page — the banner slideshow is.
 
-**Product page** (`product.json`) current (STEP 4b orchestrator): `main-product → otodor-product-reveal → otodor-product-specs → otodor-product-compat → otodor-product-install → otodor-product-warranty → otodor-product-downloads → otodor-comparison → related-products → otodor-sticky-atc`. Every module auto-hides on no data.
+**Product page** (`product.json`) current (STEP 4b orchestrator): `main-product → otodor-product-reveal → otodor-product-specs → otodor-product-compat → otodor-product-install → otodor-product-warranty → otodor-product-downloads → otodor-comparison → related-products → otodor-sticky-atc`. Every module auto-hides on no data **and on no relevance** (STEP 12).
+
+| Commit | What |
+|---|---|
+| STEP 12 | **Digital Locks as a real category landing · the compare table · PDP relevance.** See the three subsections under "Done — STEP 12" below. |
 
 ---
 
@@ -150,6 +154,47 @@ behind them (the canvas is transparent — the "behind" is the DOM).
   mid-animation without errors or a reset. Timings/guards (session-once, reduced-motion, no-WebGL, safety net)
   are untouched.
 
+### ✅ Done — STEP 12 (Digital Locks landing · compare table · PDP relevance)
+Three defects the user reported after QA, fixed as three commits.
+
+**A — "Digital Locks" now opens a page, with its sub-categories.** A nav item with children renders as
+`<summary>` in Dawn, so clicking a parent only toggled the dropdown; and `/collections/digital-locks` fell to
+the generic `collection.json`, whose selector had no blocks and hid itself. Now: the mega menu **and** the
+mobile drawer carry a **"View all &lt;category&gt;"** link inside the panel (accessible, no JS), and on
+hover-capable desktop a pointer click on the parent follows its own URL (keyboard still toggles the
+disclosure). `otodor-category-selector` gained a **source** setting — `auto` = `category` blocks →
+**Shopify Navigation** (finds the link pointing at the current collection, renders *its* children) →
+**child collections** (`custom.parent_collection`) → hide. The generic `collection.json` runs `auto`, so **any**
+parent collection shows its sub-categories with no bespoke template. The card override chain moved into
+`snippets/otodor-category-card.liquid` (one implementation, three sources). Four config-only leaf templates
+added: `collection.wooden-door-locks/glass-door-locks/metal-gate-locks/smart-padlocks.json`.
+
+**B — The compare table renders the client's sheet.** `otodor-comparison` was right but empty (no `specs.*`
+metafields exist, so every row but `warranty` dropped). Registry gained the missing rows (**Size, Weight,
+Emergency backup port, Mini screen**) and retyped the qualified ones to the new **`yesno`** renderer —
+tick/dash **plus** the qualifier ("Yes (up to 20)" → ✓ *up to 20*). A **column no longer needs a product**: a
+block can stand alone with a title/image/link and carry **seed values** (`spec_id = value`,
+`snippets/otodor-spec-seed`), handed to the resolver as `spec_default` so a real metafield always wins.
+Digital Locks is seeded with SENTRY · NEXUS · ONYX · ZION+ · ZEAL. Also: an **Explore** action per column
+(mygate parity), a light/dark scheme, keyboard-scrollable table region.
+
+**C — Modules declare what they apply to.** A smart padlock was shown professional door installation, the
+85 mm clearance and door compatibility. Not a data problem: those modules ship non-blank defaults, so
+"hide when empty" can never fire. New `snippets/otodor-module-applies.liquid` answers *should* this render —
+allow/deny lists over **product type + tags + collection handles**, plus per-product
+`custom.hidden_modules` / `custom.shown_modules` which beat any section config; all blank = shows.
+Install, Warranty, Compatibility and Downloads consult it; Install also prefers `custom.install_clearance`.
+The buy-box trust row stopped being a hardcoded `custom_liquid` string and became an **`otodor_trust_row`
+block** in `main-product` rendering `otodor-trust-row`, which asks for the same `install` verdict the Install
+module uses — one answer, not two that can disagree. `product.json` marks install + compat as not applying to
+`smart-padlocks`.
+
+- **Data still owed by the client:** the sheet leaves **Size blank for NEXUS / ONYX / ZION+** and truncates
+  **Inbuilt battery to "Yes," for NEXUS / ONYX**. Those cells render "—"; nothing was invented.
+- **Verified headlessly:** `theme check` at baseline (5 errors / 16 warnings); every template + section schema
+  parsed; the `yesno` parser and the applicability decision matrix were ported and exercised (15 cases —
+  comma fences so `lock` ≠ `padlock`, precedence, empty config, bare product).
+
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
 - Optional: real LLM concierge as a hosted micro-service if the deterministic advisor proves the demand.
@@ -157,11 +202,13 @@ behind them (the canvas is transparent — the "behind" is the DOM).
 
 ### Admin setup the merchant must do (theme degrades gracefully until done)
 - **Navigation:** build the nested 3-level `main-menu` (Products → Digital Locks → Wooden/Glass/…; see Phase 2 report) so the mega menu shows the hierarchy.
-- **Assign** the `digital-locks` **collection → theme template `digital-locks`**. Optionally create sub-collections `wooden-door-locks`/`glass-door-locks`/`metal-gate-locks`/`smart-padlocks` (selector falls back gracefully if absent).
+- **Assign five collection templates** (Online Store → Collections → *collection* → Theme template): `digital-locks`, `wooden-door-locks`, `glass-door-locks`, `metal-gate-locks`, `smart-padlocks`. Until assigned, each collection still gets the generic `collection.json` — which now shows its sub-categories automatically from Navigation, so nothing is broken meanwhile.
+- **Optional (STEP 12):** set `custom.parent_collection` on each sub-collection → the selector finds them even where the menu isn't built. And set `custom.menu_image` / `menu_description` / `menu_icon` on the four sub-collections — those are what give the sub-category cards their art and blurb.
 - **Custom data:** define product metafields (`specs.*`, `custom.specs`, `custom.access_methods`, `custom.documents`, `custom.door_compatibility`, `custom.positioning_line`) + collection metafields (`custom.menu_icon/description/image`, `hero_*`, `faqs`, `seo_content`); optional metaobjects only if reused (see data model). Flag comparable ones for Search & Discovery filters.
 - **Leads (STEP 8):** confirm the store **contact/notification email** (Settings → Notifications) — that is where lead-form submissions arrive. Ensure a page with handle `contact` uses the `page.contact` template (the lead desk). Optionally repoint the **homepage CTA banner** and **mega-menu "Get a Custom Quote"** link settings to `/pages/contact#otodor-lead` (they're merchant URL settings; the digital-locks collection is already wired).
 
 ### Content (owner: user — blocks real impact)
+- **Missing cells in the client's comparison sheet** — Size for NEXUS / ONYX / ZION+, and the Inbuilt-battery detail for NEXUS / ONYX. They render "—" until the client supplies them.
 - **Real product prices** — WINDSOR/VAULTEX/FREDDY are ₹0 (card guard shows "Contact for pricing").
 - **Photography / high-res flagship renders** (ONYX/SENTRY/NEXUS/ZION+/ZEAL/OHM); product descriptions are near-empty.
 

@@ -25,12 +25,12 @@ Consumed by the `product.json` orchestrator (Gallery → Purchase → **modules*
 | Module | Purpose | Data sources (primary) | Fallback chain | Visibility rule | Reusable in | Dependencies | Status |
 |---|---|---|---|---|---|---|---|
 | **otodor-product-specs** | The specification ledger | `product.metafields.custom.specs` (grouped JSON) | metafield → `row` blocks → hide | Hidden if no metafield **and** no blocks | PDP, collection, landing, comparison source | `.otodor-ledger`, base.css | ✅ |
-| **otodor-product-compat** | Will it fit my door/gate/opening? | `product.metafields[ns][key]` fit tags (default `custom.door_compatibility`) + `specs.door_thickness` / `specs.installation_type` | Tags: metafield → `tag` blocks → hide · Specs: `specs.*` → `spec` blocks → hide | Hidden when **both** tags and specs empty | PDP, comparison; **any category** (repoint tag metafield) | `.otodor-ledger`, base.css | ✅ |
-| **otodor-product-install** | Installation flow + 85 mm clearance | `step` blocks / settings | blocks → built-in default stages; clearance note from setting (auto-hides if blank) | Always (has sensible defaults) | PDP, landing | base.css, `settings.otodor_whatsapp_number` | ◑ (doc block retrofit pending) |
-| **otodor-product-warranty** | What the warranty covers, for how long | `custom.warranty_policies` metaobjects + `specs.warranty` / `specs.warranty_battery` | metaobjects → `policy` blocks → spec metafields on 2 slots → editable setting defaults → hide | Hidden only when all sources cleared | PDP, comparison, collection | `otodor-icon`, base.css; opt. `warranty_policy` metaobject | ✅ |
-| **otodor-product-downloads** | Manuals, datasheets, certs, brochures | `product.metafields.custom.documents` (list.file_reference) | metafield files → `document` blocks → hide | Hidden if no document exists | PDP, collection, landing | base.css | ✅ |
+| **otodor-product-compat** | Will it fit my door/gate/opening? | `product.metafields[ns][key]` fit tags (default `custom.door_compatibility`) + `specs.door_thickness` / `specs.installation_type` | Tags: metafield → `tag` blocks → hide · Specs: `specs.*` → `spec` blocks → hide | Hidden when **both** empty, **or when it does not apply** (`otodor-module-applies`; excludes `smart-padlocks`) | PDP, comparison; **any category** (repoint tag metafield) | `otodor-module-applies`, `.otodor-ledger`, base.css | ✅ |
+| **otodor-product-install** | Installation flow + door clearance | `step` blocks / settings; clearance from `custom.install_clearance` | blocks → built-in default stages; clearance: product metafield → setting → hide | **Only when it applies** (`otodor-module-applies`; excludes `smart-padlocks`) — its defaults are never blank, so relevance is what hides it | PDP, landing | `otodor-module-applies`, base.css, `settings.otodor_whatsapp_number` | ✅ |
+| **otodor-product-warranty** | What the warranty covers, for how long | `custom.warranty_policies` metaobjects + `specs.warranty` / `specs.warranty_battery` | metaobjects → `policy` blocks → spec metafields on 2 slots → editable setting defaults → hide | Hidden when all sources cleared **or when it does not apply** (`otodor-module-applies`) | PDP, comparison, collection | `otodor-module-applies`, `otodor-icon`, base.css; opt. `warranty_policy` metaobject | ✅ |
+| **otodor-product-downloads** | Manuals, datasheets, certs, brochures | `product.metafields.custom.documents` (list.file_reference) | metafield files → `document` blocks → hide | Hidden if no document exists **or when it does not apply** (`otodor-module-applies`) | PDP, collection, landing | `otodor-module-applies`, base.css | ✅ |
 | **otodor-product-reveal** | Editorial statement between purchase & specs | section setting (`statement`) | setting → hide when blank | Optional slot | PDP | base.css | ◑ |
-| **otodor-comparison** | Compare products across the spec set | **Spec Engine**: registry × resolved products (`specs.*`) | product blocks → collection setting → current collection → current product + siblings → hide | Hidden if < 2 products; empty rows drop | PDP, collection, landing, any category | `otodor-spec-registry`, `otodor-spec-value`, `otodor-icon`, base.css | ✅ (engine consumer) |
+| **otodor-comparison** | Compare products across the spec set | **Spec Engine**: registry × resolved columns (`specs.*`) | per cell: metafield → column **seed** → registry default → dash. Columns: blocks (a picked product *or* a standalone title) → collection setting → current collection → PDP siblings → hide | Hidden if < 2 columns; empty rows drop | PDP, collection, landing, any category | `otodor-spec-registry`, `otodor-spec-value`, `otodor-spec-seed`, `otodor-icon`, base.css | ✅ (engine consumer) |
 | **otodor-sticky-atc** | Persistent purchase bar | `product`, variants, price | always on PDP | Scroll-triggered | PDP | `.otodor-sticky-atc`, base.css, JS | ◑ |
 
 **Reused as-is (Dawn):** Gallery + Purchase (`main-product`), Video (`video`), FAQ (`collapsible-content`),
@@ -45,11 +45,14 @@ Not sections — snippets consumed by sections. No consumer hardcodes a spec nam
 
 | Snippet | Purpose | Data sources | Fallback chain | Visibility rule | Reusable in | Dependencies | Status |
 |---|---|---|---|---|---|---|---|
-| **otodor-spec-registry** | Single source of truth: every spec definition (10-col records) | built-in canonical set (20 specs) + optional `comparison_spec` metaobjects | metaobject overrides built-in by id → built-in | Emits requested view (`only_comparable` / `group` / `ids`) | Comparison, highlights, landing, search-intent, API | — | ✅ |
-| **otodor-spec-value** | Value resolver + 10 type renderers (the render engine) | `product.metafields[ns][key]` or `raw_value` | raw_value → metafield → default → '—' (comparison) / nothing (inline) | per renderer | Every spec consumer | `otodor-icon`, `.otodor-spec__*` in base.css | ✅ |
+| **otodor-spec-registry** | Single source of truth: every spec definition (10-col records) | built-in canonical set (24 specs, group-ordered) + optional `comparison_spec` metaobjects | metaobject overrides built-in by id → built-in | Emits requested view (`only_comparable` / `group` / `ids`) | Comparison, highlights, landing, search-intent, API | — | ✅ |
+| **otodor-spec-value** | Value resolver + 11 type renderers (the render engine) | `product.metafields[ns][key]` or `raw_value` | raw_value → metafield → default → '—' (comparison) / nothing (inline) | per renderer | Every spec consumer | `otodor-icon`, `.otodor-spec__*` in base.css | ✅ |
+| **otodor-spec-seed** | Read one `spec_id = value` line out of a column's seed block | a column's seed textarea | line match → nothing | — (lowest-priority source; passed as `spec_default`) | Comparison; any consumer publishing ahead of its metafields | — | ✅ |
 
-**Renderers:** boolean · range · number · text · badge · chip · rating · link · document · image. Add a type =
-one `when` branch; add a spec = one registry record. Zero section edits either way.
+**Renderers:** boolean · **yesno** · range · number · text · badge · chip · rating · link · document · image.
+Add a type = one `when` branch; add a spec = one registry record. Zero section edits either way.
+`yesno` is the workhorse: OTODOR spec sheets qualify their answers ("Yes (up to 100)"), so it keeps the
+tick/dash and prints the qualifier under it.
 
 ## 1c. Schema Registry (structured data)
 
@@ -77,7 +80,7 @@ Composed by `templates/collection.json` (inherited by every category); Digital L
 | Section | Purpose | Data sources (primary) | Fallback chain | Visibility rule | Reusable in | Dependencies | Status |
 |---|---|---|---|---|---|---|---|
 | **otodor-collection-hero** | Dark brand handshake for a category | collection `custom.hero_*` / `custom.category_intro` | metafields → collection title/description/count → theme defaults | Never (always has collection title) | All categories | base.css | ◑ |
-| **otodor-category-selector** | "Choose your type" chooser (reference impl.) | `category` blocks → collection (title/image/desc via `custom.menu_*`) | per-block override → collection → collection image → 1st product image → gradient | Hidden if no `category` blocks | Home, collection, landing, PDP cross-sell | `otodor-icon`, base.css | ✅ (reference) |
+| **otodor-category-selector** | "Choose your type" chooser (reference impl.) | `category` blocks → **Navigation** (this collection's child links) → **child collections** (`custom.parent_collection`) | source: blocks → menu → children → hide; per card: override → `custom.menu_*` → collection → 1st product image → gradient | Hidden if no source resolves a card | Home, collection, landing, PDP cross-sell | `otodor-category-card`, `otodor-icon`, base.css | ✅ (reference) |
 | **otodor-collection-grid** | Product discovery grid | collection products | products → collection empty state | Hides grid if 0 products | All categories | base.css | ◑ |
 | **otodor-features** | Feature highlights | `feature` blocks *(ext: `custom.feature_highlights`)* | blocks → hide | Hidden if no `feature` blocks | All categories, home | base.css | ◑ |
 | **otodor-why** | "Why OTODOR" statements | `statement` blocks | blocks → hide | Hidden if no `statement` blocks | All categories, home | base.css | ◑ |
@@ -145,11 +148,16 @@ listed so the inventory is complete.
 
 ## 4. Coverage summary
 
-- **Contract-compliant modules (✅):** 6 — `otodor-product-specs`, `otodor-product-compat`,
-  `otodor-product-warranty`, `otodor-product-downloads`, `otodor-category-selector` (reference),
-  `otodor-comparison` (spec-engine consumer).
-- **Spec Rendering Engine (✅):** `otodor-spec-registry`, `otodor-spec-value` — reusable across all consumers.
-- **Framework sections pending doc-block retrofit (◑):** `otodor-product-install`, `otodor-product-reveal`,
+- **Contract-compliant modules (✅):** 7 — `otodor-product-specs`, `otodor-product-compat`,
+  `otodor-product-install`, `otodor-product-warranty`, `otodor-product-downloads`,
+  `otodor-category-selector` (reference), `otodor-comparison` (spec-engine consumer).
+- **Spec Rendering Engine (✅):** `otodor-spec-registry`, `otodor-spec-value`, `otodor-spec-seed` — reusable
+  across all consumers.
+- **Module applicability (✅, STEP 12):** `otodor-module-applies` — the contract's relevance clause
+  (`OTODOR-MODULE-CONTRACT.md` §2.5). Consumed by Install, Warranty, Compatibility, Downloads and
+  `otodor-trust-row` (the buy-box claims, now a first-class `otodor_trust_row` block in `main-product`
+  rather than a hardcoded `custom_liquid` string).
+- **Framework sections pending doc-block retrofit (◑):** `otodor-product-reveal`,
   `otodor-sticky-atc`, `otodor-collection-hero`, `otodor-collection-grid`, `otodor-features`, `otodor-why`.
   All are already self-hiding/data-driven; retrofit adds the 10-field block.
 - **Content Experience Layer (✅, STEP 7):** `otodor-content-guide`, `otodor-content-rail` — surface native
