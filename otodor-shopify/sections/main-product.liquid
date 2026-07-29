@@ -209,6 +209,21 @@
                 </p>
               {%- when 'custom_liquid' -%}
                 {{ block.settings.custom_liquid }}
+              {%- comment -%}
+                OTODOR: the buy-box trust row as a first-class block. It was a
+                custom_liquid string in templates/product.json, which printed
+                "Free professional installation" on products nobody installs.
+                The snippet gates each claim; this block makes it editable.
+              {%- endcomment -%}
+              {%- when 'otodor_trust_row' -%}
+                <div {{ block.shopify_attributes }}>
+                  {%- render 'otodor-trust-row',
+                    product: product,
+                    except_collections: block.settings.except_collections,
+                    install_label: block.settings.install_label,
+                    warranty_label: block.settings.warranty_label,
+                    technicians_label: block.settings.technicians_label -%}
+                </div>
               {%- when 'collapsible_tab' -%}
                 <div class="product__accordion accordion quick-add-hidden" {{ block.shopify_attributes }}>
                   <details id="Details-{{ block.id }}-{{ section.id }}">
@@ -956,6 +971,18 @@
           "label": "t:sections.custom-liquid.settings.custom_liquid.label",
           "info": "t:sections.custom-liquid.settings.custom_liquid.info"
         }
+      ]
+    },
+    {
+      "type": "otodor_trust_row",
+      "name": "OTODOR Trust row",
+      "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Three reassurances under the buy button. The installation claims are hidden automatically on products that are not fitted (see \"Not installed\" below), and the warranty reads specs.warranty when the product has it." },
+        { "type": "text", "id": "install_label", "label": "Installation claim", "default": "Free professional installation" },
+        { "type": "text", "id": "warranty_label", "label": "Warranty claim", "default": "3-year warranty" },
+        { "type": "text", "id": "technicians_label", "label": "Technicians claim", "default": "Certified technicians" },
+        { "type": "text", "id": "except_collections", "label": "Not installed", "info": "Collection handles (comma separated) whose products are not fitted by a technician.", "default": "smart-padlocks" }
       ]
     },
     {

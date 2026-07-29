@@ -1,0 +1,189 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Module Applicability
+  The relevance clause of the module contract — see OTODOR-MODULE-CONTRACT.md.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:   Answer one question for a product module: does this module
+             APPLY to this product at all?
+
+  Auto-hiding on "no data" is not enough. A module can be fully populated
+  and still be wrong: professional door installation, an 85 mm door
+  clearance and door compatibility are all real, well-sourced content —
+  and all nonsense on a smart padlock, which is not fitted to a door.
+  Data presence answers "can I render this?"; applicability answers
+  "should I?". Modules must pass BOTH.
+
+  Params:
+    module_id          stable id, e.g. 'install' | 'warranty' | 'compat'
+    product            the product to judge (pass `product: product`)
+    only_types         comma list of product types this module applies to
+    only_tags          comma list of product tags
+    only_collections   comma list of collection HANDLES
+    except_types       comma list of product types to exclude
+    except_tags        comma list of product tags to exclude
+    except_collections comma list of collection HANDLES to exclude
+
+  Decision order (first match wins):
+    1. product custom.hidden_modules contains module_id  → false
+    2. product custom.shown_modules  contains module_id  → true
+    3. any except_* matches                              → false
+    4. any only_* is set and none matches                → false
+    5. otherwise                                         → true
+
+  All lists blank + no metafields = true, so a module that says nothing
+  about relevance behaves exactly as it did before. Matching is
+  case-insensitive; whitespace around list items is ignored.
+
+  Usage:
+    {%- capture applies -%}
+      {%- render 'otodor-module-applies', module_id: 'install', product: product,
+          except_collections: section.settings.except_collections -%}
+    {%- endcapture -%}
+    {%- if applies == 'true' and has_content -%} … {%- endif -%}
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign verdict = 'true'
+  assign decided = false
+  assign want = module_id | strip | downcase
+
+  # ── 1 & 2. Per-product overrides (the merchant's explicit answer) ──
+  if want != blank
+    assign hidden = product.metafields.custom.hidden_modules.value
+    if hidden != blank
+      for m in hidden
+        assign mm = m | strip | downcase
+        if mm == want
+          assign verdict = 'false'
+          assign decided = true
+          break
+        endif
+      endfor
+    endif
+
+    unless decided
+      assign shown = product.metafields.custom.shown_modules.value
+      if shown != blank
+        for m in shown
+          assign mm = m | strip | downcase
+          if mm == want
+            assign verdict = 'true'
+            assign decided = true
+            break
+          endif
+        endfor
+      endif
+    endunless
+  endif
+
+  # ── Facts about this product, normalised once. Tags and handles are
+  #    matched inside comma-fenced haystacks so "lock" never matches
+  #    "padlock".
+  unless decided
+    assign p_type = product.type | downcase | strip
+
+    assign p_tags = ','
+    for t in product.tags
+      assign tt = t | downcase | strip
+      assign p_tags = p_tags | append: tt | append: ','
+    endfor
+
+    assign p_cols = ','
+    for c in product.collections
+      assign ch = c.handle | downcase | strip
+      assign p_cols = p_cols | append: ch | append: ','
+    endfor
+  endunless
+
+  # ── 3. Exclusions ──
+  unless decided
+    assign ex_types = except_types | split: ','
+    for v in ex_types
+      assign needle = v | strip | downcase
+      if needle != blank and p_type == needle
+        assign verdict = 'false'
+        assign decided = true
+        break
+      endif
+    endfor
+  endunless
+  unless decided
+    assign ex_tags = except_tags | split: ','
+    for v in ex_tags
+      assign vv = v | strip | downcase
+      assign needle = ',' | append: vv | append: ','
+      if vv != blank and p_tags contains needle
+        assign verdict = 'false'
+        assign decided = true
+        break
+      endif
+    endfor
+  endunless
+  unless decided
+    assign ex_cols = except_collections | split: ','
+    for v in ex_cols
+      assign vv = v | strip | downcase
+      assign needle = ',' | append: vv | append: ','
+      if vv != blank and p_cols contains needle
+        assign verdict = 'false'
+        assign decided = true
+        break
+      endif
+    endfor
+  endunless
+
+  # ── 4. Allow-lists: if any is set, at least one entry must match ──
+  unless decided
+    assign has_only = false
+    assign only_hit = false
+
+    if only_types != blank
+      assign has_only = true
+      assign on_types = only_types | split: ','
+      for v in on_types
+        assign needle = v | strip | downcase
+        if needle != blank and p_type == needle
+          assign only_hit = true
+          break
+        endif
+      endfor
+    endif
+
+    if only_tags != blank
+      assign has_only = true
+      unless only_hit
+        assign on_tags = only_tags | split: ','
+        for v in on_tags
+          assign vv = v | strip | downcase
+          assign needle = ',' | append: vv | append: ','
+          if vv != blank and p_tags contains needle
+            assign only_hit = true
+            break
+          endif
+        endfor
+      endunless
+    endif
+
+    if only_collections != blank
+      assign has_only = true
+      unless only_hit
+        assign on_cols = only_collections | split: ','
+        for v in on_cols
+          assign vv = v | strip | downcase
+          assign needle = ',' | append: vv | append: ','
+          if vv != blank and p_cols contains needle
+            assign only_hit = true
+            break
+          endif
+        endfor
+      endunless
+    endif
+
+    if has_only and only_hit == false
+      assign verdict = 'false'
+    endif
+  endunless
+
+  echo verdict
+-%}

@@ -33,7 +33,24 @@
   ════════════════════════════════════════════════════════════════════════
 {%- endcomment -%}
 
+{%- capture warranty_applies -%}
+  {%- render 'otodor-module-applies',
+    module_id: 'warranty',
+    product: product,
+    only_types: section.settings.only_types,
+    only_tags: section.settings.only_tags,
+    only_collections: section.settings.only_collections,
+    except_types: section.settings.except_types,
+    except_tags: section.settings.except_tags,
+    except_collections: section.settings.except_collections -%}
+{%- endcapture -%}
+
 {%- liquid
+  # 0. APPLIES — this module's defaults are never blank, so "hide when
+  #    empty" can never fire. Relevance is what decides. See
+  #    snippets/otodor-module-applies.
+  assign warranty_applies = warranty_applies | strip
+
   # 1. READ primary
   assign mo_policies = product.metafields.custom.warranty_policies.value
   assign spec_lock = product.metafields.specs.warranty
@@ -54,6 +71,9 @@
   if mo_policies != blank or has_blocks or spec_lock != blank or spec_batt != blank or has_defaults
     assign has_content = true
   endif
+  unless warranty_applies == 'true'
+    assign has_content = false
+  endunless
 -%}
 
 {%- if has_content -%}
@@ -207,6 +227,14 @@
     { "type": "text", "id": "policy_2_duration", "label": "Duration", "default": "1 year" },
     { "type": "text", "id": "policy_2_title", "label": "Title", "default": "Battery" },
     { "type": "textarea", "id": "policy_2_covers", "label": "Covers", "default": "Rechargeable battery performance and capacity." },
+    { "type": "header", "content": "Relevance" },
+    { "type": "paragraph", "content": "Leave every field blank to show this module on all products; list product types, tags or collection handles (comma separated) to limit it. A product's custom.hidden_modules / custom.shown_modules metafield overrides everything here." },
+    { "type": "text", "id": "only_types", "label": "Only these product types" },
+    { "type": "text", "id": "only_tags", "label": "Only these tags" },
+    { "type": "text", "id": "only_collections", "label": "Only these collections" },
+    { "type": "text", "id": "except_types", "label": "Except these product types" },
+    { "type": "text", "id": "except_tags", "label": "Except these tags" },
+    { "type": "text", "id": "except_collections", "label": "Except these collections" },
     { "type": "header", "content": "Spacing" },
     { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 88 },
     { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 88 }

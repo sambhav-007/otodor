@@ -1,0 +1,68 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Buy-box Trust Row
+  Rendered by the `otodor_trust_row` block in sections/main-product.liquid.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:   The three reassurances under the Add-to-cart button.
+
+  Was a hardcoded custom_liquid string in templates/product.json, where
+  all three claims were printed on every product — including
+  "Free professional installation" on a smart padlock, which is not
+  installed by anyone. Each claim now stands on its own condition:
+
+    installation  otodor-module-applies (module id `install`), so it
+                  follows the same relevance rule as the Install module —
+                  one answer, not two that can disagree.
+    warranty      specs.warranty when set, else the default below.
+    technicians   shown with installation; a product nobody fits does not
+                  need certified fitters.
+
+  Params (all optional):
+    product              the product to judge (pass `product: product`)
+    except_collections   comma list of collection handles that are not
+                         installed (default: smart-padlocks)
+    install_label / warranty_label / technicians_label — copy overrides
+
+  Renders nothing when no claim survives.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- assign not_installed = except_collections | default: 'smart-padlocks' -%}
+{%- capture trust_install -%}
+  {%- render 'otodor-module-applies',
+    module_id: 'install',
+    product: product,
+    except_collections: not_installed -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign trust_install = trust_install | strip
+  assign warranty = product.metafields.specs.warranty.value | default: warranty_label | default: '3-year warranty'
+  assign show_install = false
+  if trust_install == 'true'
+    assign show_install = true
+  endif
+-%}
+
+{%- if show_install or warranty != blank -%}
+  <div class="otodor-trust-row">
+    {%- if show_install -%}
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>
+        {{ install_label | default: 'Free professional installation' | escape }}
+      </span>
+    {%- endif -%}
+    {%- if warranty != blank -%}
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/></svg>
+        {{ warranty | escape }}
+      </span>
+    {%- endif -%}
+    {%- if show_install -%}
+      <span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+        {{ technicians_label | default: 'Certified technicians' | escape }}
+      </span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

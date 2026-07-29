@@ -1,3 +1,28 @@
+{%- comment -%}
+  ────────────────────────────────────────────────────────────────────────
+  RELEVANCE: this module describes fitting a device to a DOOR. It ships
+  with real defaults (four stages, the 85 mm clearance), which is why it
+  cannot rely on "hide when empty" — it is never empty. It asks
+  otodor-module-applies instead, and stays out of the way on products
+  that are not door-fitted (a smart padlock needs no technician).
+  The clearance note prefers the product's own custom.install_clearance,
+  so door types that differ can say so without a second section.
+  ────────────────────────────────────────────────────────────────────────
+{%- endcomment -%}
+{%- capture install_applies -%}
+  {%- render 'otodor-module-applies',
+    module_id: 'install',
+    product: product,
+    only_types: section.settings.only_types,
+    only_tags: section.settings.only_tags,
+    only_collections: section.settings.only_collections,
+    except_types: section.settings.except_types,
+    except_tags: section.settings.except_tags,
+    except_collections: section.settings.except_collections -%}
+{%- endcapture -%}
+{%- assign install_applies = install_applies | strip -%}
+
+{%- if install_applies == 'true' -%}
 {%- style -%}
   /* ─────────────────────────────────────────────────────────
      OTODOR Product Install — compatibility trust section.
@@ -201,10 +226,11 @@
     {%- endif -%}
   </div>
 
-  {%- if section.settings.clearance_note != blank -%}
+  {%- assign clearance = product.metafields.custom.install_clearance.value | default: section.settings.clearance_note -%}
+  {%- if clearance != blank -%}
     <div class="otodor-pinstall__clearance" data-otodor-reveal="fade-up">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 6l3-3M3 6l3 3M21 6l-3-3M21 6l-3 3M8 12v9M16 12v9M8 18h8"/></svg>
-      <p>{{ section.settings.clearance_note | escape }}</p>
+      <p>{{ clearance | escape }}</p>
     </div>
   {%- endif -%}
 </div>
@@ -218,6 +244,7 @@
 {%- if section.settings.emit_howto_schema and section.blocks.size > 1 -%}
   {%- render 'otodor-schema', build: 'howto', howto_section: section, howto_name: section.settings.howto_name -%}
 {%- endif -%}
+{%- endif -%}
 
 {% schema %}
 {
@@ -229,7 +256,15 @@
     { "type": "checkbox", "id": "show_cta", "label": "Show compatibility-check button", "default": true },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "Check my door" },
     { "type": "header", "content": "Clearance guide" },
-    { "type": "textarea", "id": "clearance_note", "label": "Clearance note", "info": "Auto-hides if left blank.", "default": "Requires roughly 85 mm (3.35\") of side clearance from the door edge to any wall or frame for the handle to swing freely. Unsure? We confirm this during the compatibility check." },
+    { "type": "textarea", "id": "clearance_note", "label": "Clearance note", "info": "Overridden per product by custom.install_clearance. Auto-hides if both are blank.", "default": "Requires roughly 85 mm (3.35\") of side clearance from the door edge to any wall or frame for the handle to swing freely. Unsure? We confirm this during the compatibility check." },
+    { "type": "header", "content": "Relevance" },
+    { "type": "paragraph", "content": "This module is about fitting a device to a door. Leave every field blank to show it on all products; list product types, tags or collection handles (comma separated) to limit it. A product's custom.hidden_modules / custom.shown_modules metafield overrides everything here." },
+    { "type": "text", "id": "only_types", "label": "Only these product types" },
+    { "type": "text", "id": "only_tags", "label": "Only these tags" },
+    { "type": "text", "id": "only_collections", "label": "Only these collections", "info": "Collection handles, e.g. wooden-door-locks, glass-door-locks" },
+    { "type": "text", "id": "except_types", "label": "Except these product types" },
+    { "type": "text", "id": "except_tags", "label": "Except these tags" },
+    { "type": "text", "id": "except_collections", "label": "Except these collections", "info": "Collection handles, e.g. smart-padlocks" },
     { "type": "header", "content": "SEO" },
     { "type": "checkbox", "id": "emit_howto_schema", "label": "Emit HowTo structured data", "info": "Only for genuine step-by-step instructions (needs 2+ stage blocks). OTODOR's professional-install stages usually do NOT qualify — leave off.", "default": false },
     { "type": "text", "id": "howto_name", "label": "HowTo name", "info": "Defaults to \"How to install <product>\"." }
