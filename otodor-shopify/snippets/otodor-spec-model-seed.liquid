@@ -1,0 +1,143 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Model Spec Seed  (the published spec sheet, per model)
+  Part of the Specification Rendering Engine — see OTODOR-SPEC-ENGINE.md.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:   Supply a model's published specification values wherever the
+             product's own `specs.*` metafields are not populated yet.
+
+  WHY THIS IS IN THE THEME. The values below are the client's published
+  spec sheet — the same canonical brand data as the specification list in
+  otodor-spec-registry, which is also a built-in here. Keeping it in one
+  snippet means every consumer (any collection template, any product page,
+  assigned template or not) shows the same figures, instead of the sheet
+  being pasted per template.
+
+  IT IS STILL THE WEAKEST SOURCE. Consumers pass the result as
+  `spec_default`, which the Value Resolver only reaches when the metafield
+  is empty:
+
+      product metafield  →  column seed  →  MODEL SEED  →  registry default  →  '—'
+
+  So populating `specs.*` in admin silently overrides it, one product at a
+  time, and this file is deleted when the last model is covered. Never
+  read it in place of a metafield.
+
+  Params:
+    product   product object (its handle/title identify the model)
+    title     fallback identifier when there is no product (manual column)
+    id        registry spec id to look up (e.g. `door_thickness`)
+
+  Model matching: handle and title are upper-cased and stripped of
+  non-alphanumerics, then tested as PREFIXES, so `ZION+ Rose Gold` and
+  `ZION+ Galaxy Black` both resolve to ZION+, and `SENTRY Pro` to SENTRY.
+  A product no model matches (e.g. OHM) simply gets nothing.
+
+  Echoes the value, or nothing.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  # ── Identify the model ───────────────────────────────────────────────
+  assign ident = product.handle | default: title | default: ''
+  assign ident = ident | upcase | replace: '-', '' | replace: ' ', '' | replace: '+', '' | replace: '_', ''
+  assign alt = product.title | default: title | default: ''
+  assign alt = alt | upcase | replace: '-', '' | replace: ' ', '' | replace: '+', '' | replace: '_', ''
+
+  assign model = ''
+  assign keys = 'SENTRY,NEXUS,ONYX,ZION,ZEAL' | split: ','
+  for k in keys
+    assign klen = k | size
+    assign head_a = ident | slice: 0, klen
+    assign head_b = alt | slice: 0, klen
+    if head_a == k or head_b == k
+      assign model = k
+      break
+    endif
+  endfor
+-%}
+
+{%- if model != blank and id != blank -%}
+  {%- capture sheet -%}
+    {%- case model -%}
+      {%- when 'SENTRY' -%}
+dimensions = 41.5 × 7 cm
+bolts = 5 bolts
+face_recognition = Yes (up to 20)
+fingerprint = Yes (up to 100)
+cards = Yes (up to 100)
+door_thickness = 45–100 mm
+backup_port = Type-C
+battery = Yes (4200 mAh, 6 months backup)
+weight = 4.4
+deadbolt = Yes
+two_way_talk = Yes
+doorbell = Yes
+inside_screen = Yes (4.5 in)
+mini_screen = Yes
+motorised_latch = Yes
+      {%- when 'NEXUS' -%}
+bolts = 5 bolts
+face_recognition = Yes (up to 20)
+fingerprint = Yes (up to 100)
+cards = Yes (up to 100)
+door_thickness = 45–100 mm
+backup_port = Type-C
+battery = Yes
+weight = 3.8
+deadbolt = Yes
+two_way_talk = Yes
+doorbell = Yes
+inside_screen = Yes (4.5 in)
+mini_screen = Yes
+motorised_latch = Yes
+      {%- when 'ONYX' -%}
+bolts = 5 bolts
+face_recognition = Yes (up to 20)
+fingerprint = Yes (up to 100)
+cards = Yes (up to 100)
+door_thickness = 45–100 mm
+backup_port = Micro-USB
+battery = Yes
+weight = 3.9
+deadbolt = Yes
+two_way_talk = Yes
+doorbell = Yes
+inside_screen = Yes (4.5 in)
+mini_screen = Yes
+motorised_latch = Yes
+      {%- when 'ZION' -%}
+bolts = 5 bolts
+face_recognition = No
+fingerprint = Yes (up to 100)
+cards = Yes (up to 100)
+door_thickness = 30–80 mm
+backup_port = Micro-USB
+battery = No (4 × AA, 1 year backup)
+weight = 2.8
+deadbolt = Yes
+two_way_talk = No
+doorbell = Yes
+inside_screen = No
+mini_screen = Yes
+motorised_latch = No
+      {%- when 'ZEAL' -%}
+dimensions = 27 × 6.2 cm
+bolts = 2 bolts
+face_recognition = No
+fingerprint = Yes (up to 100)
+cards = Yes (up to 100)
+door_thickness = 30–60 mm
+backup_port = Type-C
+battery = No (4 × AA, 1 year backup)
+weight = 1.5
+deadbolt = No
+two_way_talk = No
+doorbell = Yes
+inside_screen = No
+mini_screen = No
+motorised_latch = No
+    {%- endcase -%}
+  {%- endcapture -%}
+  {%- render 'otodor-spec-seed', seed: sheet, id: id -%}
+{%- endif -%}

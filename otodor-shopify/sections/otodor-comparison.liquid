@@ -45,6 +45,14 @@
   assign max_products = section.settings.max_products | default: 4
   assign scheme = section.settings.color_scheme | default: 'dark'
 
+  # The published spec sheet, consulted only where a metafield is empty.
+  # Defaults ON so the table is populated before admin data exists; turn it
+  # off (or delete the snippet) once specs.* covers the catalogue.
+  assign use_model_seed = true
+  if section.settings.use_model_seed == false
+    assign use_model_seed = false
+  endif
+
   # ── Column Resolver ─────────────────────────────────────────────────
   # 1. Blocks win when any of them carries a product or a manual title.
   assign mode = ''
@@ -305,6 +313,11 @@
                       capture sv
                         render 'otodor-spec-seed', seed: block.settings.values, id: f[0]
                       endcapture
+                      if sv == blank and use_model_seed
+                        capture sv
+                          render 'otodor-spec-model-seed', product: block.settings.product, title: block.settings.title, id: f[0]
+                        endcapture
+                      endif
                       if sv != blank
                         assign row_has = true
                         break
@@ -317,6 +330,15 @@
                       if mv != blank
                         assign row_has = true
                         break
+                      endif
+                      if use_model_seed
+                        capture sv
+                          render 'otodor-spec-model-seed', product: p, id: f[0]
+                        endcapture
+                        if sv != blank
+                          assign row_has = true
+                          break
+                        endif
                       endif
                     endfor
                   endif
@@ -345,7 +367,12 @@
                           registry default when the column has no seed line.
                         {%- endcomment -%}
                         {%- capture seed_val -%}{%- render 'otodor-spec-seed', seed: block.settings.values, id: f[0] -%}{%- endcapture -%}
-                        {%- assign cell_default = seed_val | strip | default: f[7] -%}
+                        {%- assign seed_val = seed_val | strip -%}
+                        {%- if seed_val == blank and use_model_seed -%}
+                          {%- capture seed_val -%}{%- render 'otodor-spec-model-seed', product: bp, title: c_title, id: f[0] -%}{%- endcapture -%}
+                          {%- assign seed_val = seed_val | strip -%}
+                        {%- endif -%}
+                        {%- assign cell_default = seed_val | default: f[7] -%}
                         <td>{%- render 'otodor-spec-value', product: bp, namespace: f[2], key: f[3], type: f[4], unit: f[5], spec_default: cell_default, context: 'comparison' -%}</td>
                       {%- endif -%}
                     {%- endfor -%}
@@ -353,7 +380,9 @@
                     {%- for h in cols -%}
                       {%- assign p = all_products[h] -%}
                       {%- if p != empty -%}
-                        <td>{%- render 'otodor-spec-value', product: p, namespace: f[2], key: f[3], type: f[4], unit: f[5], spec_default: f[7], context: 'comparison' -%}</td>
+                        {%- capture seed_val -%}{%- if use_model_seed -%}{%- render 'otodor-spec-model-seed', product: p, id: f[0] -%}{%- endif -%}{%- endcapture -%}
+                        {%- assign cell_default = seed_val | strip | default: f[7] -%}
+                        <td>{%- render 'otodor-spec-value', product: p, namespace: f[2], key: f[3], type: f[4], unit: f[5], spec_default: cell_default, context: 'comparison' -%}</td>
                       {%- endif -%}
                     {%- endfor -%}
                   {%- endif -%}
@@ -437,6 +466,7 @@
         { "value": "light", "label": "Light" }
       ]
     },
+    { "type": "checkbox", "id": "use_model_seed", "label": "Use the published spec sheet where metafields are empty", "info": "Fills cells from snippets/otodor-spec-model-seed (SENTRY / NEXUS / ONYX / ZION+ / ZEAL). A product's own specs.* metafields always win. Turn off once the catalogue is populated.", "default": true },
     { "type": "header", "content": "Explore row" },
     { "type": "checkbox", "id": "show_explore", "label": "Show an action under each column", "default": true },
     { "type": "text", "id": "explore_label", "label": "Action label", "default": "Explore" },

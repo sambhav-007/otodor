@@ -5,17 +5,15 @@
  * no forked section code. A leaf carries no category selector:
  * it has no sub-categories of its own.
  *
- * The comparison carries the client's five-model spec sheet as SEED
- * values (same seed as collection.digital-locks.json — this is the
- * wooden-door range, and Digital Locks is its hub page). Seeds are the
- * weakest source: a product's specs.* metafields override them silently,
- * so both copies retire together once admin data lands. See
- * OTODOR-SPEC-ENGINE.md "Seed layer".
+ * The comparison resolves its columns from THIS collection's products and
+ * fills the cells from the published spec sheet in
+ * snippets/otodor-spec-model-seed — which each product's own specs.*
+ * metafields override silently. No spec data lives in this file.
  *
  * REQUIRES ADMIN: assign this template to the `wooden-door-locks`
  * collection (Online Store -> Collections -> Theme template). Until then
- * the collection renders the generic collection.json and none of this
- * shows.
+ * the collection renders the generic collection.json — which also carries
+ * a comparison, so the table appears either way.
  * ------------------------------------------------------------
  */
 {
@@ -43,49 +41,12 @@
     },
     "comparison": {
       "type": "otodor-comparison",
-      "blocks": {
-        "sentry": {
-          "type": "product",
-          "settings": {
-            "title": "SENTRY",
-            "values": "dimensions = 41.5 × 7 cm\nbolts = 5 bolts\nface_recognition = Yes (up to 20)\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 45–100 mm\nbackup_port = Type-C\nbattery = Yes (4200 mAh, 6 months backup)\nweight = 4.4\ndeadbolt = Yes\ntwo_way_talk = Yes\ndoorbell = Yes\ninside_screen = Yes (4.5 in)\nmini_screen = Yes\nmotorised_latch = Yes"
-          }
-        },
-        "nexus": {
-          "type": "product",
-          "settings": {
-            "title": "NEXUS",
-            "values": "bolts = 5 bolts\nface_recognition = Yes (up to 20)\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 45–100 mm\nbackup_port = Type-C\nbattery = Yes\nweight = 3.8\ndeadbolt = Yes\ntwo_way_talk = Yes\ndoorbell = Yes\ninside_screen = Yes (4.5 in)\nmini_screen = Yes\nmotorised_latch = Yes"
-          }
-        },
-        "onyx": {
-          "type": "product",
-          "settings": {
-            "title": "ONYX",
-            "values": "bolts = 5 bolts\nface_recognition = Yes (up to 20)\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 45–100 mm\nbackup_port = Micro-USB\nbattery = Yes\nweight = 3.9\ndeadbolt = Yes\ntwo_way_talk = Yes\ndoorbell = Yes\ninside_screen = Yes (4.5 in)\nmini_screen = Yes\nmotorised_latch = Yes"
-          }
-        },
-        "zion": {
-          "type": "product",
-          "settings": {
-            "title": "ZION+",
-            "values": "bolts = 5 bolts\nface_recognition = No\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 30–80 mm\nbackup_port = Micro-USB\nbattery = No (4 × AA, 1 year backup)\nweight = 2.8\ndeadbolt = Yes\ntwo_way_talk = No\ndoorbell = Yes\ninside_screen = No\nmini_screen = Yes\nmotorised_latch = No"
-          }
-        },
-        "zeal": {
-          "type": "product",
-          "settings": {
-            "title": "ZEAL",
-            "values": "dimensions = 27 × 6.2 cm\nbolts = 2 bolts\nface_recognition = No\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 30–60 mm\nbackup_port = Type-C\nbattery = No (4 × AA, 1 year backup)\nweight = 1.5\ndeadbolt = No\ntwo_way_talk = No\ndoorbell = Yes\ninside_screen = No\nmini_screen = No\nmotorised_latch = No"
-          }
-        }
-      },
-      "block_order": ["sentry", "nexus", "onyx", "zion", "zeal"],
       "settings": {
         "eyebrow": "Compare the range",
         "heading": "Every wooden-door model, ",
         "heading_accent": "side by side.",
         "color_scheme": "dark",
+        "use_model_seed": true,
         "show_explore": true,
         "explore_label": "Explore",
         "max_products": 5
@@ -96,37 +57,65 @@
       "blocks": {
         "german": {
           "type": "statement",
-          "settings": { "lead": "German-engineered.", "counter": "Built for Indian conditions." }
+          "settings": {
+            "lead": "German-engineered.",
+            "counter": "Built for Indian conditions."
+          }
         },
         "installed": {
           "type": "statement",
-          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+          "settings": {
+            "lead": "Installed.",
+            "counter": "Not delivered."
+          }
         },
         "warranty": {
           "type": "statement",
-          "settings": { "lead": "3-year warranty.", "counter": "On every lock." }
+          "settings": {
+            "lead": "3-year warranty.",
+            "counter": "On every lock."
+          }
         }
       },
-      "block_order": ["german", "installed", "warranty"],
-      "settings": { "eyebrow": "Why OTODOR Wooden Door Locks" }
+      "block_order": [
+        "german",
+        "installed",
+        "warranty"
+      ],
+      "settings": {
+        "eyebrow": "Why OTODOR Wooden Door Locks"
+      }
     },
     "faq": {
       "type": "collapsible-content",
       "blocks": {
         "q1": {
           "type": "collapsible_row",
-          "settings": { "heading": "What door thickness do these locks fit?", "row_content": "<p>Most OTODOR wooden-door models fit 45–100 mm; the compact models fit 30–80 mm. The exact range is listed on every product page and confirmed during the free compatibility check.</p>" }
+          "settings": {
+            "heading": "What door thickness do these locks fit?",
+            "row_content": "<p>Most OTODOR wooden-door models fit 45–100 mm; the compact models fit 30–80 mm. The exact range is listed on every product page and confirmed during the free compatibility check.</p>"
+          }
         },
         "q2": {
           "type": "collapsible_row",
-          "settings": { "heading": "Is there an installation clearance requirement?", "row_content": "<p>Yes — keep a minimum 85 mm (3.35&quot;) gap between the safety door and the main door so the lock never contacts the safety door.</p>" }
+          "settings": {
+            "heading": "Is there an installation clearance requirement?",
+            "row_content": "<p>Yes — keep a minimum 85 mm (3.35&quot;) gap between the safety door and the main door so the lock never contacts the safety door.</p>"
+          }
         },
         "q3": {
           "type": "collapsible_row",
-          "settings": { "heading": "Will installation damage my door?", "row_content": "<p>A certified OTODOR technician cuts to template and finishes the mortise. On a standard wooden door the lock body sits entirely inside the leaf, with no visible modification beyond the lock face.</p>" }
+          "settings": {
+            "heading": "Will installation damage my door?",
+            "row_content": "<p>A certified OTODOR technician cuts to template and finishes the mortise. On a standard wooden door the lock body sits entirely inside the leaf, with no visible modification beyond the lock face.</p>"
+          }
         }
       },
-      "block_order": ["q1", "q2", "q3"],
+      "block_order": [
+        "q1",
+        "q2",
+        "q3"
+      ],
       "settings": {
         "heading": "Frequently asked questions",
         "heading_alignment": "center",
@@ -150,5 +139,12 @@
       }
     }
   },
-  "order": ["hero", "product-grid", "comparison", "why", "faq", "cta"]
+  "order": [
+    "hero",
+    "product-grid",
+    "comparison",
+    "why",
+    "faq",
+    "cta"
+  ]
 }

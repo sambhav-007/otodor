@@ -59,7 +59,12 @@
           }
         }
       },
-      "block_order": ["wooden", "glass", "metal", "padlocks"],
+      "block_order": [
+        "wooden",
+        "glass",
+        "metal",
+        "padlocks"
+      ],
       "settings": {
         "source": "blocks",
         "eyebrow": "Find your fit",
@@ -132,7 +137,12 @@
           }
         }
       },
-      "block_order": ["fingerprint", "app", "pin", "rfid"],
+      "block_order": [
+        "fingerprint",
+        "app",
+        "pin",
+        "rfid"
+      ],
       "settings": {
         "eyebrow": "Core Technology",
         "heading": "Engineered for",
@@ -145,56 +155,98 @@
       "blocks": {
         "german": {
           "type": "statement",
-          "settings": { "lead": "German-engineered.", "counter": "Built for Indian conditions." }
+          "settings": {
+            "lead": "German-engineered.",
+            "counter": "Built for Indian conditions."
+          }
         },
         "installed": {
           "type": "statement",
-          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+          "settings": {
+            "lead": "Installed.",
+            "counter": "Not delivered."
+          }
         },
         "warranty": {
           "type": "statement",
-          "settings": { "lead": "3-year warranty.", "counter": "On every lock." }
+          "settings": {
+            "lead": "3-year warranty.",
+            "counter": "On every lock."
+          }
         }
       },
-      "block_order": ["german", "installed", "warranty"],
-      "settings": { "eyebrow": "Why OTODOR Digital Locks" }
+      "block_order": [
+        "german",
+        "installed",
+        "warranty"
+      ],
+      "settings": {
+        "eyebrow": "Why OTODOR Digital Locks"
+      }
     },
     "content": {
       "type": "rich-text",
       "blocks": {
         "heading": {
           "type": "heading",
-          "settings": { "heading": "Digital Locks by OTODOR", "heading_size": "h1" }
+          "settings": {
+            "heading": "Digital Locks by OTODOR",
+            "heading_size": "h1"
+          }
         },
         "text": {
           "type": "text",
-          "settings": { "text": "<p>Secure every entry point with OTODOR's premium range of Digital Locks — designed for wooden doors, glass doors, metal gates and smart padlocks, all controllable through a single mobile app. Crafted with precise German engineering and built using highest-grade stainless steel and aluminium, each lock carries a sleek Italian finish and a 3-year warranty. Smart. Secure. Seamlessly controlled.</p>" }
+          "settings": {
+            "text": "<p>Secure every entry point with OTODOR's premium range of Digital Locks — designed for wooden doors, glass doors, metal gates and smart padlocks, all controllable through a single mobile app. Crafted with precise German engineering and built using highest-grade stainless steel and aluminium, each lock carries a sleek Italian finish and a 3-year warranty. Smart. Secure. Seamlessly controlled.</p>"
+          }
         }
       },
-      "block_order": ["heading", "text"],
-      "settings": { "color_scheme": "scheme-1" }
+      "block_order": [
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1"
+      }
     },
     "faq": {
       "type": "collapsible-content",
       "blocks": {
         "q1": {
           "type": "collapsible_row",
-          "settings": { "heading": "Which doors are OTODOR digital locks compatible with?", "row_content": "<p>Wooden, glass and metal doors, plus smart padlocks. Each range is engineered for its door type — tell us your door and we'll confirm compatibility before installation.</p>" }
+          "settings": {
+            "heading": "Which doors are OTODOR digital locks compatible with?",
+            "row_content": "<p>Wooden, glass and metal doors, plus smart padlocks. Each range is engineered for its door type — tell us your door and we'll confirm compatibility before installation.</p>"
+          }
         },
         "q2": {
           "type": "collapsible_row",
-          "settings": { "heading": "What access methods are supported?", "row_content": "<p>Face recognition, fingerprint, RFID card, PIN, physical key and the OTODOR app — depending on the model.</p>" }
+          "settings": {
+            "heading": "What access methods are supported?",
+            "row_content": "<p>Face recognition, fingerprint, RFID card, PIN, physical key and the OTODOR app — depending on the model.</p>"
+          }
         },
         "q3": {
           "type": "collapsible_row",
-          "settings": { "heading": "What warranty and support do I get?", "row_content": "<p>A 3-year warranty on the lock and 1-year on the battery, with PAN-India professional installation across 10,000+ PIN codes and 24/7 support.</p>" }
+          "settings": {
+            "heading": "What warranty and support do I get?",
+            "row_content": "<p>A 3-year warranty on the lock and 1-year on the battery, with PAN-India professional installation across 10,000+ PIN codes and 24/7 support.</p>"
+          }
         },
         "q4": {
           "type": "collapsible_row",
-          "settings": { "heading": "Is there an installation clearance requirement?", "row_content": "<p>Yes — keep a minimum 85 mm (3.35&quot;) gap between the safety door and the main door so the lock never contacts the safety door.</p>" }
+          "settings": {
+            "heading": "Is there an installation clearance requirement?",
+            "row_content": "<p>Yes — keep a minimum 85 mm (3.35&quot;) gap between the safety door and the main door so the lock never contacts the safety door.</p>"
+          }
         }
       },
-      "block_order": ["q1", "q2", "q3", "q4"],
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4"
+      ],
       "settings": {
         "heading": "Frequently asked questions",
         "heading_alignment": "center",
@@ -206,49 +258,12 @@
     },
     "comparison": {
       "type": "otodor-comparison",
-      "blocks": {
-        "sentry": {
-          "type": "product",
-          "settings": {
-            "title": "SENTRY",
-            "values": "dimensions = 41.5 × 7 cm\nbolts = 5 bolts\nface_recognition = Yes (up to 20)\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 45–100 mm\nbackup_port = Type-C\nbattery = Yes (4200 mAh, 6 months backup)\nweight = 4.4\ndeadbolt = Yes\ntwo_way_talk = Yes\ndoorbell = Yes\ninside_screen = Yes (4.5 in)\nmini_screen = Yes\nmotorised_latch = Yes"
-          }
-        },
-        "nexus": {
-          "type": "product",
-          "settings": {
-            "title": "NEXUS",
-            "values": "bolts = 5 bolts\nface_recognition = Yes (up to 20)\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 45–100 mm\nbackup_port = Type-C\nbattery = Yes\nweight = 3.8\ndeadbolt = Yes\ntwo_way_talk = Yes\ndoorbell = Yes\ninside_screen = Yes (4.5 in)\nmini_screen = Yes\nmotorised_latch = Yes"
-          }
-        },
-        "onyx": {
-          "type": "product",
-          "settings": {
-            "title": "ONYX",
-            "values": "bolts = 5 bolts\nface_recognition = Yes (up to 20)\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 45–100 mm\nbackup_port = Micro-USB\nbattery = Yes\nweight = 3.9\ndeadbolt = Yes\ntwo_way_talk = Yes\ndoorbell = Yes\ninside_screen = Yes (4.5 in)\nmini_screen = Yes\nmotorised_latch = Yes"
-          }
-        },
-        "zion": {
-          "type": "product",
-          "settings": {
-            "title": "ZION+",
-            "values": "bolts = 5 bolts\nface_recognition = No\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 30–80 mm\nbackup_port = Micro-USB\nbattery = No (4 × AA, 1 year backup)\nweight = 2.8\ndeadbolt = Yes\ntwo_way_talk = No\ndoorbell = Yes\ninside_screen = No\nmini_screen = Yes\nmotorised_latch = No"
-          }
-        },
-        "zeal": {
-          "type": "product",
-          "settings": {
-            "title": "ZEAL",
-            "values": "dimensions = 27 × 6.2 cm\nbolts = 2 bolts\nface_recognition = No\nfingerprint = Yes (up to 100)\ncards = Yes (up to 100)\ndoor_thickness = 30–60 mm\nbackup_port = Type-C\nbattery = No (4 × AA, 1 year backup)\nweight = 1.5\ndeadbolt = No\ntwo_way_talk = No\ndoorbell = Yes\ninside_screen = No\nmini_screen = No\nmotorised_latch = No"
-          }
-        }
-      },
-      "block_order": ["sentry", "nexus", "onyx", "zion", "zeal"],
       "settings": {
         "eyebrow": "Compare the range",
         "heading": "Find the right lock for your ",
         "heading_accent": "door.",
         "color_scheme": "dark",
+        "use_model_seed": true,
         "show_explore": true,
         "explore_label": "Explore",
         "max_products": 5
@@ -288,15 +303,25 @@
       "blocks": {
         "heading": {
           "type": "heading",
-          "settings": { "heading": "Smart digital door locks, engineered in detail", "heading_size": "h2" }
+          "settings": {
+            "heading": "Smart digital door locks, engineered in detail",
+            "heading_size": "h2"
+          }
         },
         "text": {
           "type": "text",
-          "settings": { "text": "<p>OTODOR digital locks combine German engineering with highest-grade stainless steel and aluminium for lasting security in Indian conditions. Choose fingerprint, face recognition, RFID, PIN, app or key access; monitor entry with real-time audit logs; and control everything over Wi-Fi and Bluetooth from one app. Every lock ships with professional installation, a 3-year warranty and 24/7 support.</p>" }
+          "settings": {
+            "text": "<p>OTODOR digital locks combine German engineering with highest-grade stainless steel and aluminium for lasting security in Indian conditions. Choose fingerprint, face recognition, RFID, PIN, app or key access; monitor entry with real-time audit logs; and control everything over Wi-Fi and Bluetooth from one app. Every lock ships with professional installation, a 3-year warranty and 24/7 support.</p>"
+          }
         }
       },
-      "block_order": ["heading", "text"],
-      "settings": { "color_scheme": "scheme-1" }
+      "block_order": [
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1"
+      }
     }
   },
   "order": [
