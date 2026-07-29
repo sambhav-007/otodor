@@ -129,16 +129,32 @@ A spec sheet usually exists long before the metafields do. The seed layer lets a
 plain `spec_id = value` list (blank lines and `#` comments ignored) so a range can be published before its
 products or their `specs.*` exist.
 
-**It is deliberately the weakest source.** Consumers pass the looked-up value as `spec_default`, which the
-Value Resolver only reaches when the metafield is empty:
+There are two seeds, in priority order:
+
+| Seed | Where | Scope |
+|---|---|---|
+| **column seed** | a comparison column's *Seed values* textarea | that one column, that one section |
+| **model seed** | `snippets/otodor-spec-model-seed.liquid` | **every** consumer, everywhere |
+
+The **model seed** holds the client's published sheet (SENTRY / NEXUS / ONYX / ZION+ / ZEAL) once, so a
+comparison shows real figures on any page — collection templates assigned or not, product pages, PDP
+siblings. That is the same class of canonical brand data as the specification list already built into
+`otodor-spec-registry`; seeding it per template instead produced empty tables wherever a template wasn't
+assigned. Models are matched on **handle or title**, normalised (upper-cased, punctuation stripped) and
+tested as **prefixes**, so `ZION+ Rose Gold` and `ZION+ Galaxy Black` both resolve to ZION+ and `SENTRY Pro`
+to SENTRY. A product no model matches gets nothing rather than a wrong guess. The comparison exposes a
+checkbox to switch it off.
+
+**Both are deliberately the weakest sources.** Consumers pass the looked-up value as `spec_default`, which
+the Value Resolver only reaches when the metafield is empty:
 
 ```
-product metafield  →  column seed  →  registry default  →  "—"
+product metafield  →  column seed  →  model seed  →  registry default  →  "—"
 ```
 
-So admin data always wins, no merge logic is needed, and the seed retires by itself as `specs.*` is
-populated. Never read a seed in place of a metafield, and never treat it as the data model — it is a bridge.
-Live example: the five wooden-door models seeded on `templates/collection.digital-locks.json`.
+So admin data always wins, no merge logic is needed, and a seed retires by itself as `specs.*` is populated —
+one product at a time, until `otodor-spec-model-seed.liquid` can be deleted. Never read a seed in place of a
+metafield, and never treat it as the data model — it is a bridge.
 
 A comparison **column** likewise no longer requires a product: a block may stand alone with a title, image
 and link, which is what makes a pre-catalogue range comparable at all.

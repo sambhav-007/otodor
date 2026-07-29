@@ -47,7 +47,8 @@ Not sections — snippets consumed by sections. No consumer hardcodes a spec nam
 |---|---|---|---|---|---|---|---|
 | **otodor-spec-registry** | Single source of truth: every spec definition (10-col records) | built-in canonical set (24 specs, group-ordered) + optional `comparison_spec` metaobjects | metaobject overrides built-in by id → built-in | Emits requested view (`only_comparable` / `group` / `ids`) | Comparison, highlights, landing, search-intent, API | — | ✅ |
 | **otodor-spec-value** | Value resolver + 11 type renderers (the render engine) | `product.metafields[ns][key]` or `raw_value` | raw_value → metafield → default → '—' (comparison) / nothing (inline) | per renderer | Every spec consumer | `otodor-icon`, `.otodor-spec__*` in base.css | ✅ |
-| **otodor-spec-seed** | Read one `spec_id = value` line out of a column's seed block | a column's seed textarea | line match → nothing | — (lowest-priority source; passed as `spec_default`) | Comparison; any consumer publishing ahead of its metafields | — | ✅ |
+| **otodor-spec-seed** | Read one `spec_id = value` line out of a seed block | a column's seed textarea | line match → nothing | — (low-priority source; passed as `spec_default`) | Comparison; any consumer publishing ahead of its metafields | — | ✅ |
+| **otodor-spec-model-seed** | The client's published spec sheet (SENTRY / NEXUS / ONYX / ZION+ / ZEAL), theme-wide | model matched on handle **or** title, normalised, prefix-tested | model match → `otodor-spec-seed` lookup → nothing | — (weakest source; a product's `specs.*` always wins). Delete when the catalogue is populated | Every comparison, on any template, assigned or not | `otodor-spec-seed` | ✅ (bridge) |
 
 **Renderers:** boolean · **yesno** · range · number · text · badge · chip · rating · link · document · image.
 Add a type = one `when` branch; add a spec = one registry record. Zero section edits either way.

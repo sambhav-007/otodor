@@ -195,10 +195,14 @@ module uses — one answer, not two that can disagree. `product.json` marks inst
   reached the `<h2>`. Fixed by declaring it on `.otodor-cats__title` per scheme (and on the collection grid's
   dark CTA band, where the same bug pointed the other way). **Watch for this in any new section** whose
   heading is an `<h2>` with no `color` of its own.
-- **Compare table reach** — the client's sheet is the *wooden-door* range, so it is now seeded on
-  `collection.wooden-door-locks.json` as well; the **generic `collection.json` gained a comparison** too
-  (resolves from the collection's own products, auto-hides below two columns), so every category gets one
-  without a bespoke template.
+- **Compare table reach** — the generic `collection.json` gained a comparison (resolves from the collection's
+  own products, auto-hides below two columns), so every category gets one without a bespoke template. The
+  spec **values** then had the same reach problem: seeded per template, they were invisible wherever a
+  template wasn't assigned. The client's sheet now lives **once**, in `snippets/otodor-spec-model-seed.liquid`,
+  and every comparison consults it — models matched on handle *or* title, normalised and prefix-tested, so
+  `ZION+ Rose Gold` and `ZION+ Galaxy Black` both resolve to ZION+. Precedence is unchanged:
+  `metafield → column seed → model seed → registry default → —`. **`OHM` is not in the client's sheet**, so its
+  column is empty until either the client supplies its figures or its `specs.*` are populated.
 - **Clearance infographic** — artwork belongs in **Shopify Files**, not the repo. `otodor-product-install`
   gained a *Clearance diagram* image slot (+ alt, caption), overridable per product by
   `custom.install_clearance_image`. The default clearance **note was also factually wrong** (it described side
