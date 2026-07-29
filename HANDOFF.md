@@ -127,6 +127,29 @@ recomposed as the lead desk; digital-locks CTAs repointed to `/pages/contact#oto
   seamless** (track 2× viewport). Two layout bugs found and fixed there: bottom-centre copy colliding with the
   indicators (desktop **and** mobile), and the mobile actions overflowing the frame.
 
+### ✅ Done — STEP 11 (Vault intro V5 — the doors ARE the screen)
+`assets/otodor-vault.js` rewritten (311 → ~215 lines). The intro no longer builds a *place*: the chamber
+(floor/ceiling/side walls), the carved wall with lintel/sill/jambs, the reveal sleeve, the interior light leak,
+the fog, the shadows and the camera fly-through are **all gone**. What is left is two pitch-black gates,
+split on the diagonal, **covering the entire viewport**, that glide off both sides to reveal **the live page**
+behind them (the canvas is transparent — the "behind" is the DOM).
+- **Full-viewport coverage at any aspect** is the invariant: the slabs are **rebuilt on resize** to cover the
+  camera's visible rect × 1.12 margin, rather than scaled (scaling would skew the 45° slant and drag the
+  monogram's size around with the window). The monogram is sized against the **frame** (26 % of the short side),
+  and the seam gap is proportional (~3 px at any height) instead of a fixed world size that went sub-pixel once
+  the doors filled the screen.
+- **The camera never moves.** Any sway or dolly would swing the viewport edge past the doors and leak page
+  around them before they open — so the breathing, the pre-open dolly and the fly-through were removed, not
+  re-tuned.
+- **Ends on actual clearance,** not on the nominal end of the glide: `easeInOutQuart` spends its last ~15 %
+  crawling the final few percent of travel, entirely off-screen. Measured dead air on an empty overlay dropped
+  from ~900 ms to 200 ms; the whole intro is now ≈4.1 s + the 0.55 s overlay fade.
+- **Verified by pixel probe** (headless, via the module's own WebGL context): closed frame **fully opaque on a
+  25-point grid** at aspects 3.43 (ultrawide), 1.78, 1.6 and 0.39 (tall phone); mid-glide shows the page through
+  a clean diagonal gap; end frame **fully transparent** — no black wedge left anywhere. Rebuild-on-resize fired
+  mid-animation without errors or a reset. Timings/guards (session-once, reduced-motion, no-WebGL, safety net)
+  are untouched.
+
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
 - Optional: real LLM concierge as a hosted micro-service if the deterministic advisor proves the demand.

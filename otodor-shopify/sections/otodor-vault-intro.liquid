@@ -3,11 +3,15 @@
   OTODOR Vault Intro — Three.js cinematic blast-door overlay
   ────────────────────────────────────────────────────────────────────────
   A one-time, full-screen 3D intro that plays ONCE PER SESSION before the
-  hero, then removes itself forever. It NEVER touches the hero — pure overlay.
+  page, then removes itself forever. It NEVER touches the page — pure overlay.
+
+  V5: the two gates cover the WHOLE viewport and part to reveal the live page
+  behind them. There is no room, no chamber and no interior — the canvas is
+  transparent, so what is behind the doors is the DOM itself.
 
   The 3D scene lives in assets/otodor-vault.js (Three.js r160, lazy-loaded).
   This section is a thin host: guards + a CSS "closed-door" poster shown while
-  Three loads (so there's never a hero flash), plus the loader/fallback logic.
+  Three loads (so there's never a flash of the page), plus loader/fallback logic.
 
   Guards (each independently skips to the hero):
     prefers-reduced-motion  → CSS display:none + JS skip
@@ -44,7 +48,9 @@
     display: block;
   }
 
-  /* ── Poster: a believable closed vault while Three loads (no flash) ── */
+  /* ── Poster: the closed gate itself while Three loads (no flash) ──
+     Matched to what renders behind it: a near-black slab lit from the
+     upper left, so the hand-off from poster to WebGL is invisible. */
   .otodor-vault__poster {
     position: absolute;
     inset: 0;
@@ -54,7 +60,7 @@
     opacity: 1;
     transition: opacity 0.6s ease;
     background:
-      radial-gradient(90% 70% at 50% 44%, #10151c 0%, #0a0d12 45%, #050608 100%);
+      radial-gradient(120% 100% at 22% 6%, #161b22 0%, #0a0d12 46%, #040507 100%);
   }
   .otodor-vault__poster::after {
     content: "";
@@ -148,7 +154,7 @@
   "tag": "section",
   "class": "shopify-section otodor-vault-section",
   "settings": [
-    { "type": "paragraph", "content": "A one-time cinematic Three.js blast-door intro that plays once per browser session before the hero, then removes itself. Never modifies the hero. Skipped for reduced-motion users and where WebGL is unavailable (hero shows instantly)." },
+    { "type": "paragraph", "content": "A one-time cinematic Three.js blast-door intro: two full-screen gates part to reveal the page behind them. Plays once per browser session, then removes itself. Never modifies the page. Skipped for reduced-motion users and where WebGL is unavailable (the page shows instantly)." },
     { "type": "checkbox", "id": "enabled", "label": "Enable vault intro", "default": true },
     { "type": "text", "id": "status_text", "label": "Unlock status text", "default": "Access Granted" },
     { "type": "text", "id": "facility_label", "label": "Facility label", "default": "OTODOR · Secure Facility" }
