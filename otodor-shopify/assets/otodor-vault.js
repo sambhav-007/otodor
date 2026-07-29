@@ -141,7 +141,15 @@ export default function initVault(overlay, opts) {
 
       const v = visibleHalf();
       const HW = v.w * MARGIN, HH = v.h * MARGIN;      // half-extents the gates must cover
-      const SLANT = HH * 0.52;                          // diagonal offset — matches the logo's ~45° slash
+      // The cut must lie on the monogram's slash. The diagonal runs 2·SLANT
+      // across a 2·HH drop, so its angle is atan(SLANT / HH) off vertical:
+      // SLANT = HH · 1.04 puts it at ~46° off vertical, i.e. the mark's ~45° "/".
+      // (Deriving it from the HALF-height instead of the full height is what
+      // steepened the cut to ~62° and threw it off the logo.)
+      const SLANT = HH * 1.04;
+      // The outer edge has to sit beyond the cut's own reach or the slab polygon
+      // folds back on itself — on a tall, narrow viewport SLANT exceeds HW.
+      const XW = Math.max(HW, SLANT + 0.6);
       const LOGO = Math.min(HW, HH) * 2 * 0.26;         // monogram sized against the FRAME, not the door
       GAP = v.h * 0.008;                                // ~3 px hairline at any viewport height
       const diagRot = -Math.atan2(2 * SLANT, HH * 2);
@@ -153,14 +161,14 @@ export default function initVault(overlay, opts) {
         const grp = new THREE.Group();
         const shape = new THREE.Shape();
         if (side < 0) {   // left of the diagonal
-          shape.moveTo(-HW, -HH);
+          shape.moveTo(-XW, -HH);
           shape.lineTo(-SLANT - GAP, -HH);
           shape.lineTo(SLANT - GAP, HH);
-          shape.lineTo(-HW, HH);
+          shape.lineTo(-XW, HH);
         } else {          // right of the diagonal
           shape.moveTo(-SLANT + GAP, -HH);
-          shape.lineTo(HW, -HH);
-          shape.lineTo(HW, HH);
+          shape.lineTo(XW, -HH);
+          shape.lineTo(XW, HH);
           shape.lineTo(SLANT + GAP, HH);
         }
         shape.closePath();
