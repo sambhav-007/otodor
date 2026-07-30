@@ -1,14 +1,10 @@
 /*
  * ------------------------------------------------------------
- * OTODOR generic collection framework (category-agnostic).
- * Inherited by every collection. Empty slots (selector/features/
- * why) auto-hide, so a plain collection degrades to hero -> grid.
- * The selector runs in `auto` mode: any parent collection shows its
- * sub-categories straight from Navigation (or from child collections
- * via custom.parent_collection) with no per-collection template.
- * Category landings (e.g. collection.digital-locks.json) reuse this
- * same composition with data — see OTODOR-COLLECTION-TEMPLATE.md.
- * The theme editor / Shopify admin may rewrite this file.
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
 {
@@ -32,8 +28,18 @@
         "heading": "Choose your",
         "heading_accent": "category.",
         "subheading": "",
+        "card_link_label": "Explore",
         "color_scheme": "light",
-        "show_cta": false
+        "columns_desktop": 4,
+        "show_descriptions": true,
+        "show_icons": true,
+        "show_cta": false,
+        "cta_title": "Any other custom?",
+        "cta_text": "Not sure or need something bespoke? Ask our OTODOR experts.",
+        "cta_button_label": "Ask an expert",
+        "cta_link": "",
+        "padding_top": 96,
+        "padding_bottom": 96
       }
     },
     "product-grid": {
@@ -44,15 +50,23 @@
         "show_cta": true,
         "cta_title": "Not sure which fits your door?",
         "cta_sub": "We verify compatibility before installation — talk to a specialist.",
-        "cta_button_label": "Talk to us"
+        "cta_button_label": "Talk to us",
+        "cta_whatsapp_message": "Hello! I need help choosing an OTODOR product."
       }
     },
     "comparison": {
       "type": "otodor-comparison",
       "settings": {
         "eyebrow": "Compare the range",
-        "heading": "Every model, ",
+        "heading": "Every model,",
         "heading_accent": "side by side.",
+        "spec_column_label": "Specification",
+        "color_scheme": "dark",
+        "use_model_seed": true,
+        "show_explore": true,
+        "explore_label": "Explore",
+        "models": "SENTRY, NEXUS, ONYX, ZION+ Galaxy Black, ZEAL",
+        "collection": "",
         "max_products": 5
       }
     },

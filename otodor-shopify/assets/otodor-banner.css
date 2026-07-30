@@ -46,7 +46,7 @@
        and two actions, and the cinematic desktop ratios are shorter still.
        The floor crops the image instead of squeezing the copy; taller mobile
        ratios never reach it. */
-    min-height: 300px;
+    min-height: 375px;
   }
 }
 

@@ -19,6 +19,19 @@
    11. Keyframe Declarations
    12. WhatsApp Floating Button
    13. Accessibility & Reduced Motion
+
+   SCALE (read before adding sizes)
+   ─────────────────────────────────────────────────────────────
+   Dawn sets the root font-size to `62.5% x body_scale`, so with
+   body_scale at 125 (theme settings) **1rem = 12.5px**, not 16px.
+   Every token below that is expressed in rem therefore follows the
+   theme's own scale setting — change that one number and the whole
+   site resizes together.
+
+   Consequence: prefer rem for anything that should scale with the
+   type (sizes, spacing, gaps, max-widths of text). Use px only for
+   things that must NOT scale — hairline borders, and the container
+   widths + radii below, which are kept in step by hand.
    ============================================================ */
 
 
@@ -98,17 +111,29 @@
   --otodor-font-display:   'Hanken Grotesk', system-ui, -apple-system, sans-serif;
   --otodor-font-body:      'Inter', system-ui, -apple-system, sans-serif;
 
-  --otodor-text-xs:   clamp(0.7rem,  1.2vw, 0.75rem);
-  --otodor-text-sm:   clamp(0.8rem,  1.5vw, 0.875rem);
-  --otodor-text-base: clamp(0.9rem,  1.8vw, 1rem);
-  --otodor-text-md:   clamp(1rem,    2vw,   1.125rem);
-  --otodor-text-lg:   clamp(1.1rem,  2.2vw, 1.25rem);
-  --otodor-text-xl:   clamp(1.3rem,  2.8vw, 1.5rem);
-  --otodor-text-2xl:  clamp(1.6rem,  3.5vw, 2rem);
-  --otodor-text-3xl:  clamp(2rem,    5vw,   3rem);
-  --otodor-text-4xl:  clamp(2.5rem,  6.5vw, 4rem);
-  --otodor-text-5xl:  clamp(3rem,    8vw,   5.5rem);
-  --otodor-text-hero: clamp(3.2rem,  9vw,   6.5rem);
+  /* The reading end of the scale was authored as though 1rem were 16px, but
+     the root is 62.5%-based — so it had always rendered at ~63% of intent
+     (--otodor-text-sm capped at 8.8px, not 14px). That, not taste, is why
+     body copy and table cells were unreadable. Re-based here so each token
+     renders its documented size at the current root, and still in rem so
+     the theme's body_scale setting keeps moving them together.
+     Rendered sizes below are at body_scale 125 (root 12.5px), wide viewport. */
+  --otodor-text-xs:   clamp(0.9rem,  1.2vw, 0.96rem);  /* 12px */
+  --otodor-text-sm:   clamp(1.02rem, 1.5vw, 1.12rem);  /* 14px */
+  --otodor-text-base: clamp(1.15rem, 1.8vw, 1.28rem);  /* 16px */
+  --otodor-text-md:   clamp(1.28rem, 2vw,   1.44rem);  /* 18px */
+  --otodor-text-lg:   clamp(1.41rem, 2.2vw, 1.6rem);   /* 20px */
+  --otodor-text-xl:   clamp(1.66rem, 2.8vw, 1.92rem);  /* 24px */
+  /* 2xl is re-based too, or it would land 1px above the re-based xl and the
+     ramp would have a flat spot where two steps look identical. */
+  --otodor-text-2xl:  clamp(2.05rem, 3.5vw, 2.56rem);  /* 32px */
+  /* The rest are left on the original ramp: they are dominated by their vw
+     term at real viewports and already read correctly — re-basing these too
+     would double them, not scale them. */
+  --otodor-text-3xl:  clamp(2rem,    5vw,   3rem);     /* 38px */
+  --otodor-text-4xl:  clamp(2.5rem,  6.5vw, 4rem);     /* 50px */
+  --otodor-text-5xl:  clamp(3rem,    8vw,   5.5rem);   /* 69px */
+  --otodor-text-hero: clamp(3.2rem,  9vw,   6.5rem);   /* 81px */
 
   --otodor-leading-tight:  1.1;
   --otodor-leading-snug:   1.3;
@@ -120,32 +145,41 @@
   --otodor-tracking-wider:  0.12em;
   --otodor-tracking-widest: 0.20em;
 
-  /* ─── Spacing Scale ─────────────────────────────────────── */
-  --otodor-space-2xs:  0.25rem;   /*  4px */
-  --otodor-space-xs:   0.5rem;    /*  8px */
-  --otodor-space-sm:   0.75rem;   /* 12px */
-  --otodor-space-md:   1rem;      /* 16px */
-  --otodor-space-lg:   1.5rem;    /* 24px */
-  --otodor-space-xl:   2.5rem;    /* 40px */
-  --otodor-space-2xl:  4rem;      /* 64px */
-  --otodor-space-3xl:  6rem;      /* 96px */
-  --otodor-space-4xl:  8rem;      /* 128px */
-  --otodor-space-5xl: 10rem;      /* 160px */
+  /* ─── Spacing Scale ─────────────────────────────────────────
+     Comments are the RENDERED px at body_scale 125 (root 12.5px). The old
+     comments claimed a 16px root and were wrong by the same factor as the
+     type scale above; the values themselves are deliberately unchanged —
+     they scale with body_scale, and the reading sizes above grew into them
+     rather than the layout growing again. */
+  --otodor-space-2xs:  0.25rem;   /*   3px */
+  --otodor-space-xs:   0.5rem;    /*   6px */
+  --otodor-space-sm:   0.75rem;   /*   9px */
+  --otodor-space-md:   1rem;      /*  13px */
+  --otodor-space-lg:   1.5rem;    /*  19px */
+  --otodor-space-xl:   2.5rem;    /*  31px */
+  --otodor-space-2xl:  4rem;      /*  50px */
+  --otodor-space-3xl:  6rem;      /*  75px */
+  --otodor-space-4xl:  8rem;      /* 100px */
+  --otodor-space-5xl: 10rem;      /* 125px */
 
   /* ─── Section Spacing ───────────────────────────────────── */
   --otodor-section-py:     clamp(4rem, 10vw, 8rem);
   --otodor-section-py-sm:  clamp(3rem, 7vw,  5rem);
-  --otodor-container:      min(1280px, calc(100% - 3rem));
-  --otodor-container-wide: min(1440px, calc(100% - 3rem));
-  --otodor-container-sm:   min(960px, calc(100% - 3rem));
+  /* Containers are in px, so they do NOT follow the root scale — they are
+     scaled by hand alongside it (1280/1440/960 x 1.25) so a section's
+     column keeps its proportion to the type inside it. The gutter is rem
+     and scales on its own. See the SCALE note at the top of this file. */
+  --otodor-container:      min(1600px, calc(100% - 3rem));
+  --otodor-container-wide: min(1800px, calc(100% - 3rem));
+  --otodor-container-sm:   min(1200px, calc(100% - 3rem));
 
   /* ─── Border Radius ─────────────────────────────────────── */
-  --otodor-radius-xs:   4px;
-  --otodor-radius-sm:   8px;
-  --otodor-radius-md:   12px;
-  --otodor-radius-lg:   20px;
-  --otodor-radius-xl:   28px;
-  --otodor-radius-2xl:  40px;
+  --otodor-radius-xs:   5px;
+  --otodor-radius-sm:   10px;
+  --otodor-radius-md:   15px;
+  --otodor-radius-lg:   25px;
+  --otodor-radius-xl:   35px;
+  --otodor-radius-2xl:  50px;
   --otodor-radius-pill: 999px;
 
   /* ─── Shadows ────────────────────────────────────────────── */
@@ -835,11 +869,11 @@
 .otodor-glow-top::before {
   content: '';
   position: absolute;
-  top: -200px;
+  top: -250px;
   left: 50%;
   transform: translateX(-50%);
-  width: 800px;
-  height: 400px;
+  width: 1000px;
+  height: 500px;
   background: radial-gradient(ellipse, rgba(77, 166, 255, 0.08) 0%, transparent 70%);
   pointer-events: none;
   z-index: var(--otodor-z-below);
