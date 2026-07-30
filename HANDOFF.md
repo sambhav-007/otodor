@@ -254,6 +254,23 @@ would land 1 px above the re-based `xl`. Display sizes above it are left alone: 
 - Verified: ramp monotonic with no flat spots at 1920 / 1280 / 375; the stale `/* 16px */` spacing comments
   were corrected so the next person doesn't repeat the mistake. `theme check` at baseline.
 
+### ✅ Done — STEP 14 (Mobile: two-up grids and a tile built for a narrow column)
+Every product grid dropped to a **single full-width card below 599 px** — a lookbook, not a shop. Now:
+- **Two-up on phones:** `otodor-collection-grid`, `otodor-search` results and `otodor-category-selector`;
+  `.otodor-grid-3` / `-grid-4` collapse to **two**, not one. `.otodor-grid-2` still goes single (text/media
+  splits — half a phone can't hold a paragraph). `otodor-products` keeps its deliberate 85vw scroll-snap
+  carousel; it's a homepage showcase, not a shop grid.
+- **The tile was redesigned for ~163 px**, because a column count alone isn't responsive: padding roughly
+  halves, title + meta step down one rung, and both **line-clamp** (title 2, meta 1) so a long model name
+  can't make one tile taller than its neighbour and stagger the row. The category description clamps to 2 for
+  the same reason, and the "Ask an expert" card keeps the full row (editorial, not a tile). **Price
+  deliberately does *not* step down** — on a tile it's the second thing a shopper reads, so it holds the
+  title's size.
+- **Verified in a browser** against the real `otodor-base.css` + the real section `{% style %}` blocks at the
+  live 12.5 px root: 375 px → products 2/2/2, categories 2/2/2 + full-row CTA, card 163 px, row heights paired
+  exactly (278/278 then 258×4), no horizontal overflow; 768 px → 2/2/2; 1280 px → products 3/3, categories 4/3,
+  title 20 / meta 14 / price 18. Desktop unchanged at every number.
+
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
 - Optional: real LLM concierge as a hosted micro-service if the deterministic advisor proves the demand.
