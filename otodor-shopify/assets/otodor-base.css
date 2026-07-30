@@ -427,10 +427,17 @@
   }
 }
 
+/* On phones a 3- or 4-up grid collapses to TWO, not one: these hold cards and
+   tiles, which stay scannable side by side. Only .otodor-grid-2 goes single —
+   it is used for text/media splits, where a half-width column cannot hold a
+   paragraph. */
 @media (max-width: 768px) {
-  .otodor-grid-2,
   .otodor-grid-3,
   .otodor-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--otodor-space-md);
+  }
+  .otodor-grid-2 {
     grid-template-columns: 1fr;
   }
 }
@@ -1871,6 +1878,41 @@ body.otodor-light-page {
   color: var(--otodor-ink-faint);
   font-weight: 400;
   margin-right: 0.5rem;
+}
+
+/* Narrow-column treatment. The grid stays two-up on phones, so a card gets
+   roughly 160px: the desktop padding and 20px title would leave no room for
+   the price. Type steps down one rung and the padding halves, which is how a
+   real storefront tile behaves — the card gets denser, not the grid emptier. */
+@media (max-width: 599px) {
+  .otodor-pcard__info {
+    gap: 0.3rem;
+    padding: 0.9rem 0.9rem 1.05rem;
+  }
+  .otodor-pcard__title {
+    font-size: var(--otodor-text-md);
+    /* Two lines max, so a long model name cannot make one tile taller
+       than its neighbour and break the row. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .otodor-pcard__meta {
+    font-size: var(--otodor-text-xs);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  /* Price does NOT step down with the rest — on a tile it is the second
+     thing a shopper looks at, so it holds the same size as the title. */
+  .otodor-pcard__price {
+    font-size: var(--otodor-text-md);
+    margin-top: 0.3rem;
+  }
+  .otodor-pcard__price s { margin-right: 0.35rem; }
+  .otodor-pcard__badge { font-size: var(--otodor-text-xs); }
 }
 
 /* ─── Category rail (pill filter links) ─────────────────── */

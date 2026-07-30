@@ -48,8 +48,15 @@
   @media (max-width: 989px) {
     .otodor-cgrid__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
+  /* Phones keep TWO columns. A single full-width card per row is a lookbook,
+     not a shop — two-up is what lets a shopper compare and scan, and it is
+     what every storefront they already use does. The card carries its own
+     narrow-column treatment in otodor-base.css. */
   @media (max-width: 599px) {
-    .otodor-cgrid__grid { grid-template-columns: 1fr; }
+    .otodor-cgrid__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
   }
 
   .otodor-cgrid__empty {
