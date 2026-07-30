@@ -261,7 +261,7 @@
   /* Number styling (small blue accent) */
   .otodor-category-card__index {
     font-family: var(--otodor-font-display);
-    font-size: 11px;
+    font-size: var(--otodor-text-xs);
     font-weight: 700;
     color: #1E90FF;
     letter-spacing: 0.22em;
@@ -271,7 +271,7 @@
   /* Badge styling */
   .otodor-category-badge {
     font-family: var(--otodor-font-body);
-    font-size: 9px;
+    font-size: 0.85rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -329,7 +329,7 @@
   /* CTA (blue uppercase with arrow sliding right on hover) */
   .otodor-category-card__link {
     font-family: var(--otodor-font-body);
-    font-size: 11px;
+    font-size: var(--otodor-text-xs);
     font-weight: 700;
     color: #1E90FF;
     display: inline-flex;
@@ -380,13 +380,33 @@
       grid-row: span 1;
     }
 
-    /* Hero spans 2 columns on tablet */
+    /* Hero spans 2 columns on tablet — and must therefore drop the portrait
+       ratio the satellites keep. At 4/5 a full-width hero measured 765x956,
+       taller than the tablet viewport on its own. Landscape reads as a banner
+       and brings it to ~430px, the same move the phone layout makes. */
     .otodor-category-card-glow:nth-child(1) {
       grid-column: span 2;
+      aspect-ratio: 16 / 9;
     }
   }
 
-  /* Mobile Layout (1 column, all cards remain portrait 3/4) */
+  /* ── Mobile: keep the bento, don't unstack it ──────────────────────────
+     One column of 4/5 portrait cards meant five near-full-height cards and
+     five screens of scrolling to see a five-item menu. The desktop layout is
+     a bento — one hero plus four satellites — and that idea survives a phone
+     perfectly well at half scale:
+
+        ┌───────────────┐   hero, full width, 16/10 landscape
+        │       1       │
+        ├───────┬───────┤   four satellites, 2 x 2, square
+        │   2   │   3   │
+        ├───────┼───────┤
+        │   4   │   5   │
+        └───────┴───────┘
+
+     The whole menu now lands in about one and a half screens instead of
+     five, nothing is hidden behind a swipe, and the section still reads as
+     the same design on both devices. */
   @media (max-width: 767px) {
     #otodor-categories-{{ section.id }} {
       padding-top: 44px;
@@ -405,21 +425,58 @@
     }
 
     .otodor-categories__grid {
-      grid-template-columns: 1fr;
-      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
     }
 
-    /* One column, so the card is full-bleed wide: 3/4 made a single card taller
-       than the phone viewport. 4/5 keeps it portrait but on-screen. */
     .otodor-category-card-glow {
-      aspect-ratio: 4 / 5;
+      aspect-ratio: 1 / 1;
       grid-column: span 1 !important;
       grid-row: span 1 !important;
     }
 
-    .otodor-category-card__content {
-      padding: 1.15rem;
+    /* The hero keeps its billing: full width, and landscape so it reads as a
+       banner rather than a bigger tile. */
+    .otodor-category-card-glow:nth-child(1) {
+      aspect-ratio: 16 / 10;
+      grid-column: span 2 !important;
     }
+
+    .otodor-category-card { border-radius: 20px; }
+
+    .otodor-category-card__content {
+      padding: 0.9rem;
+      gap: 6px;
+    }
+    .otodor-category-card-glow:nth-child(1) .otodor-category-card__content {
+      padding: 1.15rem;
+      gap: 8px;
+    }
+
+    /* A satellite is now ~165px wide, so the title steps down and the
+       description gives way — the image and the name carry the card. */
+    .otodor-category-card__title {
+      font-size: var(--otodor-text-md);
+      line-height: 1.2;
+    }
+    .otodor-category-card-glow:nth-child(1) .otodor-category-card__title {
+      font-size: var(--otodor-text-xl);
+    }
+    .otodor-category-card-glow:not(:nth-child(1)) .otodor-category-card__desc {
+      display: none;
+    }
+    .otodor-category-card__meta-top { gap: 8px; margin-bottom: 2px; }
+
+    /* The mesh is a 32px lattice; on a 165px tile it reads as noise. */
+    .otodor-category-card__mesh { display: none; }
+  }
+
+  /* No pointer, no hover affordances — the tilt, sheen and cursor highlight
+     are desktop-only (the JS already gates on min-width 1025px), so make sure
+     nothing is left mid-transition on a touch device. */
+  @media (hover: none) {
+    .otodor-category-card__sheen,
+    .otodor-category-card__highlight { display: none; }
   }
 {%- endstyle -%}
 

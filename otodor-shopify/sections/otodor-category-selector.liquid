@@ -215,9 +215,15 @@
   .otodor-cats--dark  a.otodor-cats__card:hover { border-color: var(--otodor-glass-border-h); }
   #otodor-cat-selector-{{ section.id }} a.otodor-cats__card:focus-visible { outline: 2px solid var(--cats-accent); outline-offset: 3px; }
 
+  /* The whole image, never a crop — the same treatment the product tile
+     uses (.otodor-pcard__media): a square plinth, `contain`, and padding so
+     the art sits on the surface rather than bleeding to the card edge.
+     `cover` on a 4:3 frame was cutting the top and bottom off every
+     category photo. Square because the art is mixed portrait/landscape and
+     a square frame is the only one that letterboxes both gently. */
   #otodor-cat-selector-{{ section.id }} .otodor-cats__media {
     position: relative;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
     background:
       radial-gradient(120% 100% at 50% 0%, var(--otodor-blue-glow) 0%, transparent 60%),
@@ -225,7 +231,8 @@
   }
   .otodor-cats--light .otodor-cats__media { background: linear-gradient(160deg, var(--otodor-plinth), var(--otodor-bg-light)); }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__media img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
+    width: 100%; height: 100%; object-fit: contain; display: block;
+    padding: clamp(0.75rem, 4%, 1.5rem);
     transition: transform var(--otodor-dur-slow) var(--otodor-ease-spring);
   }
   a.otodor-cats__card:hover .otodor-cats__media img { transform: scale(1.05); }
