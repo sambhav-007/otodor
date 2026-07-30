@@ -228,6 +228,32 @@ module uses — one answer, not two that can disagree. `product.json` marks inst
   parsed; the `yesno` parser and the applicability decision matrix were ported and exercised (15 cases —
   comma fences so `lock` ≠ `padlock`, precedence, empty config, bare product).
 
+### ✅ Done — STEP 13 (Sitewide scale: 1.25× — and the reason it read small)
+The user reported the whole site as too small to read and asked for 1.25×. Two separate things:
+
+**The scale.** Dawn derives the root font-size from its own setting — `62.5% × body_scale` — and every OTODOR
+token that matters is rem-based, so **one number moves the site together**: `body_scale` and `heading_scale`
+100 → **125** in `config/settings_data.json`. Type, spacing, section rhythm and Dawn's `--page-width`
+(1200 → 1500 px) all land on exactly 1.25×, and it stays **merchant-tunable in the theme editor** (Typography →
+scale; `body_scale` caps at 130). Values that *cannot* follow a root scale were stepped by hand to stay in
+proportion: OTODOR container tokens (1280/1440/960 → 1600/1800/1200), the radius tokens, the comparison
+table's column + min widths, the mega-menu tile track and CTA thumb, the banner's mobile frame floor, and a
+few section `max-width`s. **Deliberately untouched:** media-query breakpoints, 1 px hairlines, the 44 px touch
+target, and `image_url`/`sizes` render hints.
+
+**The bug underneath.** The OTODOR type scale was authored as though **1rem were 16px** — its own comments said
+so — but the root has always been 62.5%-based (1rem = 10px). Every reading size had therefore been rendering at
+**~63 % of its documented intent**: `--otodor-text-sm`, which the comparison table uses, capped at **8.8 px**
+instead of 14 px. That is why the site read small, and why 1.25× alone would only have reached 10.9 px. The
+reading end of the ramp (`xs`…`2xl`) is **re-based** so each token renders the size it always claimed —
+12 / 14 / 16 / 18 / 20 / 24 / 32 px — still in rem so `body_scale` keeps moving it. `2xl` is included or it
+would land 1 px above the re-based `xl`. Display sizes above it are left alone: they are dominated by their
+`vw` term at real viewports and already read correctly, so re-basing would *double* rather than scale them.
+- **Rule for new work:** 1rem is **12.5 px**, not 16 px. Use rem for anything that should scale with the type;
+  use px only for things that must not (hairlines, breakpoints). See the SCALE note atop `otodor-base.css`.
+- Verified: ramp monotonic with no flat spots at 1920 / 1280 / 375; the stale `/* 16px */` spacing comments
+  were corrected so the next person doesn't repeat the mistake. `theme check` at baseline.
+
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
 - Optional: real LLM concierge as a hosted micro-service if the deterministic advisor proves the demand.
