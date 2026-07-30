@@ -1,0 +1,138 @@
+/*
+ * ------------------------------------------------------------
+ * Gate Automation — category landing. Configuration only, the same
+ * reusable sections as collection.json (OTODOR-COLLECTION-TEMPLATE.md).
+ *
+ * The selector runs in `auto`, so the sub-categories (Sliding Gate
+ * Motor, Swing Gate Motor, …) come straight from the navigation —
+ * add one there and it appears here, no template change.
+ *
+ * NOTE ON THE NAVIGATION: the "Gate Automation" menu item currently
+ * points at /collections/sliding-gate-motors, which is one of its own
+ * sub-categories — so the parent link lands on a child. Create a
+ * `gate-automation` collection, point the menu item at it, assign
+ * this template to it, and the hierarchy reads correctly. Until then
+ * this template can be assigned to whichever collection the item
+ * points at; the selector still finds the children by URL.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "otodor-collection-hero",
+      "settings": {
+        "eyebrow": "Gate Automation",
+        "fallback_line": "Motorised sliding and swing gates — sized to the leaf, wired for Indian power, and installed by the people who supply them.",
+        "show_count": true,
+        "moment_line": "A gate is not a door.",
+        "moment_sub": "Weight, span and duty cycle decide the motor. That is why every OTODOR gate job starts with a site survey, not a cart."
+      }
+    },
+    "selector": {
+      "type": "otodor-category-selector",
+      "settings": {
+        "source": "auto",
+        "menu": "main-menu",
+        "eyebrow": "Find your fit",
+        "heading": "Which gate",
+        "heading_accent": "do you have?",
+        "subheading": "Sliding or swing decides the motor, the mount and the safety kit.",
+        "color_scheme": "light",
+        "columns_desktop": 4,
+        "show_descriptions": true,
+        "show_icons": true,
+        "show_cta": true,
+        "cta_title": "Something unusual?",
+        "cta_text": "Cantilever, folding, oversized or heritage gates — send us a photo and the span.",
+        "cta_button_label": "Ask an expert",
+        "cta_link": "/pages/contact#otodor-lead"
+      }
+    },
+    "product-grid": {
+      "type": "otodor-collection-grid",
+      "settings": {
+        "products_per_page": 12,
+        "show_sort": true,
+        "show_cta": true,
+        "cta_title": "Not sure which motor your gate needs?",
+        "cta_sub": "Send us the gate weight and span — we size the motor before you order.",
+        "cta_button_label": "Talk to us"
+      }
+    },
+    "comparison": {
+      "type": "otodor-comparison",
+      "settings": {
+        "eyebrow": "Compare the range",
+        "heading": "Every motor, ",
+        "heading_accent": "side by side.",
+        "color_scheme": "dark",
+        "show_explore": true,
+        "explore_label": "Explore",
+        "max_products": 5
+      }
+    },
+    "why": {
+      "type": "otodor-why",
+      "blocks": {
+        "sized": {
+          "type": "statement",
+          "settings": { "lead": "Sized to your gate.", "counter": "Not to a price list." }
+        },
+        "installed": {
+          "type": "statement",
+          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+        },
+        "backup": {
+          "type": "statement",
+          "settings": { "lead": "Opens in a power cut.", "counter": "Manual release on every motor." }
+        }
+      },
+      "block_order": ["sized", "installed", "backup"],
+      "settings": { "eyebrow": "Why OTODOR Gate Automation" }
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Sliding or swing — which do I need?", "row_content": "<p>It is decided by your existing gate, not by preference. A gate that rolls along the boundary wall is sliding; one that swings inward or outward on hinges is a swing gate. Each needs a different motor, mount and safety kit.</p>" }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": { "heading": "How is the right motor sized?", "row_content": "<p>By gate weight, span and how often it runs. An undersized motor will work for a season and then fail on duty cycle. We take the weight and span during the survey and size from that.</p>" }
+        },
+        "q3": {
+          "type": "collapsible_row",
+          "settings": { "heading": "What happens in a power cut?", "row_content": "<p>Every OTODOR gate motor has a manual release so the gate can be opened by hand. Battery backup is available where the gate is the only vehicle access.</p>" }
+        },
+        "q4": {
+          "type": "collapsible_row",
+          "settings": { "heading": "Can it be retrofitted to my existing gate?", "row_content": "<p>Usually yes. The gate needs a true, level run and sound hinges or rollers; the survey confirms whether any civil work is needed before automation.</p>" }
+        }
+      },
+      "block_order": ["q1", "q2", "q3", "q4"],
+      "settings": {
+        "heading": "Frequently asked questions",
+        "heading_alignment": "center",
+        "emit_faq_schema": true,
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Book a free gate",
+        "heading_accent": "survey.",
+        "description": "We measure the span, weigh the leaf and check the run — then quote a motor that will still be working in ten years.",
+        "cta_primary_label": "Get a Custom Quote",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Talk to us",
+        "cta_secondary_link": "/pages/contact#otodor-lead"
+      }
+    }
+  },
+  "order": ["hero", "selector", "product-grid", "comparison", "why", "faq", "cta"]
+}

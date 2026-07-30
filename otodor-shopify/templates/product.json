@@ -56,7 +56,7 @@
             "install_label": "Free professional installation",
             "warranty_label": "3-year warranty",
             "technicians_label": "Certified technicians",
-            "except_collections": "smart-padlocks, padlocks"
+            "except_collections": "padocks, padlocks, smart-padlocks"
           }
         },
         "description": {
@@ -106,7 +106,7 @@
     "compatibility": {
       "type": "otodor-product-compat",
       "settings": {
-        "except_collections": "smart-padlocks, padlocks",
+        "except_collections": "padocks, padlocks, smart-padlocks",
         "except_types": "Smart Padlock, Padlock",
         "except_tags": "padlock, padlocks, smart-padlock"
       }
@@ -116,7 +116,7 @@
       "settings": {
         "promise": "We verify compatibility before installation.",
         "estimate": "Most installations completed within 2–4 hours, by certified OTODOR professionals.",
-        "except_collections": "smart-padlocks, padlocks",
+        "except_collections": "padocks, padlocks, smart-padlocks",
         "except_types": "Smart Padlock, Padlock",
         "except_tags": "padlock, padlocks, smart-padlock"
       }
@@ -124,7 +124,7 @@
     "warranty": {
       "type": "otodor-product-warranty",
       "settings": {
-        "except_collections": "smart-padlocks, padlocks",
+        "except_collections": "padocks, padlocks, smart-padlocks",
         "except_types": "Smart Padlock, Padlock",
         "except_tags": "padlock, padlocks, smart-padlock"
       }

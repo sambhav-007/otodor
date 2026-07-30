@@ -271,6 +271,39 @@ Every product grid dropped to a **single full-width card below 599 px** — a lo
   exactly (278/278 then 258×4), no horizontal overflow; 768 px → 2/2/2; 1280 px → products 3/3, categories 4/3,
   title 20 / meta 14 / price 18. Desktop unchanged at every number.
 
+### ✅ Done — STEP 15 (Gate Automation + Other Solutions landings)
+Read the **live** navigation (`otodorlocks.com`) rather than assume the structure. Two of the four top-level
+items had no working landing:
+- **Gate Automation** → `/collections/sliding-gate-motors`, i.e. the parent points at **one of its own
+  children** (its sub-items are `sliding-gate-motors-2` and `swing-gate-motors`). Clicking the parent lands on
+  a child collection.
+- **Other Solutions** → **no URL at all**, so the item only opened a dropdown. Eight product families behind it
+  and no page to land on.
+
+**`templates/page.solutions.json`** — one reusable hub template for any group that has **no collection behind
+it**. The selector gained a third way to identify itself: explicit `menu_item` setting → the link pointing at
+the current collection → **the link whose title equals the current page's title**. That last rule means the
+template needs *zero* per-page configuration: create a Page named exactly as the menu item, assign the
+template, point the nav item at it. Composition: page content → selector → why → CTA.
+
+**`templates/collection.gate-automation.json`** — gate-specific landing (survey-first hero, sliding/swing
+selector in `auto` mode, grid, comparison, why, 4 gate FAQs, CTA). Sub-categories come from Navigation, so
+adding one there adds a card here with no template change.
+
+**Also corrected:** the padlock relevance rule named `smart-padlocks`, but the live handle is **`padocks`**
+(their typo) — so Install/Warranty/Compatibility and the trust row were never actually switching off on
+padlock PDPs. All exclusion lists now read `padocks, padlocks, smart-padlocks`.
+
+**Admin to-do for these two (theme degrades gracefully until done):**
+1. Create a **`gate-automation`** collection, point the "Gate Automation" menu item at it, and assign the
+   `gate-automation` template. (Also worth resolving `sliding-gate-motors` vs `sliding-gate-motors-2` — they
+   look like a duplicate.)
+2. Create a **page titled exactly "Other Solutions"**, assign the `solutions` template, and point the menu
+   item at that page. Then give each of its eight children a real link — they currently have none, so their
+   cards fall back to `/collections/all`.
+3. Template suffix names are just names: assign `digital-locks` → the `door-locks` collection, and
+   `smart-padlocks` → `padocks`.
+
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
 - Optional: real LLM concierge as a hosted micro-service if the deterministic advisor proves the demand.

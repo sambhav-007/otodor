@@ -58,30 +58,50 @@
     endif
   endif
 
-  # 2. Navigation — the link whose collection IS this page, then its children.
+  # 2. Navigation — find the menu item THIS page represents, render its
+  #    children. What identifies "this page" depends on where the section is:
+  #      a. an explicit `menu_item` setting (wins — say it outright)
+  #      b. on a collection: the link pointing at that collection
+  #      c. on a Shopify Page: the link whose TITLE matches the page title.
+  #         This is what lets a hub with no collection behind it — "Other
+  #         Solutions", a grouping of eight product families — still open as
+  #         a page listing its sub-categories, with no per-page config.
+  #    Nothing identified (e.g. the homepage) → the menu's top level.
   assign nav_children = ''
   if resolved == blank and source != 'blocks' and source != 'children'
     assign nav_menu = section.settings.menu
-    if nav_menu != blank
+    assign want_title = section.settings.menu_item | strip | downcase
+    assign want_url = ''
+    if want_title == blank
       if collection != blank and collection != empty
+        assign want_url = collection.url
+      elsif page != blank and page != empty
+        assign want_title = page.title | strip | downcase
+      endif
+    endif
+
+    if nav_menu != blank
+      if want_title != blank or want_url != blank
         for l in nav_menu.links
           if l.links != blank
-            if l.type == 'collection_link' and l.object.handle == collection.handle
+            assign lt = l.title | strip | downcase
+            if want_title != blank and lt == want_title
               assign nav_children = l.links
               break
             endif
-            if l.url == collection.url
+            if want_url != blank and l.url == want_url
               assign nav_children = l.links
               break
             endif
             # one level deeper: a sub-category that itself has children
             for l2 in l.links
               if l2.links != blank
-                if l2.type == 'collection_link' and l2.object.handle == collection.handle
+                assign l2t = l2.title | strip | downcase
+                if want_title != blank and l2t == want_title
                   assign nav_children = l2.links
                   break
                 endif
-                if l2.url == collection.url
+                if want_url != blank and l2.url == want_url
                   assign nav_children = l2.links
                   break
                 endif
@@ -93,7 +113,7 @@
           endif
         endfor
       else
-        # No collection context (homepage, page): show the menu's top level.
+        # Nothing to identify (homepage): show the menu's top level.
         assign nav_children = nav_menu.links
       endif
     endif
@@ -403,7 +423,8 @@
         { "value": "children", "label": "Child collections only" }
       ]
     },
-    { "type": "link_list", "id": "menu", "label": "Navigation menu", "default": "main-menu", "info": "The section finds the link pointing at this collection and renders its child links as cards — the same data as the mega menu." },
+    { "type": "link_list", "id": "menu", "label": "Navigation menu", "default": "main-menu", "info": "The section finds the menu item this page represents and renders its child links as cards — the same data as the mega menu. On a collection it matches the link pointing at that collection; on a page it matches the menu item with the same title." },
+    { "type": "text", "id": "menu_item", "label": "Navigation item override", "info": "Name a top-level menu item to expand instead, e.g. \"Other Solutions\". Leave blank to match automatically." },
     { "type": "header", "content": "Content" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Find your fit" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Which type of lock" },

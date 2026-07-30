@@ -64,6 +64,22 @@ Because the generic `collection.json` runs the selector in `auto`, **any** paren
 sub-categories with zero template work. Navigation stays the single source of truth — the same data the mega
 menu draws — and the per-card override chain lives once, in `snippets/otodor-category-card.liquid`.
 
+### Hubs with no collection behind them — `templates/page.solutions.json`
+
+Not every category group is a collection. **"Other Solutions"** is eight product families (Boom Barriers,
+Electromagnetic Locks, Shutter Motors, …) with no parent collection, and its nav item carries no URL at all —
+so clicking it did nothing. The selector therefore learned a third way to identify itself:
+
+| Context | Matches the menu item by |
+|---|---|
+| explicit | the `menu_item` setting ("Other Solutions") |
+| collection page | the link pointing at that collection |
+| **Shopify Page** | **the link whose title equals the page title** |
+
+That last row is what makes `page.solutions.json` work with **zero per-page configuration**: create a page
+named exactly as the menu item, assign the template, point the nav item at the page. One template serves
+every hub — Gate Automation, Other Solutions, and whatever is added next.
+
 Leaf categories get config-only instances (`collection.wooden-door-locks.json`, `…glass-door-locks`,
 `…metal-gate-locks`, `…smart-padlocks`) with no selector: they have no children. The padlock instance
 deliberately carries no door-install or clearance content, matching the product modules' relevance rule.

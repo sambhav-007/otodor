@@ -1,0 +1,93 @@
+/*
+ * ------------------------------------------------------------
+ * OTODOR Solutions Hub — a category landing for a group that has
+ * no collection behind it.
+ *
+ * "Other Solutions" is eight product families with no parent
+ * collection, and its nav item carries no URL, so clicking it did
+ * nothing. This template turns any Shopify PAGE into that group's
+ * landing: the category selector matches the menu item whose title
+ * equals the PAGE TITLE and renders its children as cards.
+ *
+ * That means ONE template serves every hub — create a page called
+ * "Other Solutions", assign this template, done. No per-page
+ * settings, no forked section code. Name the page exactly as the
+ * menu item is named (or set the selector's "Navigation item
+ * override" if they must differ).
+ *
+ * Auto-hides gracefully: no matching menu item -> no selector, and
+ * the page still renders its own content.
+ *
+ * REQUIRES ADMIN: create the page, assign this template, and point
+ * the navigation item at it (Navigation -> Main menu -> the item's
+ * link -> Pages -> <the page>). That last step is what makes the
+ * nav link open something.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 40,
+        "padding_bottom": 8
+      }
+    },
+    "selector": {
+      "type": "otodor-category-selector",
+      "settings": {
+        "source": "menu",
+        "menu": "main-menu",
+        "menu_item": "",
+        "eyebrow": "Explore the range",
+        "heading": "What are you",
+        "heading_accent": "looking to automate?",
+        "subheading": "Pick a system and we'll show the OTODOR range built for it — surveyed, installed and supported by us.",
+        "color_scheme": "light",
+        "columns_desktop": 4,
+        "show_descriptions": true,
+        "show_icons": true,
+        "show_cta": true,
+        "cta_title": "Not on this list?",
+        "cta_text": "Tell us the opening and we'll engineer for it. Most OTODOR installations start as a site survey.",
+        "cta_button_label": "Ask an expert",
+        "cta_link": "/pages/contact#otodor-lead",
+        "padding_top": 40,
+        "padding_bottom": 96
+      }
+    },
+    "why": {
+      "type": "otodor-why",
+      "blocks": {
+        "surveyed": {
+          "type": "statement",
+          "settings": { "lead": "Surveyed first.", "counter": "Then quoted." }
+        },
+        "installed": {
+          "type": "statement",
+          "settings": { "lead": "Installed.", "counter": "Not delivered." }
+        },
+        "supported": {
+          "type": "statement",
+          "settings": { "lead": "One number to call.", "counter": "For all of it." }
+        }
+      },
+      "block_order": ["surveyed", "installed", "supported"],
+      "settings": { "eyebrow": "Why OTODOR" }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Book a free site",
+        "heading_accent": "survey.",
+        "description": "Automation is specified from the opening, not from a catalogue. A certified OTODOR technician measures, recommends and installs.",
+        "cta_primary_label": "Get a Custom Quote",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Talk to us",
+        "cta_secondary_link": "/pages/contact#otodor-lead"
+      }
+    }
+  },
+  "order": ["main", "selector", "why", "cta"]
+}

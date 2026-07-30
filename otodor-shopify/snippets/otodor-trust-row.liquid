@@ -30,7 +30,7 @@
 {%- endcomment -%}
 
 {%- liquid
-  assign not_installed_cols = except_collections | default: 'smart-padlocks'
+  assign not_installed_cols = except_collections | default: 'padocks, padlocks, smart-padlocks'
   assign not_installed_types = except_types | default: 'Smart Padlock, Padlock'
   assign not_installed_tags = except_tags | default: 'padlock, padlocks, smart-padlock'
 -%}
