@@ -183,7 +183,7 @@
 
 .otodor-banner__eyebrow {
   font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
-  font-size: clamp(0.62rem, 1vw, 0.75rem);
+  font-size: clamp(0.79rem, 1vw, 0.96rem);
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -205,7 +205,7 @@
 
 .otodor-banner__text {
   font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
-  font-size: clamp(0.82rem, 1.25vw, 1.05rem);
+  font-size: clamp(1.05rem, 1.25vw, 1.34rem);
   line-height: 1.5;
   color: var(--banner-fg);
   opacity: 0.82;
@@ -232,7 +232,7 @@
   border: 1px solid transparent;
   border-radius: var(--otodor-radius-pill, 999px);
   font-family: var(--otodor-font-body, 'Inter', system-ui, sans-serif);
-  font-size: clamp(0.78rem, 1vw, 0.9rem);
+  font-size: clamp(1rem, 1vw, 1.15rem);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-decoration: none;
@@ -368,11 +368,11 @@
   }
 
   .otodor-banner__heading {
-    font-size: clamp(1.25rem, 6.4vw, 1.8rem);
+    font-size: clamp(1.6rem, 6.4vw, 2.3rem);
   }
 
   .otodor-banner__text {
-    font-size: 0.82rem;
+    font-size: 1.05rem;
   }
 
   .otodor-banner__actions {
@@ -386,7 +386,7 @@
     flex: 0 1 auto;
     padding: 0.55rem 1.05rem;
     min-height: 44px;
-    font-size: 0.78rem;
+    font-size: 1rem;
   }
 }
 

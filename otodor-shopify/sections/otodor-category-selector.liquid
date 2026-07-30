@@ -138,7 +138,7 @@
   #otodor-cat-selector-{{ section.id }} .otodor-cats__eyebrow {
     display: block;
     font-family: var(--otodor-font-display);
-    font-size: 0.75rem;
+    font-size: 0.96rem;
     font-weight: 600;
     letter-spacing: var(--otodor-tracking-widest);
     text-transform: uppercase;
@@ -164,7 +164,7 @@
   #otodor-cat-selector-{{ section.id }} .otodor-cats__title .accent { color: var(--cats-accent); }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__sub {
     margin: 0.9rem 0 0;
-    font-size: 1rem;
+    font-size: 1.28rem;
     line-height: 1.55;
     opacity: 0.62;
   }
@@ -215,40 +215,48 @@
   a.otodor-cats__card:hover .otodor-cats__media img { transform: scale(1.05); }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__badge {
     position: absolute; top: 0.75rem; left: 0.75rem;
-    font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    font-size: 0.84rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
     padding: 0.3rem 0.6rem; border-radius: var(--otodor-radius-pill);
     background: var(--cats-accent); color: #fff;
   }
 
+  /* Card type reads off the tokens, so it follows the theme's body_scale
+     from here on instead of drifting again: name 20px / desc 14px / CTA
+     14px, with the padding stepped up to match — the old values were
+     correct-sized but cramped, which is what read as unattractive. */
   #otodor-cat-selector-{{ section.id }} .otodor-cats__body {
-    display: flex; flex-direction: column; gap: 0.4rem;
-    padding: clamp(1rem, 1.6vw, 1.4rem);
+    display: flex; flex-direction: column; gap: 0.55rem;
+    padding: clamp(1.4rem, 2vw, 1.9rem);
     flex: 1 1 auto;
   }
-  #otodor-cat-selector-{{ section.id }} .otodor-cats__card-top { display: flex; align-items: center; gap: 0.6rem; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__card-top { display: flex; align-items: center; gap: 0.7rem; }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__icon { display: inline-flex; color: var(--cats-accent); }
-  #otodor-cat-selector-{{ section.id }} .otodor-cats__icon svg { width: 22px; height: 22px; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__icon svg { width: 26px; height: 26px; }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__name {
-    font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em; margin: 0;
+    font-family: var(--otodor-font-display); font-weight: 600;
+    font-size: var(--otodor-text-lg); line-height: 1.25;
+    letter-spacing: var(--otodor-tracking-tight); margin: 0;
   }
-  #otodor-cat-selector-{{ section.id }} .otodor-cats__desc { margin: 0; font-size: 0.85rem; line-height: 1.5; opacity: 0.6; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__desc {
+    margin: 0; font-size: var(--otodor-text-sm); line-height: 1.55; opacity: 0.68;
+  }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__go {
-    margin-top: auto; display: inline-flex; align-items: center; gap: 0.4rem;
-    font-size: 0.8rem; font-weight: 600; color: var(--cats-accent); padding-top: 0.6rem;
+    margin-top: auto; display: inline-flex; align-items: center; gap: 0.45rem;
+    font-size: var(--otodor-text-sm); font-weight: 600; color: var(--cats-accent); padding-top: 0.9rem;
   }
-  #otodor-cat-selector-{{ section.id }} .otodor-cats__go svg { width: 15px; height: 15px; transition: transform var(--otodor-dur-fast) ease; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__go svg { width: 17px; height: 17px; transition: transform var(--otodor-dur-fast) ease; }
   a.otodor-cats__card:hover .otodor-cats__go svg { transform: translateX(3px); }
 
   /* CTA card */
   #otodor-cat-selector-{{ section.id }} .otodor-cats__card--cta { justify-content: center; padding: clamp(1.2rem, 2vw, 1.75rem); }
   .otodor-cats--light .otodor-cats__card--cta { background: var(--otodor-ink); color: #fff; border-color: transparent; }
   .otodor-cats--dark  .otodor-cats__card--cta { background: var(--otodor-gradient-blue-subtle); }
-  #otodor-cat-selector-{{ section.id }} .otodor-cats__cta-title { font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.1rem; margin: 0 0 0.4rem; }
-  #otodor-cat-selector-{{ section.id }} .otodor-cats__cta-text { font-size: 0.85rem; line-height: 1.5; opacity: 0.72; margin: 0 0 1rem; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__cta-title { font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.41rem; margin: 0 0 0.4rem; }
+  #otodor-cat-selector-{{ section.id }} .otodor-cats__cta-text { font-size: 1.09rem; line-height: 1.5; opacity: 0.72; margin: 0 0 1rem; }
   #otodor-cat-selector-{{ section.id }} .otodor-cats__cta-btn {
     align-self: flex-start; display: inline-flex; align-items: center; gap: 0.45rem;
     padding: 0.6rem 1.1rem; border-radius: var(--otodor-radius-pill);
-    background: var(--cats-accent); color: #fff; font-weight: 600; font-size: 0.82rem; text-decoration: none;
+    background: var(--cats-accent); color: #fff; font-weight: 600; font-size: 1.05rem; text-decoration: none;
   }
 
   @media (prefers-reduced-motion: reduce) {

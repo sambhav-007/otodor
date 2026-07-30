@@ -88,7 +88,7 @@
 
   /* ─ Left rail (value proposition) ─────────────────────────── */
   #otodor-lead-{{ section.id }} .otodor-lead__eyebrow {
-    display: block; font-family: var(--otodor-font-display); font-size: 0.75rem; font-weight: 600;
+    display: block; font-family: var(--otodor-font-display); font-size: 0.96rem; font-weight: 600;
     letter-spacing: var(--otodor-tracking-widest); text-transform: uppercase; margin-bottom: 0.9rem; color: var(--lead-accent);
   }
   #otodor-lead-{{ section.id }} .otodor-lead__title {
@@ -98,7 +98,7 @@
   #otodor-lead-{{ section.id }}.otodor-lead--light .otodor-lead__title { color: var(--otodor-ink); }
   #otodor-lead-{{ section.id }}.otodor-lead--dark  .otodor-lead__title { color: var(--otodor-white); }
   #otodor-lead-{{ section.id }} .otodor-lead__title .accent { color: var(--lead-accent); }
-  #otodor-lead-{{ section.id }} .otodor-lead__sub { margin: 1rem 0 0; font-size: 1.05rem; line-height: 1.55; opacity: 0.66; max-width: 34rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__sub { margin: 1rem 0 0; font-size: 1.34rem; line-height: 1.55; opacity: 0.66; max-width: 34rem; }
 
   #otodor-lead-{{ section.id }} .otodor-lead__reasons { list-style: none; margin: clamp(1.75rem, 3vw, 2.5rem) 0 0; padding: 0; display: grid; gap: 1.1rem; }
   #otodor-lead-{{ section.id }} .otodor-lead__reason { display: flex; gap: 0.85rem; align-items: flex-start; }
@@ -109,8 +109,8 @@
   .otodor-lead--light .otodor-lead__reason-icon { background: rgba(26,120,216,0.08); }
   .otodor-lead--dark  .otodor-lead__reason-icon { background: rgba(77,166,255,0.12); }
   #otodor-lead-{{ section.id }} .otodor-lead__reason-icon svg { width: 20px; height: 20px; }
-  #otodor-lead-{{ section.id }} .otodor-lead__reason-title { font-family: var(--otodor-font-display); font-weight: 600; font-size: 0.98rem; margin: 0 0 0.15rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__reason-text { margin: 0; font-size: 0.86rem; line-height: 1.5; opacity: 0.6; }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-title { font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.25rem; margin: 0 0 0.15rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-text { margin: 0; font-size: 1.1rem; line-height: 1.5; opacity: 0.6; }
 
   /* ─ Right panel (the form card) ───────────────────────────── */
   #otodor-lead-{{ section.id }} .otodor-lead__panel {
@@ -123,12 +123,12 @@
   #otodor-lead-{{ section.id }} .otodor-lead__row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   @media (max-width: 480px) { #otodor-lead-{{ section.id }} .otodor-lead__row { grid-template-columns: 1fr; } }
   #otodor-lead-{{ section.id }} .otodor-lead__field { display: grid; gap: 0.4rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.01em; opacity: 0.85; }
+  #otodor-lead-{{ section.id }} .otodor-lead__label { font-size: 1.02rem; font-weight: 600; letter-spacing: 0.01em; opacity: 0.85; }
   #otodor-lead-{{ section.id }} .otodor-lead__label .req { color: var(--lead-accent); }
   #otodor-lead-{{ section.id }} .otodor-lead__input,
   #otodor-lead-{{ section.id }} .otodor-lead__select,
   #otodor-lead-{{ section.id }} .otodor-lead__textarea {
-    width: 100%; font-family: var(--otodor-font-body); font-size: 0.95rem; color: inherit;
+    width: 100%; font-family: var(--otodor-font-body); font-size: 1.22rem; color: inherit;
     padding: 0.72rem 0.9rem; border-radius: var(--otodor-radius-md); border: 1px solid; background: transparent;
     transition: border-color var(--otodor-dur-fast) ease, box-shadow var(--otodor-dur-fast) ease;
   }
@@ -146,14 +146,14 @@
   }
   #otodor-lead-{{ section.id }} .otodor-lead__select { appearance: none; -webkit-appearance: none; cursor: pointer; }
 
-  #otodor-lead-{{ section.id }} .otodor-lead__consent { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.8rem; line-height: 1.45; opacity: 0.72; }
+  #otodor-lead-{{ section.id }} .otodor-lead__consent { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 1.02rem; line-height: 1.45; opacity: 0.72; }
   #otodor-lead-{{ section.id }} .otodor-lead__consent input { margin-top: 0.2rem; accent-color: var(--lead-accent); flex: 0 0 auto; }
 
   #otodor-lead-{{ section.id }} .otodor-lead__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.35rem; }
   #otodor-lead-{{ section.id }} .otodor-lead__submit {
     flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
     padding: 0.85rem 1.4rem; border: none; cursor: pointer; border-radius: var(--otodor-radius-pill);
-    font-family: var(--otodor-font-display); font-weight: 600; font-size: 0.95rem;
+    font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.22rem;
     background: var(--lead-accent); color: #fff;
     transition: transform var(--otodor-dur-fast) ease, filter var(--otodor-dur-fast) ease;
   }
@@ -162,7 +162,7 @@
   #otodor-lead-{{ section.id }} .otodor-lead__wa {
     display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
     padding: 0.85rem 1.2rem; border-radius: var(--otodor-radius-pill); text-decoration: none;
-    font-family: var(--otodor-font-display); font-weight: 600; font-size: 0.9rem;
+    font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.15rem;
     background: #25D366; color: #05300f;
     transition: transform var(--otodor-dur-fast) ease;
   }
@@ -179,14 +179,14 @@
     border-radius: 50%; background: rgba(37,211,102,0.14); color: #25D366;
   }
   #otodor-lead-{{ section.id }} .otodor-lead__success-badge svg { width: 26px; height: 26px; }
-  #otodor-lead-{{ section.id }} .otodor-lead__success-title { font-family: var(--otodor-font-display); font-weight: 700; font-size: 1.35rem; margin: 0; }
-  #otodor-lead-{{ section.id }} .otodor-lead__success-text { margin: 0; font-size: 0.95rem; line-height: 1.55; opacity: 0.66; max-width: 26rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-title { font-family: var(--otodor-font-display); font-weight: 700; font-size: 1.73rem; margin: 0; }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-text { margin: 0; font-size: 1.22rem; line-height: 1.55; opacity: 0.66; max-width: 26rem; }
   #otodor-lead-{{ section.id }} .otodor-lead__errors {
     margin: 0 0 0.5rem; padding: 0.75rem 0.9rem; border-radius: var(--otodor-radius-md);
-    background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.28); font-size: 0.85rem;
+    background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.28); font-size: 1.09rem;
   }
   #otodor-lead-{{ section.id }} .otodor-lead__errors ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__field-error { color: #dc2626; font-size: 0.78rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__field-error { color: #dc2626; font-size: 1rem; }
 
   @media (prefers-reduced-motion: reduce) {
     #otodor-lead-{{ section.id }} .otodor-lead__submit,
