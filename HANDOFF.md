@@ -304,6 +304,22 @@ padlock PDPs. All exclusion lists now read `padocks, padlocks, smart-padlocks`.
 3. Template suffix names are just names: assign `digital-locks` → the `door-locks` collection, and
    `smart-padlocks` → `padocks`.
 
+### ✅ Done — STEP 16 (Site audit: specs on the PDP, real phone, theme check to zero)
+Audited the **live** site rather than the repo. Findings and fixes:
+- **Product pages showed no specifications at all** while the comparison on the same site showed a full sheet
+  for the same models — `otodor-product-specs` read only `custom.specs`, which is undefined. It is now the
+  registry's **second consumer**: `custom.specs` → registry resolved against the product (metafield → model
+  seed → default) → blocks → hide. A row backed *only* by a registry default doesn't count as evidence
+  (otherwise every product rendered a one-row ledger repeating the warranty module). Simulated: SENTRY 16 rows
+  over 7 groups, ZEAL 16, ZION+ 15, OHM/CLOUD correctly nothing.
+- **`+91 00000 00000`** was shipping in the footer and contact column on every page, while every WhatsApp link
+  on the same page published **+91 7206895607**. Replaced with the number the site already uses.
+- **`theme check` errors 5 → 0.** Two were a stale `t:` reference in `featured-product.liquid` to a key that
+  never existed (fixed with literal strings — adding it to `en.default.schema.json` instead would have obliged
+  all 16 other locale files, which is why that attempt was reverted). Three were `ImgWidthAndHeight` on the
+  logo fallbacks; both logos are sized by CSS (`height: auto` / `height: 72px`), so the attributes can only
+  reserve space, never distort. Ratio from the official `brand-logo.png` (1800×420).
+
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
 - Optional: real LLM concierge as a hosted micro-service if the deterministic advisor proves the demand.
@@ -329,7 +345,13 @@ padlock PDPs. All exclusion lists now read `padocks, padlocks, smart-padlocks`.
 ---
 
 ## Verification method (important)
-The agent sandbox **cannot run a headless preview** (storefront password + non-interactive). Validation here uses **`shopify theme check`** (currently 5 pre-existing errors / 18 warnings — footer logo `img` dims + translation keys; none from this session's work). **The user QAs visually on their own `shopify theme dev` at :9292.** Pinned scroll-tours (Moments) and scroll-drawn lines need a real browser.
+The agent sandbox **cannot run a headless preview** (storefront password + non-interactive). Validation here uses
+**`shopify theme check`** — the baseline is now **0 errors / 16 warnings** (STEP 16 cleared the 5 long-standing
+errors). **Any new error is yours; do not re-baseline it away.** Pure CSS/layout work can additionally be driven
+in a static harness (extract a section's `{% style %}`, serve it with the real `otodor-base.css`, probe computed
+layout in the browser) — that is how the mobile grids and the category bento were measured.
+**The user QAs visually on their own `shopify theme dev` at :9292.** Pinned scroll-tours (Moments) and
+scroll-drawn lines need a real browser.
 
 ## User preferences observed
 - Premium storytelling over transactional ecommerce energy. **Dislikes:** feature-card grids, icons-as-decoration, bento layouts for credibility content, cyberpunk/HUD/neon. **Likes:** large type, restraint, real photography, editorial rows, Apple/Tesla/B&O references.

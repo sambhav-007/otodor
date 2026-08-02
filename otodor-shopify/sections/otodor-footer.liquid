@@ -197,7 +197,7 @@
           {%- if section.settings.logo != blank -%}
             {{ section.settings.logo | image_url: width: 360 | image_tag: loading: 'lazy', alt: shop.name, widths: '120,240,360' }}
           {%- else -%}
-            <img src="{{ 'otodor_log_bg_removed.png' | file_img_url: '360x' }}" alt="{{ shop.name }}" loading="lazy">
+            <img src="{{ 'otodor_log_bg_removed.png' | file_img_url: '360x' }}" alt="{{ shop.name }}" loading="lazy" width="360" height="84">
           {%- endif -%}
         </a>
 
