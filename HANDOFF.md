@@ -62,14 +62,17 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 **Desktop Mega Menu (UI milestone, `snippets/header-mega-menu.liquid` + `assets/otodor-mega-menu.css`):** enterprise-grade, editorial. Full-width panel = category columns (level-2 collections → level-3 links, icon/description from `custom.menu_icon`/`menu_description`) **+ a featured panel that updates to the hovered/focused category** (image from `custom.menu_image` → collection image → first product image; cross-fades via opacity/translateY/scale, ~200ms) **+ a full-width "Get a Custom Quote" CTA**. Data = Shopify Navigation + collection metafields (single source of truth; no parallel menu). Minimal scoped inline JS only swaps the active featured panel (no AJAX). Open/ESC/keyboard stay with Dawn's `<header-menu>`. Mobile drawer untouched. Merchant-editable: Navigation (structure), Collections (image/description/url), `custom.menu_*` (icon/description/image), header settings (`mega_featured_label`, `mega_cta_*`).
 
 **Homepage order** (`index.json`), STEP 17 onward: `otodor_vault_intro → otodor_promo_strip → otodor_banner →
-otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials →
+otodor_categories → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials →
 otodor_process → otodor_ecosystem → otodor_cta_banner`. **The pinned monolith hero is deleted** (STEP 17); the
 banner slideshow opens the page. It briefly left for Digital Locks and the user asked for it back, so there
 are now **two configurations of `otodor-banner`** — homepage (whole-range copy) and Digital Locks
 (category copy) — one section, no fork.
 
-**Digital Locks order** (`collection.digital-locks.json`): `hero → banner → selector → product-grid → …` — the
-slideshow sits above the sub-categories.
+**Digital Locks order** (`collection.digital-locks.json`): `hero → banner → selector → product-grid →
+moments → features → why → content → comparison → faq → buying-guide → content-rail → cta → seo`. The
+slideshow sits above the sub-categories, and the **Moments scroll-tour** ("Security that adapts to modern
+living") moved here from the homepage — it is a door-lock story, so it plays on the door-lock page, between
+the grid and the technology bento.
 
 **Product page** (`product.json`) current (STEP 4b orchestrator + STEP 17 offer block): buy box is
 `title → positioning → price → access_chips → otodor_offer → variant_picker → quantity → buy_buttons →
