@@ -74,6 +74,15 @@ slideshow sits above the sub-categories, and the **Moments scroll-tour** ("Secur
 living") moved here from the homepage — it is a door-lock story, so it plays on the door-lock page, between
 the grid and the technology bento.
 
+**A section on a `collection.<suffix>.json` is invisible until that template is assigned** — the user
+reported Moments missing for exactly this reason. Store data, not a theme file (`shopify theme push` cannot
+set it). The pattern that fixes it: give the section a **handle scope** and place it on the **generic
+`collection.json`** too. `otodor-moments` now has `only_collections` (blank = render wherever placed) and sits
+on the generic template scoped to the lock collections, so it reaches an unassigned `door-locks` with no
+admin step and stays off gate motors. No double-render — one template serves a request.
+**The banner has no such gate**: if Digital Locks is unassigned, its slideshow is invisible too, and the fix
+there is the template assignment (or the same scoping treatment).
+
 **Product page** (`product.json`) current (STEP 4b orchestrator + STEP 17 offer block): buy box is
 `title → positioning → price → access_chips → otodor_offer → variant_picker → quantity → buy_buttons →
 trust_row → description`; then `otodor-product-reveal → otodor-product-specs → otodor-product-compat →
