@@ -228,15 +228,92 @@
     .otodor-feature-tile-glow--small { grid-column: span 1; }
   }
 
+  /* ─ Phones ───────────────────────────────────────────────────
+     A bento that collapses to one column stops being a bento: six
+     full-width bars, three screens of scrolling, no hierarchy. It stays
+     a grid — two up — with the hero tile keeping the full row because it
+     carries the product render. The tile is rebuilt for ~163px rather
+     than merely narrowed (same treatment as the product cards, STEP 14):
+     padding roughly halves, type steps down one rung, and both title and
+     description line-clamp so one long feature name can't make its tile
+     taller than its neighbour and stagger the row.
+  ───────────────────────────────────────────────────────────── */
   @media (max-width: 599px) {
     .otodor-features__header { flex-direction: column; align-items: flex-start; }
     .otodor-features__subheading { text-align: left; }
-    .otodor-features__grid { grid-template-columns: 1fr; }
-    .otodor-feature-tile-glow,
-    .otodor-feature-tile-glow--large,
+
+    .otodor-features__grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: minmax(150px, auto);
+      gap: 0.7rem;
+    }
+    .otodor-feature-tile-glow--large { grid-column: span 2; grid-row: auto; min-height: 260px; }
     .otodor-feature-tile-glow--wide,
     .otodor-feature-tile-glow--small { grid-column: span 1; grid-row: auto; }
+
+    .otodor-feature-tile { padding: 0.9rem; border-radius: 16px; }
+    .otodor-feature-tile--large { padding: 1.25rem; }
+
+    .otodor-feature-tile__icon {
+      width: 32px; height: 32px; border-radius: 9px; margin-bottom: 0.45rem;
+    }
+    .otodor-feature-tile__icon svg { width: 18px; height: 18px; }
+
+    .otodor-feature-tile__content { max-width: none; gap: 0.3rem; }
+    .otodor-feature-tile__title {
+      font-size: var(--otodor-text-lg);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .otodor-feature-tile--large .otodor-feature-tile__title {
+      font-size: var(--otodor-text-xl);
+      -webkit-line-clamp: 3;
+    }
+    {%- comment -%}
+      The description keeps its reading size and clamps at four lines, not
+      three: a grid row is as tall as its tallest tile anyway, so the pair
+      stays level whether the copy runs long or short — there is nothing to
+      buy by cutting the sentence, only meaning to lose.
+    {%- endcomment -%}
+    .otodor-feature-tile__desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* The motifs were drawn for a tile twice this wide, and they sit
+       behind the copy. Shrink them, drop them to the bottom of the tile
+       and take the opacity down so they read as texture under the text
+       rather than something the text is printed on top of. */
     .otodor-feature-tile--large .otodor-feature-tile__render { width: 42%; right: 3%; height: 72%; }
+    .otodor-feature-tile--wide .feat-motif,
+    .otodor-feature-tile--small .feat-motif { opacity: 0.34; }
+
+    .feat-app,
+    .feat-keypad,
+    .feat-log { align-items: flex-end; justify-content: flex-end; padding: 0 8% 8% 0; }
+    .feat-signal,
+    .feat-rfid { align-items: flex-end; padding-bottom: 14%; }
+
+    .feat-phone {
+      width: 92px; height: 120px; border-radius: 14px; padding: 8px 7px; gap: 5px;
+    }
+    .feat-phone__pill { height: 20px; border-radius: 6px; }
+    .feat-phone__pill::after { width: 12px; height: 12px; top: 4px; }
+    .feat-phone__row { height: 6px; }
+
+    .feat-keypad__grid { grid-template-columns: repeat(3, 14px); grid-auto-rows: 14px; gap: 7px; }
+
+    .feat-log { gap: 5px; }
+    .feat-log__row { width: 104px; gap: 7px; }
+
+    .feat-signal span { width: 20px; height: 20px; }
+    .feat-rfid__card { width: 42px; height: 28px; }
+    .feat-rfid__card::before { right: 5px; top: 6px; width: 8px; height: 8px; }
+    .feat-rfid__ripple { width: 28px; height: 28px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
