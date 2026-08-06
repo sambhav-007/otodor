@@ -1,3 +1,40 @@
+{%- comment -%}
+  ────────────────────────────────────────────────────────────────────────
+  RELEVANCE GATE. Moments is a door story — every frame is someone walking
+  through a door — so it belongs on lock collections and nowhere near gate
+  motors or accessories.
+
+  It is placed on the GENERIC collection template as well as the Digital
+  Locks one, because a collection with no theme template assigned falls back
+  to `collection.json`, and "assign the template" is admin data a theme push
+  cannot set. Scoping by handle lets the generic template carry the story
+  safely: it renders on the lock collections and hides everywhere else.
+  Blank list = renders wherever it is placed (the homepage-style use).
+
+  It cannot double up: only one template renders per request, so the
+  collection either gets its own instance or the generic one, never both.
+  ────────────────────────────────────────────────────────────────────────
+{%- endcomment -%}
+{%- liquid
+  assign moments_visible = true
+  if section.settings.only_collections != blank
+    assign moments_visible = false
+    assign wanted_handles = section.settings.only_collections | split: ','
+    for wanted in wanted_handles
+      assign wanted_handle = wanted | strip | downcase
+      if wanted_handle != blank and collection.handle == wanted_handle
+        assign moments_visible = true
+        break
+      endif
+    endfor
+  endif
+  unless section.blocks.size > 0
+    assign moments_visible = false
+  endunless
+-%}
+
+{%- if moments_visible -%}
+
 {%- style -%}
   /* ─────────────────────────────────────────────────────────
      OTODOR Moments — editorial day-in-the-life narrative.
@@ -327,11 +364,14 @@
 })();
 </script>
 
+{%- endif -%}
+
 {% schema %}
 {
   "name": "OTODOR Moments",
   "settings": [
-    { "type": "text", "id": "opener", "label": "Opening line", "default": "Security that adapts to modern living." }
+    { "type": "text", "id": "opener", "label": "Opening line", "default": "Security that adapts to modern living." },
+    { "type": "text", "id": "only_collections", "label": "Show only on these collections", "info": "Collection handles, comma separated (e.g. door-locks, digital-locks). Leave blank to show wherever this section is placed — that is what the homepage-style use wants." }
   ],
   "blocks": [
     {
