@@ -61,12 +61,20 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 
 **Desktop Mega Menu (UI milestone, `snippets/header-mega-menu.liquid` + `assets/otodor-mega-menu.css`):** enterprise-grade, editorial. Full-width panel = category columns (level-2 collections → level-3 links, icon/description from `custom.menu_icon`/`menu_description`) **+ a featured panel that updates to the hovered/focused category** (image from `custom.menu_image` → collection image → first product image; cross-fades via opacity/translateY/scale, ~200ms) **+ a full-width "Get a Custom Quote" CTA**. Data = Shopify Navigation + collection metafields (single source of truth; no parallel menu). Minimal scoped inline JS only swaps the active featured panel (no AJAX). Open/ESC/keyboard stay with Dawn's `<header-menu>`. Mobile drawer untouched. Merchant-editable: Navigation (structure), Collections (image/description/url), `custom.menu_*` (icon/description/image), header settings (`mega_featured_label`, `mega_cta_*`).
 
-**Homepage order** (`index.json`), STEP 10 onward: `otodor_vault_intro → otodor_promo_strip → otodor_banner →
-otodor_hero → otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why →
-otodor_testimonials → otodor_process → otodor_ecosystem → otodor_cta_banner`. The pinned monolith hero is no
-longer the first thing on the page — the banner slideshow is.
+**Homepage order** (`index.json`), STEP 17 onward: `otodor_vault_intro → otodor_promo_strip →
+otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials →
+otodor_process → otodor_ecosystem → otodor_cta_banner`. **Both the pinned monolith hero and the banner
+slideshow have left the homepage** (STEP 17) — the hero is deleted, the banner now opens Digital Locks. The
+first visual on the homepage is the category bento.
 
-**Product page** (`product.json`) current (STEP 4b orchestrator): `main-product → otodor-product-reveal → otodor-product-specs → otodor-product-compat → otodor-product-install → otodor-product-warranty → otodor-product-downloads → otodor-comparison → related-products → otodor-sticky-atc`. Every module auto-hides on no data **and on no relevance** (STEP 12).
+**Digital Locks order** (`collection.digital-locks.json`): `hero → banner → selector → product-grid → …` — the
+slideshow sits above the sub-categories.
+
+**Product page** (`product.json`) current (STEP 4b orchestrator + STEP 17 offer block): buy box is
+`title → positioning → price → access_chips → otodor_offer → variant_picker → quantity → buy_buttons →
+trust_row → description`; then `otodor-product-reveal → otodor-product-specs → otodor-product-compat →
+otodor-product-install → otodor-product-warranty → otodor-product-downloads → otodor-comparison →
+related-products → otodor-sticky-atc`. Every module auto-hides on no data **and on no relevance** (STEP 12).
 
 | Commit | What |
 |---|---|
@@ -319,6 +327,66 @@ Audited the **live** site rather than the repo. Findings and fixes:
   all 16 other locale files, which is why that attempt was reverted). Three were `ImgWidthAndHeight` on the
   logo fallbacks; both logos are sized by CSS (`height: auto` / `height: 72px`), so the attributes can only
   reserve space, never distort. Ratio from the official `brand-logo.png` (1800×420).
+
+### ✅ Done — STEP 17 (Hero retired · slideshow moves · complaint desk · the offer layer)
+Four user requests, three commits.
+
+**A — The monolith hero is gone, desktop and mobile.** `otodor_hero` dropped from `index.json`;
+`sections/otodor-hero.liquid` and `assets/otodor-hero.{css,js}` deleted. Nothing else referenced them
+(`otodor-animations.js` never touched the hero), so no motion code moved. **Note for the user:** with the
+banner also moved away, the homepage now opens on the promo strip → `otodor_categories` bento. There is no
+hero on the homepage at all — deliberate, but worth a decision (a static image-banner or a slimmer opener
+would fill it).
+
+**B — The banner slideshow is the Digital Locks opener.** `otodor-banner` moved out of `index.json` into
+`collection.digital-locks.json`, between the collection hero and the sub-category selector. Slide CTAs
+repointed at the category (a slide no longer linked to the page it sits on). Its LCP handling is unchanged —
+the first slide is still eager/high-priority, which is now correct for that page.
+
+**C — Raise a Complaint.** New **`otodor-complaint-form`** on the native `{% form 'contact' %}` (so complaints
+arrive at the store's notification email, no app, no backend): name/phone/email, order number,
+purchase-or-installation date, model, issue category, description, preferred contact, consent, plus hidden
+`Request type: Complaint` and source-page lines so complaints are filterable in the inbox. The **WhatsApp
+button carries the complaint, not a greeting** — its href is rebuilt on every keystroke from the filled
+fields, so the chat opens with the order number, model, category and description already written out; the
+Liquid-built href is the no-JS fallback. **`templates/page.complaint.json`** composes intro → form → four
+support FAQs (FAQPage schema on) → CTA.
+
+**D — The offer layer (prices · coupon · seasonal sale · delivery · EMI).** One source of truth,
+**Theme settings → OTODOR Offers, Pricing & EMI** (campaign name + start/end, coupon code/value/scope
+collections/tags, free-delivery and GST wording, EMI tenure + note), read by three consumers:
+- **`snippets/otodor-offer-box.liquid`** — a first-class **`otodor_offer` block** in `main-product`, wired into
+  `product.json` under the price. Resolves the effective price `custom.effective_price` → **price seed** →
+  Shopify price, and the discounted price `custom.deal_price` → seed → effective − coupon; prints it with the
+  GST wording, free delivery and the EMI it works out to (headline ÷ tenure, rounded up). No price resolves,
+  no panel. Per-product `custom.hidden_modules` containing `coupon` switches the coupon row off.
+- **`sections/otodor-offer-popup.liquid`** — rendered **once sitewide from `theme.liquid`**; decides for itself
+  whether the page is in its targeting (all / home / shopping / *only where the coupon applies*) and whether
+  the campaign window is open. Delay + optional scroll trigger, dismissal remembered for N days, **a copied
+  code suppresses it for a year**, focus trapped and restored, ESC/backdrop/dismiss close.
+- **`otodor-promo-strip`** gained `show_campaign`: the offer line is **generated**, not typed, so strip, popup
+  and PDP always agree and the line retires by itself when the campaign ends.
+- Supporting snippets: **`otodor-campaign-live`** (the window), **`otodor-price-seed`** (published pricing,
+  weakest source, read by the existing spec-seed parser), **`otodor-rupees`** (Indian digit grouping).
+- **Seeded data (client-supplied only):** ZEAL — effective **₹7,699**, after-coupon **₹6,200 incl GST**.
+  Defaults: campaign *Independence Day Sale*, code **OTODOR1500**, **₹1,500**, scope **wooden-door-locks**,
+  free delivery on, EMI 6 months (₹1,034/mo on ZEAL). **No other model has published pricing — nothing was
+  invented**; models without a row fall back to the Shopify price or hide.
+- The saving badge stands down while the coupon row shows: 7,699 − 6,200 is 1,499 against a ₹1,500 coupon,
+  and printing both invites a rupee of arithmetic that doesn't tie out.
+- **Verified in a browser** against the real `otodor-offer.js`: opens on delay, ESC/backdrop close and restore
+  focus, dismissal survives a reload, copy swaps the label + suppresses for a year, clipboard falls back to
+  `execCommand` when the async API refuses (added after the harness proved the async path can reject).
+  The rupee grouping was ported and exercised across 13 magnitudes. `theme check` at baseline.
+
+**Admin to-do for STEP 17 (the theme advertises; admin has to make it real):**
+1. **Create the discount code `OTODOR1500`** in Shopify (Discounts → Amount off products → ₹1,500, limited to
+   the Wooden Door Locks collection). The theme only advertises it — nothing enforces it at checkout.
+2. **Create a Page "Raise a Complaint"** (handle `complaint`), assign the **`complaint`** template, and add it
+   to the footer menu. Footer columns are Shopify link lists, so this is a Navigation edit.
+3. Confirm the **contact/notification email** (Settings → Notifications) — complaints land there.
+4. Optional: set `custom.effective_price` / `custom.deal_price` on products to retire the price seed, and type
+   a **campaign end date** if the sale should switch itself off.
 
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
