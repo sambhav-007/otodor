@@ -1,0 +1,642 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Complaint Form  (post-sale service / grievance intake)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Give an existing customer one place to raise a service
+                      complaint and have it reach a human — by native email
+                      (Shopify `contact` form) or instantly on WhatsApp with
+                      the same details already typed into the message.
+  Primary source:     Section settings + `issue` / `model` / `promise` blocks.
+                      A complaint desk is config-driven, not metafield-driven.
+  Fallback order:     issue blocks   → free-text description only;
+                      model blocks   → free-text "product" field;
+                      promise blocks → omit the left assurance list;
+                      channel settings blank → that channel row drops.
+  Visibility rule:    Always renders (a complaint desk is never "empty"); every
+                      sub-part self-hides when it has nothing to show.
+  Merchant editable:  YES — all copy, labels, issue categories, model list,
+                      assurances, direct channels, colour scheme, WhatsApp.
+  Required metafields: none.
+  Optional metafields: none. Reads settings.otodor_whatsapp_number /
+                      _enabled for the WhatsApp path.
+  Dependencies:       snippets/otodor-icon.liquid; otodor-base.css tokens.
+                      Native `{% form 'contact' %}` — submissions arrive at the
+                      store's contact/notification email (Settings →
+                      Notifications). No backend, no app.
+  Preset:             Full desk — 3 assurances, 6 issue categories, 5 models,
+                      WhatsApp + phone + email channels. Renders live.
+  Accessibility:      <section aria-labelledby>, <label> per control, radios in
+                      a <fieldset>/<legend>, aria-required on required fields,
+                      error aria-describedby, visible focus, success panel
+                      tabindex=-1 autofocus (Dawn parity).
+  Reusable for:       Complaint page, warranty-claim page, service-request page,
+                      installation-issue page — one section, different copy.
+
+  THE WHATSAPP PATH IS THE SAME COMPLAINT, NOT A "CONTACT US" LINK. The
+  button's href is rebuilt on every keystroke from the fields the visitor has
+  filled, so tapping it opens WhatsApp with the order number, model, issue
+  category and description already written out. The static href (built in
+  Liquid) is the no-JS fallback.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign scheme = section.settings.color_scheme | default: 'light'
+  assign anchor = section.settings.anchor_id | default: 'otodor-complaint' | handle
+  assign complaint_form_id = 'otodor-complaint-form-' | append: section.id
+
+  assign issue_blocks = section.blocks | where: 'type', 'issue'
+  assign model_blocks = section.blocks | where: 'type', 'model'
+  assign promise_blocks = section.blocks | where: 'type', 'promise'
+
+  # ── WhatsApp path ──────────────────────────────────────────────────────
+  assign wa_enabled = false
+  if section.settings.show_whatsapp and settings.otodor_whatsapp_enabled and settings.otodor_whatsapp_number != blank
+    assign wa_enabled = true
+    assign wa_number = settings.otodor_whatsapp_number
+    assign wa_intro = section.settings.whatsapp_message | default: 'Hello OTODOR, I would like to raise a complaint.'
+    assign wa_text = wa_intro | url_encode
+    assign wa_link = 'https://wa.me/' | append: wa_number | append: '?text=' | append: wa_text
+  endif
+
+  # ── Direct channels (each row drops when blank) ────────────────────────
+  assign phone_number = section.settings.support_phone
+  assign support_email = section.settings.support_email
+-%}
+
+{%- style -%}
+  #otodor-complaint-{{ section.id }} {
+    padding-block: {{ section.settings.padding_top | default: 96 }}px {{ section.settings.padding_bottom | default: 96 }}px;
+    scroll-margin-top: 90px;
+  }
+  #otodor-complaint-{{ section.id }}.otodor-cmp--light { background: var(--otodor-bg-light); color: var(--otodor-ink); --cmp-accent: var(--otodor-accent-on-light); }
+  #otodor-complaint-{{ section.id }}.otodor-cmp--dark  { background: var(--otodor-black); color: var(--otodor-white); --cmp-accent: var(--otodor-blue); }
+
+  #otodor-complaint-{{ section.id }} .otodor-cmp__inner {
+    max-width: var(--otodor-container);
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    #otodor-complaint-{{ section.id }} .otodor-cmp__inner { grid-template-columns: 1fr; gap: clamp(1.75rem, 6vw, 2.75rem); }
+  }
+
+  /* ─ Left rail ─────────────────────────────────────────────── */
+  #otodor-complaint-{{ section.id }} .otodor-cmp__eyebrow {
+    display: block; font-family: var(--otodor-font-display); font-size: 0.96rem; font-weight: 600;
+    letter-spacing: var(--otodor-tracking-widest); text-transform: uppercase; margin-bottom: 0.9rem; color: var(--cmp-accent);
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__title {
+    font-family: var(--otodor-font-display); font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 700;
+    line-height: 1.05; letter-spacing: var(--otodor-tracking-tight); margin: 0;
+  }
+  #otodor-complaint-{{ section.id }}.otodor-cmp--light .otodor-cmp__title { color: var(--otodor-ink); }
+  #otodor-complaint-{{ section.id }}.otodor-cmp--dark  .otodor-cmp__title { color: var(--otodor-white); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__title .accent { color: var(--cmp-accent); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__sub { margin: 1rem 0 0; font-size: 1.34rem; line-height: 1.55; opacity: 0.66; max-width: 34rem; }
+
+  #otodor-complaint-{{ section.id }} .otodor-cmp__promises { list-style: none; margin: clamp(1.75rem, 3vw, 2.5rem) 0 0; padding: 0; display: grid; gap: 1.1rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__promise { display: flex; gap: 0.85rem; align-items: flex-start; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__promise-icon {
+    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: var(--otodor-radius-md); color: var(--cmp-accent);
+  }
+  .otodor-cmp--light .otodor-cmp__promise-icon { background: rgba(26,120,216,0.08); }
+  .otodor-cmp--dark  .otodor-cmp__promise-icon { background: rgba(77,166,255,0.12); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__promise-icon svg { width: 20px; height: 20px; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__promise-title { font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.25rem; display: block; margin-bottom: 0.15rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__promise-text { margin: 0; font-size: 1.1rem; line-height: 1.5; opacity: 0.6; }
+
+  /* ─ Direct channels ───────────────────────────────────────── */
+  #otodor-complaint-{{ section.id }} .otodor-cmp__channels {
+    margin-top: clamp(1.75rem, 3vw, 2.5rem); display: grid; gap: 0.6rem;
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__channels-label {
+    font-size: 1.02rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.55;
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__channel {
+    display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; color: inherit;
+    font-size: 1.22rem; font-weight: 600; width: fit-content;
+    border-bottom: 1px solid transparent; transition: border-color var(--otodor-dur-fast) ease;
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__channel:hover { border-bottom-color: currentColor; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__channel svg { width: 17px; height: 17px; color: var(--cmp-accent); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__channel--wa svg { color: #25D366; }
+
+  /* ─ Right panel (the form card) ───────────────────────────── */
+  #otodor-complaint-{{ section.id }} .otodor-cmp__panel {
+    border-radius: var(--otodor-radius-lg); padding: clamp(1.5rem, 3vw, 2.4rem);
+  }
+  .otodor-cmp--light .otodor-cmp__panel { background: var(--otodor-bg-light-2); border: 1px solid var(--otodor-hairline-light); box-shadow: var(--otodor-shadow-md); }
+  .otodor-cmp--dark  .otodor-cmp__panel { background: var(--otodor-surface); border: 1px solid var(--otodor-hairline); }
+
+  #otodor-complaint-{{ section.id }} .otodor-cmp__form { display: grid; gap: 1rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 480px) { #otodor-complaint-{{ section.id }} .otodor-cmp__row { grid-template-columns: 1fr; } }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__field { display: grid; gap: 0.4rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__label { font-size: 1.02rem; font-weight: 600; letter-spacing: 0.01em; opacity: 0.85; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__label .req { color: var(--cmp-accent); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__hint { font-size: 0.98rem; opacity: 0.55; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__input,
+  #otodor-complaint-{{ section.id }} .otodor-cmp__select,
+  #otodor-complaint-{{ section.id }} .otodor-cmp__textarea {
+    width: 100%; font-family: var(--otodor-font-body); font-size: 1.22rem; color: inherit;
+    padding: 0.72rem 0.9rem; border-radius: var(--otodor-radius-md); border: 1px solid; background: transparent;
+    transition: border-color var(--otodor-dur-fast) ease, box-shadow var(--otodor-dur-fast) ease;
+  }
+  .otodor-cmp--light .otodor-cmp__input,
+  .otodor-cmp--light .otodor-cmp__select,
+  .otodor-cmp--light .otodor-cmp__textarea { border-color: var(--otodor-hairline-light-2); background: #fff; }
+  .otodor-cmp--dark .otodor-cmp__input,
+  .otodor-cmp--dark .otodor-cmp__select,
+  .otodor-cmp--dark .otodor-cmp__textarea { border-color: var(--otodor-hairline-mid); background: rgba(255,255,255,0.03); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__textarea { resize: vertical; min-height: 120px; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__input:focus-visible,
+  #otodor-complaint-{{ section.id }} .otodor-cmp__select:focus-visible,
+  #otodor-complaint-{{ section.id }} .otodor-cmp__textarea:focus-visible {
+    outline: none; border-color: var(--cmp-accent); box-shadow: 0 0 0 3px var(--otodor-blue-glow);
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__select { appearance: none; -webkit-appearance: none; cursor: pointer; }
+
+  /* ─ Preferred contact (radio pills) ───────────────────────── */
+  #otodor-complaint-{{ section.id }} .otodor-cmp__fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 0.4rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__legend { font-size: 1.02rem; font-weight: 600; opacity: 0.85; padding: 0; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__pill {
+    display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer;
+    padding: 0.5rem 1rem; border-radius: var(--otodor-radius-pill); border: 1px solid;
+    font-size: 1.09rem; font-weight: 600; min-height: 44px;
+    transition: border-color var(--otodor-dur-fast) ease, background var(--otodor-dur-fast) ease;
+  }
+  .otodor-cmp--light .otodor-cmp__pill { border-color: var(--otodor-hairline-light-2); background: #fff; }
+  .otodor-cmp--dark  .otodor-cmp__pill { border-color: var(--otodor-hairline-mid); background: rgba(255,255,255,0.03); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__pill input { accent-color: var(--cmp-accent); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__pill:has(input:checked) { border-color: var(--cmp-accent); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__pill:focus-within { outline: 2px solid var(--cmp-accent); outline-offset: 2px; }
+
+  #otodor-complaint-{{ section.id }} .otodor-cmp__consent { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 1.02rem; line-height: 1.45; opacity: 0.72; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__consent input { margin-top: 0.2rem; accent-color: var(--cmp-accent); flex: 0 0 auto; }
+
+  #otodor-complaint-{{ section.id }} .otodor-cmp__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.35rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__submit {
+    flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.85rem 1.4rem; border: none; cursor: pointer; border-radius: var(--otodor-radius-pill);
+    font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.22rem; min-height: 44px;
+    background: var(--cmp-accent); color: #fff;
+    transition: transform var(--otodor-dur-fast) ease, filter var(--otodor-dur-fast) ease;
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__submit:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__submit svg { width: 16px; height: 16px; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__wa {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.85rem 1.2rem; border-radius: var(--otodor-radius-pill); text-decoration: none;
+    font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.15rem; min-height: 44px;
+    background: #25D366; color: #05300f;
+    transition: transform var(--otodor-dur-fast) ease;
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__wa:hover { transform: translateY(-1px); }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__wa svg { width: 17px; height: 17px; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__note { margin: 0.35rem 0 0; font-size: 0.98rem; line-height: 1.5; opacity: 0.55; }
+
+  /* ─ Success + error states ────────────────────────────────── */
+  #otodor-complaint-{{ section.id }} .otodor-cmp__success {
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.75rem;
+    padding: clamp(1.5rem, 4vw, 3rem) 1rem;
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__success-badge {
+    display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px;
+    border-radius: 50%; background: rgba(37,211,102,0.14); color: #25D366;
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__success-badge svg { width: 26px; height: 26px; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__success-title { font-family: var(--otodor-font-display); font-weight: 700; font-size: 1.73rem; margin: 0; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__success-text { margin: 0; font-size: 1.22rem; line-height: 1.55; opacity: 0.66; max-width: 26rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__errors {
+    margin: 0 0 0.5rem; padding: 0.75rem 0.9rem; border-radius: var(--otodor-radius-md);
+    background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.28); font-size: 1.09rem;
+  }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__errors ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
+  #otodor-complaint-{{ section.id }} .otodor-cmp__field-error { color: #dc2626; font-size: 1rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #otodor-complaint-{{ section.id }} .otodor-cmp__submit,
+    #otodor-complaint-{{ section.id }} .otodor-cmp__wa { transition: none; }
+    #otodor-complaint-{{ section.id }} .otodor-cmp__submit:hover,
+    #otodor-complaint-{{ section.id }} .otodor-cmp__wa:hover { transform: none; }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-complaint-{{ section.id }}"
+  class="otodor-cmp otodor-cmp--{{ scheme }}"
+  data-otodor-section="complaint-form"
+  aria-labelledby="otodor-cmp-title-{{ section.id }}"
+>
+  <span id="{{ anchor }}" class="otodor-cmp__anchor" aria-hidden="true"></span>
+  <div class="otodor-cmp__inner">
+
+    {%- comment -%} ── Left rail: assurances + direct channels ── {%- endcomment -%}
+    <div class="otodor-cmp__aside" data-otodor-reveal="fade-up">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="otodor-cmp__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      <h2 class="otodor-cmp__title" id="otodor-cmp-title-{{ section.id }}">
+        {{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %} <span class="accent">{{ section.settings.heading_accent | escape }}</span>{% endif %}
+      </h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="otodor-cmp__sub">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+
+      {%- if promise_blocks.size > 0 -%}
+        <ul class="otodor-cmp__promises" role="list">
+          {%- for block in promise_blocks -%}
+            <li class="otodor-cmp__promise" {{ block.shopify_attributes }}>
+              {%- if block.settings.icon != blank -%}
+                <span class="otodor-cmp__promise-icon" aria-hidden="true">{% render 'otodor-icon', name: block.settings.icon %}</span>
+              {%- endif -%}
+              <span>
+                {%- if block.settings.title != blank -%}<span class="otodor-cmp__promise-title">{{ block.settings.title | escape }}</span>{%- endif -%}
+                {%- if block.settings.text != blank -%}<p class="otodor-cmp__promise-text">{{ block.settings.text | escape }}</p>{%- endif -%}
+              </span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if wa_enabled or phone_number != blank or support_email != blank -%}
+        <div class="otodor-cmp__channels">
+          {%- if section.settings.channels_label != blank -%}
+            <span class="otodor-cmp__channels-label">{{ section.settings.channels_label | escape }}</span>
+          {%- endif -%}
+          {%- if wa_enabled -%}
+            <a class="otodor-cmp__channel otodor-cmp__channel--wa" href="{{ wa_link }}" target="_blank" rel="noopener">
+              <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+              {{ section.settings.whatsapp_label | escape }}
+              <span class="visually-hidden">(opens WhatsApp)</span>
+            </a>
+          {%- endif -%}
+          {%- if phone_number != blank -%}
+            <a class="otodor-cmp__channel" href="tel:{{ phone_number | remove: ' ' | remove: '-' }}">
+              <span aria-hidden="true">{% render 'otodor-icon', name: 'app' %}</span>
+              {{ phone_number | escape }}
+            </a>
+          {%- endif -%}
+          {%- if support_email != blank -%}
+            <a class="otodor-cmp__channel" href="mailto:{{ support_email }}">
+              <span aria-hidden="true">{% render 'otodor-icon', name: 'log' %}</span>
+              {{ support_email | escape }}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ── Right panel: the native contact form ── {%- endcomment -%}
+    <div class="otodor-cmp__panel" data-otodor-reveal="fade-up">
+      {%- form 'contact', id: complaint_form_id, class: 'otodor-cmp__form' -%}
+        {%- if form.posted_successfully? -%}
+          <div class="otodor-cmp__success" tabindex="-1" autofocus>
+            <span class="otodor-cmp__success-badge" aria-hidden="true">{% render 'otodor-icon', name: 'warranty' %}</span>
+            <h3 class="otodor-cmp__success-title">{{ section.settings.success_title | escape }}</h3>
+            <p class="otodor-cmp__success-text">{{ section.settings.success_text | escape }}</p>
+            {%- if wa_enabled -%}
+              <a class="otodor-cmp__wa" href="{{ wa_link }}" target="_blank" rel="noopener">
+                <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+                {{ section.settings.whatsapp_label | escape }}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- else -%}
+          {%- if form.errors -%}
+            <div class="otodor-cmp__errors" role="alert" tabindex="-1" autofocus>
+              {{ 'templates.contact.form.error_heading' | t }}
+              <ul>
+                {%- for field in form.errors -%}
+                  <li>{{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%}
+            Hidden context — arrives as labelled lines in the contact email, so a
+            complaint is filterable and attributed without any app.
+          {%- endcomment -%}
+          <input type="hidden" name="contact[Request type]" value="{{ section.settings.request_type | default: 'Complaint' | escape }}">
+          <input type="hidden" name="contact[Source page]" value="{{ canonical_url | escape }}">
+
+          <div class="otodor-cmp__row">
+            <div class="otodor-cmp__field">
+              <label class="otodor-cmp__label" for="otodor-cmp-name-{{ section.id }}">{{ section.settings.label_name | escape }} <span class="req" aria-hidden="true">*</span></label>
+              <input class="otodor-cmp__input" type="text" id="otodor-cmp-name-{{ section.id }}" name="contact[Name]" autocomplete="name"
+                required aria-required="true"
+                value="{% if form.name %}{{ form.name | escape }}{% elsif customer %}{{ customer.name | escape }}{% endif %}">
+            </div>
+            <div class="otodor-cmp__field">
+              <label class="otodor-cmp__label" for="otodor-cmp-phone-{{ section.id }}">{{ section.settings.label_phone | escape }} <span class="req" aria-hidden="true">*</span></label>
+              <input class="otodor-cmp__input" type="tel" id="otodor-cmp-phone-{{ section.id }}" name="contact[Phone]" autocomplete="tel"
+                inputmode="tel" required aria-required="true"
+                value="{% if customer %}{{ customer.phone | escape }}{% endif %}">
+            </div>
+          </div>
+
+          <div class="otodor-cmp__field">
+            <label class="otodor-cmp__label" for="otodor-cmp-email-{{ section.id }}">{{ section.settings.label_email | escape }} <span class="req" aria-hidden="true">*</span></label>
+            <input class="otodor-cmp__input" type="email" id="otodor-cmp-email-{{ section.id }}" name="contact[email]"
+              autocomplete="email" spellcheck="false" autocapitalize="off" required aria-required="true"
+              {% if form.errors contains 'email' %}aria-invalid="true" aria-describedby="otodor-cmp-email-error-{{ section.id }}"{% endif %}
+              value="{% if form.email %}{{ form.email | escape }}{% elsif customer %}{{ customer.email | escape }}{% endif %}">
+            {%- if form.errors contains 'email' -%}
+              <small class="otodor-cmp__field-error" id="otodor-cmp-email-error-{{ section.id }}">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</small>
+            {%- endif -%}
+          </div>
+
+          <div class="otodor-cmp__row">
+            <div class="otodor-cmp__field">
+              <label class="otodor-cmp__label" for="otodor-cmp-order-{{ section.id }}">{{ section.settings.label_order | escape }}</label>
+              <input class="otodor-cmp__input" type="text" id="otodor-cmp-order-{{ section.id }}" name="contact[Order number]"
+                inputmode="text" placeholder="{{ section.settings.order_placeholder | escape }}">
+            </div>
+            <div class="otodor-cmp__field">
+              <label class="otodor-cmp__label" for="otodor-cmp-date-{{ section.id }}">{{ section.settings.label_date | escape }}</label>
+              <input class="otodor-cmp__input" type="date" id="otodor-cmp-date-{{ section.id }}" name="contact[Purchase date]">
+            </div>
+          </div>
+
+          <div class="otodor-cmp__field">
+            <label class="otodor-cmp__label" for="otodor-cmp-product-{{ section.id }}">{{ section.settings.label_product | escape }}</label>
+            {%- if model_blocks.size > 0 -%}
+              <select class="otodor-cmp__select" id="otodor-cmp-product-{{ section.id }}" name="contact[Product]" data-otodor-cmp-product>
+                <option value="">{{ section.settings.product_placeholder | escape }}</option>
+                {%- for block in model_blocks -%}
+                  <option value="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</option>
+                {%- endfor -%}
+                {%- if section.settings.product_other != blank -%}
+                  <option value="{{ section.settings.product_other | escape }}">{{ section.settings.product_other | escape }}</option>
+                {%- endif -%}
+              </select>
+            {%- else -%}
+              <input class="otodor-cmp__input" type="text" id="otodor-cmp-product-{{ section.id }}" name="contact[Product]"
+                data-otodor-cmp-product placeholder="{{ section.settings.product_placeholder | escape }}">
+            {%- endif -%}
+          </div>
+
+          {%- if issue_blocks.size > 0 -%}
+            <div class="otodor-cmp__field">
+              <label class="otodor-cmp__label" for="otodor-cmp-issue-{{ section.id }}">{{ section.settings.label_issue | escape }} <span class="req" aria-hidden="true">*</span></label>
+              <select class="otodor-cmp__select" id="otodor-cmp-issue-{{ section.id }}" name="contact[Issue]"
+                required aria-required="true" data-otodor-cmp-issue>
+                <option value="">{{ section.settings.issue_placeholder | escape }}</option>
+                {%- for block in issue_blocks -%}
+                  <option value="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endif -%}
+
+          <div class="otodor-cmp__field">
+            <label class="otodor-cmp__label" for="otodor-cmp-body-{{ section.id }}">{{ section.settings.label_message | escape }} <span class="req" aria-hidden="true">*</span></label>
+            <textarea class="otodor-cmp__textarea" id="otodor-cmp-body-{{ section.id }}" name="contact[Comment]"
+              required aria-required="true" data-otodor-cmp-message
+              placeholder="{{ section.settings.message_placeholder | escape }}">{{ form.body }}</textarea>
+            {%- if section.settings.message_hint != blank -%}
+              <span class="otodor-cmp__hint">{{ section.settings.message_hint | escape }}</span>
+            {%- endif -%}
+          </div>
+
+          {%- if section.settings.show_preferred -%}
+            <fieldset class="otodor-cmp__fieldset">
+              <legend class="otodor-cmp__legend">{{ section.settings.label_preferred | escape }}</legend>
+              <div class="otodor-cmp__pills">
+                {%- assign preferred_options = section.settings.preferred_options | default: 'Phone call, WhatsApp, Email' | split: ',' -%}
+                {%- for option in preferred_options -%}
+                  {%- assign option_label = option | strip -%}
+                  {%- if option_label == blank -%}{%- continue -%}{%- endif -%}
+                  <label class="otodor-cmp__pill" for="otodor-cmp-pref-{{ forloop.index }}-{{ section.id }}">
+                    <input type="radio" id="otodor-cmp-pref-{{ forloop.index }}-{{ section.id }}"
+                      name="contact[Preferred contact]" value="{{ option_label | escape }}"
+                      {% if forloop.first %}checked{% endif %}>
+                    <span>{{ option_label | escape }}</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- endif -%}
+
+          {%- if section.settings.show_consent -%}
+            <label class="otodor-cmp__consent" for="otodor-cmp-consent-{{ section.id }}">
+              <input type="checkbox" id="otodor-cmp-consent-{{ section.id }}" name="contact[Consent]" value="Yes"
+                {% if section.settings.consent_required %}required aria-required="true"{% endif %}>
+              <span>{{ section.settings.consent_text | escape }}</span>
+            </label>
+          {%- endif -%}
+
+          <div class="otodor-cmp__actions">
+            <button type="submit" class="otodor-cmp__submit">
+              {{ section.settings.submit_label | escape }}
+              <span aria-hidden="true">{% render 'otodor-icon', name: 'arrow-right' %}</span>
+            </button>
+            {%- if wa_enabled -%}
+              <a class="otodor-cmp__wa" href="{{ wa_link }}" target="_blank" rel="noopener"
+                aria-label="{{ section.settings.whatsapp_label | escape }} (opens WhatsApp)"
+                data-otodor-cmp-wa
+                data-wa-number="{{ wa_number | escape }}"
+                data-wa-intro="{{ wa_intro | escape }}"
+                data-l-name="{{ section.settings.label_name | escape }}"
+                data-l-phone="{{ section.settings.label_phone | escape }}"
+                data-l-email="{{ section.settings.label_email | escape }}"
+                data-l-order="{{ section.settings.label_order | escape }}"
+                data-l-date="{{ section.settings.label_date | escape }}"
+                data-l-product="{{ section.settings.label_product | escape }}"
+                data-l-issue="{{ section.settings.label_issue | escape }}"
+                data-l-message="{{ section.settings.label_message | escape }}"
+                data-l-preferred="{{ section.settings.label_preferred | escape }}">
+                <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+                {{ section.settings.whatsapp_label | escape }}
+              </a>
+            {%- endif -%}
+          </div>
+          {%- if section.settings.form_note != blank -%}
+            <p class="otodor-cmp__note">{{ section.settings.form_note | escape }}</p>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{%- comment -%}
+  The WhatsApp button carries the complaint, not a greeting: its href is rebuilt
+  from the filled fields on every input/change. Progressive enhancement — the
+  Liquid-built href already works without this script.
+{%- endcomment -%}
+<script>
+  (function () {
+    var root = document.getElementById('otodor-complaint-{{ section.id }}');
+    if (!root) return;
+    var wa = root.querySelector('[data-otodor-cmp-wa]');
+    if (!wa) return;
+
+    var num = wa.getAttribute('data-wa-number');
+    var intro = wa.getAttribute('data-wa-intro') || '';
+    var fields = [
+      ['data-l-name', 'contact[Name]'],
+      ['data-l-phone', 'contact[Phone]'],
+      ['data-l-email', 'contact[email]'],
+      ['data-l-order', 'contact[Order number]'],
+      ['data-l-date', 'contact[Purchase date]'],
+      ['data-l-product', 'contact[Product]'],
+      ['data-l-issue', 'contact[Issue]'],
+      ['data-l-message', 'contact[Comment]'],
+      ['data-l-preferred', 'contact[Preferred contact]']
+    ];
+    var clean = function (s) { return (s || '').replace(/\s*\*+\s*$/, '').replace(/\s*\(optional\)\s*$/i, '').trim(); };
+    var valueOf = function (name) {
+      var nodes = root.querySelectorAll('[name="' + name + '"]');
+      if (!nodes.length) return '';
+      for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        if (el.type === 'radio' || el.type === 'checkbox') {
+          if (el.checked) return el.value.trim();
+        } else if (el.value) {
+          return el.value.trim();
+        }
+      }
+      return '';
+    };
+    var rebuild = function () {
+      var lines = [];
+      if (intro) lines.push(intro);
+      fields.forEach(function (f) {
+        var v = valueOf(f[1]);
+        if (v) lines.push(clean(wa.getAttribute(f[0])) + ': ' + v);
+      });
+      wa.setAttribute('href', 'https://wa.me/' + num + '?text=' + encodeURIComponent(lines.join('\n')));
+    };
+    root.addEventListener('input', rebuild);
+    root.addEventListener('change', rebuild);
+    rebuild();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "OTODOR Complaint Form",
+  "tag": "section",
+  "class": "shopify-section otodor-section",
+  "settings": [
+    { "type": "paragraph", "content": "Post-sale complaint intake. Submissions arrive at your store's contact email (Settings → Notifications). The WhatsApp button opens a chat with the complaint already written out." },
+    { "type": "text", "id": "anchor_id", "label": "Anchor id (for deep links)", "default": "otodor-complaint", "info": "Link to this page with #otodor-complaint to scroll straight to the form." },
+    { "type": "select", "id": "color_scheme", "label": "Colour scheme", "options": [ { "value": "light", "label": "Light" }, { "value": "dark", "label": "Dark" } ], "default": "light" },
+    { "type": "text", "id": "request_type", "label": "Request type (email label)", "default": "Complaint", "info": "Sent as a hidden field so complaints are easy to filter in your inbox." },
+
+    { "type": "header", "content": "Heading (left rail)" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Customer care" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Raise a" },
+    { "type": "text", "id": "heading_accent", "label": "Heading accent (coloured)", "default": "complaint." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Something not right with your OTODOR product or installation? Tell us what happened and a service engineer will take it from here." },
+
+    { "type": "header", "content": "Direct channels" },
+    { "type": "text", "id": "channels_label", "label": "Channels label", "default": "Or reach us directly" },
+    { "type": "text", "id": "support_phone", "label": "Support phone", "default": "+91 72068 95607", "info": "Leave blank to hide the phone row." },
+    { "type": "text", "id": "support_email", "label": "Support email", "info": "Leave blank to hide the email row." },
+
+    { "type": "header", "content": "Form labels" },
+    { "type": "text", "id": "label_name", "label": "Name label", "default": "Name" },
+    { "type": "text", "id": "label_phone", "label": "Phone label", "default": "Phone" },
+    { "type": "text", "id": "label_email", "label": "Email label", "default": "Email" },
+    { "type": "text", "id": "label_order", "label": "Order number label", "default": "Order number (optional)" },
+    { "type": "text", "id": "order_placeholder", "label": "Order number placeholder", "default": "e.g. #1042" },
+    { "type": "text", "id": "label_date", "label": "Purchase / installation date label", "default": "Purchase or installation date" },
+    { "type": "text", "id": "label_product", "label": "Product label", "default": "Which product?" },
+    { "type": "text", "id": "product_placeholder", "label": "Product placeholder", "default": "Select your model" },
+    { "type": "text", "id": "product_other", "label": "Last product option", "default": "Other / not listed", "info": "Leave blank to omit." },
+    { "type": "text", "id": "label_issue", "label": "Issue label", "default": "What is the issue?" },
+    { "type": "text", "id": "issue_placeholder", "label": "Issue placeholder", "default": "Select a category" },
+    { "type": "text", "id": "label_message", "label": "Description label", "default": "Describe the problem" },
+    { "type": "text", "id": "message_placeholder", "label": "Description placeholder", "default": "What happens, when it started, and anything you have already tried…" },
+    { "type": "text", "id": "message_hint", "label": "Description hint", "default": "Photos or a short video help — our engineer will ask for them on WhatsApp." },
+    { "type": "text", "id": "submit_label", "label": "Submit button label", "default": "Submit complaint" },
+    { "type": "text", "id": "form_note", "label": "Note under the buttons", "default": "We acknowledge every complaint within one business day." },
+
+    { "type": "header", "content": "Preferred contact" },
+    { "type": "checkbox", "id": "show_preferred", "label": "Ask how they'd like to be contacted", "default": true },
+    { "type": "text", "id": "label_preferred", "label": "Preferred contact label", "default": "How should we reach you?" },
+    { "type": "text", "id": "preferred_options", "label": "Options (comma separated)", "default": "Phone call, WhatsApp, Email" },
+
+    { "type": "header", "content": "Consent" },
+    { "type": "checkbox", "id": "show_consent", "label": "Show consent checkbox", "default": true },
+    { "type": "checkbox", "id": "consent_required", "label": "Consent is required", "default": false },
+    { "type": "text", "id": "consent_text", "label": "Consent text", "default": "I agree to be contacted by OTODOR about this complaint." },
+
+    { "type": "header", "content": "WhatsApp" },
+    { "type": "checkbox", "id": "show_whatsapp", "label": "Show WhatsApp button", "default": true, "info": "Uses the store WhatsApp number (Theme settings → OTODOR WhatsApp Settings)." },
+    { "type": "text", "id": "whatsapp_label", "label": "WhatsApp button label", "default": "Send on WhatsApp" },
+    { "type": "text", "id": "whatsapp_message", "label": "WhatsApp opening line", "default": "Hello OTODOR, I would like to raise a complaint." },
+
+    { "type": "header", "content": "Success message" },
+    { "type": "text", "id": "success_title", "label": "Success title", "default": "Complaint registered." },
+    { "type": "textarea", "id": "success_text", "label": "Success text", "default": "Thank you — our service team will contact you within one business day. Need it faster? Send the same details on WhatsApp." },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "promise",
+      "name": "Service assurance",
+      "settings": [
+        {
+          "type": "select", "id": "icon", "label": "Icon", "default": "warranty",
+          "options": [
+            { "value": "", "label": "None" },
+            { "value": "warranty", "label": "Warranty / Shield" },
+            { "value": "installation", "label": "Installation" },
+            { "value": "smart", "label": "Smart / Support" },
+            { "value": "log", "label": "Clock / Log" },
+            { "value": "remote", "label": "Remote" },
+            { "value": "star", "label": "Star" }
+          ]
+        },
+        { "type": "text", "id": "title", "label": "Title", "default": "Answered in one business day" },
+        { "type": "text", "id": "text", "label": "Text", "default": "Every complaint is acknowledged by a real person." }
+      ]
+    },
+    {
+      "type": "issue",
+      "name": "Issue category",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Category label", "default": "Product not working" }
+      ]
+    },
+    {
+      "type": "model",
+      "name": "Product option",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Product label", "default": "ZEAL" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Complaint Form",
+      "blocks": [
+        { "type": "promise", "settings": { "icon": "log", "title": "Answered in one business day", "text": "Every complaint is acknowledged by a real person, not a bot." } },
+        { "type": "promise", "settings": { "icon": "warranty", "title": "3-year warranty", "text": "In-warranty faults are repaired or replaced at no cost (1-year battery)." } },
+        { "type": "promise", "settings": { "icon": "installation", "title": "Engineer visit if needed", "text": "Certified OTODOR technicians across 10,000+ PIN codes." } },
+        { "type": "issue", "settings": { "label": "Product not working" } },
+        { "type": "issue", "settings": { "label": "Installation issue" } },
+        { "type": "issue", "settings": { "label": "Fingerprint / access not recognised" } },
+        { "type": "issue", "settings": { "label": "App or connectivity problem" } },
+        { "type": "issue", "settings": { "label": "Damaged or wrong item delivered" } },
+        { "type": "issue", "settings": { "label": "Warranty claim" } },
+        { "type": "issue", "settings": { "label": "Delivery delay" } },
+        { "type": "issue", "settings": { "label": "Something else" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

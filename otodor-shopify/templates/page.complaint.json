@@ -1,0 +1,169 @@
+/*
+ * ------------------------------------------------------------
+ * OTODOR complaint desk. Composition:
+ *   main-page        → page body (optional intro copy)
+ *   complaint-form   → native complaint intake + WhatsApp (#otodor-complaint)
+ *   faq              → the questions support answers most often
+ *   cta              → back to buying / talk to a specialist
+ * Assign this template to a Page titled "Raise a Complaint"
+ * (handle `complaint`) and link it from the footer menu.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 36,
+        "padding_bottom": 12
+      }
+    },
+    "complaint-form": {
+      "type": "otodor-complaint-form",
+      "blocks": {
+        "p-response": {
+          "type": "promise",
+          "settings": {
+            "icon": "log",
+            "title": "Answered in one business day",
+            "text": "Every complaint is acknowledged by a real person, not a bot."
+          }
+        },
+        "p-warranty": {
+          "type": "promise",
+          "settings": {
+            "icon": "warranty",
+            "title": "3-year warranty",
+            "text": "In-warranty faults are repaired or replaced at no cost (1-year battery)."
+          }
+        },
+        "p-engineer": {
+          "type": "promise",
+          "settings": {
+            "icon": "installation",
+            "title": "Engineer visit if needed",
+            "text": "Certified OTODOR technicians across 10,000+ PIN codes."
+          }
+        },
+        "i-not-working": { "type": "issue", "settings": { "label": "Product not working" } },
+        "i-install": { "type": "issue", "settings": { "label": "Installation issue" } },
+        "i-access": { "type": "issue", "settings": { "label": "Fingerprint / face / PIN not recognised" } },
+        "i-app": { "type": "issue", "settings": { "label": "App or connectivity problem" } },
+        "i-battery": { "type": "issue", "settings": { "label": "Battery draining too fast" } },
+        "i-damaged": { "type": "issue", "settings": { "label": "Damaged or wrong item delivered" } },
+        "i-warranty": { "type": "issue", "settings": { "label": "Warranty claim" } },
+        "i-delivery": { "type": "issue", "settings": { "label": "Delivery delay" } },
+        "i-other": { "type": "issue", "settings": { "label": "Something else" } },
+        "m-sentry": { "type": "model", "settings": { "label": "SENTRY" } },
+        "m-nexus": { "type": "model", "settings": { "label": "NEXUS" } },
+        "m-onyx": { "type": "model", "settings": { "label": "ONYX" } },
+        "m-zion": { "type": "model", "settings": { "label": "ZION+" } },
+        "m-zeal": { "type": "model", "settings": { "label": "ZEAL" } },
+        "m-gate": { "type": "model", "settings": { "label": "Gate motor / gate lock" } },
+        "m-padlock": { "type": "model", "settings": { "label": "Smart padlock" } }
+      },
+      "block_order": [
+        "p-response",
+        "p-warranty",
+        "p-engineer",
+        "i-not-working",
+        "i-install",
+        "i-access",
+        "i-app",
+        "i-battery",
+        "i-damaged",
+        "i-warranty",
+        "i-delivery",
+        "i-other",
+        "m-sentry",
+        "m-nexus",
+        "m-onyx",
+        "m-zion",
+        "m-zeal",
+        "m-gate",
+        "m-padlock"
+      ],
+      "settings": {
+        "anchor_id": "otodor-complaint",
+        "color_scheme": "light",
+        "request_type": "Complaint",
+        "eyebrow": "Customer care",
+        "heading": "Raise a",
+        "heading_accent": "complaint.",
+        "subheading": "Something not right with your OTODOR product or installation? Tell us what happened and a service engineer will take it from here.",
+        "channels_label": "Or reach us directly",
+        "support_phone": "+91 72068 95607",
+        "support_email": "",
+        "show_preferred": true,
+        "show_consent": true,
+        "show_whatsapp": true,
+        "whatsapp_label": "Send on WhatsApp",
+        "whatsapp_message": "Hello OTODOR, I would like to raise a complaint.",
+        "success_title": "Complaint registered.",
+        "success_text": "Thank you — our service team will contact you within one business day. Need it faster? Send the same details on WhatsApp.",
+        "padding_top": 64
+      }
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "How quickly will I hear back?",
+            "row_content": "<p>We acknowledge every complaint within one business day. Fault diagnosis usually happens on the same call; if an engineer visit is needed, we schedule it at that point.</p>"
+          }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What is covered under warranty?",
+            "row_content": "<p>Every OTODOR lock carries a 3-year warranty on the lock and 1 year on the battery. Manufacturing faults are repaired or replaced at no cost. Physical damage, tampering and unauthorised repairs are not covered.</p>"
+          }
+        },
+        "q3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What should I keep ready?",
+            "row_content": "<p>Your order number (or the phone number you bought with), the model name, and a short photo or video of the problem. It lets our engineer diagnose before the visit.</p>"
+          }
+        },
+        "q4": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Can I just message on WhatsApp?",
+            "row_content": "<p>Yes. Fill the form and tap <strong>Send on WhatsApp</strong> — the chat opens with your complaint already written out, so nothing has to be typed twice.</p>"
+          }
+        }
+      },
+      "block_order": ["q1", "q2", "q3", "q4"],
+      "settings": {
+        "heading": "Before you write to us",
+        "heading_alignment": "center",
+        "emit_faq_schema": true,
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Need something else",
+        "heading_accent": "instead?",
+        "description": "Looking for a quote, a site survey or advice on which lock fits your door? Our specialists are one message away.",
+        "cta_primary_label": "Talk to a specialist",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Shop smart locks",
+        "cta_secondary_link": "/collections/digital-locks"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "complaint-form",
+    "faq",
+    "cta"
+  ]
+}
