@@ -1,0 +1,52 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Rupee formatter  (Indian digit grouping)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:  Print a whole-rupee amount the way an Indian shopper reads it —
+            last three digits, then groups of two: 7699 → 7,699;
+            62000 → 62,000; 125000 → 1,25,000.
+
+  WHY NOT `money`. The `money` filter formats a Shopify price in the store's
+  currency format, from paise. These figures are published offer prices held
+  in settings / metafields / the price seed as plain rupees, so they never
+  pass through a Shopify price object. Products that DO have a real Shopify
+  price are printed with `money` by their callers.
+
+  Params:
+    amount   whole rupees (number or numeric string). Rounded, never negative.
+
+  Echoes the grouped digits only — no symbol. Callers print ₹ themselves.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign rupees = amount | plus: 0 | round | at_least: 0
+  assign digits = rupees | append: ''
+  assign digit_count = digits | size
+
+  if digit_count <= 3
+    assign grouped = digits
+  else
+    assign head_len = digit_count | minus: 3
+    assign grouped = digits | slice: head_len, 3
+    assign rest = digits | slice: 0, head_len
+
+    # Indian grouping walks leftwards in twos (max 5 hops covers 13 digits).
+    for hop in (1..5)
+      assign rest_len = rest | size
+      if rest_len == 0
+        break
+      elsif rest_len <= 2
+        assign grouped = rest | append: ',' | append: grouped
+        break
+      else
+        assign chunk_at = rest_len | minus: 2
+        assign chunk = rest | slice: chunk_at, 2
+        assign grouped = chunk | append: ',' | append: grouped
+        assign rest = rest | slice: 0, chunk_at
+      endif
+    endfor
+  endif
+
+  echo grouped
+-%}

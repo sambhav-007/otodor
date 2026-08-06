@@ -1,0 +1,57 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Campaign window
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:   Answer one question for every offer surface (promo strip, offer
+             popup, product offer panel): is the campaign running right now?
+
+  A seasonal sale that has to be switched off by hand is a sale that stays up
+  until someone notices. The merchant types a start and an end date once in
+  Theme settings → OTODOR Offers, Pricing & EMI; every surface reads this
+  snippet, so the campaign appears and retires on its own.
+
+  Params: none — it reads theme settings.
+
+  Rules:
+    otodor_offer_enabled off        → not live
+    start set and still ahead       → not live
+    end set and already past (end
+      date is inclusive, to 23:59)  → not live
+    otherwise                       → live
+
+  Echoes `1` when live, nothing otherwise. Callers:
+    {%- capture campaign_live -%}{%- render 'otodor-campaign-live' -%}{%- endcapture -%}
+    {%- if campaign_live == '1' -%} … {%- endif -%}
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign live = true
+
+  unless settings.otodor_offer_enabled
+    assign live = false
+  endunless
+
+  if live
+    assign now_ts = 'now' | date: '%s' | plus: 0
+
+    if settings.otodor_campaign_start != blank
+      assign start_ts = settings.otodor_campaign_start | date: '%s' | plus: 0
+      if start_ts > 0 and now_ts < start_ts
+        assign live = false
+      endif
+    endif
+
+    if live and settings.otodor_campaign_end != blank
+      assign end_day = settings.otodor_campaign_end | append: ' 23:59:59'
+      assign end_ts = end_day | date: '%s' | plus: 0
+      if end_ts > 0 and now_ts > end_ts
+        assign live = false
+      endif
+    endif
+  endif
+
+  if live
+    echo '1'
+  endif
+-%}

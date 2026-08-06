@@ -1,0 +1,346 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Offer Popup  (seasonal campaign / coupon)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Put the running campaign in front of a visitor once —
+                      the coupon, what it applies to, what the price becomes,
+                      and a one-tap copy of the code.
+  Primary source:     Theme settings → OTODOR Offers, Pricing & EMI (campaign
+                      name, coupon code, value, scope, delivery, GST, EMI), so
+                      the popup, the promo strip and every product offer panel
+                      quote the same offer.
+  Fallback order:     Section overrides (heading / body / code / CTA) → theme
+                      settings → hide the line.
+  Visibility rule:    Renders nothing unless the offer layer is on AND the
+                      campaign window is open AND there is a coupon code AND
+                      the current page is in the chosen targeting. The visitor
+                      then sees it at most once per "show again" period, and
+                      never again after they copy the code.
+  Merchant editable:  YES — copy, image, trigger timing, targeting, frequency.
+  Required metafields: none.
+  Optional metafields: none.
+  Dependencies:       otodor-campaign-live, otodor-rupees, otodor-icon;
+                      assets/otodor-offer.js (dialog behaviour + copy button);
+                      otodor-base.css tokens.
+  Placement:          Rendered once sitewide from layout/theme.liquid, so one
+                      configuration covers every page. Targeting decides where
+                      it actually appears.
+  Accessibility:      role="dialog" aria-modal, labelled by its heading, focus
+                      moved in and restored on close, ESC closes, focus trapped
+                      while open, backdrop click closes, reduced motion honoured.
+
+  A POPUP THAT CANNOT BE DISMISSED FOR GOOD IS A TAX ON RETURNING CUSTOMERS.
+  Dismissal is remembered for `remember_days`; copying the code suppresses it
+  for a year. Both are localStorage, keyed by the coupon code — change the
+  campaign and everyone sees the new one.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- comment -%}
+  Captures sit outside the {% liquid %} block: that tag reads one line per tag,
+  so a multi-line `render` inside it would be truncated. Same idiom as the
+  product modules.
+{%- endcomment -%}
+{%- capture campaign_live -%}
+  {%- render 'otodor-campaign-live' -%}
+{%- endcapture -%}
+{%- capture product_scope -%}
+  {%- render 'otodor-module-applies',
+    module_id: 'coupon',
+    product: product,
+    only_collections: settings.otodor_coupon_collections,
+    only_tags: settings.otodor_coupon_tags -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign campaign_live = campaign_live | strip
+  assign product_scope = product_scope | strip
+
+  assign coupon_code = section.settings.code_override | default: settings.otodor_coupon_code
+  assign coupon_amount = settings.otodor_coupon_amount | plus: 0
+
+  # ── Targeting: which pages may show it ───────────────────────────────
+  assign target = section.settings.target | default: 'all'
+  assign in_target = false
+  case target
+    when 'all'
+      assign in_target = true
+    when 'home'
+      if request.page_type == 'index'
+        assign in_target = true
+      endif
+    when 'shopping'
+      if request.page_type == 'index' or request.page_type == 'collection' or request.page_type == 'product' or request.page_type == 'list-collections'
+        assign in_target = true
+      endif
+    when 'scoped'
+      # Only where the coupon can actually be used.
+      if request.page_type == 'collection' and collection != blank
+        assign scope_handles = settings.otodor_coupon_collections | split: ','
+        for handle in scope_handles
+          assign wanted = handle | strip | downcase
+          if wanted != blank and collection.handle == wanted
+            assign in_target = true
+            break
+          endif
+        endfor
+      elsif request.page_type == 'product' and product != blank
+        if product_scope == 'true'
+          assign in_target = true
+        endif
+      endif
+  endcase
+
+  assign show_popup = false
+  if section.settings.enabled and campaign_live == '1' and coupon_code != blank and in_target
+    assign show_popup = true
+  endif
+
+  assign popup_key = coupon_code | handle
+-%}
+
+{%- if show_popup -%}
+  {%- style -%}
+    .otodor-pop {
+      position: fixed; inset: 0; z-index: 100;
+      display: none; align-items: center; justify-content: center;
+      padding: clamp(1rem, 4vw, 2.5rem);
+    }
+    .otodor-pop[data-open="true"] { display: flex; }
+    .otodor-pop__backdrop {
+      position: absolute; inset: 0;
+      background: rgba(11, 11, 11, 0.62);
+      -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+      animation: otodor-pop-fade 240ms ease both;
+    }
+    .otodor-pop__dialog {
+      position: relative;
+      width: min(46rem, 100%);
+      display: grid;
+      grid-template-columns: {% if section.settings.image != blank %}0.85fr 1fr{% else %}1fr{% endif %};
+      overflow: hidden;
+      border-radius: var(--otodor-radius-lg, 12px);
+      background: var(--otodor-black, #0B0B0B);
+      color: var(--otodor-white, #fff);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.45);
+      animation: otodor-pop-rise 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @media (max-width: 700px) {
+      .otodor-pop__dialog { grid-template-columns: 1fr; width: min(30rem, 100%); }
+      .otodor-pop__media { display: none; }
+    }
+    .otodor-pop__media { position: relative; overflow: hidden; min-height: 100%; }
+    .otodor-pop__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .otodor-pop__body { padding: clamp(1.6rem, 3vw, 2.4rem); display: grid; gap: 0.9rem; align-content: center; }
+    .otodor-pop__eyebrow {
+      font-family: var(--otodor-font-display); font-size: 0.94rem; font-weight: 700;
+      letter-spacing: var(--otodor-tracking-widest, 0.14em); text-transform: uppercase;
+      color: var(--otodor-blue, #4DA6FF);
+    }
+    .otodor-pop__title {
+      font-family: var(--otodor-font-display); font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+      font-weight: 700; line-height: 1.06; letter-spacing: var(--otodor-tracking-tight, -0.02em);
+      margin: 0; color: var(--otodor-white, #fff);
+    }
+    .otodor-pop__text { margin: 0; font-size: 1.22rem; line-height: 1.55; opacity: 0.72; }
+    .otodor-pop__coupon {
+      display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+      padding: 0.75rem 0.9rem; border-radius: var(--otodor-radius-md, 8px);
+      border: 1px dashed var(--otodor-blue, #4DA6FF);
+      background: rgba(77,166,255,0.08);
+    }
+    .otodor-pop__code {
+      font-family: var(--otodor-font-body); font-size: 1.45rem; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--otodor-blue, #4DA6FF);
+      flex: 1 1 auto;
+    }
+    .otodor-pop__copy {
+      display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+      min-height: 44px; padding: 0.5rem 1.1rem; border: none;
+      border-radius: var(--otodor-radius-pill, 999px);
+      background: var(--otodor-blue, #4DA6FF); color: #04203a;
+      font-family: var(--otodor-font-display); font-size: 1.09rem; font-weight: 700;
+      transition: filter 160ms ease;
+    }
+    .otodor-pop__copy:hover { filter: brightness(1.08); }
+    .otodor-pop__copy[data-copied="true"] { background: #25D366; color: #05300f; }
+    .otodor-pop__value {
+      margin: -0.35rem 0 0; font-family: var(--otodor-font-display);
+      font-size: 1.22rem; font-weight: 600; color: var(--otodor-white, #fff);
+    }
+    .otodor-pop__perks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; }
+    .otodor-pop__perk { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 1.02rem; opacity: 0.72; }
+    .otodor-pop__perk svg { width: 14px; height: 14px; color: var(--otodor-blue, #4DA6FF); }
+    .otodor-pop__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.2rem; }
+    .otodor-pop__cta {
+      display: inline-flex; align-items: center; gap: 0.45rem; min-height: 44px;
+      padding: 0.7rem 1.4rem; border-radius: var(--otodor-radius-pill, 999px);
+      background: var(--otodor-white, #fff); color: var(--otodor-black, #0B0B0B);
+      font-family: var(--otodor-font-display); font-size: 1.15rem; font-weight: 600;
+      text-decoration: none; transition: transform 160ms ease;
+    }
+    .otodor-pop__cta:hover { transform: translateY(-1px); }
+    .otodor-pop__cta svg { width: 15px; height: 15px; }
+    .otodor-pop__later {
+      background: none; border: none; cursor: pointer; padding: 0.7rem 0.4rem;
+      color: inherit; opacity: 0.5; font-size: 1.02rem; text-decoration: underline;
+      text-underline-offset: 0.25em; min-height: 44px;
+    }
+    .otodor-pop__later:hover { opacity: 0.8; }
+    .otodor-pop__fine { margin: 0; font-size: 0.94rem; line-height: 1.5; opacity: 0.42; }
+    .otodor-pop__close {
+      position: absolute; top: 0.6rem; right: 0.6rem; z-index: 2;
+      width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+      border: none; border-radius: 50%; cursor: pointer;
+      background: rgba(255,255,255,0.08); color: var(--otodor-white, #fff);
+      font-size: 1.6rem; line-height: 1;
+    }
+    .otodor-pop__close:hover { background: rgba(255,255,255,0.16); }
+    .otodor-pop :focus-visible { outline: 2px solid var(--otodor-blue, #4DA6FF); outline-offset: 3px; }
+
+    @keyframes otodor-pop-fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes otodor-pop-rise { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .otodor-pop__backdrop, .otodor-pop__dialog { animation: none; }
+      .otodor-pop__cta:hover { transform: none; }
+    }
+  {%- endstyle -%}
+
+  <div
+    class="otodor-pop"
+    data-otodor-popup
+    data-popup-key="{{ popup_key | escape }}"
+    data-delay="{{ section.settings.delay | default: 6 }}"
+    data-scroll="{{ section.settings.scroll_trigger | default: 0 }}"
+    data-remember-days="{{ section.settings.remember_days | default: 7 }}"
+    data-open="false"
+    hidden
+  >
+    <div class="otodor-pop__backdrop" data-otodor-popup-close></div>
+
+    <div
+      class="otodor-pop__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="otodor-pop-title-{{ section.id }}"
+    >
+      <button type="button" class="otodor-pop__close" data-otodor-popup-close aria-label="Close">&times;</button>
+
+      {%- if section.settings.image != blank -%}
+        <div class="otodor-pop__media">
+          {{ section.settings.image | image_url: width: 700 | image_tag: loading: 'lazy', alt: '', widths: '350, 700' }}
+        </div>
+      {%- endif -%}
+
+      <div class="otodor-pop__body">
+        {%- assign eyebrow = section.settings.eyebrow | default: settings.otodor_campaign_name -%}
+        {%- if eyebrow != blank -%}
+          <span class="otodor-pop__eyebrow">{{ eyebrow | escape }}</span>
+        {%- endif -%}
+
+        <h2 class="otodor-pop__title" id="otodor-pop-title-{{ section.id }}">
+          {{ section.settings.heading | escape }}
+        </h2>
+
+        {%- if section.settings.text != blank -%}
+          <p class="otodor-pop__text">{{ section.settings.text | escape }}</p>
+        {%- endif -%}
+
+        <div class="otodor-pop__coupon">
+          <span class="otodor-pop__code">{{ coupon_code | escape }}</span>
+          <button type="button" class="otodor-pop__copy"
+            data-otodor-copy="{{ coupon_code | escape }}"
+            data-copied-label="{{ section.settings.copied_label | default: 'Copied!' | escape }}">
+            {{ section.settings.copy_label | default: 'Copy code' | escape }}
+          </button>
+        </div>
+
+        {%- comment -%}
+          The offer's value is generated, not typed — change the coupon in theme
+          settings and this line follows, with no stale number left in the copy.
+        {%- endcomment -%}
+        {%- if coupon_amount > 0 -%}
+          <p class="otodor-pop__value">
+            ₹{% render 'otodor-rupees', amount: coupon_amount %} off{% if settings.otodor_coupon_scope_label != blank %} — {{ settings.otodor_coupon_scope_label | escape }}{% endif %}
+          </p>
+        {%- endif -%}
+
+        {%- if settings.otodor_free_delivery or settings.otodor_emi_enabled -%}
+          <ul class="otodor-pop__perks" role="list">
+            {%- if settings.otodor_free_delivery and settings.otodor_free_delivery_label != blank -%}
+              <li class="otodor-pop__perk">
+                <span aria-hidden="true">{% render 'otodor-icon', name: 'installation' %}</span>
+                {{ settings.otodor_free_delivery_label | escape }}
+              </li>
+            {%- endif -%}
+            {%- if settings.otodor_emi_enabled -%}
+              <li class="otodor-pop__perk">
+                <span aria-hidden="true">{% render 'otodor-icon', name: 'log' %}</span>
+                {{ section.settings.emi_label | default: 'EMI options available' | escape }}
+              </li>
+            {%- endif -%}
+          </ul>
+        {%- endif -%}
+
+        <div class="otodor-pop__actions">
+          {%- if section.settings.cta_label != blank -%}
+            <a class="otodor-pop__cta" href="{{ section.settings.cta_link | default: '/collections/all' }}" data-otodor-popup-cta>
+              {{ section.settings.cta_label | escape }}
+              <span aria-hidden="true">{% render 'otodor-icon', name: 'arrow-right' %}</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.dismiss_label != blank -%}
+            <button type="button" class="otodor-pop__later" data-otodor-popup-close>{{ section.settings.dismiss_label | escape }}</button>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.fine_print != blank -%}
+          <p class="otodor-pop__fine">{{ section.settings.fine_print | escape }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Offer Popup",
+  "tag": "div",
+  "class": "otodor-popup-mount",
+  "settings": [
+    { "type": "paragraph", "content": "The campaign popup. It reads the coupon, delivery and EMI wording from Theme settings → OTODOR Offers, Pricing & EMI, and hides itself outside the campaign dates — so ending a sale is a date, not an edit." },
+    { "type": "checkbox", "id": "enabled", "label": "Enabled", "default": true },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "info": "Blank = the campaign name from theme settings." },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Sale pricing, unlocked.", "info": "The coupon value and scope are printed for you from theme settings — no number to keep in step here." },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "Independence Day pricing on the OTODOR wooden-door range. Apply the code at checkout and the ZEAL lands at ₹6,200 including GST." },
+    { "type": "text", "id": "code_override", "label": "Discount code override", "info": "Blank = the code from theme settings." },
+    { "type": "text", "id": "copy_label", "label": "Copy button label", "default": "Copy code" },
+    { "type": "text", "id": "copied_label", "label": "Copied confirmation", "default": "Copied!" },
+    { "type": "text", "id": "emi_label", "label": "EMI line", "default": "EMI options available" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Shop wooden door locks" },
+    { "type": "url", "id": "cta_link", "label": "Button link" },
+    { "type": "text", "id": "dismiss_label", "label": "Dismiss link label", "default": "No thanks" },
+    { "type": "textarea", "id": "fine_print", "label": "Fine print", "default": "Valid on Wooden Door Locks only, while the sale runs. One code per order." },
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Optional. Hidden on phones." },
+
+    { "type": "header", "content": "Where it shows" },
+    {
+      "type": "select", "id": "target", "label": "Pages", "default": "shopping",
+      "options": [
+        { "value": "all", "label": "Every page" },
+        { "value": "home", "label": "Homepage only" },
+        { "value": "shopping", "label": "Homepage, collections & products" },
+        { "value": "scoped", "label": "Only where the coupon applies" }
+      ]
+    },
+
+    { "type": "header", "content": "When it shows" },
+    { "type": "range", "id": "delay", "label": "Delay before showing", "min": 0, "max": 30, "step": 1, "unit": "s", "default": 6 },
+    { "type": "range", "id": "scroll_trigger", "label": "…or once scrolled past", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 0, "info": "0 = time only. Otherwise whichever happens first." },
+    { "type": "range", "id": "remember_days", "label": "Don't show again for", "min": 1, "max": 90, "step": 1, "unit": "d", "default": 7, "info": "Copying the code suppresses it for a year." }
+  ]
+}
+{% endschema %}

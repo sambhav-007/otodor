@@ -18,6 +18,49 @@
  */
 {
   "sections": {
+    "promo-strip": {
+      "type": "otodor-promo-strip",
+      "blocks": {
+        "delivery": {
+          "type": "message",
+          "settings": {
+            "text": "Free delivery across India",
+            "code": "",
+            "link": ""
+          }
+        },
+        "emi": {
+          "type": "message",
+          "settings": {
+            "text": "EMI options available",
+            "code": "",
+            "link": ""
+          }
+        },
+        "install": {
+          "type": "message",
+          "settings": {
+            "text": "Free professional installation",
+            "code": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "delivery",
+        "emi",
+        "install"
+      ],
+      "settings": {
+        "show_campaign": true,
+        "campaign_link": "",
+        "direction": "ltr",
+        "speed": 30,
+        "color_scheme": "accent",
+        "pause_on_hover": true,
+        "aria_label": "Current offers"
+      }
+    },
     "hero": {
       "type": "otodor-collection-hero",
       "settings": {
@@ -141,6 +184,7 @@
     }
   },
   "order": [
+    "promo-strip",
     "hero",
     "product-grid",
     "comparison",

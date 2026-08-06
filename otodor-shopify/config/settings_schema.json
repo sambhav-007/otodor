@@ -1477,6 +1477,129 @@
     ]
   },
   {
+    "name": "OTODOR Offers, Pricing & EMI",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "One place for the current campaign. The promo strip, the offer popup and the price panel on every product page all read these values, so an offer is changed once and changes everywhere. Blank a field and whatever it feeds simply disappears."
+      },
+      {
+        "type": "checkbox",
+        "id": "otodor_offer_enabled",
+        "label": "Offer layer enabled",
+        "default": true,
+        "info": "Master switch. Off = no coupon panel, no popup, nothing to remove by hand."
+      },
+      {
+        "type": "header",
+        "content": "Campaign"
+      },
+      {
+        "type": "text",
+        "id": "otodor_campaign_name",
+        "label": "Campaign name",
+        "default": "Independence Day Sale",
+        "info": "Shown as the eyebrow on the popup and the offer panel."
+      },
+      {
+        "type": "text",
+        "id": "otodor_campaign_start",
+        "label": "Campaign starts",
+        "info": "YYYY-MM-DD. Leave blank to start immediately."
+      },
+      {
+        "type": "text",
+        "id": "otodor_campaign_end",
+        "label": "Campaign ends",
+        "info": "YYYY-MM-DD (inclusive). Leave blank to run until switched off. After this date the campaign hides itself — no edit needed."
+      },
+      {
+        "type": "header",
+        "content": "Coupon"
+      },
+      {
+        "type": "text",
+        "id": "otodor_coupon_code",
+        "label": "Discount code",
+        "default": "OTODOR1500",
+        "info": "Must exist as a real discount in Shopify admin (Discounts → Create). The theme only advertises it."
+      },
+      {
+        "type": "number",
+        "id": "otodor_coupon_amount",
+        "label": "Coupon value (₹)",
+        "default": 1500
+      },
+      {
+        "type": "text",
+        "id": "otodor_coupon_scope_label",
+        "label": "Coupon scope wording",
+        "default": "Wooden Door Locks only"
+      },
+      {
+        "type": "text",
+        "id": "otodor_coupon_collections",
+        "label": "Coupon applies to — collections",
+        "default": "wooden-door-locks",
+        "info": "Collection handles, comma separated. The coupon row only shows on products inside these collections. Blank = every product."
+      },
+      {
+        "type": "text",
+        "id": "otodor_coupon_tags",
+        "label": "Coupon applies to — tags",
+        "info": "Optional. Product tags, comma separated — a second way in for products not in the collection yet."
+      },
+      {
+        "type": "header",
+        "content": "Delivery, GST & EMI"
+      },
+      {
+        "type": "checkbox",
+        "id": "otodor_free_delivery",
+        "label": "Show free delivery",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "otodor_free_delivery_label",
+        "label": "Free delivery wording",
+        "default": "Free delivery across India"
+      },
+      {
+        "type": "text",
+        "id": "otodor_gst_note",
+        "label": "GST wording",
+        "default": "including GST",
+        "info": "Printed next to the discounted price."
+      },
+      {
+        "type": "checkbox",
+        "id": "otodor_emi_enabled",
+        "label": "Show EMI",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "otodor_emi_months",
+        "label": "EMI tenure used for the 'from' figure",
+        "default": "6",
+        "options": [
+          { "value": "3", "label": "3 months" },
+          { "value": "6", "label": "6 months" },
+          { "value": "9", "label": "9 months" },
+          { "value": "12", "label": "12 months" }
+        ]
+      },
+      {
+        "type": "text",
+        "id": "otodor_emi_note",
+        "label": "EMI fine print",
+        "default": "No-cost EMI on select cards & pay-later options",
+        "info": "The monthly figure is the discounted price divided by the tenure — say so here if it is indicative."
+      }
+    ]
+  },
+  {
     "name": "OTODOR Brand Entity (SEO)",
     "settings": [
       {

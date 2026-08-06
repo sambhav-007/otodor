@@ -32,6 +32,12 @@
             "custom_liquid": "{%- assign access = product.metafields.custom.access_methods.value -%}{%- if access != blank -%}<div style=\"display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.6rem 0 0.2rem;\">{%- assign parts = access | split: '·' -%}{%- for part in parts -%}<span style=\"font-family: var(--otodor-font-body); font-size: 0.78rem; font-weight: 500; color: var(--otodor-ink-soft); border: 1px solid var(--otodor-hairline-light-2); border-radius: 999px; padding: 0.3rem 0.85rem;\">{{ part | strip | escape }}</span>{%- endfor -%}</div>{%- endif -%}"
           }
         },
+        "offer": {
+          "type": "otodor_offer",
+          "settings": {
+            "hide_campaign": false
+          }
+        },
         "variant_picker": {
           "type": "variant_picker",
           "settings": {
@@ -69,6 +75,7 @@
         "positioning",
         "price",
         "access_chips",
+        "offer",
         "variant_picker",
         "quantity_selector",
         "buy_buttons",

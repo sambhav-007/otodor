@@ -23,15 +23,15 @@
         "promo_1": {
           "type": "message",
           "settings": {
-            "text": "Limited-time launch pricing on smart locks",
+            "text": "Free delivery across India",
             "code": "",
-            "link": "/collections/all"
+            "link": ""
           }
         },
         "promo_2": {
           "type": "message",
           "settings": {
-            "text": "Free professional installation on every lock",
+            "text": "EMI options available",
             "code": "",
             "link": ""
           }
@@ -39,12 +39,20 @@
         "promo_3": {
           "type": "message",
           "settings": {
-            "text": "3-year lock warranty · 1-year battery",
+            "text": "Free professional installation on every lock",
             "code": "",
             "link": ""
           }
         },
         "promo_4": {
+          "type": "message",
+          "settings": {
+            "text": "3-year lock warranty · 1-year battery",
+            "code": "",
+            "link": ""
+          }
+        },
+        "promo_5": {
           "type": "message",
           "settings": {
             "text": "Free home survey & compatibility check",
@@ -57,9 +65,12 @@
         "promo_1",
         "promo_2",
         "promo_3",
-        "promo_4"
+        "promo_4",
+        "promo_5"
       ],
       "settings": {
+        "show_campaign": true,
+        "campaign_link": "/collections/wooden-door-locks",
         "direction": "ltr",
         "speed": 30,
         "color_scheme": "dark",

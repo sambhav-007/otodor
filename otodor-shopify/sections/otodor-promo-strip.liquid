@@ -4,21 +4,62 @@
 
   Purpose      A thin, always-moving announcement ribbon that carries offer /
                discount lines. Sits directly above the banner slideshow.
-  Inputs       `message` blocks (text, optional code pill, optional link).
+  Inputs       `message` blocks (text, optional code pill, optional link), plus
+               an optional generated campaign line (theme offer settings).
   Outputs      A seamless CSS-only marquee (no JS), direction + speed settable.
   Dependencies assets/otodor-base.css (tokens only). No JS, no GSAP.
+               snippets/otodor-campaign-live + otodor-rupees for the campaign line.
   Reusable for Any template — homepage, collection, product (offer ribbons).
   Merchant     Message text, discount code, link, direction, speed, colour
                scheme, pause-on-hover — all section settings.
   Required     None.
   Optional     None (section settings only — no metafields).
-  Degrades     No blocks → section renders nothing. Reduced motion → static,
+  Degrades     No blocks and no live campaign → section renders nothing.
+               Campaign over → the generated line drops, the rest stays.
+               Reduced motion → static,
                centred, wrapped row (clone hidden). No JS needed at any point.
   ─────────────────────────────────────────────────────────────────────────
 {%- endcomment -%}
 
+{%- comment -%}
+  The campaign line is not typed into a block: it is generated from Theme
+  settings → OTODOR Offers, Pricing & EMI, so the strip, the popup and every
+  product offer panel quote one offer — and the line retires by itself when
+  the campaign window closes.
+{%- endcomment -%}
+{%- liquid
+  assign campaign_text = ''
+  if section.settings.show_campaign
+    capture campaign_live
+      render 'otodor-campaign-live'
+    endcapture
+    if campaign_live == '1' and settings.otodor_coupon_code != blank
+      assign campaign_amount = settings.otodor_coupon_amount | plus: 0
+      capture campaign_text
+        if settings.otodor_campaign_name != blank
+          echo settings.otodor_campaign_name
+          echo ' · '
+        endif
+        if campaign_amount > 0
+          echo '₹'
+          render 'otodor-rupees', amount: campaign_amount
+          echo ' off'
+          if settings.otodor_coupon_scope_label != blank
+            echo ' — '
+            echo settings.otodor_coupon_scope_label
+          endif
+        endif
+      endcapture
+      assign campaign_text = campaign_text | strip
+    endif
+  endif
+-%}
+
 {%- comment -%} Lifecycle guard — nothing to say, nothing to render. {%- endcomment -%}
 {%- assign has_message = false -%}
+{%- if campaign_text != blank -%}
+  {%- assign has_message = true -%}
+{%- endif -%}
 {%- for block in section.blocks -%}
   {%- if block.settings.text != blank -%}
     {%- assign has_message = true -%}
@@ -217,6 +258,24 @@
           {% if half == 2 %}aria-hidden="true"{% endif %}
         >
           {%- for copy in (1..copies) -%}
+            {%- if campaign_text != blank -%}
+              <li class="otodor-strip__item{% unless copy == 1 %} otodor-strip__item--dup{% endunless %}">
+                {%- if section.settings.campaign_link != blank -%}
+                  <a
+                    class="otodor-strip__link"
+                    href="{{ section.settings.campaign_link }}"
+                    {% if half == 2 or copy > 1 %}tabindex="-1"{% endif %}
+                  >
+                    <span class="otodor-strip__text">{{ campaign_text | escape }}</span>
+                    <span class="otodor-strip__code">{{ settings.otodor_coupon_code | escape }}</span>
+                  </a>
+                {%- else -%}
+                  <span class="otodor-strip__text">{{ campaign_text | escape }}</span>
+                  <span class="otodor-strip__code">{{ settings.otodor_coupon_code | escape }}</span>
+                {%- endif -%}
+              </li>
+              <li class="otodor-strip__sep{% unless copy == 1 %} otodor-strip__sep--dup{% endunless %}" aria-hidden="true"></li>
+            {%- endif -%}
             {%- for block in section.blocks -%}
               {%- if block.settings.text == blank -%}{%- continue -%}{%- endif -%}
               <li
@@ -263,6 +322,18 @@
     {
       "type": "paragraph",
       "content": "A thin, continuously moving offer ribbon. Hides itself when it has no messages."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_campaign",
+      "label": "Lead with the running campaign",
+      "default": true,
+      "info": "Generates the first line from Theme settings → OTODOR Offers, Pricing & EMI (campaign name, coupon value, scope, code). It disappears on its own when the campaign ends."
+    },
+    {
+      "type": "url",
+      "id": "campaign_link",
+      "label": "Campaign line link"
     },
     {
       "type": "select",

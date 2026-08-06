@@ -1,0 +1,251 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Offer panel  (price after discount · delivery · EMI)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Show, next to the buy button, what this product actually
+                      costs after the running campaign — the effective price,
+                      the coupon that takes it down, the price after discount
+                      including GST, free delivery, and the EMI it works out to.
+  Primary source:     product metafields `custom.effective_price` /
+                      `custom.deal_price` (both whole rupees).
+  Fallback order:     metafield → otodor-price-seed (published campaign
+                      pricing) → the Shopify product price → hide.
+                      The discounted price additionally falls back to
+                      effective − coupon value when the product is in the
+                      coupon's scope.
+  Visibility rule:    Hides when the offer layer is off, or when no price can
+                      be resolved at all. The coupon row hides off-campaign or
+                      out of scope; delivery / EMI / GST rows hide on their
+                      own settings.
+  Merchant editable:  YES — Theme settings → OTODOR Offers, Pricing & EMI.
+                      Per product: `custom.effective_price`, `custom.deal_price`,
+                      and `custom.hidden_modules` containing `coupon` to switch
+                      the coupon off for one product.
+  Required metafields: none.
+  Dependencies:       otodor-rupees, otodor-price-seed, otodor-campaign-live,
+                      otodor-module-applies, otodor-icon; otodor-base.css
+                      tokens; assets/otodor-offer.js for the copy button
+                      (progressive enhancement — the code is selectable text
+                      without it).
+
+  Params:
+    product   the product to price (required)
+    compact   true = no campaign eyebrow (for tight placements)
+
+  NOT A CHECKOUT PRICE. The panel advertises the campaign; the customer pays
+  the Shopify price minus the real discount code. See otodor-price-seed.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- comment -%}
+  Captures live outside the {% liquid %} block on purpose: that tag parses one
+  line per tag, so a multi-line `render` inside it would be read as a truncated
+  tag. Same idiom as the product modules.
+{%- endcomment -%}
+{%- capture seeded_effective -%}
+  {%- render 'otodor-price-seed', product: product, key: 'effective' -%}
+{%- endcapture -%}
+{%- capture seeded_deal -%}
+  {%- render 'otodor-price-seed', product: product, key: 'deal' -%}
+{%- endcapture -%}
+{%- capture campaign_live -%}
+  {%- render 'otodor-campaign-live' -%}
+{%- endcapture -%}
+{%- capture coupon_scope -%}
+  {%- render 'otodor-module-applies',
+    module_id: 'coupon',
+    product: product,
+    only_collections: settings.otodor_coupon_collections,
+    only_tags: settings.otodor_coupon_tags -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign campaign_live = campaign_live | strip
+  assign coupon_scope = coupon_scope | strip
+  assign show_panel = false
+
+  if settings.otodor_offer_enabled and product != blank
+    # ── Effective price: metafield → seed → Shopify price ───────────────
+    assign effective = product.metafields.custom.effective_price.value | plus: 0
+    if effective <= 0
+      assign effective = seeded_effective | strip | plus: 0
+    endif
+    if effective <= 0 and product.price > 0
+      assign effective = product.price | divided_by: 100
+    endif
+
+    assign coupon_amount = settings.otodor_coupon_amount | plus: 0
+    assign coupon_code = settings.otodor_coupon_code
+    assign coupon_on = false
+    if campaign_live == '1' and coupon_scope == 'true' and coupon_amount > 0 and coupon_code != blank
+      assign coupon_on = true
+    endif
+
+    # ── Discounted price: metafield → seed → effective − coupon ─────────
+    assign deal = product.metafields.custom.deal_price.value | plus: 0
+    if deal <= 0
+      assign deal = seeded_deal | strip | plus: 0
+    endif
+    if deal <= 0 and coupon_on and effective > 0
+      assign deal = effective | minus: coupon_amount
+    endif
+    # A "discount" that is not below the effective price is not a discount.
+    if effective > 0 and deal >= effective
+      assign deal = 0
+    endif
+
+    assign saving = 0
+    if deal > 0 and effective > 0
+      assign saving = effective | minus: deal
+    endif
+
+    assign headline = deal
+    if headline <= 0
+      assign headline = effective
+    endif
+
+    # ── EMI: the headline price over the chosen tenure, rounded up ──────
+    assign emi_months = settings.otodor_emi_months | plus: 0
+    assign emi_monthly = 0
+    if settings.otodor_emi_enabled and emi_months > 0 and headline > 0
+      assign emi_ceiling = headline | plus: emi_months | minus: 1
+      assign emi_monthly = emi_ceiling | divided_by: emi_months
+    endif
+
+    if headline > 0
+      assign show_panel = true
+    endif
+  endif
+-%}
+
+{%- if show_panel -%}
+  {%- style -%}
+    .otodor-offer {
+      margin: 1.2rem 0 0;
+      padding: 1.2rem 1.3rem;
+      border-radius: var(--otodor-radius-lg, 12px);
+      border: 1px solid var(--otodor-hairline-light-2, rgba(0,0,0,0.12));
+      background: var(--otodor-bg-light-2, #fff);
+      display: grid;
+      gap: 0.85rem;
+    }
+    .otodor-offer__campaign {
+      display: inline-flex; align-items: center; gap: 0.45rem; width: fit-content;
+      font-family: var(--otodor-font-display); font-size: 0.94rem; font-weight: 700;
+      letter-spacing: var(--otodor-tracking-widest, 0.14em); text-transform: uppercase;
+      color: var(--otodor-accent-on-light, #1A78D8);
+    }
+    .otodor-offer__campaign::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor; flex: 0 0 auto;
+    }
+    .otodor-offer__prices { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.55rem 0.8rem; }
+    .otodor-offer__now {
+      font-family: var(--otodor-font-display); font-size: 2.2rem; font-weight: 700;
+      line-height: 1; letter-spacing: var(--otodor-tracking-tight, -0.02em);
+      color: var(--otodor-ink, #0B0B0B);
+    }
+    .otodor-offer__was {
+      font-size: 1.3rem; text-decoration: line-through; opacity: 0.45;
+    }
+    .otodor-offer__save {
+      font-size: 1.02rem; font-weight: 700; letter-spacing: 0.04em;
+      color: #0f7a3d; background: rgba(37,211,102,0.12);
+      border-radius: var(--otodor-radius-pill, 999px); padding: 0.24rem 0.7rem;
+    }
+    .otodor-offer__gst { font-size: 1.02rem; opacity: 0.6; }
+
+    .otodor-offer__coupon {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem;
+      padding: 0.7rem 0.85rem; border-radius: var(--otodor-radius-md, 8px);
+      border: 1px dashed var(--otodor-accent-on-light, #1A78D8);
+      background: rgba(26,120,216,0.05);
+    }
+    .otodor-offer__coupon-text { font-size: 1.09rem; line-height: 1.45; flex: 1 1 12rem; }
+    .otodor-offer__coupon-text strong { font-weight: 700; }
+    .otodor-offer__code {
+      font-family: var(--otodor-font-body); font-size: 1.09rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--otodor-accent-on-light, #1A78D8);
+    }
+    .otodor-offer__copy {
+      display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;
+      min-height: 44px; padding: 0.45rem 0.95rem;
+      border: 1px solid var(--otodor-accent-on-light, #1A78D8);
+      border-radius: var(--otodor-radius-pill, 999px);
+      background: transparent; color: var(--otodor-accent-on-light, #1A78D8);
+      font-family: var(--otodor-font-display); font-size: 1.02rem; font-weight: 600;
+      transition: background var(--otodor-dur-fast, 160ms) ease, color var(--otodor-dur-fast, 160ms) ease;
+    }
+    .otodor-offer__copy:hover { background: var(--otodor-accent-on-light, #1A78D8); color: #fff; }
+    .otodor-offer__copy[data-copied="true"] { background: #0f7a3d; border-color: #0f7a3d; color: #fff; }
+
+    .otodor-offer__perks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+    .otodor-offer__perk { display: flex; align-items: flex-start; gap: 0.55rem; font-size: 1.09rem; line-height: 1.45; }
+    .otodor-offer__perk svg { width: 15px; height: 15px; flex: 0 0 auto; margin-top: 0.15rem; color: var(--otodor-accent-on-light, #1A78D8); }
+    .otodor-offer__perk-note { display: block; font-size: 0.98rem; opacity: 0.55; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .otodor-offer__copy { transition: none; }
+    }
+  {%- endstyle -%}
+
+  <div class="otodor-offer" data-otodor-offer>
+    {%- if campaign_live == '1' and settings.otodor_campaign_name != blank and compact != true -%}
+      <span class="otodor-offer__campaign">{{ settings.otodor_campaign_name | escape }}</span>
+    {%- endif -%}
+
+    <div class="otodor-offer__prices">
+      <span class="otodor-offer__now">₹{% render 'otodor-rupees', amount: headline %}</span>
+      {%- if saving > 0 -%}
+        <span class="otodor-offer__was" aria-label="Was">₹{% render 'otodor-rupees', amount: effective %}</span>
+        {%- comment -%}
+          The saving badge stands down when the coupon row is showing: the
+          published campaign price and the coupon value are two separately
+          quoted figures, and printing both invites a rupee of arithmetic
+          that doesn't tie out. The coupon line already states its value.
+        {%- endcomment -%}
+        {%- unless coupon_on -%}
+          <span class="otodor-offer__save">Save ₹{% render 'otodor-rupees', amount: saving %}</span>
+        {%- endunless -%}
+      {%- endif -%}
+      {%- if settings.otodor_gst_note != blank -%}
+        <span class="otodor-offer__gst">{{ settings.otodor_gst_note | escape }}</span>
+      {%- endif -%}
+    </div>
+
+    {%- if coupon_on -%}
+      <div class="otodor-offer__coupon">
+        <span class="otodor-offer__coupon-text">
+          Apply <span class="otodor-offer__code">{{ coupon_code | escape }}</span> at checkout for
+          <strong>₹{% render 'otodor-rupees', amount: coupon_amount %} off</strong>{% if settings.otodor_coupon_scope_label != blank %} — {{ settings.otodor_coupon_scope_label | escape }}{% endif %}.
+        </span>
+        <button type="button" class="otodor-offer__copy" data-otodor-copy="{{ coupon_code | escape }}" data-copied-label="Copied">
+          Copy code
+        </button>
+      </div>
+    {%- endif -%}
+
+    {%- if settings.otodor_free_delivery or emi_monthly > 0 -%}
+      <ul class="otodor-offer__perks" role="list">
+        {%- if settings.otodor_free_delivery and settings.otodor_free_delivery_label != blank -%}
+          <li class="otodor-offer__perk">
+            <span aria-hidden="true">{% render 'otodor-icon', name: 'installation' %}</span>
+            <span>{{ settings.otodor_free_delivery_label | escape }}</span>
+          </li>
+        {%- endif -%}
+        {%- if emi_monthly > 0 -%}
+          <li class="otodor-offer__perk">
+            <span aria-hidden="true">{% render 'otodor-icon', name: 'log' %}</span>
+            <span>
+              EMI from <strong>₹{% render 'otodor-rupees', amount: emi_monthly %}/month</strong> for {{ emi_months }} months
+              {%- if settings.otodor_emi_note != blank -%}
+                <span class="otodor-offer__perk-note">{{ settings.otodor_emi_note | escape }}</span>
+              {%- endif -%}
+            </span>
+          </li>
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+  </div>
+{%- endif -%}

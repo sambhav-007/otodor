@@ -226,6 +226,16 @@
                     warranty_label: block.settings.warranty_label,
                     technicians_label: block.settings.technicians_label -%}
                 </div>
+              {%- comment -%}
+                OTODOR: what this product costs after the running campaign —
+                effective price, the coupon, the price including GST, free
+                delivery and EMI. The snippet resolves the figures and hides
+                itself when there is no price to quote.
+              {%- endcomment -%}
+              {%- when 'otodor_offer' -%}
+                <div {{ block.shopify_attributes }}>
+                  {%- render 'otodor-offer-box', product: product, compact: block.settings.hide_campaign -%}
+                </div>
               {%- when 'collapsible_tab' -%}
                 <div class="product__accordion accordion quick-add-hidden" {{ block.shopify_attributes }}>
                   <details id="Details-{{ block.id }}-{{ section.id }}">
@@ -973,6 +983,15 @@
           "label": "t:sections.custom-liquid.settings.custom_liquid.label",
           "info": "t:sections.custom-liquid.settings.custom_liquid.info"
         }
+      ]
+    },
+    {
+      "type": "otodor_offer",
+      "name": "OTODOR Offer panel",
+      "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Price after the running campaign, the coupon, free delivery and EMI. Values come from Theme settings → OTODOR Offers, Pricing & EMI, and per product from custom.effective_price / custom.deal_price. Hides itself when no price can be resolved." },
+        { "type": "checkbox", "id": "hide_campaign", "label": "Hide the campaign name", "default": false, "info": "Useful when the promo strip already names the sale." }
       ]
     },
     {

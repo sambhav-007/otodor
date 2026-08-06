@@ -470,5 +470,14 @@
         </svg>
       </a>
     {%- endif -%}
+
+    {%- comment -%}
+      OTODOR — Offer layer. One campaign popup for the whole store: the section
+      decides for itself whether this page is in its targeting and whether the
+      campaign window is open, so it costs nothing outside a sale. The script
+      also powers every "copy code" button (offer panel, popup) via delegation.
+    {%- endcomment -%}
+    {% section 'otodor-offer-popup' %}
+    <script src="{{ 'otodor-offer.js' | asset_url }}" defer="defer"></script>
   </body>
 </html>

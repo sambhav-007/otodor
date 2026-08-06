@@ -1,0 +1,70 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Model Price Seed  (published offer pricing, per model)
+  Sibling of otodor-spec-model-seed — same idea, applied to money.
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:   Supply a model's PUBLISHED offer pricing wherever the product's
+             own price metafields are not populated yet, so the offer panel
+             reads the same figures on every surface.
+
+  IT IS THE WEAKEST SOURCE. Consumers resolve in this order:
+
+      product metafield  →  MODEL SEED  →  Shopify product price  →  nothing
+
+  Populating `custom.effective_price` / `custom.deal_price` in admin (or
+  giving the product a real Shopify price) silently overrides it, one product
+  at a time; this file is deleted when the last model is covered.
+
+  IT IS NOT A CHECKOUT PRICE. These are the advertised campaign figures the
+  client published. What a customer actually pays is the Shopify product
+  price minus the real discount code — keep them in step, or delete the seed
+  row and let the Shopify price speak.
+
+  Params:
+    product   product object (its handle/title identify the model)
+    title     fallback identifier when there is no product
+    key       `effective` (price before the coupon) or
+              `deal` (price after the coupon, including GST)
+
+  Model matching is the spec seed's: upper-cased, stripped of
+  non-alphanumerics, tested as a PREFIX — so `ZEAL Matte Black` is ZEAL.
+
+  Echoes whole rupees, or nothing.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign ident = product.handle | default: title | default: ''
+  assign ident = ident | upcase | replace: '-', '' | replace: ' ', '' | replace: '+', '' | replace: '_', ''
+  assign alt = product.title | default: title | default: ''
+  assign alt = alt | upcase | replace: '-', '' | replace: ' ', '' | replace: '+', '' | replace: '_', ''
+
+  assign model = ''
+  assign keys = 'SENTRY,NEXUS,ONYX,ZION,ZEAL' | split: ','
+  for k in keys
+    assign klen = k | size
+    assign head_a = ident | slice: 0, klen
+    assign head_b = alt | slice: 0, klen
+    if head_a == k or head_b == k
+      assign model = k
+      break
+    endif
+  endfor
+-%}
+
+{%- if model != blank and key != blank -%}
+  {%- capture sheet -%}
+    {%- case model -%}
+      {%- comment -%}
+        Only models whose offer pricing the client has actually published
+        appear here. A model with no row simply gets nothing — the panel then
+        falls back to the Shopify price, or hides. Nothing is invented.
+      {%- endcomment -%}
+      {%- when 'ZEAL' -%}
+effective = 7699
+deal = 6200
+    {%- endcase -%}
+  {%- endcapture -%}
+  {%- comment -%} Same `key = value` parser the spec seed uses — one implementation. {%- endcomment -%}
+  {%- render 'otodor-spec-seed', seed: sheet, id: key -%}
+{%- endif -%}
