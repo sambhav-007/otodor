@@ -1,0 +1,379 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   OTODOR — Cart & Checkout handoff
+   ───────────────────────────────────────────────────────────────────────
+   Purpose      Carry the brand through the last three screens of the funnel:
+                the cart drawer, the cart page, and the empty state. Until
+                this file, a shopper crossed an editorial storefront and was
+                handed to a stock Dawn table at the moment of purchase.
+
+   EVOLVE, DON'T REWRITE. Dawn's cart sections keep their markup, their
+   classes and every native behaviour — quantity rules, line-item discounts,
+   cart notes, dynamic checkout buttons, the AJAX drawer. This file only
+   re-dresses them in OTODOR tokens. Nothing here changes what the cart does,
+   so Dawn's cart JS and any future Shopify update still apply cleanly.
+
+   Scope        `.otodor-light-page` for the cart PAGE (the body class is set
+                in theme.liquid); `.cart-drawer` for the drawer, which lives
+                outside <main> and so is never reached by the light-page
+                recolour rules in otodor-base.css.
+   Loaded       theme.liquid, on the cart template and wherever the drawer
+                exists (settings.cart_type == 'drawer').
+   Depends on   otodor-base.css tokens only.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────
+   1. CART PAGE — the table becomes a ledger of cards
+   ───────────────────────────────────────────────────────── */
+
+body.otodor-light-page .cart__contents,
+body.otodor-light-page .cart__footer {
+  --otodor-cart-accent: var(--otodor-accent-on-light);
+}
+
+/* Title row: display face, and the "continue shopping" link stops
+   competing with it. */
+body.otodor-light-page .title-wrapper-with-link .title--primary {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-2xl);
+  font-weight: 700;
+  letter-spacing: var(--otodor-tracking-tight);
+  line-height: var(--otodor-leading-tight);
+  color: var(--otodor-ink);
+  margin-block: 0 0.4rem;
+}
+
+body.otodor-light-page .title-wrapper-with-link .underlined-link {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  font-weight: 600;
+  color: var(--otodor-accent-on-light);
+  text-underline-offset: 0.3em;
+}
+
+/* Column headings: the same quiet uppercase caption used across the site. */
+body.otodor-light-page .cart-items th {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--otodor-tracking-wider);
+  text-transform: uppercase;
+  color: var(--otodor-ink-faint);
+  border-bottom: 1px solid var(--otodor-hairline-light);
+  padding-bottom: 0.9rem;
+}
+
+/* Each line becomes a white card on the warm ground, the way product
+   cards read everywhere else. */
+body.otodor-light-page .cart-item {
+  background: var(--otodor-bg-light-2);
+  border: 1px solid var(--otodor-hairline-light);
+  border-radius: var(--otodor-radius-md);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+body.otodor-light-page .cart-item > td {
+  padding-block: 1.1rem;
+  border: 0;
+}
+
+body.otodor-light-page .cart-item > td:first-child { padding-left: 1.1rem; }
+body.otodor-light-page .cart-item > td:last-child { padding-right: 1.1rem; }
+
+body.otodor-light-page .cart-items tbody tr + tr {
+  /* Dawn separates rows with a rule; cards want air instead. */
+  border-top: 0;
+}
+
+body.otodor-light-page .cart-item__image-container,
+body.otodor-light-page .cart-item__image {
+  border-radius: var(--otodor-radius-sm);
+  background: var(--otodor-plinth);
+}
+
+body.otodor-light-page .cart-item__name {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-base);
+  font-weight: 600;
+  letter-spacing: var(--otodor-tracking-base);
+  color: var(--otodor-ink);
+  text-decoration: none;
+}
+
+body.otodor-light-page .cart-item__name:hover {
+  color: var(--otodor-accent-on-light);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+body.otodor-light-page .cart-item .product-option,
+body.otodor-light-page .cart-item dl,
+body.otodor-light-page .cart-item__details .product-option {
+  font-size: var(--otodor-text-xs);
+  color: var(--otodor-ink-soft);
+}
+
+body.otodor-light-page .cart-item .price,
+body.otodor-light-page .cart-item__totals .price {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-base);
+  font-weight: 600;
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .cart-item__old-price {
+  color: var(--otodor-ink-faint);
+}
+
+body.otodor-light-page .cart-item__discounted-prices .cart-item__final-price {
+  color: var(--otodor-accent-on-light);
+}
+
+/* Quantity control: a pill, matching the buy box. */
+body.otodor-light-page .cart-item .quantity {
+  border-radius: var(--otodor-radius-pill);
+  border: 1px solid var(--otodor-hairline-light-2);
+  background: var(--otodor-bg-light);
+  overflow: hidden;
+}
+
+body.otodor-light-page .cart-item .quantity:after { box-shadow: none; }
+
+body.otodor-light-page .cart-item .quantity__input {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  font-weight: 600;
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .cart-item .quantity__button { color: var(--otodor-ink-soft); }
+body.otodor-light-page .cart-item .quantity__button:hover { color: var(--otodor-accent-on-light); }
+
+body.otodor-light-page .cart-item cart-remove-button .button,
+cart-drawer .cart-drawer cart-remove-button .button {
+  color: var(--otodor-ink-faint);
+  min-height: 44px;
+  min-width: 44px;
+}
+
+body.otodor-light-page .cart-item cart-remove-button .button:hover,
+cart-drawer .cart-drawer cart-remove-button .button:hover { color: #dc2626; }
+
+/* ─────────────────────────────────────────────────────────
+   2. CART FOOTER — the totals block and the one button that matters
+   ───────────────────────────────────────────────────────── */
+
+body.otodor-light-page .cart__footer .cart__blocks {
+  background: var(--otodor-bg-light-2);
+  border: 1px solid var(--otodor-hairline-light);
+  border-radius: var(--otodor-radius-lg);
+  padding: clamp(1.2rem, 2.5vw, 2rem);
+}
+
+body.otodor-light-page .totals__total {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-md);
+  font-weight: 600;
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .totals__total-value {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-xl);
+  font-weight: 700;
+  letter-spacing: var(--otodor-tracking-tight);
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .tax-note {
+  font-size: var(--otodor-text-xs);
+  color: var(--otodor-ink-soft);
+}
+
+body.otodor-light-page .cart__note .text-area,
+body.otodor-light-page .cart__note label {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .cart__note .text-area {
+  border-radius: var(--otodor-radius-md);
+  border: 1px solid var(--otodor-hairline-light-2);
+  background: var(--otodor-bg-light-2);
+}
+
+body.otodor-light-page .cart__checkout-button,
+cart-drawer .cart-drawer .cart__checkout-button {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-base);
+  font-weight: 600;
+  letter-spacing: var(--otodor-tracking-base);
+  border-radius: var(--otodor-radius-pill);
+  min-height: 52px;
+  background: var(--otodor-accent-on-light);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(26, 120, 216, 0.22);
+  transition: transform var(--otodor-dur-fast, 160ms) ease, filter var(--otodor-dur-fast, 160ms) ease;
+}
+
+body.otodor-light-page .cart__checkout-button:hover,
+cart-drawer .cart-drawer .cart__checkout-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+body.otodor-light-page .cart__checkout-button::after,
+cart-drawer .cart-drawer .cart__checkout-button::after { box-shadow: none; }
+
+body.otodor-light-page .discounts__discount,
+cart-drawer .cart-drawer .discounts__discount {
+  font-size: var(--otodor-text-xs);
+  font-weight: 600;
+  color: var(--otodor-accent-on-light);
+}
+
+/* ─────────────────────────────────────────────────────────
+   3. CART DRAWER — outside <main>, so it needs its own light surface
+   ───────────────────────────────────────────────────────── */
+
+cart-drawer .cart-drawer .drawer__inner,
+cart-drawer .cart-drawer .drawer__inner-empty {
+  background: var(--otodor-bg-light) !important;
+  color: var(--otodor-ink);
+  --color-foreground: 26, 26, 26;
+  --color-background: 247, 246, 243;
+}
+
+cart-drawer .cart-drawer .drawer__header { border-bottom: 1px solid var(--otodor-hairline-light); }
+
+cart-drawer .cart-drawer .drawer__heading {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-xl);
+  font-weight: 700;
+  letter-spacing: var(--otodor-tracking-tight);
+  color: var(--otodor-ink);
+}
+
+cart-drawer .cart-drawer .drawer__close {
+  color: var(--otodor-ink-soft);
+  min-height: 44px;
+  min-width: 44px;
+}
+cart-drawer .cart-drawer .drawer__close:hover { color: var(--otodor-ink); }
+
+cart-drawer .cart-drawer .cart-item {
+  background: var(--otodor-bg-light-2);
+  border: 1px solid var(--otodor-hairline-light);
+  border-radius: var(--otodor-radius-md);
+}
+cart-drawer .cart-drawer .cart-item > td { border: 0; padding-block: 0.9rem; }
+cart-drawer .cart-drawer .cart-item > td:first-child { padding-left: 0.9rem; }
+cart-drawer .cart-drawer .cart-item > td:last-child { padding-right: 0.9rem; }
+
+cart-drawer .cart-drawer .cart-item__image-container,
+cart-drawer .cart-drawer .cart-item__image {
+  border-radius: var(--otodor-radius-sm);
+  background: var(--otodor-plinth);
+}
+
+cart-drawer .cart-drawer .cart-item__name {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-sm);
+  font-weight: 600;
+  color: var(--otodor-ink);
+  text-decoration: none;
+}
+
+cart-drawer .cart-drawer .cart-item .price,
+cart-drawer .cart-drawer .totals__subtotal-value {
+  font-family: var(--otodor-font-display);
+  font-weight: 600;
+  color: var(--otodor-ink);
+}
+
+cart-drawer .cart-drawer .totals__subtotal {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  color: var(--otodor-ink-soft);
+}
+
+cart-drawer .cart-drawer .totals__subtotal-value { font-size: var(--otodor-text-lg); }
+
+cart-drawer .cart-drawer .cart-drawer__footer,
+cart-drawer .cart-drawer .drawer__footer { border-top: 1px solid var(--otodor-hairline-light); }
+
+cart-drawer .cart-drawer .tax-note,
+cart-drawer .cart-drawer .cart__dynamic-checkout-buttons {
+  font-size: var(--otodor-text-xs);
+  color: var(--otodor-ink-soft);
+}
+
+cart-drawer .cart-drawer .quantity {
+  border-radius: var(--otodor-radius-pill);
+  border: 1px solid var(--otodor-hairline-light-2);
+  background: var(--otodor-bg-light);
+  overflow: hidden;
+}
+cart-drawer .cart-drawer .quantity:after { box-shadow: none; }
+cart-drawer .cart-drawer .quantity__input { font-size: var(--otodor-text-sm); font-weight: 600; color: var(--otodor-ink); }
+
+cart-drawer .cart-drawer .cart-drawer__overlay { background-color: rgba(11, 11, 11, 0.55); }
+
+/* ─────────────────────────────────────────────────────────
+   4. EMPTY STATE — a route back into the range, not a dead end
+   ───────────────────────────────────────────────────────── */
+
+body.otodor-light-page .cart__empty-text,
+cart-drawer .cart-drawer .cart__empty-text {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-2xl);
+  font-weight: 700;
+  letter-spacing: var(--otodor-tracking-tight);
+  line-height: var(--otodor-leading-tight);
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .cart__warnings .button,
+cart-drawer .cart-drawer .drawer__inner-empty .button {
+  font-family: var(--otodor-font-display);
+  font-weight: 600;
+  border-radius: var(--otodor-radius-pill);
+  min-height: 48px;
+  background: var(--otodor-accent-on-light);
+  color: #fff;
+}
+body.otodor-light-page .cart__warnings .button::after,
+cart-drawer .cart-drawer .drawer__inner-empty .button::after { box-shadow: none; }
+
+body.otodor-light-page .cart__login-title,
+cart-drawer .cart-drawer .cart__login-title {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-md);
+  font-weight: 600;
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .cart__login-paragraph,
+cart-drawer .cart-drawer .cart__login-paragraph {
+  font-size: var(--otodor-text-sm);
+  color: var(--otodor-ink-soft);
+}
+
+/* ─────────────────────────────────────────────────────────
+   5. Phones — the cart is where a thumb has to work
+   ───────────────────────────────────────────────────────── */
+
+@media screen and (max-width: 749px) {
+  body.otodor-light-page .cart-item > td { padding-block: 0.8rem; }
+  body.otodor-light-page .title-wrapper-with-link .title--primary { font-size: var(--otodor-text-xl); }
+  body.otodor-light-page .cart__footer .cart__blocks { padding: 1rem; border-radius: var(--otodor-radius-md); }
+  body.otodor-light-page .cart__checkout-button,
+  cart-drawer .cart-drawer .cart__checkout-button { min-height: 50px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.otodor-light-page .cart__checkout-button,
+  cart-drawer .cart-drawer .cart__checkout-button { transition: none; }
+  body.otodor-light-page .cart__checkout-button:hover,
+  cart-drawer .cart-drawer .cart__checkout-button:hover { transform: none; }
+}

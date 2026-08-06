@@ -307,6 +307,7 @@
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {%- comment -%} OTODOR — Brand Design System (loaded after Dawn base so our tokens can override) {%- endcomment -%}
     {{ 'otodor-base.css' | asset_url | stylesheet_tag }}
+
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}
@@ -315,6 +316,19 @@
       {{ 'component-totals.css' | asset_url | stylesheet_tag }}
       {{ 'component-price.css' | asset_url | stylesheet_tag }}
       {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
+
+    {%- comment -%}
+      OTODOR cart dressing — only where there is a cart to dress: the cart
+      template, or any page carrying the drawer.
+
+      It must come AFTER Dawn's cart stylesheets above. It re-dresses Dawn's
+      own classes, and several of its rules tie with Dawn's on specificity —
+      `.cart-drawer .cart-item` exists in both — so source order is what
+      decides them. Loaded before, half of this file would silently lose.
+    {%- endcomment -%}
+    {%- if template.name == 'cart' or settings.cart_type == 'drawer' -%}
+      {{ 'otodor-cart.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
 
     {%- unless settings.type_body_font.system? -%}
@@ -359,7 +373,35 @@
     </script>
   </head>
 
-  <body class="gradient{% if template.name == 'collection' or template.name == 'product' or template.name == 'search' %} otodor-light-page{% endif %}{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+  {%- comment -%}
+    OTODOR light-page scope. The brand rhythm is light-first for anything
+    transactional, dark for the editorial surfaces (home, section anchors).
+    This used to stop at collection/product/search, which meant the funnel
+    went brand-less exactly where money changes hands: the cart, the account
+    and order pages, content pages and the 404 all fell back to stock Dawn on
+    a background the rest of the site had already moved away from.
+
+    `cart`/`customers` were additionally excluded from the dark body gradient
+    further down otodor-base.css, so they had neither treatment — a page in
+    between two designs. They are now on the light side, deliberately.
+  {%- endcomment -%}
+  {%- liquid
+    assign light_templates = 'collection,product,search,cart,page,404,list-collections,blog,article'
+    assign light_template_list = light_templates | split: ','
+    assign is_light_page = false
+    for name in light_template_list
+      if template.name == name
+        assign is_light_page = true
+        break
+      endif
+    endfor
+    # Customer templates report as `customers/login`, `customers/order` … so
+    # they are matched by prefix, not by equality.
+    if template.name contains 'customers'
+      assign is_light_page = true
+    endif
+  -%}
+  <body class="gradient{% if is_light_page %} otodor-light-page{% endif %}{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>
