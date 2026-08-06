@@ -67,110 +67,6 @@
         "aria_label": "Current offers"
       }
     },
-    "otodor_banner": {
-      "type": "otodor-banner",
-      "blocks": {
-        "slide_1": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/flagship1.png",
-            "focal_point": "center center",
-            "eyebrow": "",
-            "heading": "Security, redesigned.",
-            "text": "Smart locks engineered for modern Indian homes.",
-            "content_position": "bottom-center",
-            "text_color": "light",
-            "cta_primary_label": "Shop smart locks",
-            "cta_primary_link": "/collections/all",
-            "cta_secondary_label": "Book a free survey",
-            "cta_secondary_link": "/pages/contact#otodor-lead"
-          }
-        },
-        "slide_2": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/leave.png",
-            "focal_point": "center center",
-            "eyebrow": "",
-            "heading": "Every entry point. Protected.",
-            "text": "Doors, gates and access — one ecosystem, one app.",
-            "content_position": "bottom-center",
-            "text_color": "light",
-            "cta_primary_label": "Explore the range",
-            "cta_primary_link": "/collections/all",
-            "cta_secondary_label": "Talk to an expert",
-            "cta_secondary_link": "/pages/contact#otodor-lead"
-          }
-        },
-        "slide_3": {
-          "type": "slide",
-          "settings": {
-            "image": "shopify://shop_images/secure.png",
-            "focal_point": "center center",
-            "eyebrow": "",
-            "heading": "Installed. Not delivered.",
-            "text": "Certified technicians, a 3-year warranty, and real people on call.",
-            "content_position": "bottom-center",
-            "text_color": "light",
-            "cta_primary_label": "Book a home survey",
-            "cta_primary_link": "/pages/contact#otodor-lead",
-            "cta_secondary_label": "See the collection",
-            "cta_secondary_link": "/collections/digital-locks"
-          }
-        }
-      },
-      "block_order": [
-        "slide_1",
-        "slide_2",
-        "slide_3"
-      ],
-      "settings": {
-        "autoplay": true,
-        "interval": 6,
-        "fade_duration": 800,
-        "pause_on_hover": true,
-        "show_indicators": true,
-        "drift": false,
-        "width": "full",
-        "desktop_ratio": "12 / 5",
-        "mobile_ratio": "16 / 9",
-        "cap_height": true,
-        "scrim": 25,
-        "aria_label": "Featured"
-      }
-    },
-    "otodor_hero": {
-      "type": "otodor-hero",
-      "settings": {
-        "heading": "Security Reimagined",
-        "heading_accent": "Protected.",
-        "subheading": "Smart Security Solutions Built For Modern Living.",
-        "final_heading": "The Complete OTODOR Ecosystem",
-        "p1_image": "shopify://shop_images/zion_B_front_45.png",
-        "p1_title": "Smart Digital Lock",
-        "p1_feature": "Smart Access",
-        "p1_desc": "Next-generation digital door locks designed for wooden entries.",
-        "p1_link": "",
-        "p2_title": "Smart Gate Lock",
-        "p2_feature": "Perimeter Protection",
-        "p2_desc": "Heavy-duty weatherproof smart locks for your outer gates.",
-        "p2_link": "",
-        "p3_image": "shopify://shop_images/armour_front_2.png",
-        "p3_title": "Fingerprint Padlock",
-        "p3_feature": "Portable Security",
-        "p3_desc": "High-security biometric padlocks for versatile access control.",
-        "p3_link": "",
-        "p4_image": "shopify://shop_images/Sliding_gate_motor_45.png",
-        "p4_title": "Sliding Gate Motor",
-        "p4_feature": "Intelligent Automation",
-        "p4_desc": "Automate heavy sliding gates with powerful obstacle-sensing motors.",
-        "p4_link": "",
-        "cta_primary_label": "Explore Products",
-        "cta_primary_link": "",
-        "cta_secondary_label": "View Collections",
-        "cta_secondary_link": ""
-      }
-    },
     "otodor_categories": {
       "type": "otodor-categories",
       "blocks": {
@@ -686,8 +582,6 @@
   "order": [
     "otodor_vault_intro",
     "otodor_promo_strip",
-    "otodor_banner",
-    "otodor_hero",
     "otodor_categories",
     "otodor_moments",
     "otodor_trust_bar",
