@@ -61,11 +61,12 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 
 **Desktop Mega Menu (UI milestone, `snippets/header-mega-menu.liquid` + `assets/otodor-mega-menu.css`):** enterprise-grade, editorial. Full-width panel = category columns (level-2 collections → level-3 links, icon/description from `custom.menu_icon`/`menu_description`) **+ a featured panel that updates to the hovered/focused category** (image from `custom.menu_image` → collection image → first product image; cross-fades via opacity/translateY/scale, ~200ms) **+ a full-width "Get a Custom Quote" CTA**. Data = Shopify Navigation + collection metafields (single source of truth; no parallel menu). Minimal scoped inline JS only swaps the active featured panel (no AJAX). Open/ESC/keyboard stay with Dawn's `<header-menu>`. Mobile drawer untouched. Merchant-editable: Navigation (structure), Collections (image/description/url), `custom.menu_*` (icon/description/image), header settings (`mega_featured_label`, `mega_cta_*`).
 
-**Homepage order** (`index.json`), STEP 17 onward: `otodor_vault_intro → otodor_promo_strip →
+**Homepage order** (`index.json`), STEP 17 onward: `otodor_vault_intro → otodor_promo_strip → otodor_banner →
 otodor_categories → otodor_moments → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials →
-otodor_process → otodor_ecosystem → otodor_cta_banner`. **Both the pinned monolith hero and the banner
-slideshow have left the homepage** (STEP 17) — the hero is deleted, the banner now opens Digital Locks. The
-first visual on the homepage is the category bento.
+otodor_process → otodor_ecosystem → otodor_cta_banner`. **The pinned monolith hero is deleted** (STEP 17); the
+banner slideshow opens the page. It briefly left for Digital Locks and the user asked for it back, so there
+are now **two configurations of `otodor-banner`** — homepage (whole-range copy) and Digital Locks
+(category copy) — one section, no fork.
 
 **Digital Locks order** (`collection.digital-locks.json`): `hero → banner → selector → product-grid → …` — the
 slideshow sits above the sub-categories.
@@ -328,20 +329,21 @@ Audited the **live** site rather than the repo. Findings and fixes:
   logo fallbacks; both logos are sized by CSS (`height: auto` / `height: 72px`), so the attributes can only
   reserve space, never distort. Ratio from the official `brand-logo.png` (1800×420).
 
-### ✅ Done — STEP 17 (Hero retired · slideshow moves · complaint desk · the offer layer)
-Four user requests, three commits.
+### ✅ Done — STEP 17 (Hero retired · slideshow on both openers · complaint desk · the offer layer)
+Four user requests, five commits.
 
 **A — The monolith hero is gone, desktop and mobile.** `otodor_hero` dropped from `index.json`;
 `sections/otodor-hero.liquid` and `assets/otodor-hero.{css,js}` deleted. Nothing else referenced them
-(`otodor-animations.js` never touched the hero), so no motion code moved. **Note for the user:** with the
-banner also moved away, the homepage now opens on the promo strip → `otodor_categories` bento. There is no
-hero on the homepage at all — deliberate, but worth a decision (a static image-banner or a slimmer opener
-would fill it).
+(`otodor-animations.js` never touched the hero), so no motion code moved.
 
-**B — The banner slideshow is the Digital Locks opener.** `otodor-banner` moved out of `index.json` into
-`collection.digital-locks.json`, between the collection hero and the sub-category selector. Slide CTAs
-repointed at the category (a slide no longer linked to the page it sits on). Its LCP handling is unchanged —
-the first slide is still eager/high-priority, which is now correct for that page.
+**B — The banner slideshow opens Digital Locks — and the homepage again.** `otodor-banner` was moved out of
+`index.json` into `collection.digital-locks.json`, between the collection hero and the sub-category selector
+(slide CTAs repointed at the category, so a slide no longer links to the page it sits on). That left the
+homepage with no opener at all — hero deleted, banner gone — and the user asked for the slideshow back, so
+`index.json` carries **its own instance** directly under the promo strip. **Two configurations of one
+section**: homepage slides speak for the whole range (primary CTA → Digital Locks, not `/collections/all`),
+Digital Locks slides stay category-specific. LCP handling is unchanged on both — the first slide is still
+eager / high-priority, which is correct wherever the banner is the first thing on the page.
 
 **C — Raise a Complaint.** New **`otodor-complaint-form`** on the native `{% form 'contact' %}` (so complaints
 arrive at the store's notification email, no app, no backend): name/phone/email, order number,
