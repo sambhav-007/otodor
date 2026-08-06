@@ -331,6 +331,16 @@
       {{ 'otodor-cart.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
 
+    {%- comment -%}
+      OTODOR account dressing — the post-purchase pages, where the warranty
+      and installation promises get checked. Same cascade note as the cart:
+      Dawn loads customer.css per section, i.e. after this, so the rules are
+      anchored on `body.` to win on specificity rather than order.
+    {%- endcomment -%}
+    {%- if template.name contains 'customers' -%}
+      {{ 'otodor-account.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
+
     {%- unless settings.type_body_font.system? -%}
       {% comment %}theme-check-disable AssetPreload{% endcomment %}
       <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>

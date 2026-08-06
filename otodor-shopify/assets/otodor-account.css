@@ -1,0 +1,149 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   OTODOR — Customer account, order and address pages
+   ───────────────────────────────────────────────────────────────────────
+   Purpose      The pages a customer sees AFTER buying — login, register,
+                account, order detail, addresses, password reset. For a
+                company whose promise is installation and a 3-year warranty,
+                the order page is where that promise gets checked. It should
+                not be the one screen that looks like a different company.
+
+   EVOLVE, DON'T REWRITE. Dawn's customer sections keep their markup and
+   `customer.css` still does the layout work; this file only re-dresses the
+   result in OTODOR tokens.
+
+   Scope        `body.otodor-light-page .customer` — theme.liquid puts the
+                light-page class on every `customers/*` template. The `body.`
+                anchor wins ties against customer.css, which Dawn loads per
+                section (i.e. after this file in the cascade).
+   Depends on   otodor-base.css tokens only.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+body.otodor-light-page .customer {
+  color: var(--otodor-ink);
+}
+
+/* ─ Headings ─────────────────────────────────────────────── */
+
+body.otodor-light-page .customer h1,
+body.otodor-light-page .customer h2,
+body.otodor-light-page .customer__title {
+  font-family: var(--otodor-font-display);
+  font-weight: 700;
+  letter-spacing: var(--otodor-tracking-tight);
+  line-height: var(--otodor-leading-tight);
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .customer__title { font-size: var(--otodor-text-2xl); }
+
+body.otodor-light-page .customer h2 { font-size: var(--otodor-text-xl); }
+
+body.otodor-light-page .customer p,
+body.otodor-light-page .customer li,
+body.otodor-light-page .customer td,
+body.otodor-light-page .customer th {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  color: var(--otodor-ink);
+}
+
+body.otodor-light-page .customer a:not(.button) {
+  color: var(--otodor-accent-on-light);
+  text-underline-offset: 0.25em;
+}
+
+/* ─ Forms: login, register, reset, addresses ─────────────── */
+
+/* Dawn's customer forms use BARE elements — `<input>` inside `.field`, and a
+   plain `<button>`; there is no `.field__input` or `.button` class on these
+   pages the way there is elsewhere in the theme. Targeting the classes here
+   would be dead CSS. */
+body.otodor-light-page .customer .field input,
+body.otodor-light-page .customer .field select,
+body.otodor-light-page .customer .field textarea,
+body.otodor-light-page .customer input[type='text'],
+body.otodor-light-page .customer input[type='email'],
+body.otodor-light-page .customer input[type='password'],
+body.otodor-light-page .customer input[type='tel'] {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  color: var(--otodor-ink);
+  background: var(--otodor-bg-light-2);
+  border-radius: var(--otodor-radius-md);
+}
+
+body.otodor-light-page .customer .field input:focus-visible,
+body.otodor-light-page .customer .field select:focus-visible,
+body.otodor-light-page .customer .field textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--otodor-blue-glow);
+  border-color: var(--otodor-accent-on-light);
+}
+
+body.otodor-light-page .customer .field label,
+body.otodor-light-page .customer label {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  color: var(--otodor-ink-soft);
+}
+
+body.otodor-light-page .customer button,
+body.otodor-light-page .customer .button {
+  font-family: var(--otodor-font-display);
+  font-size: var(--otodor-text-sm);
+  font-weight: 600;
+  border-radius: var(--otodor-radius-pill);
+  min-height: 48px;
+  background: var(--otodor-accent-on-light);
+  color: #fff;
+}
+
+body.otodor-light-page .customer button::after,
+body.otodor-light-page .customer .button::after { box-shadow: none; }
+
+body.otodor-light-page .customer .form__message {
+  font-size: var(--otodor-text-sm);
+  color: var(--otodor-ink);
+}
+
+/* ─ Order history + order detail tables ──────────────────── */
+
+body.otodor-light-page .customer table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+body.otodor-light-page .customer table th {
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-xs);
+  font-weight: 600;
+  letter-spacing: var(--otodor-tracking-wider);
+  text-transform: uppercase;
+  color: var(--otodor-ink-faint);
+  border-bottom: 1px solid var(--otodor-hairline-light);
+}
+
+body.otodor-light-page .customer .order-history td,
+body.otodor-light-page .customer .order-details td {
+  border-bottom: 1px solid var(--otodor-hairline-light);
+}
+
+body.otodor-light-page .customer .order-history a,
+body.otodor-light-page .customer .order-details a {
+  font-weight: 600;
+}
+
+/* The account page's two columns: order history + the address card. */
+body.otodor-light-page .customer.account > div,
+body.otodor-light-page .customer.order > div {
+  max-width: var(--otodor-container-sm);
+  margin-inline: auto;
+}
+
+/* ─ Phones ───────────────────────────────────────────────── */
+
+@media screen and (max-width: 749px) {
+  body.otodor-light-page .customer__title { font-size: var(--otodor-text-xl); }
+  body.otodor-light-page .customer .button,
+  body.otodor-light-page .customer button:not(.field__button) { min-height: 46px; }
+}
