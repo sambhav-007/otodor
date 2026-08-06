@@ -292,6 +292,40 @@ Every product grid dropped to a **single full-width card below 599 px** — a lo
   exactly (278/278 then 258×4), no horizontal overflow; 768 px → 2/2/2; 1280 px → products 3/3, categories 4/3,
   title 20 / meta 14 / price 18. Desktop unchanged at every number.
 
+### ✅ Done — STEP 19 (The purchase funnel joins the brand)
+A site audit found the funnel going stock-Dawn exactly where money changes hands: `cart.json` is
+`cart-items → cart-footer`, and the cart drawer, cart items, cart footer and all seven `templates/customers/*`
+contained **zero** OTODOR references. Three commits.
+
+**A — Light-page scope + cart dressing.** `otodor-light-page` stopped at collection/product/search; cart,
+customer, page, 404, blog and list-collections fell through to stock Dawn on the dark body gradient. (The
+`:not(.template-cart):not(.template-customers)` guards in `otodor-base.css` meant to spare them are **dead
+selectors — nothing in the theme sets those classes**.) `theme.liquid` now derives the class from a template
+list, matching customer templates by prefix (`customers/login`, `customers/order`…). New
+**`assets/otodor-cart.css`** re-dresses Dawn's cart: line items as white cards, display face, pill quantity
+control, totals as a card, accent-pill checkout, and the same light surface for the **drawer** — which lives
+outside `<main>` and so was never reached by the light-page recolour.
+
+**B — Reassurance + empty state.** **`snippets/otodor-cart-reassurance.liquid`** (cart page + drawer) answers
+delivery / EMI / coupon from the **same offer settings** as the promo strip, popup and PDP panel, so the cart
+cannot contradict the page before it and the coupon line retires with the campaign. Installation and warranty
+claims are `main-cart-footer` settings. **`snippets/otodor-cart-empty.liquid`** replaces the single
+`/collections/all` link with up to four category routes read from **Navigation** (children of the first parent
+item → top level → render nothing).
+
+**C — Account pages.** **`assets/otodor-account.css`** for login/register/account/order/addresses/reset.
+
+- **Cascade rule for anything that re-dresses Dawn:** load the stylesheet **after** Dawn's, *and* anchor
+  selectors on `body.` / an element so ties are won on specificity. `main-cart-items.liquid` re-links Dawn's
+  cart CSS **in the body**, and Dawn loads `customer.css` per section — either would otherwise flip ties back.
+- **Dawn's customer forms use BARE elements** — a plain `<input>` inside `.field`, a plain `<button>`; there is
+  no `.field__input` / `.button` there. The first draft targeted those classes and was entirely dead CSS. The
+  harness caught it.
+- **Verified** in a browser against the real Dawn stylesheets (with Dawn's cart CSS deliberately re-linked in
+  the body to reproduce the cascade): every rule lands, checkout pill 52/50 px, drawer surface + overlay,
+  44 px copy button and route pills, reassurance renders *after* the CTAs, the delegated copy handler fires,
+  and no horizontal overflow at 375 or 1280.
+
 ### ✅ Done — STEP 18 (Core Technology bento: two-up on phones)
 `otodor-features` collapsed to **one column below 599 px** — six full-width bars and no hierarchy, the same
 defect STEP 14 fixed for the product grids. Now **two-up**, with the `large` tile keeping the full row (it
@@ -419,6 +453,24 @@ collections/tags, free-delivery and GST wording, EMI tenure + note), read by thr
 3. Confirm the **contact/notification email** (Settings → Notifications) — complaints land there.
 4. Optional: set `custom.effective_price` / `custom.deal_price` on products to retire the price seed, and type
    a **campaign end date** if the sale should switch itself off.
+
+### Site audit — what is still unfinished (STEP 19 findings, ranked)
+Evidence-based, from the repo rather than memory. Funnel branding (#1) is **done** above; the rest stand:
+1. ~~The funnel goes stock at the cart~~ — **done, STEP 19.**
+2. **No trust/policy layer.** No shipping, returns, warranty-terms, privacy or T&C templates exist, while
+   every page claims a 3-year warranty and free installation. Some payment providers require policy pages.
+   A warranty-registration flow would turn a post-sale obligation into a data asset.
+3. **Nothing is measured.** No `gtag` / `dataLayer` / `fbq` / pixel anywhere. The campaign, coupon popup,
+   WhatsApp clicks, lead and complaint submissions are all uninstrumented — the Independence Day sale cannot
+   be judged. Mostly Shopify admin (Customer Events); the theme's part is an event layer on the new CTAs.
+4. **Mobile navigation never got the mega-menu treatment.** `snippets/header-drawer.liquid` has **one** OTODOR
+   reference against an enterprise-grade desktop mega menu, on what is likely the majority of traffic.
+5. **Performance.** `three.module.js` (1.24 MB) is fine — dynamically imported, homepage-only, session-once,
+   reduced-motion aware. The real sitewide cost is **GSAP + ScrollTrigger (116 KB) loading unconditionally on
+   every page**, cart and account included, plus every section inlining its full CSS.
+6. **Reviews / social proof** are hardcoded testimonials; no review app, no `AggregateRating` from real data.
+7. India-specific commerce polish: pincode serviceability + delivery ETA on the PDP, an EMI breakdown to back
+   the "EMI from ₹X" claim, Hindi locale (the schema already advertises `availableLanguage: [en, hi]`).
 
 ### Remaining roadmap
 - **Product-ownership schema** (deferred) — take when real prices + `specs.*` exist (see above).
