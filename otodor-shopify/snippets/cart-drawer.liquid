@@ -46,6 +46,9 @@
                 {{ 'general.continue_shopping' | t }}
               </a>
 
+              {%- comment -%} OTODOR: category routes from Navigation, not one blanket link. {%- endcomment -%}
+              {%- render 'otodor-cart-empty', menu: 'main-menu', limit: 4 -%}
+
               {%- if shop.customer_accounts_enabled and customer == null -%}
                 <p class="cart__login-title h3">{{ 'sections.cart.login.title' | t }}</p>
                 <p class="cart__login-paragraph">
@@ -575,6 +578,12 @@
             {{ 'sections.cart.checkout' | t }}
           </button>
         </div>
+
+        {%- comment -%}
+          OTODOR: the same delivery / EMI / coupon reassurance the cart page
+          carries, in its compact form. Self-hides with nothing to say.
+        {%- endcomment -%}
+        {%- render 'otodor-cart-reassurance', context: 'drawer' -%}
       </div>
     </div>
   </div>

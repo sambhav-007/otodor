@@ -1,0 +1,57 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Empty cart routes
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Turn the empty cart from a dead end into a way back
+                      into the range. Dawn offers one "Continue shopping"
+                      link to /collections/all — a shopper who has not yet
+                      chosen a door type learns nothing from that.
+  Primary source:     Shopify Navigation. Reads a link list and offers its
+                      top-level items (or the children of the item that has
+                      them, which is where a Products → Digital Locks → …
+                      menu keeps the useful routes).
+  Fallback order:     children of the first parent item → top-level items →
+                      render nothing (Dawn's own button still stands).
+  Visibility rule:    Renders nothing when the menu is missing or empty, so
+                      the empty cart is never worse than Dawn's.
+  Merchant editable:  YES — entirely, by editing the menu in Navigation.
+                      No parallel menu system, per the nav architecture rule.
+  Dependencies:       otodor-cart.css for styling.
+
+  Params:
+    menu    link list handle (default `main-menu`)
+    limit   maximum routes to show (default 4)
+    title   optional heading above the routes
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign menu_handle = menu | default: 'main-menu'
+  assign route_limit = limit | default: 4
+  assign menu_object = linklists[menu_handle]
+
+  # Prefer the children of the first item that has any: on this store that is
+  # "Products", whose children are the categories worth offering here.
+  assign routes = menu_object.links
+  for link in menu_object.links
+    if link.links.size > 0
+      assign routes = link.links
+      break
+    endif
+  endfor
+-%}
+
+{%- if routes.size > 0 -%}
+  <div class="otodor-cart-empty-routes">
+    {%- if title != blank -%}
+      <p class="otodor-cart-empty-routes__title">{{ title | escape }}</p>
+    {%- endif -%}
+    <ul class="otodor-cart-empty-routes__list" role="list">
+      {%- for link in routes limit: route_limit -%}
+        <li>
+          <a class="otodor-cart-empty-routes__link" href="{{ link.url }}">{{ link.title | escape }}</a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

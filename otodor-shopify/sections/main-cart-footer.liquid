@@ -124,6 +124,16 @@
                   {{ content_for_additional_checkout_buttons }}
                 </div>
               {%- endif -%}
+
+              {%- comment -%}
+                OTODOR: delivery, EMI and the running coupon, read from the
+                offer settings so the cart never contradicts the page the
+                shopper just left. Self-hides with nothing to say.
+              {%- endcomment -%}
+              {%- render 'otodor-cart-reassurance',
+                context: 'page',
+                install_label: section.settings.otodor_install_label,
+                warranty_label: section.settings.otodor_warranty_label -%}
           {%- endcase -%}
         {% endfor %}
 
@@ -143,6 +153,26 @@
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "OTODOR reassurance"
+    },
+    {
+      "type": "paragraph",
+      "content": "Shown under the checkout button. Delivery, EMI and the running coupon come from Theme settings → OTODOR Offers, Pricing & EMI. Clear a field below to drop that line."
+    },
+    {
+      "type": "text",
+      "id": "otodor_install_label",
+      "label": "Installation claim",
+      "default": "Free professional installation, PAN-India"
+    },
+    {
+      "type": "text",
+      "id": "otodor_warranty_label",
+      "label": "Warranty claim",
+      "default": "3-year lock warranty · 1-year battery"
     },
     {
       "type": "header",

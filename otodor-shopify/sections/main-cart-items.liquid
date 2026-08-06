@@ -40,6 +40,12 @@
         {{ 'general.continue_shopping' | t }}
       </a>
 
+      {%- comment -%}
+        OTODOR: an empty cart is a shopper who has not chosen a door type yet.
+        Offer the categories from Navigation instead of only /collections/all.
+      {%- endcomment -%}
+      {%- render 'otodor-cart-empty', menu: 'main-menu', limit: 4, title: 'Or start with a category' -%}
+
       {%- if shop.customer_accounts_enabled and customer == null -%}
         <h2 class="cart__login-title">{{ 'sections.cart.login.title' | t }}</h2>
         <p class="cart__login-paragraph">

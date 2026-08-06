@@ -1,0 +1,138 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Cart reassurance  (the last thing read before checkout)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Answer, next to the checkout button, the three questions
+                      that stall an Indian cart: what does delivery cost, can I
+                      pay monthly, and is there a code I am about to miss.
+                      Plus the two promises the whole site makes — free
+                      professional installation and the 3-year warranty.
+  Primary source:     Theme settings → OTODOR Offers, Pricing & EMI. Same
+                      values as the promo strip, the offer popup and the
+                      product offer panel, so the cart cannot contradict the
+                      page the shopper just came from.
+  Fallback order:     Every line is independent: a setting blank or switched
+                      off drops that line. All of them off → the block renders
+                      nothing at all.
+  Visibility rule:    Hides on an empty cart (there is nothing to reassure),
+                      and hides entirely when it has no lines to show.
+  Merchant editable:  YES — the offer settings, plus the two claim strings
+                      passed in by the caller.
+  Required metafields: none.
+  Dependencies:       otodor-campaign-live, otodor-rupees, otodor-icon;
+                      otodor-cart.css for styling; assets/otodor-offer.js for
+                      the copy button (progressive enhancement — without it
+                      the code is still selectable text).
+
+  Params:
+    context           'page' | 'drawer' — the drawer version drops the
+                      installation/warranty lines to stay compact.
+    install_label     override for the installation claim
+    warranty_label    override for the warranty claim
+
+  THE COUPON LINE IS NOT A SECOND SOURCE OF TRUTH. It shows only while the
+  campaign window is open, and it quotes the code and value from settings —
+  so ending the sale removes it from the cart at the same moment it disappears
+  from every other surface.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- capture campaign_live -%}
+  {%- render 'otodor-campaign-live' -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign campaign_live = campaign_live | strip
+  assign is_drawer = false
+  if context == 'drawer'
+    assign is_drawer = true
+  endif
+
+  assign coupon_code = settings.otodor_coupon_code
+  assign coupon_amount = settings.otodor_coupon_amount | plus: 0
+  assign show_coupon = false
+  if campaign_live == '1' and coupon_code != blank and coupon_amount > 0
+    assign show_coupon = true
+  endif
+
+  assign show_delivery = false
+  if settings.otodor_offer_enabled and settings.otodor_free_delivery and settings.otodor_free_delivery_label != blank
+    assign show_delivery = true
+  endif
+
+  assign show_emi = false
+  if settings.otodor_offer_enabled and settings.otodor_emi_enabled
+    assign show_emi = true
+  endif
+
+  assign show_install = false
+  assign show_warranty = false
+  unless is_drawer
+    if install_label != blank
+      assign show_install = true
+    endif
+    if warranty_label != blank
+      assign show_warranty = true
+    endif
+  endunless
+
+  assign has_anything = false
+  if show_coupon or show_delivery or show_emi or show_install or show_warranty
+    assign has_anything = true
+  endif
+-%}
+
+{%- if has_anything and cart != empty -%}
+  <div class="otodor-cart-reassure{% if is_drawer %} otodor-cart-reassure--drawer{% endif %}">
+    {%- if show_coupon -%}
+      <div class="otodor-cart-reassure__coupon">
+        <span class="otodor-cart-reassure__coupon-text">
+          {%- if settings.otodor_campaign_name != blank -%}
+            <strong>{{ settings.otodor_campaign_name | escape }}</strong> —
+          {%- endif -%}
+          ₹{% render 'otodor-rupees', amount: coupon_amount %} off with
+          <span class="otodor-cart-reassure__code">{{ coupon_code | escape }}</span>
+          {%- if settings.otodor_coupon_scope_label != blank %} ({{ settings.otodor_coupon_scope_label | escape }}){% endif -%}
+          . Apply it at checkout.
+        </span>
+        <button
+          type="button"
+          class="otodor-cart-reassure__copy"
+          data-otodor-copy="{{ coupon_code | escape }}"
+          data-copied-label="Copied"
+        >
+          Copy
+        </button>
+      </div>
+    {%- endif -%}
+
+    {%- if show_delivery or show_emi or show_install or show_warranty -%}
+      <ul class="otodor-cart-reassure__list" role="list">
+        {%- if show_delivery -%}
+          <li class="otodor-cart-reassure__item">
+            <span aria-hidden="true">{% render 'otodor-icon', name: 'installation' %}</span>
+            {{ settings.otodor_free_delivery_label | escape }}
+          </li>
+        {%- endif -%}
+        {%- if show_emi -%}
+          <li class="otodor-cart-reassure__item">
+            <span aria-hidden="true">{% render 'otodor-icon', name: 'log' %}</span>
+            {{ settings.otodor_emi_note | default: 'EMI options available' | escape }}
+          </li>
+        {%- endif -%}
+        {%- if show_install -%}
+          <li class="otodor-cart-reassure__item">
+            <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+            {{ install_label | escape }}
+          </li>
+        {%- endif -%}
+        {%- if show_warranty -%}
+          <li class="otodor-cart-reassure__item">
+            <span aria-hidden="true">{% render 'otodor-icon', name: 'warranty' %}</span>
+            {{ warranty_label | escape }}
+          </li>
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+  </div>
+{%- endif -%}
