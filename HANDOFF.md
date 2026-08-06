@@ -292,6 +292,24 @@ Every product grid dropped to a **single full-width card below 599 px** — a lo
   exactly (278/278 then 258×4), no horizontal overflow; 768 px → 2/2/2; 1280 px → products 3/3, categories 4/3,
   title 20 / meta 14 / price 18. Desktop unchanged at every number.
 
+### ✅ Done — STEP 18 (Core Technology bento: two-up on phones)
+`otodor-features` collapsed to **one column below 599 px** — six full-width bars and no hierarchy, the same
+defect STEP 14 fixed for the product grids. Now **two-up**, with the `large` tile keeping the full row (it
+carries the product render) and `wide`/`small` both becoming single-column tiles. The tile is **rebuilt for
+~164 px**: padding 17.5 → 11.25 px, icon 40 → 32 px, title up one rung (17.6 px) over a 12.75 px description,
+title clamped at 2 lines and description at **4** — four because a grid row is already as tall as its tallest
+tile, so the pair stays level either way and cutting the sentence buys nothing. Motifs (phone mock, keypad,
+audit rows, signal, RFID) are scaled down, dropped to the bottom of the tile and taken to 0.34 opacity so they
+sit under the copy instead of behind the middle of it.
+- **Measured** against the real `otodor-base.css` at the 12.5 px root: 320 → two-up at 137 px; 375 → two-up at
+  164 px, rows pairing exactly (150/190/170), no horizontal overflow; 596 → the block engages; 768 / 1280
+  unchanged (4 cols, large 2×2, 25 px padding, no clamps). A long-title + long-blurb stress case left its row
+  level and clipped nothing.
+- **Two harness traps, worth remembering:** the harness must inject Dawn's `box-sizing: border-box` reset (it
+  lives in `base.css`, not `otodor-base.css`) or every height reads padding-inflated; and a 400 ms opacity
+  transition **freezes in a non-painting pane**, which looks exactly like a mobile rule leaking into desktop
+  until you disable the transition.
+
 ### ✅ Done — STEP 15 (Gate Automation + Other Solutions landings)
 Read the **live** navigation (`otodorlocks.com`) rather than assume the structure. Two of the four top-level
 items had no working landing:
