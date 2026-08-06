@@ -231,52 +231,6 @@
         "heading_accent": "category."
       }
     },
-    "otodor_moments": {
-      "type": "otodor-moments",
-      "blocks": {
-        "moment_leave": {
-          "type": "moment",
-          "settings": {
-            "word": "Leave",
-            "line": "Walk out. It locks behind you.",
-            "image": "shopify://shop_images/leave.png"
-          }
-        },
-        "moment_arrive": {
-          "type": "moment",
-          "settings": {
-            "word": "Arrive",
-            "line": "Hands full. The door already knows.",
-            "image": "shopify://shop_images/arrive.png"
-          }
-        },
-        "moment_welcome": {
-          "type": "moment",
-          "settings": {
-            "word": "Welcome",
-            "line": "Guest access, granted from anywhere.",
-            "image": "shopify://shop_images/welcome.png"
-          }
-        },
-        "moment_secure": {
-          "type": "moment",
-          "settings": {
-            "word": "Secure",
-            "line": "One glance. Everything is locked.",
-            "image": "shopify://shop_images/secure.png"
-          }
-        }
-      },
-      "block_order": [
-        "moment_leave",
-        "moment_arrive",
-        "moment_welcome",
-        "moment_secure"
-      ],
-      "settings": {
-        "opener": "Security that adapts to modern living."
-      }
-    },
     "otodor_trust_bar": {
       "type": "otodor-trust-bar",
       "blocks": {
@@ -667,7 +621,6 @@
     "otodor_promo_strip",
     "otodor_banner",
     "otodor_categories",
-    "otodor_moments",
     "otodor_trust_bar",
     "otodor_features",
     "otodor_why",
