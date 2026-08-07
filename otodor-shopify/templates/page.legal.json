@@ -1,0 +1,92 @@
+/*
+ * ------------------------------------------------------------
+ * OTODOR legal / policy page — the reusable template for the
+ * documents Shopify has NO native policy type for:
+ *
+ *   Warranty Terms · Installation Policy · Service Terms ·
+ *   Cancellation Policy · anything else the merchant must state
+ *
+ * Shopify's own policies (Refund, Privacy, Terms of Service,
+ * Shipping, Contact information) are written in Settings →
+ * Policies and live at /policies/*. They are NOT pages and do
+ * not use this template — they are styled by otodor-legal.css.
+ * Do not duplicate them here; two copies of a legal document is
+ * a liability, not a convenience.
+ *
+ * Composition:
+ *   main      → the page body (the document itself, as rich text)
+ *   questions → the three or four things support is asked about it
+ *   cta       → a way to act on it rather than re-read it
+ *
+ * Both trailing sections auto-hide when empty, so a bare document
+ * page is a valid use of this template.
+ *
+ * ADMIN: create the Page, paste the document, assign this
+ * template (Online Store → Pages → … → Theme template: legal),
+ * then add it to the footer menu.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 36,
+        "padding_bottom": 28
+      }
+    },
+    "questions": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "How do I make a claim under this?",
+            "row_content": "<p>Raise it from the <a href=\"/pages/complaint\">complaint desk</a> with your order number and model — or send the same details on WhatsApp. Our service team acknowledges every request within one business day.</p>"
+          }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What do I need to have ready?",
+            "row_content": "<p>Your order number (or the phone number you purchased with), the model name, the installation date, and photos or a short video if the issue is physical.</p>"
+          }
+        },
+        "q3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Who do I talk to if something here is unclear?",
+            "row_content": "<p>Ask us before you buy, not after. A specialist will walk you through it — <a href=\"/pages/contact#otodor-lead\">talk to a specialist</a>.</p>"
+          }
+        }
+      },
+      "block_order": ["q1", "q2", "q3"],
+      "settings": {
+        "heading": "Questions about this document",
+        "heading_alignment": "left",
+        "emit_faq_schema": false,
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Still need a",
+        "heading_accent": "person?",
+        "description": "Policies answer the general case. For yours, talk to the team that installs and services the product.",
+        "cta_primary_label": "Talk to a specialist",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Raise a complaint",
+        "cta_secondary_link": "/pages/complaint"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "questions",
+    "cta"
+  ]
+}

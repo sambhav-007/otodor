@@ -1,11 +1,27 @@
 {%- comment -%}
   ════════════════════════════════════════════════════════════════════════
-  OTODOR Module: Complaint Form  (post-sale service / grievance intake)
+  OTODOR Module: Service Form  (post-sale intake — complaint OR registration)
   ────────────────────────────────────────────────────────────────────────
-  Purpose:            Give an existing customer one place to raise a service
-                      complaint and have it reach a human — by native email
+  Purpose:            Give an existing customer one place to reach a human
+                      about a product they already own — by native email
                       (Shopify `contact` form) or instantly on WhatsApp with
                       the same details already typed into the message.
+
+  TWO JOBS, ONE SECTION. The file is still named `otodor-complaint-form`
+  (renaming it would break the templates that reference the type), but it
+  serves both post-sale intakes, because they differ only in which fields
+  are asked for:
+
+    Complaint     issue blocks present, serial label blank
+                  → `page.complaint`, Request type "Complaint"
+    Registration  issue blocks absent (the select drops itself), serial
+                  label set and required
+                  → `page.warranty-registration`, Request type
+                    "Warranty registration"
+
+  The hidden `Request type` field is what separates them in the merchant's
+  inbox. Duplicating 300 lines to change three labels would have been the
+  more expensive mistake.
   Primary source:     Section settings + `issue` / `model` / `promise` blocks.
                       A complaint desk is config-driven, not metafield-driven.
   Fallback order:     issue blocks   → free-text description only;
@@ -365,6 +381,27 @@
             </div>
           </div>
 
+          {%- comment -%}
+            Serial number: blank label = no field. A complaint rarely needs it;
+            a warranty registration is worthless without it, which is the whole
+            difference between this form's two jobs.
+          {%- endcomment -%}
+          {%- if section.settings.label_serial != blank -%}
+            <div class="otodor-cmp__field">
+              <label class="otodor-cmp__label" for="otodor-cmp-serial-{{ section.id }}">
+                {{ section.settings.label_serial | escape }}
+                {%- if section.settings.serial_required %} <span class="req" aria-hidden="true">*</span>{% endif -%}
+              </label>
+              <input class="otodor-cmp__input" type="text" id="otodor-cmp-serial-{{ section.id }}" name="contact[Serial number]"
+                inputmode="text" autocapitalize="characters" spellcheck="false"
+                {% if section.settings.serial_required %}required aria-required="true"{% endif %}
+                placeholder="{{ section.settings.serial_placeholder | escape }}">
+              {%- if section.settings.serial_hint != blank -%}
+                <span class="otodor-cmp__hint">{{ section.settings.serial_hint | escape }}</span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
           <div class="otodor-cmp__field">
             <label class="otodor-cmp__label" for="otodor-cmp-product-{{ section.id }}">{{ section.settings.label_product | escape }}</label>
             {%- if model_blocks.size > 0 -%}
@@ -448,6 +485,7 @@
                 data-l-phone="{{ section.settings.label_phone | escape }}"
                 data-l-email="{{ section.settings.label_email | escape }}"
                 data-l-order="{{ section.settings.label_order | escape }}"
+                data-l-serial="{{ section.settings.label_serial | escape }}"
                 data-l-date="{{ section.settings.label_date | escape }}"
                 data-l-product="{{ section.settings.label_product | escape }}"
                 data-l-issue="{{ section.settings.label_issue | escape }}"
@@ -486,6 +524,7 @@
       ['data-l-phone', 'contact[Phone]'],
       ['data-l-email', 'contact[email]'],
       ['data-l-order', 'contact[Order number]'],
+      ['data-l-serial', 'contact[Serial number]'],
       ['data-l-date', 'contact[Purchase date]'],
       ['data-l-product', 'contact[Product]'],
       ['data-l-issue', 'contact[Issue]'],
@@ -523,7 +562,7 @@
 
 {% schema %}
 {
-  "name": "OTODOR Complaint Form",
+  "name": "OTODOR Service Form",
   "tag": "section",
   "class": "shopify-section otodor-section",
   "settings": [
@@ -549,6 +588,10 @@
     { "type": "text", "id": "label_email", "label": "Email label", "default": "Email" },
     { "type": "text", "id": "label_order", "label": "Order number label", "default": "Order number (optional)" },
     { "type": "text", "id": "order_placeholder", "label": "Order number placeholder", "default": "e.g. #1042" },
+    { "type": "text", "id": "label_serial", "label": "Serial number label", "info": "Leave blank to hide the field. Required for warranty registration; usually unnecessary for a complaint." },
+    { "type": "checkbox", "id": "serial_required", "label": "Serial number is required", "default": false },
+    { "type": "text", "id": "serial_placeholder", "label": "Serial number placeholder", "default": "e.g. OTD-ZL-0042173" },
+    { "type": "text", "id": "serial_hint", "label": "Serial number hint", "default": "Printed on the inside panel and on the box label." },
     { "type": "text", "id": "label_date", "label": "Purchase / installation date label", "default": "Purchase or installation date" },
     { "type": "text", "id": "label_product", "label": "Product label", "default": "Which product?" },
     { "type": "text", "id": "product_placeholder", "label": "Product placeholder", "default": "Select your model" },

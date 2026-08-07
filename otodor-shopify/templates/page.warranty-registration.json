@@ -1,0 +1,177 @@
+/*
+ * ------------------------------------------------------------
+ * OTODOR warranty registration.
+ *
+ * The 3-year warranty is claimed on every page of this site. It
+ * was, until now, a promise with no record behind it: nothing
+ * captured WHICH lock a customer owns, WHEN it was installed, or
+ * HOW to reach them about it. This page turns the obligation into
+ * data the merchant owns — serial number, model, install date,
+ * installer — arriving at the store's contact email like every
+ * other lead, with no app and no backend.
+ *
+ * It reuses `otodor-complaint-form` (see the doc block in that
+ * section): registration is the same intake with the issue
+ * categories dropped and the serial number required.
+ *
+ * ADMIN: create a Page titled "Warranty Registration"
+ * (handle `warranty-registration`), assign this template, and
+ * link it from the footer and the order-confirmation email.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 36,
+        "padding_bottom": 12
+      }
+    },
+    "registration": {
+      "type": "otodor-complaint-form",
+      "blocks": {
+        "p-cover": {
+          "type": "promise",
+          "settings": {
+            "icon": "warranty",
+            "title": "3 years on the lock, 1 on the battery",
+            "text": "Registering fixes your cover to a date we can both see."
+          }
+        },
+        "p-faster": {
+          "type": "promise",
+          "settings": {
+            "icon": "log",
+            "title": "Faster service, later",
+            "text": "A registered serial means no hunting for an invoice when something needs attention."
+          }
+        },
+        "p-recall": {
+          "type": "promise",
+          "settings": {
+            "icon": "smart",
+            "title": "We can reach you",
+            "text": "Firmware updates and safety notices go to registered owners first."
+          }
+        },
+        "m-sentry": { "type": "model", "settings": { "label": "SENTRY" } },
+        "m-nexus": { "type": "model", "settings": { "label": "NEXUS" } },
+        "m-onyx": { "type": "model", "settings": { "label": "ONYX" } },
+        "m-zion": { "type": "model", "settings": { "label": "ZION+" } },
+        "m-zeal": { "type": "model", "settings": { "label": "ZEAL" } },
+        "m-gate": { "type": "model", "settings": { "label": "Gate motor / gate lock" } },
+        "m-padlock": { "type": "model", "settings": { "label": "Smart padlock" } }
+      },
+      "block_order": [
+        "p-cover",
+        "p-faster",
+        "p-recall",
+        "m-sentry",
+        "m-nexus",
+        "m-onyx",
+        "m-zion",
+        "m-zeal",
+        "m-gate",
+        "m-padlock"
+      ],
+      "settings": {
+        "anchor_id": "otodor-warranty",
+        "color_scheme": "light",
+        "request_type": "Warranty registration",
+        "eyebrow": "Ownership",
+        "heading": "Register your",
+        "heading_accent": "warranty.",
+        "subheading": "Two minutes now saves the invoice hunt later. Register the lock you own and your cover is on record from the day it was installed.",
+        "channels_label": "Or register over the phone",
+        "support_phone": "+91 72068 95607",
+        "support_email": "",
+        "label_order": "Order or invoice number",
+        "order_placeholder": "e.g. #1042",
+        "label_serial": "Serial number",
+        "serial_required": true,
+        "serial_placeholder": "e.g. OTD-ZL-0042173",
+        "serial_hint": "Printed on the inside panel and on the box label.",
+        "label_date": "Installation date",
+        "label_product": "Which model do you own?",
+        "product_placeholder": "Select your model",
+        "product_other": "Other / not listed",
+        "label_message": "Anything we should note?",
+        "message_placeholder": "Installer name, address area, or anything unusual about the fit…",
+        "message_hint": "",
+        "submit_label": "Register my warranty",
+        "form_note": "We confirm every registration by email within one business day.",
+        "show_preferred": false,
+        "show_consent": true,
+        "consent_text": "I agree to be contacted by OTODOR about this product, including safety and firmware notices.",
+        "show_whatsapp": true,
+        "whatsapp_label": "Register on WhatsApp",
+        "whatsapp_message": "Hello OTODOR, I would like to register my warranty.",
+        "success_title": "Warranty registered.",
+        "success_text": "Thank you — your cover is on record. We'll email a confirmation within one business day.",
+        "padding_top": 64
+      }
+    },
+    "questions": {
+      "type": "collapsible-content",
+      "blocks": {
+        "q1": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Do I have to register to be covered?",
+            "row_content": "<p>No. Your warranty starts at purchase whether or not you register. Registering simply means we can find your cover without an invoice, and can reach you about safety or firmware notices.</p>"
+          }
+        },
+        "q2": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Where do I find the serial number?",
+            "row_content": "<p>On the inside panel of the lock and on the original box label. If the lock is already fitted and you can't see it, send us the order number instead and we'll match it.</p>"
+          }
+        },
+        "q3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What does the warranty cover?",
+            "row_content": "<p>3 years on the lock and 1 year on the battery, against manufacturing faults. Physical damage, tampering and unauthorised repairs are not covered. The full terms are on the Warranty Terms page.</p>"
+          }
+        },
+        "q4": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Something is already wrong. What now?",
+            "row_content": "<p>Register it here if you haven't, then <a href=\"/pages/complaint\">raise a complaint</a> — or send the details straight to us on WhatsApp and a service engineer will pick it up.</p>"
+          }
+        }
+      },
+      "block_order": ["q1", "q2", "q3", "q4"],
+      "settings": {
+        "heading": "About your cover",
+        "heading_alignment": "center",
+        "emit_faq_schema": true,
+        "layout": "row",
+        "color_scheme": "scheme-1",
+        "container_color_scheme": "scheme-2"
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Something not right",
+        "heading_accent": "with it?",
+        "description": "Registration is for the good days. If the lock needs attention, our service team answers every complaint within one business day.",
+        "cta_primary_label": "Raise a complaint",
+        "cta_primary_link": "/pages/complaint",
+        "cta_secondary_label": "Talk to a specialist",
+        "cta_secondary_link": "/pages/contact#otodor-lead"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "registration",
+    "questions",
+    "cta"
+  ]
+}
