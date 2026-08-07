@@ -292,6 +292,35 @@ Every product grid dropped to a **single full-width card below 599 px** — a lo
   exactly (278/278 then 258×4), no horizontal overflow; 768 px → 2/2/2; 1280 px → products 3/3, categories 4/3,
   title 20 / meta 14 / price 18. Desktop unchanged at every number.
 
+### ✅ Done — STEP 20 (Trust & policy: documents behind the promises)
+Every page claims a 3-year warranty and free professional installation; nothing stated the terms.
+
+**A — Native policies were invisible work.** Shopify generates `/policies/*` itself — a fixed
+`.shopify-policy__container / __title / __body` the theme never renders, **only styles**. There were **no rules
+for those class names at all**, and `request.page_type == 'policy'` was outside the light-page scope, so a
+policy rendered as raw text on the dark gradient. **`assets/otodor-legal.css`** styles the prose (display-face
+headings with space above, hairlines, accent links, uppercase caption treatment for a warranty matrix,
+bordered blockquote); `theme.liquid` adds policy pages to the light scope and serves the file there and on
+`template.suffix == 'legal'`. The OTODOR footer **already** loops `shop.policies`, so links appear the moment
+the merchant writes them.
+
+**B — `templates/page.legal.json`** — the reusable template for what Shopify has **no policy type for**
+(Warranty Terms, Installation Policy, Service Terms): page body → questions → CTA, trailing sections auto-hide.
+**Shopify's own five policies deliberately do NOT use it** — two copies of a legal document is a liability.
+
+**C — `templates/page.warranty-registration.json`** — turns the loudest promise into owned data (serial, model,
+install date). It **reuses `otodor-complaint-form`** rather than forking: registration is the same intake minus
+issue categories plus a serial number, so the section gained **one optional field** (blank label = no field)
+and its schema name widened to **"OTODOR Service Form"**. The file name stays `otodor-complaint-form` (renaming
+the type would break templates). The hidden `Request type` line separates the two in the inbox.
+
+- **Reading measure:** capped at **62ch, not 70ch** — `ch` is the width of the *zero* glyph, wider than Inter's
+  average letter, so 70ch measured out at ~82 characters. 62ch lands at **74 characters**, verified.
+- **Verified** against Shopify's real policy markup: every rule lands, no overflow at 375 or 1280.
+- **Admin, in order:** write the five native policies (Settings → Policies — they appear in the footer
+  automatically); create Pages for Warranty Terms / Installation Policy on the **`legal`** template; create the
+  Warranty Registration page on its template and link it from the order-confirmation email.
+
 ### ✅ Done — STEP 19 (The purchase funnel joins the brand)
 A site audit found the funnel going stock-Dawn exactly where money changes hands: `cart.json` is
 `cart-items → cart-footer`, and the cart drawer, cart items, cart footer and all seven `templates/customers/*`
@@ -457,9 +486,8 @@ collections/tags, free-delivery and GST wording, EMI tenure + note), read by thr
 ### Site audit — what is still unfinished (STEP 19 findings, ranked)
 Evidence-based, from the repo rather than memory. Funnel branding (#1) is **done** above; the rest stand:
 1. ~~The funnel goes stock at the cart~~ — **done, STEP 19.**
-2. **No trust/policy layer.** No shipping, returns, warranty-terms, privacy or T&C templates exist, while
-   every page claims a 3-year warranty and free installation. Some payment providers require policy pages.
-   A warranty-registration flow would turn a post-sale obligation into a data asset.
+2. ~~No trust/policy layer~~ — **done, STEP 20.** The theme side is complete (policy styling, `page.legal`,
+   warranty registration); **writing the five native policies is admin work and still outstanding.**
 3. **Nothing is measured.** No `gtag` / `dataLayer` / `fbq` / pixel anywhere. The campaign, coupon popup,
    WhatsApp clicks, lead and complaint submissions are all uninstrumented — the Independence Day sale cannot
    be judged. Mostly Shopify admin (Customer Events); the theme's part is an event layer on the new CTAs.
