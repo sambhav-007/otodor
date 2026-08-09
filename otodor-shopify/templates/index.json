@@ -175,7 +175,8 @@
             "tagline": "Weatherproof robust security for metal gate entrances.",
             "grid_size": "small",
             "badge_text": "",
-            "badge_color": "blue"
+            "badge_color": "glass",
+            "image": "shopify://shop_images/metal_gate_lock.jpg"
           }
         },
         "cat_3": {
@@ -403,40 +404,50 @@
         "reel_1": {
           "type": "reel",
           "settings": {
+            "video_url": "",
             "cover": "shopify://shop_images/onyx_keypad.png",
             "product": "onyx",
+            "link": "",
             "caption": "One touch. Door open."
           }
         },
         "reel_2": {
           "type": "reel",
           "settings": {
+            "video_url": "",
             "cover": "shopify://shop_images/zion_B_front.png",
             "product": "nexus",
+            "link": "",
             "caption": "Fitted in under two hours."
           }
         },
         "reel_3": {
           "type": "reel",
           "settings": {
+            "video_url": "",
             "cover": "shopify://shop_images/cloud_front.png",
             "product": "cloud",
+            "link": "",
             "caption": "Keycards, for every room."
           }
         },
         "reel_4": {
           "type": "reel",
           "settings": {
+            "video_url": "",
             "cover": "shopify://shop_images/Sliding_gate_motor_45.png",
             "product": "sliding-gate-motor",
+            "link": "",
             "caption": "The gate that opens itself."
           }
         },
         "reel_5": {
           "type": "reel",
           "settings": {
+            "video_url": "",
             "cover": "shopify://shop_images/armour_front_2.png",
             "product": "armour",
+            "link": "",
             "caption": "Built for the Indian monsoon."
           }
         }
@@ -451,7 +462,7 @@
       "settings": {
         "color_scheme": "light",
         "eyebrow": "OTODOR in Action",
-        "heading": "See it in ",
+        "heading": "See it in",
         "heading_accent": "real homes.",
         "cta_label": "Shop the product",
         "card_width": 26,
@@ -520,6 +531,7 @@
       "type": "otodor-projects",
       "settings": {
         "source": "auto",
+        "blog": "projects",
         "limit": 6,
         "columns_desktop": "3",
         "color_scheme": "dark",
@@ -580,22 +592,64 @@
       "blocks": {
         "warranty": {
           "type": "reason",
-          "settings": { "icon": "warranty", "title": "3-year warranty", "text": "Every OTODOR lock is covered for three years (1-year battery)." }
+          "settings": {
+            "icon": "warranty",
+            "title": "3-year warranty",
+            "text": "Every OTODOR lock is covered for three years (1-year battery)."
+          }
         },
         "survey": {
           "type": "reason",
-          "settings": { "icon": "installation", "title": "Free site survey", "text": "A certified technician assesses your door before you buy." }
+          "settings": {
+            "icon": "installation",
+            "title": "Free site survey",
+            "text": "A certified technician assesses your door before you buy."
+          }
         },
         "heritage": {
           "type": "reason",
-          "settings": { "icon": "smart", "title": "16 years' heritage", "text": "Backed by NavKar's security-engineering track record and PAN-India support." }
+          "settings": {
+            "icon": "smart",
+            "title": "16 years' heritage",
+            "text": "Backed by NavKar's security-engineering track record and PAN-India support."
+          }
         },
-        "i-wooden": { "type": "interest", "settings": { "label": "Wooden door lock" } },
-        "i-glass": { "type": "interest", "settings": { "label": "Glass door lock" } },
-        "i-metal": { "type": "interest", "settings": { "label": "Metal gate lock" } },
-        "i-padlock": { "type": "interest", "settings": { "label": "Smart padlock" } },
-        "i-gate": { "type": "interest", "settings": { "label": "Gate automation" } },
-        "i-other": { "type": "interest", "settings": { "label": "Something bespoke / not sure" } }
+        "i-wooden": {
+          "type": "interest",
+          "settings": {
+            "label": "Wooden door lock"
+          }
+        },
+        "i-glass": {
+          "type": "interest",
+          "settings": {
+            "label": "Glass door lock"
+          }
+        },
+        "i-metal": {
+          "type": "interest",
+          "settings": {
+            "label": "Metal gate lock"
+          }
+        },
+        "i-padlock": {
+          "type": "interest",
+          "settings": {
+            "label": "Smart padlock"
+          }
+        },
+        "i-gate": {
+          "type": "interest",
+          "settings": {
+            "label": "Gate automation"
+          }
+        },
+        "i-other": {
+          "type": "interest",
+          "settings": {
+            "label": "Something bespoke / not sure"
+          }
+        }
       },
       "block_order": [
         "warranty",
@@ -616,10 +670,21 @@
         "heading": "Request a",
         "heading_accent": "custom quote.",
         "subheading": "Tell us about your door and we'll recommend the right OTODOR system, with a free site survey and installation assessment.",
+        "reason_style": "ledger",
+        "label_name": "Name",
+        "label_phone": "Phone",
+        "label_email": "Email",
+        "label_interest": "What are you looking for?",
+        "interest_placeholder": "Select a category",
+        "label_message": "Tell us more (optional)",
+        "message_placeholder": "Door type, address area, timeline…",
+        "submit_label": "Request my quote",
         "show_consent": true,
         "consent_required": false,
+        "consent_text": "I agree to be contacted by OTODOR about my enquiry.",
         "show_whatsapp": true,
         "whatsapp_label": "Chat on WhatsApp",
+        "whatsapp_message": "Hello OTODOR, I'd like a quote for a smart lock.",
         "success_title": "Request received.",
         "success_text": "Thank you — an OTODOR specialist will call you within one business day to arrange your survey.",
         "padding_top": 80,

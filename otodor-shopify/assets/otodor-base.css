@@ -1815,6 +1815,26 @@ body.otodor-light-page {
   --color-border-opacity: 0.12 !important;
 }
 
+/* …and on `main` itself, for the Dawn sections that carry NO colour-scheme
+   class at all: main-page, main-blog, main-article, main-404 and
+   main-list-collections. The rule above only reaches sections wrapped in a
+   .color-scheme-* class, so those five kept the page-level foreground —
+   white — and Dawn sets `color` DIRECTLY on h1–h5 from --color-foreground,
+   where a declared value always beats an inherited one. The result was a
+   white page title printed on the off-white band: /pages/projects,
+   /pages/complaint, the legal pages, the blog, an article and the 404 all
+   had it. No !important here on purpose — the scheme rules above are more
+   specific and must still win inside a wrapped section, and OTODOR's own
+   dark sections (the CTA banner, the installation check) declare their
+   colours from --otodor-* tokens, which this does not touch. */
+.otodor-light-page main {
+  --color-foreground: 26, 26, 26;
+  --color-background: 247, 246, 243;
+  --color-link: 26, 120, 216;
+  --color-border: 26, 26, 26;
+  --color-border-opacity: 0.12;
+}
+
 /* Explicit dark text overrides → ink */
 .otodor-light-page main .product__title,
 .otodor-light-page main .price,

@@ -1,30 +1,10 @@
 /*
  * ------------------------------------------------------------
- * OTODOR Projects — the installed-work gallery.
+ * IMPORTANT: The contents of this file are auto-generated.
  *
- * The page's own content (main) carries whatever intro the
- * merchant writes; the gallery below reads a BLOG, so the same
- * projects appear here and on the homepage from one upload. The
- * homepage instance is the same section with a limit and a
- * "View all" link — one section, two configurations.
- *
- * REQUIRES ADMIN (the page degrades to its own content until done):
- *   1. Create a blog called "Projects" (Content -> Blog posts ->
- *      Manage blogs -> Add blog).
- *   2. Add one article per project: title = the project, featured
- *      image = the cover photo, body = a sentence or two, first
- *      tag = the location line.
- *   3. Optional article metafields: custom.project_location
- *      (single line text) and custom.project_video (file
- *      reference -> a video uploaded in Content -> Files).
- *   4. Create a page called "Our Projects" (handle `projects`),
- *      assign this template, and pick the blog in the section's
- *      "Projects blog" setting, here and on the homepage.
- *   5. Add the page to a navigation menu.
- *
- * Until a blog is picked the gallery falls back to `project`
- * blocks added in the theme editor, and with neither it renders
- * nothing rather than an empty grid.
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
 {
@@ -40,6 +20,7 @@
       "type": "otodor-projects",
       "settings": {
         "source": "auto",
+        "blog": "projects",
         "limit": 24,
         "columns_desktop": "3",
         "color_scheme": "light",
@@ -47,6 +28,7 @@
         "heading": "Doors we have",
         "heading_accent": "already secured.",
         "subheading": "Homes, offices and apartment towers across India — surveyed, fitted and supported by OTODOR technicians.",
+        "footer_note": "",
         "view_all_label": "",
         "view_all_link": ""
       }

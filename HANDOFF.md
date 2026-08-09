@@ -61,9 +61,12 @@ The Brand PDF itself (`OTODOR_20260721_114022_0000.pdf`, 21 pages) is the source
 
 **Desktop Mega Menu (UI milestone, `snippets/header-mega-menu.liquid` + `assets/otodor-mega-menu.css`):** enterprise-grade, editorial. Full-width panel = category columns (level-2 collections → level-3 links, icon/description from `custom.menu_icon`/`menu_description`) **+ a featured panel that updates to the hovered/focused category** (image from `custom.menu_image` → collection image → first product image; cross-fades via opacity/translateY/scale, ~200ms) **+ a full-width "Get a Custom Quote" CTA**. Data = Shopify Navigation + collection metafields (single source of truth; no parallel menu). Minimal scoped inline JS only swaps the active featured panel (no AJAX). Open/ESC/keyboard stay with Dawn's `<header-menu>`. Mobile drawer untouched. Merchant-editable: Navigation (structure), Collections (image/description/url), `custom.menu_*` (icon/description/image), header settings (`mega_featured_label`, `mega_cta_*`).
 
-**Homepage order** (`index.json`), STEP 17 onward: `otodor_vault_intro → otodor_promo_strip → otodor_banner →
-otodor_categories → otodor_trust_bar → otodor_features → otodor_why → otodor_testimonials →
-otodor_process → otodor_ecosystem → otodor_cta_banner`. **The pinned monolith hero is deleted** (STEP 17); the
+**Homepage order** (`index.json`), STEP 22 onward: `otodor_vault_intro → otodor_promo_strip → otodor_banner →
+otodor_categories → otodor_trust_bar → otodor_features → otodor_reels → otodor_why → otodor_projects →
+otodor_testimonials → otodor_lead_form → otodor_process → otodor_ecosystem → otodor_cta_banner`.
+Projects sits **before** testimonials on purpose — visual proof before verbal proof — and takes the dark
+scheme so the light/dark alternation holds across `why → projects → testimonials`.
+**The pinned monolith hero is deleted** (STEP 17); the
 banner slideshow opens the page. It briefly left for Digital Locks and the user asked for it back, so there
 are now **two configurations of `otodor-banner`** — homepage (whole-range copy) and Digital Locks
 (category copy) — one section, no fork.
@@ -92,10 +95,111 @@ related-products → otodor-sticky-atc`. Every module auto-hides on no data **an
 | Commit | What |
 |---|---|
 | STEP 12 | **Digital Locks as a real category landing · the compare table · PDP relevance.** See the three subsections under "Done — STEP 12" below. |
+| `343ee1d` | **STEP 21 + 22 together.** The design-token pass, `otodor-reels` and `otodor-serviceability` (21) were still uncommitted when 22 began, and the two are interleaved inside `index.json` and `otodor-lead-form.liquid` — splitting them would have produced commits that never existed as working states. One commit, both bodies of work. Pushed `master → origin/main` (43 commits of local history had never been pushed; clean fast-forward). |
 
 ---
 
 ## ⚠️ Next steps
+
+### ✅ Done — STEP 22 (lead form redesign · Our Projects · coverage on the category page · Search Console)
+
+**A — The lead form stopped looking generated.** The user's words were "very vibe coded", and it was, in five
+identifiable ways: three tinted icon tiles for the trust reasons (a stock features component, and on the
+user's stated dislike list), a `#121212` card floating on a `#0B0B0B` section — an edge with nothing behind
+it, a shadow with nothing to cast onto, and a second radius inside the first once the inputs were drawn —
+two saturated pills competing at equal weight, a `<select>` with `appearance: none` and **nothing put back**,
+and the raw UA checkbox. Now: no card, one rule separating the columns (vertical on desktop, horizontal when
+stacked, and it follows the `form_first` setting rather than being pinned to the form); the trust rail is a
+**hairline ledger with a tabular index** (`reason_style: ledger | icon` keeps the old treatment available, so
+the block icon setting isn't orphaned); fields are **underlines, not boxes**, with uppercase display-face
+captions; one filled control per action row.
+
+**Three form-control defects fixed there, none of them cosmetic** — and the general lesson is that this theme
+had never told the browser which side its native controls sit on:
+- **Chrome's autofill background** is applied by a UA rule marked `!important`, so `background: transparent`
+  cannot win. On an underline field it paints a grey slab **over the underline**. `background-clip: text`
+  confines that paint to the glyphs; the 9999s transition is the fallback for engines that ignore the clip.
+- **Nothing in the theme declared `color-scheme`.** Without it a control's UA text colour resolves to
+  `FieldText` — black — so the moment anything outranked `color: inherit` the typed value went black on a
+  black field. Both schemes declare it now, which also fixes the caret, the select popup and the textarea
+  scrollbar. **Worth doing sitewide** (see Deferred).
+- The colour is stated per scheme in **`-webkit-text-fill-color` as well as `color`**, because the former is
+  what paints glyphs in a Blink form control and outranks the latter. Verified by injecting
+  `color: #000 !important` on the input and watching the text stay white.
+
+**B — The WhatsApp mark.** Every button that opens WhatsApp was rendering `otodor-icon: smart`, **which is a
+key**. The real mark was added to the icon set (plus `chevron-down` for the select) and used in the lead form
+and all three `otodor-complaint-form` buttons.
+
+**C — Our Projects.** `otodor-projects` + `snippets/otodor-project-card` + `templates/page.projects.json`, and
+a second configuration on `index.json` (limit 6, dark, "View all"). **The source is a BLOG, not blocks, and
+that is the whole design decision:** the gallery has to appear on its own page *and* on the homepage; blocks
+live in a template, so a block-built gallery would be uploaded twice and would drift apart the first time one
+copy was edited. Blocks remain the fallback for a one-off. Media cascades **video → video link → image**
+(the `otodor-reels` idiom); nothing autoplays and `preload="none"` means a visitor who never presses play
+never downloads a frame. Optional article metafields `custom.project_location` and `custom.project_video`.
+
+**D — "Compare our range".** `otodor-collection-hero` gained an optional line + button under the title (both
+blank = renders nothing, so every other collection is untouched), and `otodor-comparison` gained an
+**`anchor_id`** (default `otodor-compare`). It needed one: the section's own id is derived from the
+template's *key* for it, a name the CTA would have to know and that would break silently on rename.
+
+**E — The installation check on the wooden-door-locks landing.** No new code — `otodor-serviceability`'s guard
+already reads `collection.handle` against the same allow-list, which defaults to `wooden-door-locks`. Placed
+directly after the hero, dark: the page then alternates cleanly (hero dark → moment light → check dark → grid
+light → comparison dark → why light → FAQ light → CTA dark) and the question that stalls the purchase is
+answered before the range is browsed. **It was also removed from `page.projects.json`** after checking — the
+guard only fires in product or collection context, so on a page template it renders nothing.
+
+**F — Search Console.** A theme setting for the `google-site-verification` token (accepting a bare token *or*
+a pasted `<meta>` tag, since that paste is how it usually gets broken), emitted only when filled. **There is
+deliberately no sitemap file:** `/sitemap.xml` is generated by Shopify from live store data and cannot be
+overridden from a theme; a hand-written one would be stale the day after it was written. The real blocker is
+the **storefront password** — Google cannot read a sitemap behind a password page.
+
+**G — White page titles on every light page.** Reported as "Our Projects is white". It was not one page:
+Dawn sets `color` **directly on `h1`–`h5`** from `--color-foreground`, and the light-page recolour only
+reached sections wrapped in a `.color-scheme-*` class — but **five Dawn sections carry no wrapper at all**
+(`main-page`, `main-blog`, `main-article`, `main-404`, `main-list-collections`). Every light page using one
+of them printed a white title on the off-white band: Projects, Complaint, the legal pages, Warranty
+Registration, Other Solutions, the blog, articles and the 404. Fixed with **one rule adding `main` itself to
+the light-page variable override**, deliberately **without `!important`** so the scheme-wrapped rules above
+still win inside a wrapped section, and OTODOR's own dark sections (which take their colours from
+`--otodor-*`) are untouched.
+
+**Two traps worth remembering, both found by the harness rather than by reading:**
+- **`a:empty { display: none }` is in Dawn's `base.css`.** A stretched whole-card overlay link is by
+  definition an empty `<a>` — the project card was rendering it at **0 × 0 with clicks landing on the image
+  behind it**. Any overlay link in this theme needs an explicit `display: block`. Video cards deliberately
+  have no overlay (it would sit on the player's controls) and link from the title instead.
+- **A harness must inject Dawn's colour-scheme variables** (`--color-foreground` etc.) or rules that read
+  them resolve to nothing and a colour bug cannot be reproduced. Same class of trap as STEP 18's
+  `box-sizing` and frozen-transition notes.
+
+**Verified** in a browser against the real stylesheets in real load order at the 12.5 px root: the lead form
+at 1440 / 1280 / 375 (columns 637/701, 44 px fields, 52 px actions, focus state, stacked divider, full-width
+action pills on a phone); the projects grid at 1440 / 1000 / 375 (3 and 4 columns, 2 at 1099, rail at 899
+with the first card on the page's left rule, 4:3 frames, rows level, no overflow); both card link paths by
+hit-test; and the light-page fix by three assertions at once (unwrapped title → ink, wrapped section → still
+ink, OTODOR dark section → still white). `theme check` at baseline throughout.
+
+### ✅ Done — STEP 21 (design-token pass · reels · serviceability)
+Uncommitted when STEP 22 began; committed together as `343ee1d` (see the table above for why).
+- **`otodor-base.css` gains the tokens the sections had been approximating one at a time:**
+  `--otodor-leading-display` (1.06 — a 50 px heading at `--leading-snug` opens a gap between its own lines),
+  a section-padding scale, section-header rhythm (`--header-gap`, `--header-mb`), control heights
+  (44 / 36 / 52), a radius scale with **xl and 2xl retired to lg**, motion pairings (fast+ease-out for
+  colour, base+spring for transforms) and **one lift distance** for every interactive surface. Moving the
+  sections onto them is most of the diff in categories, features, process, why, promo-strip, testimonials,
+  cta-banner, ecosystem, collection-grid and card-product.
+- **Testimonials stops being a rail on desktop:** a real grid inside the container so the cards line up with
+  every other section, and a swipe rail only below 900 px, bled by exactly the container gutter **with
+  `scroll-padding-inline` to match** — without that the first card snaps a gutter left of the whole page.
+- **`otodor-reels`** — a 9:16 rail of the brand's own product films (video → video link → cover), nothing
+  playing until it is on screen, one soundtrack at a time.
+- **`otodor-serviceability` + `assets/otodor-service-areas.js`** — a pincode/city coverage check. The 30 KB of
+  coverage data is fetched on first touch, not on page load, and an uncovered pincode is routed to WhatsApp
+  and the survey form rather than a dead end.
 
 ### ✅ Done — STEP 4b + 4.5 + STEP 5 + STEP 6 + STEP 7
 Module contract + Downloads/Warranty/Compatibility modules + 85 mm clearance + orchestrator + framework inventory (4b/4.5). **STEP 5:** Specification Rendering Engine (`otodor-spec-registry` + `otodor-spec-value`); `otodor-comparison` rewritten as its consumer. **STEP 6:** centralized **Schema Registry** (`otodor-schema.liquid`) — Organization/WebSite (moved from header) + BreadcrumbList + CollectionPage + VideoObject as one `@graph`, plus FAQPage (collapsible-content) and opt-in HowTo (install). `shopify theme check` clean vs. baseline (5 pre-existing errors, none from this work).
@@ -497,6 +601,8 @@ Evidence-based, from the repo rather than memory. Funnel branding (#1) is **done
    reduced-motion aware. The real sitewide cost is **GSAP + ScrollTrigger (116 KB) loading unconditionally on
    every page**, cart and account included, plus every section inlining its full CSS.
 6. **Reviews / social proof** are hardcoded testimonials; no review app, no `AggregateRating` from real data.
+   *Partly addressed by STEP 22:* `otodor-projects` adds **visual** proof from real work, and it is real data
+   (a blog) rather than typed-in copy — but it is not reviews, and it emits no `AggregateRating`.
 7. India-specific commerce polish: pincode serviceability + delivery ETA on the PDP, an EMI breakdown to back
    the "EMI from ₹X" claim, Hindi locale (the schema already advertises `availableLanguage: [en, hi]`).
 
@@ -506,6 +612,29 @@ Evidence-based, from the repo rather than memory. Funnel branding (#1) is **done
 - **Content/data (owner: user)** still blocks real impact — real prices, photography, populated metafields.
 
 ### Admin setup the merchant must do (theme degrades gracefully until done)
+- **Our Projects (STEP 22)** — in this order, because the blog must exist before the section can point at it:
+  1. **Create a blog named `Projects`** (Content → Blog posts → *Manage blogs* → Add blog). Creating a *post*
+     called "Projects" inside the existing `News` blog is the easy mistake — the user made it first time.
+  2. One **post per project**: title = the project, featured image = the cover, Content (or Excerpt) = the
+     supporting line, **Blog = Projects**, and the location as a tag. Use **exactly one tag**, or set
+     `custom.project_location` — the section reads `article.tags.first` and Shopify does not guarantee tag
+     order. Optional definitions (Settings → Custom data → **Blog posts**): `custom.project_location`
+     (single line text) and `custom.project_video` (file → video).
+  3. **Create the page** "Our Projects", set its **URL handle to `projects`** (Shopify auto-generates
+     `our-projects` from that title, and the homepage button points at `/pages/projects`), assign the
+     **`projects`** template.
+  4. **Pick the blog in the section on BOTH placements** — the Projects page *and* the homepage. Missing the
+     second is why the homepage stays empty while the page works.
+  5. Add the page to a menu.
+- **Assign the `wooden-door-locks` template** to that collection, or neither the hero's "Compare our range"
+  CTA nor the installation check appears — it falls back to the generic `collection.json`. The collection's
+  **handle must be `wooden-door-locks`** too: the coverage check matches on handle.
+- **Search Console (STEP 22):** remove the **storefront password** first, verify `otodorlocks.com` (DNS TXT
+  preferred; otherwise paste the token into Theme settings → OTODOR Brand Entity → Search Console), then
+  submit `sitemap.xml`. Shopify generates the sitemap — there is nothing to build.
+- **hCaptcha**, if the badge is unwanted: Online Store → Preferences → Spam protection. Admin-only; the theme
+  cannot turn it off, and some automatic protection persists regardless. It trades directly against spam in
+  the contact inbox, which is where every lead lands.
 - **Navigation:** build the nested 3-level `main-menu` (Products → Digital Locks → Wooden/Glass/…; see Phase 2 report) so the mega menu shows the hierarchy.
 - **Assign the collection templates.** A collection's template is `templateSuffix` on the **Collection object** — store data, not a theme file, so `shopify theme push` cannot do it. Either set it per collection in admin (Collections → *collection* → Theme template), or run `scripts/assign-collection-templates.ps1` (dry run by default, `-Apply` to write). The script needs a one-time `shopify store auth --store ttna2m-mh.myshopify.com --scopes read_products,write_products` — an interactive browser grant, so it cannot be done from an agent session. Mapping (template name ≠ collection handle): `door-locks`→`digital-locks`, `padocks`→`smart-padlocks`, `sliding-gate-motors`→`gate-automation`, and the three door-type collections to their same-named templates. Until assigned, every collection gets the generic `collection.json` — which does show its sub-categories from Navigation, so nothing is broken meanwhile.
 - **Upload the clearance infographic** (Content → Files), then set it on the product page's **OTODOR Product Install → Clearance diagram** setting. Per-product art goes on `custom.install_clearance_image` instead.
@@ -521,6 +650,11 @@ Evidence-based, from the repo rather than memory. Funnel branding (#1) is **done
 
 ### Deferred (perf/a11y)
 - Sections inline full CSS/JS; GSAP loads per page from CDN. Verify gold/blue contrast (WCAG AA); JSON-LD once prices are real.
+- **`color-scheme` sitewide (from STEP 22).** Only `otodor-lead-form` declares it. Every other dark surface
+  carrying a native control — `otodor-complaint-form`, the newsletter field, search, the serviceability
+  input — still gets light-mode UA internals: a dark caret on a dark field, a light `<select>` popup, a
+  light scrollbar. Those use boxed fields with their own background, so it shows up as wrong chrome rather
+  than invisible text, which is why it isn't urgent. One declaration in `otodor-base.css` would cover it.
 
 ---
 
