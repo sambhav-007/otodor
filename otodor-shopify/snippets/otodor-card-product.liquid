@@ -17,6 +17,18 @@
     assign loading = 'eager'
   endif
   assign access_line = card_product.metafields.custom.access_methods.value | default: card_product.type
+
+  # ── Is this product actually discounted? ────────────────────────────
+  # Shopify's own definition: a compare-at price above the selling price.
+  # Set both on the product in admin and the card does the rest — the
+  # struck price, the badge and the saving are all derived, never typed.
+  assign on_sale = false
+  if card_product.compare_at_price > card_product.price and card_product.price > 0
+    assign on_sale = true
+    assign save_amount = card_product.compare_at_price | minus: card_product.price
+    # Prices are in paise, so the ratio is unaffected by the unit.
+    assign save_pct = save_amount | times: 100 | divided_by: card_product.compare_at_price
+  endif
 -%}
 
 <a href="{{ card_product.url }}" class="otodor-pcard" aria-label="{{ card_product.title | escape }}">
@@ -48,8 +60,16 @@
       <span class="otodor-pcard__placeholder" aria-hidden="true">OTODOR</span>
     {%- endif -%}
 
+    {%- comment -%}
+      Sold out outranks a saving — there is no point advertising a discount
+      on something that cannot be bought.
+    {%- endcomment -%}
     {%- unless card_product.available -%}
       <span class="otodor-pcard__badge">Sold out</span>
+    {%- else -%}
+      {%- if on_sale and save_pct > 0 -%}
+        <span class="otodor-pcard__badge otodor-pcard__badge--save">{{ save_pct }}% off</span>
+      {%- endif -%}
     {%- endunless -%}
   </div>
 
@@ -61,12 +81,34 @@
     {%- if card_product.price == 0 -%}
       <p class="otodor-pcard__price otodor-pcard__price--contact">Contact for pricing</p>
     {%- else -%}
+      {%- comment -%}
+        Selling price first and loudest, the old price struck after it. The
+        eye should land on what the thing costs today, not on the number it
+        no longer costs.
+      {%- endcomment -%}
       <p class="otodor-pcard__price">
-        {%- if card_product.compare_at_price > card_product.price -%}
-          <s>{{ card_product.compare_at_price | money }}</s>
+        <span class="otodor-pcard__price-now">{{ card_product.price | money }}</span>
+        {%- if on_sale -%}
+          <s class="otodor-pcard__price-was">{{ card_product.compare_at_price | money }}</s>
         {%- endif -%}
-        {{ card_product.price | money }}
       </p>
+
+      {%- comment -%}
+        Delivery and EMI come from Theme settings → OTODOR Offers, Pricing &
+        EMI, so the card, the popup, the promo strip and the product page all
+        quote one policy. Switch either off in settings and it leaves every
+        card at once.
+      {%- endcomment -%}
+      {%- if settings.otodor_free_delivery or settings.otodor_emi_enabled -%}
+        <p class="otodor-pcard__perks">
+          {%- if settings.otodor_free_delivery and settings.otodor_free_delivery_label != blank -%}
+            <span>{{ settings.otodor_free_delivery_label | escape }}</span>
+          {%- endif -%}
+          {%- if settings.otodor_emi_enabled -%}
+            <span>EMI available</span>
+          {%- endif -%}
+        </p>
+      {%- endif -%}
     {%- endif -%}
   </div>
 </a>

@@ -53,6 +53,21 @@
     margin-top: 1.6rem;
   }
 
+  /* In-page CTA: one line and one action, sending the visitor to a section
+     further down this same page (the comparison table, typically). Sits
+     below the count so the hero ends on the action rather than on metadata. */
+  .otodor-chero__cta {
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  }
+  .otodor-chero__cta-line {
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-base);
+    color: rgba(255, 255, 255, 0.72);
+    max-width: 46ch;
+    margin: 0 auto 1.1rem;
+    line-height: 1.6;
+  }
+
   /* Brand-moment transition: eases dark storytelling into the
      light discovery surface. */
   #shopify-section-{{ section.id }} .otodor-chero-moment {
@@ -80,6 +95,25 @@
     {%- if section.settings.show_count -%}
       <span class="otodor-chero__count">{{ collection.products_count }} {% if collection.products_count == 1 %}product{% else %}products{% endif %}</span>
     {%- endif -%}
+
+    {%- comment -%}
+      Optional in-page CTA. Either half stands alone — a line with no button,
+      or a button with no line — and with neither filled nothing renders, so
+      every other collection using this hero is untouched.
+    {%- endcomment -%}
+    {%- if section.settings.cta_line != blank or section.settings.cta_label != blank -%}
+      <div class="otodor-chero__cta" data-otodor-reveal="fade-up">
+        {%- if section.settings.cta_line != blank -%}
+          <p class="otodor-chero__cta-line">{{ section.settings.cta_line | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.cta_label != blank -%}
+          <a class="otodor-btn otodor-btn--primary" href="{{ section.settings.cta_link | default: '#' }}">
+            {{ section.settings.cta_label | escape }}
+            <span class="otodor-btn__icon" aria-hidden="true">{% render 'otodor-icon', name: 'arrow-right' %}</span>
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
   </div>
 </div>
 
@@ -103,6 +137,11 @@
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "OTODOR" },
     { "type": "text", "id": "fallback_line", "label": "Fallback positioning line", "info": "Shown when the collection has no description.", "default": "Smart security engineered for modern homes." },
     { "type": "checkbox", "id": "show_count", "label": "Show product count", "default": true },
+    { "type": "header", "content": "In-page call to action" },
+    { "type": "paragraph", "content": "Sends the visitor to a section further down this page — typically the comparison table. Leave both blank to render nothing." },
+    { "type": "text", "id": "cta_line", "label": "Line" },
+    { "type": "text", "id": "cta_label", "label": "Button label" },
+    { "type": "url", "id": "cta_link", "label": "Button link", "info": "For a section on this page use its anchor, e.g. #otodor-compare (set on the comparison section)." },
     { "type": "header", "content": "Brand moment" },
     { "type": "text", "id": "moment_line", "label": "Brand moment line", "default": "Security designed around how people actually live." },
     { "type": "text", "id": "moment_sub", "label": "Supporting line", "default": "Every OTODOR device is engineered, installed, and supported by us." }

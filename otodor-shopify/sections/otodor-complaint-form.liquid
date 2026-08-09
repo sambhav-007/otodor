@@ -288,7 +288,7 @@
           {%- endif -%}
           {%- if wa_enabled -%}
             <a class="otodor-cmp__channel otodor-cmp__channel--wa" href="{{ wa_link }}" target="_blank" rel="noopener">
-              <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+              <span aria-hidden="true">{% render 'otodor-icon', name: 'whatsapp' %}</span>
               {{ section.settings.whatsapp_label | escape }}
               <span class="visually-hidden">(opens WhatsApp)</span>
             </a>
@@ -319,7 +319,7 @@
             <p class="otodor-cmp__success-text">{{ section.settings.success_text | escape }}</p>
             {%- if wa_enabled -%}
               <a class="otodor-cmp__wa" href="{{ wa_link }}" target="_blank" rel="noopener">
-                <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+                <span aria-hidden="true">{% render 'otodor-icon', name: 'whatsapp' %}</span>
                 {{ section.settings.whatsapp_label | escape }}
               </a>
             {%- endif -%}
@@ -491,7 +491,7 @@
                 data-l-issue="{{ section.settings.label_issue | escape }}"
                 data-l-message="{{ section.settings.label_message | escape }}"
                 data-l-preferred="{{ section.settings.label_preferred | escape }}">
-                <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+                <span aria-hidden="true">{% render 'otodor-icon', name: 'whatsapp' %}</span>
                 {{ section.settings.whatsapp_label | escape }}
               </a>
             {%- endif -%}

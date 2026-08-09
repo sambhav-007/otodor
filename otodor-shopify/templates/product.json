@@ -128,6 +128,22 @@
         "except_tags": "padlock, padlocks, smart-padlock"
       }
     },
+    "serviceability": {
+      "type": "otodor-serviceability",
+      "settings": {
+        "color_scheme": "light",
+        "only_collections": "wooden-door-locks",
+        "eyebrow": "Installation Coverage",
+        "heading": "Do we install at your address?",
+        "subheading": "Every OTODOR wooden-door lock is fitted by a certified technician, not couriered. Check your pincode before you buy.",
+        "coverage_note": "Covering 3,913 pincodes across 133 districts.",
+        "field_label": "Pincode or city",
+        "field_placeholder": "e.g. 400001 or Mumbai",
+        "submit_label": "Check",
+        "note": "Installation is free and usually scheduled within 48 hours of delivery.",
+        "fallback_link": "/pages/contact#otodor-lead"
+      }
+    },
     "warranty": {
       "type": "otodor-product-warranty",
       "settings": {
@@ -181,6 +197,7 @@
     "specs",
     "compatibility",
     "install",
+    "serviceability",
     "warranty",
     "downloads",
     "comparison",

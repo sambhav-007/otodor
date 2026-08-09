@@ -98,7 +98,8 @@
         "whatsapp_label": "Chat on WhatsApp",
         "success_title": "Request received.",
         "success_text": "Thank you — an OTODOR specialist will call you within one business day to arrange your survey.",
-        "padding_top": 64
+        "padding_top": 80,
+        "padding_bottom": 80
       }
     }
   },

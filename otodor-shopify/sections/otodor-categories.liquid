@@ -1,25 +1,68 @@
+{%- liquid
+  assign cat_scheme = section.settings.color_scheme | default: 'dark'
+-%}
+
 {%- style -%}
   #otodor-categories-{{ section.id }} {
-    padding-top: 44px;
-    padding-bottom: 44px;
-    background-color: #000000;
+    /* Follows the hero directly, so it takes the close step of the rhythm —
+       it reads as the hero's continuation, not a separate slab. */
+    padding-block: var(--otodor-section-py-sm);
+    background-color: {% if cat_scheme == 'white' %}#FFFFFF{% else %}#000000{% endif %};
     position: relative;
     overflow: hidden;
   }
 
-  /* Override standard container to max-width 1400px for this section */
-  #otodor-categories-{{ section.id }} .otodor-container {
-    max-width: 1750px;
-    width: calc(100% - 48px);
-    margin-left: auto;
-    margin-right: auto;
+  {%- if cat_scheme == 'white' -%}
+  /* ─ White scheme ─────────────────────────────────────────
+     The section carries `.otodor-light`, which remaps the design
+     tokens (heading → ink, eyebrow/accent → the deeper blue) so the
+     header follows without a hardcoded colour anywhere.
+
+     The cards themselves do NOT follow: they are full-bleed photos
+     under a dark gradient, so their white titles, taglines and CTAs
+     are hardcoded and stay exactly as they are. Only the parts that
+     were tuned for a black page — the hairline, the drop shadow and
+     the BorderGlow fill — are restated for white.
+    ───────────────────────────────────────────────────────── */
+  #otodor-categories-{{ section.id }} .otodor-category-card {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.10);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 14px 34px rgba(0, 0, 0, 0.10);
   }
+
+  #otodor-categories-{{ section.id }} .otodor-category-card:hover {
+    border-color: rgba(26, 120, 216, 0.45);
+    box-shadow:
+      0 0 32px rgba(26, 120, 216, 0.16),
+      0 22px 44px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  }
+
+  /* BorderGlow paints its own card fill behind the tile; tell it white. */
+  #otodor-categories-{{ section.id }} .border-glow-card { --card-bg: #FFFFFF; }
+  {%- endif -%}
+
+  {%- comment -%}
+    This section used to override .otodor-container twice — once to
+    `calc(100% - 48px)`, then again on desktop with a height-aware
+    `min(1400px, max(880px, calc(200vh - 544px)))` cap that kept the bento
+    under one viewport tall.
+
+    At a 1280x800 window that cap resolved to 880px while every other
+    section on the page measured 1227px, so the whole category bento sat
+    inset ~165px from the features grid directly below it — three different
+    left edges down one page (19px, 184px, 227px). That misalignment costs
+    far more than the height it bought: a page is allowed to be taller than
+    the window; its sections are not allowed to disagree about where the
+    left margin is. Both overrides are gone. The container is the standard
+    one, and the square aspect ratios below keep the grid a sane height.
+  {%- endcomment -%}
 
   .otodor-categories__header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: clamp(1.25rem, 2.5vw, 2.25rem);
+    margin-bottom: var(--otodor-header-mb);
     gap: var(--otodor-space-md);
   }
 
@@ -37,18 +80,6 @@
 
   /* Desktop Grid Position Mapping */
   @media (min-width: 1025px) {
-    /* Height-aware width cap. Card height is derived from column width via
-       aspect-ratio, so the section's height is set by how WIDE it is — which is
-       why it overran short viewports no matter how much padding came off.
-       Bounding the container by viewport height fixes that at the source:
-         grid   = (containerW - 3*gap)/2 + gap
-         budget = 100vh - 96 header - 88 padding - ~98 section header
-       Solving for containerW gives ~200vh - 544px. Capped at the 1400px design
-       width for tall screens, floored at 880px so it never becomes a sliver. */
-    #otodor-categories-{{ section.id }} .otodor-container {
-      max-width: min(1400px, max(880px, calc(200vh - 544px)));
-    }
-
     .otodor-category-card-glow:nth-child(1) {
       grid-column: 1 / 3;
       grid-row: 1 / 3;
@@ -86,7 +117,7 @@
   /* Card Base Styles */
   .otodor-category-card {
     position: relative;
-    border-radius: 28px;
+    border-radius: var(--otodor-radius-lg);
     overflow: hidden;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -442,7 +473,7 @@
       grid-column: span 2 !important;
     }
 
-    .otodor-category-card { border-radius: 20px; }
+    .otodor-category-card { border-radius: var(--otodor-radius-md); }
 
     .otodor-category-card__content {
       padding: 0.9rem;
@@ -482,7 +513,7 @@
 
 <section
   id="otodor-categories-{{ section.id }}"
-  class="otodor-categories"
+  class="otodor-categories{% if cat_scheme == 'white' %} otodor-light{% endif %}"
   data-otodor-section="categories"
   aria-labelledby="otodor-categories-title-{{ section.id }}"
 >
@@ -684,6 +715,17 @@
   "class": "shopify-section",
   "max_blocks": 10,
   "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "dark",
+      "info": "The category cards are full-bleed photos either way — only the section background and the heading change.",
+      "options": [
+        { "value": "dark", "label": "Black" },
+        { "value": "white", "label": "White" }
+      ]
+    },
     {
       "type": "text",
       "id": "eyebrow",

@@ -1,0 +1,554 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Installation Serviceability  (pincode / city coverage check)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Answer the question that stalls a considered purchase —
+                      "will you actually come and fit this at my address?" —
+                      before the visitor has to ask a human.
+  Primary source:     assets/otodor-service-areas.js, generated from the DTPL
+                      coverage sheet. Shape:
+                        window.OTODOR_SERVICE_AREAS = {
+                          version, count,
+                          areas: [[district, state, "pin pin pin …"], …]
+                        }
+                      Regenerate from the sheet; never hand-edit.
+  Fallback order:     pincode (exact, 6 digits) → district / state name
+                      (case-insensitive contains) → "not found".
+  Visibility rule:    Renders only where installation is actually offered.
+                      On a product page that means passing
+                      otodor-module-applies (default: the wooden-door-locks
+                      collection). On a collection page it means the current
+                      collection is itself in that list. Anywhere else it
+                      renders nothing — a fitting checker on a padlock is a
+                      support ticket waiting to happen.
+  Merchant editable:  YES — all copy, scoping, colour scheme, the "we don't
+                      cover you yet" fallback.
+  Required metafields: none.
+  Optional metafields: custom.hidden_modules / custom.shown_modules override
+                       the scoping per product (see otodor-module-applies).
+  Dependencies:       snippets/otodor-module-applies, snippets/otodor-icon;
+                      assets/otodor-service-areas.js (lazy); base.css tokens.
+  Placement:          Product template, directly after the Installation
+                      section. Also valid on a collection template.
+  Accessibility:      A real <form> with a labelled input, submitted by
+                      Enter or the button. The verdict lands in an
+                      aria-live="polite" region so a screen reader hears it
+                      without the focus moving. Never colour alone — every
+                      state carries an icon and a sentence.
+
+  THE 30KB OF COVERAGE DATA IS NOT ON THE CRITICAL PATH. It is fetched the
+  first time the visitor touches the field, not on page load, so a product
+  page costs nothing for a checker most visitors never use.
+
+  A "NO" IS NOT A DEAD END. An uncovered pincode still gets a way through —
+  WhatsApp and the survey form — because someone who typed their pincode
+  into a lock's product page is the most qualified lead on the site.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- capture applies -%}
+  {%- render 'otodor-module-applies',
+    module_id: 'serviceability',
+    product: product,
+    only_collections: section.settings.only_collections,
+    only_tags: section.settings.only_tags -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign applies = applies | strip
+  assign scheme = section.settings.color_scheme | default: 'light'
+
+  # Where may this render? A product decided by the module contract; a
+  # collection decided by its own handle being in the same allow-list.
+  assign show = false
+  if product != blank
+    if applies == 'true'
+      assign show = true
+    endif
+  elsif collection != blank
+    assign wanted = section.settings.only_collections | default: 'wooden-door-locks' | split: ','
+    for handle in wanted
+      assign h = handle | strip | downcase
+      if h != blank and collection.handle == h
+        assign show = true
+        break
+      endif
+    endfor
+  endif
+
+  assign wa_enabled = false
+  if settings.otodor_whatsapp_enabled and settings.otodor_whatsapp_number != blank
+    assign wa_enabled = true
+    assign wa_text = section.settings.whatsapp_message | default: 'Hello OTODOR, is installation available at my pincode?' | url_encode
+    assign wa_link = 'https://wa.me/' | append: settings.otodor_whatsapp_number | append: '?text=' | append: wa_text
+  endif
+-%}
+
+{%- if show -%}
+
+{%- style -%}
+  #otodor-serv-{{ section.id }} {
+    padding-block: var(--otodor-section-py);
+    {%- if scheme == 'dark' -%}
+    background: var(--otodor-black);
+    --serv-ink: #FFFFFF;
+    --serv-soft: rgba(255,255,255,0.60);
+    /* Not the theme's --faint (0.40). Composited against this background
+       that lands at 3.4:1, under the 4.5:1 AA floor for body text, and it
+       carries the coverage figure, the fine print and the field
+       placeholder — none of which are decorative. Hierarchy here comes
+       from type size, which costs no legibility. */
+    --serv-faint: rgba(255,255,255,0.58);
+    --serv-rule: rgba(255,255,255,0.14);
+    --serv-panel: var(--otodor-surface);
+    --serv-field: rgba(255,255,255,0.04);
+    --serv-accent: var(--otodor-blue);
+    {%- else -%}
+    background: var(--otodor-bg-light);
+    --serv-ink: var(--otodor-ink);
+    --serv-soft: var(--otodor-ink-soft);
+    /* See the note in the dark branch — --otodor-ink-faint (0.40) measures
+       2.5:1 here, well under AA, and this token carries real copy. */
+    --serv-faint: rgba(26, 26, 26, 0.62);
+    --serv-rule: var(--otodor-hairline-light-2);
+    --serv-panel: #FFFFFF;
+    --serv-field: #FFFFFF;
+    --serv-accent: var(--otodor-accent-on-light);
+    {%- endif -%}
+    color: var(--serv-ink);
+  }
+
+  #otodor-serv-{{ section.id }} .otodor-serv__inner {
+    max-width: var(--otodor-container);
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    #otodor-serv-{{ section.id }} .otodor-serv__inner { grid-template-columns: 1fr; gap: clamp(1.75rem, 6vw, 2.5rem); }
+  }
+
+  #otodor-serv-{{ section.id }} .otodor-serv__eyebrow {
+    display: block;
+    font-family: var(--otodor-font-display);
+    font-size: 1rem; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--otodor-tracking-widest);
+    color: var(--serv-accent);
+    margin-bottom: var(--otodor-header-gap);
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__heading {
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-4xl);
+    font-weight: 700;
+    line-height: var(--otodor-leading-display);
+    letter-spacing: var(--otodor-tracking-tight);
+    margin: 0;
+    /* Stated, not inherited. Dawn's base sheet colours bare headings with
+       `h1, h2, h3 { color: rgb(var(--color-foreground)) }`, and a rule that
+       matches the element always beats a value inherited from an ancestor —
+       specificity never enters into it. Without this the heading took the
+       product page's white foreground and vanished into the light panel. */
+    color: var(--serv-ink);
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__sub {
+    margin: 1.1rem 0 0;
+    font-size: var(--otodor-text-md);
+    line-height: 1.6;
+    color: var(--serv-soft);
+    max-width: 46ch;
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__coverage {
+    margin: 1.4rem 0 0;
+    font-size: var(--otodor-text-xs);
+    color: var(--serv-faint);
+  }
+
+  /* ─ The panel ─────────────────────────────────────────── */
+  #otodor-serv-{{ section.id }} .otodor-serv__panel {
+    background: var(--serv-panel);
+    border: 1px solid var(--serv-rule);
+    border-radius: var(--otodor-radius-md);
+    padding: clamp(1.5rem, 3vw, 2.2rem);
+    {%- if scheme != 'dark' -%}
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 14px 34px rgba(0,0,0,0.07);
+    {%- endif -%}
+  }
+
+  #otodor-serv-{{ section.id }} .otodor-serv__label {
+    display: block;
+    font-size: var(--otodor-text-sm);
+    font-weight: 600;
+    margin-bottom: 0.55rem;
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__input {
+    flex: 1 1 12rem;
+    min-width: 0;
+    min-height: var(--otodor-control-h);
+    padding: 0.7rem 0.95rem;
+    font-family: var(--otodor-font-body);
+    font-size: var(--otodor-text-base);
+    color: var(--serv-ink);
+    background: var(--serv-field);
+    border: 1px solid var(--serv-rule);
+    border-radius: var(--otodor-radius-sm);
+    transition: border-color var(--otodor-t-tint), box-shadow var(--otodor-t-tint);
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__input::placeholder { color: var(--serv-faint); }
+  #otodor-serv-{{ section.id }} .otodor-serv__input:focus-visible {
+    outline: none;
+    border-color: var(--serv-accent);
+    box-shadow: 0 0 0 3px var(--otodor-blue-glow);
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__submit {
+    flex: 0 0 auto;
+    min-height: var(--otodor-control-h);
+    padding: 0.7rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--otodor-radius-pill);
+    background: var(--serv-accent);
+    color: #FFFFFF;
+    font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-sm);
+    font-weight: 600;
+    transition: transform var(--otodor-t-move), filter var(--otodor-t-tint);
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__submit:hover {
+    transform: translateY(var(--otodor-lift-sm));
+    filter: brightness(1.06);
+  }
+
+  /* ─ Verdict ───────────────────────────────────────────── */
+  #otodor-serv-{{ section.id }} .otodor-serv__result:empty { display: none; }
+  #otodor-serv-{{ section.id }} .otodor-serv__result {
+    margin-top: 1.1rem;
+    padding: 0.95rem 1.05rem;
+    border-radius: var(--otodor-radius-sm);
+    border: 1px solid var(--serv-rule);
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    font-size: var(--otodor-text-sm);
+    line-height: 1.55;
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__result svg { width: 17px; height: 17px; flex: 0 0 auto; margin-top: 2px; }
+  #otodor-serv-{{ section.id }} .otodor-serv__result b { font-weight: 600; }
+  #otodor-serv-{{ section.id }} .otodor-serv__result p { margin: 0.2rem 0 0; color: var(--serv-soft); }
+
+  #otodor-serv-{{ section.id }} .otodor-serv__result[data-state="yes"] {
+    border-color: rgba(37,211,102,0.45);
+    background: rgba(37,211,102,0.09);
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__result[data-state="yes"] svg { color: #17A34A; }
+  #otodor-serv-{{ section.id }} .otodor-serv__result[data-state="no"] {
+    border-color: rgba(220,38,38,0.35);
+    background: rgba(220,38,38,0.07);
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__result[data-state="no"] svg { color: #DC2626; }
+  #otodor-serv-{{ section.id }} .otodor-serv__result[data-state="hint"] svg { color: var(--serv-accent); }
+
+  #otodor-serv-{{ section.id }} .otodor-serv__ways {
+    display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem;
+    margin-top: 0.6rem;
+  }
+  #otodor-serv-{{ section.id }} .otodor-serv__ways a {
+    font-size: var(--otodor-text-sm);
+    font-weight: 600;
+    color: var(--serv-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  #otodor-serv-{{ section.id }} .otodor-serv__note {
+    margin: 0.9rem 0 0;
+    font-size: var(--otodor-text-xs);
+    color: var(--serv-faint);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #otodor-serv-{{ section.id }} .otodor-serv__submit { transition: none; }
+    #otodor-serv-{{ section.id }} .otodor-serv__submit:hover { transform: none; }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-serv-{{ section.id }}"
+  class="otodor-serv"
+  data-otodor-section="serviceability"
+  data-serv-src="{{ 'otodor-service-areas.js' | asset_url }}"
+  aria-labelledby="otodor-serv-title-{{ section.id }}"
+>
+  <div class="otodor-serv__inner">
+    <div class="otodor-serv__aside" data-otodor-reveal="fade-up">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="otodor-serv__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      <h2 class="otodor-serv__heading" id="otodor-serv-title-{{ section.id }}">
+        {{ section.settings.heading | escape }}
+      </h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="otodor-serv__sub">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.coverage_note != blank -%}
+        <p class="otodor-serv__coverage">{{ section.settings.coverage_note | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="otodor-serv__panel" data-otodor-reveal="fade-up">
+      <form class="otodor-serv__form" data-serv-form novalidate>
+        <label class="otodor-serv__label" for="otodor-serv-input-{{ section.id }}">
+          {{ section.settings.field_label | escape }}
+        </label>
+        <div class="otodor-serv__row">
+          <input
+            class="otodor-serv__input"
+            id="otodor-serv-input-{{ section.id }}"
+            name="pincode"
+            type="text"
+            inputmode="text"
+            autocomplete="postal-code"
+            spellcheck="false"
+            placeholder="{{ section.settings.field_placeholder | escape }}"
+            data-serv-input
+            aria-describedby="otodor-serv-result-{{ section.id }}"
+          >
+          <button type="submit" class="otodor-serv__submit">{{ section.settings.submit_label | escape }}</button>
+        </div>
+      </form>
+
+      {%- comment -%}
+        The verdict is announced, not just shown. polite so it waits for a
+        pause rather than cutting across whatever is being read.
+      {%- endcomment -%}
+      <div
+        class="otodor-serv__result"
+        id="otodor-serv-result-{{ section.id }}"
+        data-serv-result
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      {%- if section.settings.note != blank -%}
+        <p class="otodor-serv__note">{{ section.settings.note | escape }}</p>
+      {%- endif -%}
+
+      <noscript>
+        <p class="otodor-serv__note">
+          {{ section.settings.noscript_text | default: 'Turn on JavaScript to check your pincode, or message us and we will confirm coverage for your address.' | escape }}
+        </p>
+      </noscript>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.getElementById('otodor-serv-{{ section.id }}');
+    if (!root) return;
+
+    var form   = root.querySelector('[data-serv-form]');
+    var input  = root.querySelector('[data-serv-input]');
+    var result = root.querySelector('[data-serv-result]');
+    var src    = root.getAttribute('data-serv-src');
+
+    var COPY = {
+      yes:      {{ section.settings.result_yes      | default: 'Good news — we install here.'            | json }},
+      no:       {{ section.settings.result_no       | default: 'No installation partner here yet.'       | json }},
+      noBody:   {{ section.settings.result_no_body  | default: 'We can still deliver, and we will tell you the moment a technician covers your area.' | json }},
+      empty:    {{ section.settings.result_empty    | default: 'Enter a 6-digit pincode, or your city.'  | json }},
+      loading:  {{ section.settings.result_loading  | default: 'Checking…'                              | json }},
+      failed:   {{ section.settings.result_failed   | default: 'Could not load the coverage list. Please message us and we will check for you.' | json }}
+    };
+
+    var WAYS = [
+      {%- if wa_enabled -%}{ label: {{ section.settings.whatsapp_label | default: 'Ask on WhatsApp' | json }}, href: {{ wa_link | json }}, blank: true },{%- endif -%}
+      { label: {{ section.settings.fallback_label | default: 'Request a home survey' | json }}, href: {{ section.settings.fallback_link | default: '/pages/contact#otodor-lead' | json }}, blank: false }
+    ];
+
+    var ICONS = {
+      yes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6.5"/></svg>',
+      no:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+      hint:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.4"/></svg>'
+    };
+
+    /* ── Lazy data ────────────────────────────────────────────────────
+       30KB of coverage is worthless to a visitor who never checks, so it
+       is not requested until one touches the field. */
+    var dataPromise = null;
+    function loadData() {
+      if (dataPromise) return dataPromise;
+      dataPromise = new Promise(function (resolve, reject) {
+        if (window.OTODOR_SERVICE_AREAS) return resolve(window.OTODOR_SERVICE_AREAS);
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = function () {
+          window.OTODOR_SERVICE_AREAS ? resolve(window.OTODOR_SERVICE_AREAS) : reject();
+        };
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+      return dataPromise;
+    }
+    input.addEventListener('focus', function () { loadData().catch(function () {}); }, { once: true });
+
+    /* Index built once, on first use. */
+    var index = null;
+    function buildIndex(data) {
+      if (index) return index;
+      var byPin = Object.create(null);
+      (data.areas || []).forEach(function (a, i) {
+        a[2].split(' ').forEach(function (p) { if (p) byPin[p] = i; });
+      });
+      index = { areas: data.areas || [], byPin: byPin };
+      return index;
+    }
+
+    function render(state, title, body, ways) {
+      result.setAttribute('data-state', state);
+      result.innerHTML = '';
+
+      var icon = document.createElement('span');
+      icon.innerHTML = ICONS[state] || ICONS.hint;
+      icon.setAttribute('aria-hidden', 'true');
+      result.appendChild(icon.firstChild);
+
+      var col = document.createElement('div');
+      var strong = document.createElement('b');
+      strong.textContent = title;              // textContent: never trust the field
+      col.appendChild(strong);
+      if (body) {
+        var p = document.createElement('p');
+        p.textContent = body;
+        col.appendChild(p);
+      }
+      if (ways) {
+        var row = document.createElement('div');
+        row.className = 'otodor-serv__ways';
+        WAYS.forEach(function (w) {
+          if (!w || !w.href) return;
+          var a = document.createElement('a');
+          a.href = w.href;
+          a.textContent = w.label;
+          if (w.blank) { a.target = '_blank'; a.rel = 'noopener'; }
+          row.appendChild(a);
+        });
+        if (row.childNodes.length) col.appendChild(row);
+      }
+      result.appendChild(col);
+    }
+
+    function check(raw) {
+      var q = (raw || '').trim();
+      if (!q) return render('hint', COPY.empty);
+
+      render('hint', COPY.loading);
+
+      loadData().then(function (data) {
+        var ix = buildIndex(data);
+        var digits = q.replace(/\D/g, '');
+
+        // A 6-digit pincode is an exact question — answer it exactly.
+        if (/^\d{6}$/.test(digits)) {
+          var hit = ix.byPin[digits];
+          if (hit !== undefined) {
+            var a = ix.areas[hit];
+            return render('yes', COPY.yes, a[0] + ', ' + a[1] + ' — ' + digits + '.');
+          }
+          return render('no', COPY.no + ' (' + digits + ')', COPY.noBody, true);
+        }
+
+        // Anything else is treated as a place name.
+        if (digits.length && digits.length < 6 && /^\d+$/.test(q)) {
+          return render('hint', COPY.empty);
+        }
+
+        var needle = q.toLowerCase();
+        var matches = ix.areas.filter(function (a) {
+          return a[0].toLowerCase().indexOf(needle) !== -1 ||
+                 a[1].toLowerCase().indexOf(needle) !== -1;
+        });
+
+        if (matches.length) {
+          var names = matches.slice(0, 6).map(function (a) { return a[0] + ', ' + a[1]; });
+          var more  = matches.length > names.length ? ' +' + (matches.length - names.length) + ' more' : '';
+          return render('yes', COPY.yes, names.join(' · ') + more + '.');
+        }
+        return render('no', COPY.no, COPY.noBody, true);
+      }).catch(function () {
+        render('no', COPY.failed, null, true);
+      });
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      check(input.value);
+    });
+  })();
+</script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Installation Check",
+  "tag": "section",
+  "class": "shopify-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Lets a visitor check whether OTODOR installs at their pincode or city. Coverage comes from assets/otodor-service-areas.js — regenerate that file from the DTPL sheet when coverage changes. The section hides itself on products outside the collections below."
+    },
+    {
+      "type": "select", "id": "color_scheme", "label": "Colour scheme", "default": "light",
+      "options": [
+        { "value": "light", "label": "Light (off-white)" },
+        { "value": "dark", "label": "Dark" }
+      ]
+    },
+
+    { "type": "header", "content": "Where it shows" },
+    {
+      "type": "text", "id": "only_collections", "label": "Only these collections",
+      "default": "wooden-door-locks",
+      "info": "Collection handles, comma separated. Blank = every product the section is added to. A product's custom.hidden_modules / shown_modules metafield still wins."
+    },
+    { "type": "text", "id": "only_tags", "label": "…or these product tags", "info": "Optional. Comma separated." },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Installation Coverage" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Do we install at your address?" },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Every OTODOR wooden-door lock is fitted by a certified technician, not couriered. Check your pincode before you buy." },
+    { "type": "text", "id": "coverage_note", "label": "Coverage note", "default": "Covering 3,913 pincodes across 133 districts." },
+    { "type": "text", "id": "field_label", "label": "Field label", "default": "Pincode or city" },
+    { "type": "text", "id": "field_placeholder", "label": "Field placeholder", "default": "e.g. 400001 or Mumbai" },
+    { "type": "text", "id": "submit_label", "label": "Button label", "default": "Check" },
+    { "type": "text", "id": "note", "label": "Fine print", "default": "Installation is free and usually scheduled within 48 hours of delivery." },
+
+    { "type": "header", "content": "Results" },
+    { "type": "text", "id": "result_yes", "label": "Covered", "default": "Good news — we install here." },
+    { "type": "text", "id": "result_no", "label": "Not covered", "default": "No installation partner here yet." },
+    { "type": "textarea", "id": "result_no_body", "label": "Not covered — detail", "default": "We can still deliver, and we will tell you the moment a technician covers your area." },
+    { "type": "text", "id": "result_empty", "label": "Nothing entered", "default": "Enter a 6-digit pincode, or your city." },
+    { "type": "text", "id": "result_loading", "label": "Checking", "default": "Checking…" },
+    { "type": "textarea", "id": "result_failed", "label": "Coverage list failed to load", "default": "Could not load the coverage list. Please message us and we will check for you." },
+
+    { "type": "header", "content": "If we don't cover them" },
+    { "type": "text", "id": "fallback_label", "label": "Fallback link label", "default": "Request a home survey" },
+    { "type": "url", "id": "fallback_link", "label": "Fallback link", "info": "Defaults to the contact page lead form." },
+    { "type": "text", "id": "whatsapp_label", "label": "WhatsApp label", "default": "Ask on WhatsApp", "info": "Shown only when WhatsApp is on in Theme settings." },
+    { "type": "text", "id": "whatsapp_message", "label": "WhatsApp pre-filled message", "default": "Hello OTODOR, is installation available at my pincode?" },
+    { "type": "textarea", "id": "noscript_text", "label": "No-JavaScript message", "default": "Turn on JavaScript to check your pincode, or message us and we will confirm coverage for your address." }
+  ],
+  "presets": [
+    { "name": "OTODOR Installation Check" }
+  ]
+}
+{% endschema %}

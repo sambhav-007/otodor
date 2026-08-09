@@ -13,7 +13,14 @@
                       sub-part (trust rail, interest select, WhatsApp, consent)
                       self-hides when it has nothing to show.
   Merchant editable:  YES — all copy, fields, interest options, trust reasons,
-                      colour scheme, WhatsApp toggle.
+                      trust-reason style (ledger / icon), colour scheme,
+                      WhatsApp toggle.
+  Layout register:    Editorial, not carded. The two columns are separated by a
+                      single rule (a horizontal one when stacked); the trust
+                      reasons are a hairline ledger with a tabular index; the
+                      fields are underlines, not boxes; one filled control per
+                      action row (WhatsApp is an outline pill carrying the real
+                      WhatsApp mark, not a green slab).
   Required metafields: none.
   Optional metafields: none. Reads `product` / `collection` in the render
                        context for hidden lead-attribution fields; uses
@@ -66,23 +73,68 @@
 -%}
 
 {%- style -%}
+  {%- comment -%}
+    The wrapper used to carry `otodor-section` as well, which applies
+    --otodor-section-py on top of the padding set here: 100px from the class
+    plus 96px from the setting = 196px top and bottom. With the neighbouring
+    sections' own bands either side, this one form floated in roughly 600px
+    of dead space. The class is off the schema now, so this rule is the only
+    source of the section's padding.
+  {%- endcomment -%}
+  {%- comment -%}
+    The setting is the desktop maximum, not a constant: a flat 80px held its
+    full height on a phone while every neighbouring section relaxed to ~44px,
+    so the form re-opened the gap on exactly the screens with least room.
+    Same clamp shape as --otodor-section-py, with the merchant's value as the
+    ceiling.
+  {%- endcomment -%}
   #otodor-lead-{{ section.id }} {
-    padding-block: {{ section.settings.padding_top | default: 96 }}px {{ section.settings.padding_bottom | default: 96 }}px;
+    padding-top: clamp(2.75rem, 6.5vw, {{ section.settings.padding_top | default: 80 }}px);
+    padding-bottom: clamp(2.75rem, 6.5vw, {{ section.settings.padding_bottom | default: 80 }}px);
     scroll-margin-top: 90px;
   }
-  #otodor-lead-{{ section.id }}.otodor-lead--light { background: var(--otodor-bg-light); color: var(--otodor-ink); --lead-accent: var(--otodor-accent-on-light); }
-  #otodor-lead-{{ section.id }}.otodor-lead--dark  { background: var(--otodor-black); color: var(--otodor-white); --lead-accent: var(--otodor-blue); }
+  {%- comment -%}
+    Two rule colours, not one: --lead-rule draws structure (the column
+    divider, the ledger rows), --lead-line draws the field underlines, which
+    have to be a step stronger or a form on a plain background stops reading
+    as a form.
+  {%- endcomment -%}
+  {%- comment -%}
+    `color-scheme` is what tells the browser which side its native form-control
+    defaults sit on. Without it a control's UA text colour resolves to
+    `FieldText` — black — so the moment anything knocks out our `color: inherit`
+    (autofill, an extension, a stale cached stylesheet) the typed value goes
+    black on a black field and the visitor cannot read what they typed. It also
+    fixes the parts CSS never reached: the caret, the select's popup, and the
+    textarea's scrollbar.
+  {%- endcomment -%}
+  #otodor-lead-{{ section.id }}.otodor-lead--light {
+    color-scheme: light;
+    background: var(--otodor-bg-light); color: var(--otodor-ink);
+    --lead-accent: var(--otodor-accent-on-light);
+    --lead-rule: rgba(0, 0, 0, 0.12);
+    --lead-line: rgba(0, 0, 0, 0.22);
+    --lead-tint: rgba(26, 120, 216, 0.05);
+  }
+  #otodor-lead-{{ section.id }}.otodor-lead--dark {
+    color-scheme: dark;
+    background: var(--otodor-black); color: var(--otodor-white);
+    --lead-accent: var(--otodor-blue);
+    --lead-rule: rgba(255, 255, 255, 0.14);
+    --lead-line: rgba(255, 255, 255, 0.26);
+    --lead-tint: rgba(77, 166, 255, 0.06);
+  }
 
   #otodor-lead-{{ section.id }} .otodor-lead__inner {
     max-width: var(--otodor-container);
     margin-inline: auto;
     display: grid;
-    grid-template-columns: 1.05fr 1fr;
-    gap: clamp(2rem, 5vw, 5rem);
+    grid-template-columns: 1fr 1.1fr;
+    gap: clamp(2rem, 4vw, 4rem);
     align-items: start;
   }
   @media (max-width: 860px) {
-    #otodor-lead-{{ section.id }} .otodor-lead__inner { grid-template-columns: 1fr; gap: clamp(1.75rem, 6vw, 2.75rem); }
+    #otodor-lead-{{ section.id }} .otodor-lead__inner { grid-template-columns: 1fr; gap: clamp(1.75rem, 6vw, 2.5rem); }
     {% if section.settings.form_first %}#otodor-lead-{{ section.id }} .otodor-lead__aside { order: 2; } #otodor-lead-{{ section.id }} .otodor-lead__panel { order: 1; }{% endif %}
   }
 
@@ -92,105 +144,277 @@
     letter-spacing: var(--otodor-tracking-widest); text-transform: uppercase; margin-bottom: 0.9rem; color: var(--lead-accent);
   }
   #otodor-lead-{{ section.id }} .otodor-lead__title {
-    font-family: var(--otodor-font-display); font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 700;
-    line-height: 1.05; letter-spacing: var(--otodor-tracking-tight); margin: 0;
+    font-family: var(--otodor-font-display);
+    /* One section-heading size across the page (was 37.5px against 50px). */
+    font-size: var(--otodor-text-4xl); font-weight: 700;
+    line-height: var(--otodor-leading-display); letter-spacing: var(--otodor-tracking-tight); margin: 0;
   }
   #otodor-lead-{{ section.id }}.otodor-lead--light .otodor-lead__title { color: var(--otodor-ink); }
   #otodor-lead-{{ section.id }}.otodor-lead--dark  .otodor-lead__title { color: var(--otodor-white); }
   #otodor-lead-{{ section.id }} .otodor-lead__title .accent { color: var(--lead-accent); }
-  #otodor-lead-{{ section.id }} .otodor-lead__sub { margin: 1rem 0 0; font-size: 1.34rem; line-height: 1.55; opacity: 0.66; max-width: 34rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__sub { margin: 1.1rem 0 0; font-size: var(--otodor-text-md); line-height: 1.55; opacity: 0.6; max-width: 34rem; }
 
-  #otodor-lead-{{ section.id }} .otodor-lead__reasons { list-style: none; margin: clamp(1.75rem, 3vw, 2.5rem) 0 0; padding: 0; display: grid; gap: 1.1rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__reason { display: flex; gap: 0.85rem; align-items: flex-start; }
+  {%- comment -%}
+    The trust rail is a ledger, not a card list. Three tinted icon tiles with a
+    title and a line under each is the stock "features" component; the same
+    three claims read as evidence when they are hairline-ruled rows with a
+    tabular index — the register the comparison sheet and the spec table
+    already use. `reason_style: icon` keeps the old treatment available, minus
+    the tinted plate.
+  {%- endcomment -%}
+  #otodor-lead-{{ section.id }} .otodor-lead__reasons {
+    list-style: none; margin: clamp(2.25rem, 4vw, 3.25rem) 0 0; padding: 0;
+    border-top: 1px solid var(--lead-rule);
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason {
+    display: grid; grid-template-columns: 2.75rem 1fr; align-items: start;
+    gap: 0 1.1rem; padding: 1.15rem 0; border-bottom: 1px solid var(--lead-rule);
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-index {
+    font-family: var(--otodor-font-display); font-size: var(--otodor-text-xs); font-weight: 600;
+    letter-spacing: var(--otodor-tracking-wider); font-variant-numeric: tabular-nums;
+    color: var(--lead-accent); padding-top: 0.32rem;
+  }
+  {%- comment -%} Icon variant: the glyph only, at rail weight — no plate, no fill. {%- endcomment -%}
   #otodor-lead-{{ section.id }} .otodor-lead__reason-icon {
-    flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-    width: 40px; height: 40px; border-radius: var(--otodor-radius-md); color: var(--lead-accent);
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; margin-top: 0.1rem; color: var(--lead-accent); opacity: 0.85;
   }
-  .otodor-lead--light .otodor-lead__reason-icon { background: rgba(26,120,216,0.08); }
-  .otodor-lead--dark  .otodor-lead__reason-icon { background: rgba(77,166,255,0.12); }
-  #otodor-lead-{{ section.id }} .otodor-lead__reason-icon svg { width: 20px; height: 20px; }
-  #otodor-lead-{{ section.id }} .otodor-lead__reason-title { font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.25rem; margin: 0 0 0.15rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__reason-text { margin: 0; font-size: 1.1rem; line-height: 1.5; opacity: 0.6; }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-icon svg { width: 100%; height: 100%; }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-title {
+    display: block; font-family: var(--otodor-font-display); font-weight: 600;
+    font-size: var(--otodor-text-base); letter-spacing: var(--otodor-tracking-base); margin: 0 0 0.25rem;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__reason-text { margin: 0; font-size: var(--otodor-text-sm); line-height: 1.5; opacity: 0.55; }
 
-  /* ─ Right panel (the form card) ───────────────────────────── */
+  /* ─ Right column: the form, on the page — not in a box ──────
+     It used to sit in a #121212 card on a #0B0B0B section: an edge with
+     nothing behind it, a shadow with nothing to cast onto, and a second
+     radius inside the first as soon as the inputs were drawn. One rule
+     separates the columns instead — the same divider idiom as the rest of
+     the site's editorial splits.
+    ─────────────────────────────────────────────────────────── */
   #otodor-lead-{{ section.id }} .otodor-lead__panel {
-    border-radius: var(--otodor-radius-lg); padding: clamp(1.5rem, 3vw, 2.4rem);
+    padding-left: clamp(2rem, 4vw, 4rem);
+    border-left: 1px solid var(--lead-rule);
   }
-  .otodor-lead--light .otodor-lead__panel { background: var(--otodor-bg-light-2); border: 1px solid var(--otodor-hairline-light); box-shadow: var(--otodor-shadow-md); }
-  .otodor-lead--dark  .otodor-lead__panel { background: var(--otodor-surface); border: 1px solid var(--otodor-hairline); }
+  {%- comment -%}
+    Stacked, the divider belongs above whichever column comes second — so it
+    follows the form-first setting rather than being pinned to the form.
+  {%- endcomment -%}
+  @media (max-width: 860px) {
+    #otodor-lead-{{ section.id }} .otodor-lead__panel { padding-left: 0; border-left: 0; }
+    #otodor-lead-{{ section.id }} .otodor-lead__{% if section.settings.form_first %}aside{% else %}panel{% endif %} {
+      padding-top: clamp(1.75rem, 5vw, 2.5rem); border-top: 1px solid var(--lead-rule);
+    }
+    {%- unless section.settings.form_first -%}
+      {%- comment -%}
+        Stacked, the ledger's closing rule and the form's opening rule land
+        22px apart — two parallel lines saying one thing. The divider closes
+        the ledger and opens the form; the last row gives up its own.
+      {%- endcomment -%}
+      #otodor-lead-{{ section.id }} .otodor-lead__reason:last-child { border-bottom: 0; }
+    {%- endunless -%}
+  }
 
-  #otodor-lead-{{ section.id }} .otodor-lead__form { display: grid; gap: 1rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__form { display: grid; gap: clamp(1.35rem, 2.2vw, 1.75rem); }
+  #otodor-lead-{{ section.id }} .otodor-lead__row { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.35rem, 2.2vw, 1.75rem); }
   @media (max-width: 480px) { #otodor-lead-{{ section.id }} .otodor-lead__row { grid-template-columns: 1fr; } }
-  #otodor-lead-{{ section.id }} .otodor-lead__field { display: grid; gap: 0.4rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__label { font-size: 1.02rem; font-weight: 600; letter-spacing: 0.01em; opacity: 0.85; }
-  #otodor-lead-{{ section.id }} .otodor-lead__label .req { color: var(--lead-accent); }
+  #otodor-lead-{{ section.id }} .otodor-lead__field { display: grid; gap: 0.15rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__label {
+    font-family: var(--otodor-font-display); font-size: var(--otodor-text-xs); font-weight: 600;
+    text-transform: uppercase; letter-spacing: var(--otodor-tracking-wider); opacity: 0.5;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__label .req { color: var(--lead-accent); opacity: 0.9; }
+
+  {%- comment -%}
+    Underlines, not boxes. A boxed field inside a boxed card is two frames
+    around one value; the rule under the text is enough to say "type here" and
+    lets the type sit on the page at reading size.
+  {%- endcomment -%}
   #otodor-lead-{{ section.id }} .otodor-lead__input,
   #otodor-lead-{{ section.id }} .otodor-lead__select,
   #otodor-lead-{{ section.id }} .otodor-lead__textarea {
-    width: 100%; font-family: var(--otodor-font-body); font-size: 1.22rem; color: inherit;
-    padding: 0.72rem 0.9rem; border-radius: var(--otodor-radius-md); border: 1px solid; background: transparent;
-    transition: border-color var(--otodor-dur-fast) ease, box-shadow var(--otodor-dur-fast) ease;
+    width: 100%; font-family: var(--otodor-font-body); font-size: var(--otodor-text-base); color: inherit;
+    min-height: var(--otodor-control-h);
+    padding: 0.55rem 0; border: 0; border-bottom: 1px solid var(--lead-line);
+    border-radius: 0; background: transparent; box-shadow: none;
+    transition: border-color var(--otodor-dur-fast) var(--otodor-ease-out),
+                background-color var(--otodor-dur-fast) var(--otodor-ease-out);
   }
-  .otodor-lead--light .otodor-lead__input,
-  .otodor-lead--light .otodor-lead__select,
-  .otodor-lead--light .otodor-lead__textarea { border-color: var(--otodor-hairline-light-2); background: #fff; }
-  .otodor-lead--dark .otodor-lead__input,
-  .otodor-lead--dark .otodor-lead__select,
-  .otodor-lead--dark .otodor-lead__textarea { border-color: var(--otodor-hairline-mid); background: rgba(255,255,255,0.03); }
-  #otodor-lead-{{ section.id }} .otodor-lead__textarea { resize: vertical; min-height: 96px; }
+  {%- comment -%}
+    Belt to the color-scheme braces: the colour is stated per scheme rather
+    than inherited, and stated twice. `-webkit-text-fill-color` is what
+    actually paints the glyphs in a WebKit/Blink form control and it outranks
+    `color`, so declaring it here means a UA or extension rule that wins
+    `color` still cannot repaint the text.
+  {%- endcomment -%}
+  #otodor-lead-{{ section.id }}.otodor-lead--dark .otodor-lead__input,
+  #otodor-lead-{{ section.id }}.otodor-lead--dark .otodor-lead__select,
+  #otodor-lead-{{ section.id }}.otodor-lead--dark .otodor-lead__textarea {
+    color: var(--otodor-white); -webkit-text-fill-color: var(--otodor-white);
+  }
+  #otodor-lead-{{ section.id }}.otodor-lead--light .otodor-lead__input,
+  #otodor-lead-{{ section.id }}.otodor-lead--light .otodor-lead__select,
+  #otodor-lead-{{ section.id }}.otodor-lead--light .otodor-lead__textarea {
+    color: var(--otodor-ink); -webkit-text-fill-color: var(--otodor-ink);
+  }
+  {%- comment -%}
+    The placeholder has to name its own fill for the same reason — it inherits
+    the declared text-fill above, which would print it at full strength.
+  {%- endcomment -%}
+  #otodor-lead-{{ section.id }} .otodor-lead__input::placeholder,
+  #otodor-lead-{{ section.id }} .otodor-lead__textarea::placeholder {
+    color: currentColor; -webkit-text-fill-color: currentColor; opacity: 0.35;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__textarea { resize: vertical; min-height: 6.5rem; line-height: 1.5; }
+
+  {%- comment -%}
+    Focus is a 2px accent rule (the border plus a 1px shadow under it) and a
+    faint wash across the field — a ring can't be drawn round a control that
+    has no box. Both are non-colour-only: the rule doubles in weight.
+  {%- endcomment -%}
   #otodor-lead-{{ section.id }} .otodor-lead__input:focus-visible,
   #otodor-lead-{{ section.id }} .otodor-lead__select:focus-visible,
   #otodor-lead-{{ section.id }} .otodor-lead__textarea:focus-visible {
-    outline: none; border-color: var(--lead-accent); box-shadow: 0 0 0 3px var(--otodor-blue-glow);
+    outline: none; border-bottom-color: var(--lead-accent);
+    box-shadow: 0 1px 0 0 var(--lead-accent); background: var(--lead-tint);
   }
-  #otodor-lead-{{ section.id }} .otodor-lead__select { appearance: none; -webkit-appearance: none; cursor: pointer; }
+  {%- comment -%}
+    Chrome paints autofilled fields with its own background, and it lands as a
+    square grey slab that covers the underline — the one thing telling the
+    visitor this is a field. It is applied by an `!important` UA rule, so
+    author `background: transparent` cannot win; there are exactly two levers.
+    `background-clip: text` confines that paint to the glyphs themselves, which
+    makes it invisible on any transparent field; the 9999s transition delays it
+    on engines that ignore the clip. Both are needed, and `:hover` / `:focus`
+    are listed because Chrome re-asserts the colour on each.
 
-  #otodor-lead-{{ section.id }} .otodor-lead__consent { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 1.02rem; line-height: 1.45; opacity: 0.72; }
-  #otodor-lead-{{ section.id }} .otodor-lead__consent input { margin-top: 0.2rem; accent-color: var(--lead-accent); flex: 0 0 auto; }
-
-  #otodor-lead-{{ section.id }} .otodor-lead__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.35rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__submit {
-    flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-    padding: 0.85rem 1.4rem; border: none; cursor: pointer; border-radius: var(--otodor-radius-pill);
-    font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.22rem;
-    background: var(--lead-accent); color: #fff;
-    transition: transform var(--otodor-dur-fast) ease, filter var(--otodor-dur-fast) ease;
+    Trade-off: while a field is autofilled AND focused, the clip also applies
+    to our own focus wash, so focus shows as the 2px accent rule without the
+    tint. The rule is the accessible signal; the tint was only ever support.
+  {%- endcomment -%}
+  #otodor-lead-{{ section.id }} .otodor-lead__input:-webkit-autofill,
+  #otodor-lead-{{ section.id }} .otodor-lead__input:-webkit-autofill:hover,
+  #otodor-lead-{{ section.id }} .otodor-lead__input:-webkit-autofill:focus,
+  #otodor-lead-{{ section.id }} .otodor-lead__input:-webkit-autofill:active,
+  #otodor-lead-{{ section.id }} .otodor-lead__textarea:-webkit-autofill,
+  #otodor-lead-{{ section.id }} .otodor-lead__textarea:-webkit-autofill:hover,
+  #otodor-lead-{{ section.id }} .otodor-lead__textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: currentColor;
+    -webkit-background-clip: text;
+    background-clip: text;
+    caret-color: currentColor;
+    transition: background-color 9999s ease-out 0s;
   }
-  #otodor-lead-{{ section.id }} .otodor-lead__submit:hover { transform: translateY(-1px); filter: brightness(1.05); }
-  #otodor-lead-{{ section.id }} .otodor-lead__submit svg { width: 16px; height: 16px; }
+
+  #otodor-lead-{{ section.id }} .otodor-lead__select-wrap { position: relative; display: grid; }
+  #otodor-lead-{{ section.id }} .otodor-lead__select {
+    appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: 2rem;
+  }
+  {%- comment -%} The select was `appearance: none` with nothing put back — a dropdown with no affordance. {%- endcomment -%}
+  #otodor-lead-{{ section.id }} .otodor-lead__select-caret {
+    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    width: 1.15rem; height: 1.15rem; pointer-events: none; opacity: 0.45;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__select-caret svg { width: 100%; height: 100%; }
+  #otodor-lead-{{ section.id }} .otodor-lead__select option { background: var(--otodor-black); color: var(--otodor-white); }
+  #otodor-lead-{{ section.id }}.otodor-lead--light .otodor-lead__select option { background: #fff; color: var(--otodor-ink); }
+
+  {%- comment -%}
+    The consent box was the raw UA checkbox — a grey system square against a
+    typeset form. Drawn here so it carries the accent and the hairline.
+  {%- endcomment -%}
+  #otodor-lead-{{ section.id }} .otodor-lead__consent {
+    display: flex; gap: 0.7rem; align-items: flex-start; cursor: pointer;
+    font-size: var(--otodor-text-sm); line-height: 1.5; opacity: 0.65; margin-top: 0.15rem;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__consent input {
+    appearance: none; -webkit-appearance: none; flex: 0 0 auto; margin: 0.15rem 0 0;
+    width: 1.35rem; height: 1.35rem; border: 1px solid var(--lead-line);
+    border-radius: var(--otodor-radius-xs); background: transparent; cursor: pointer;
+    display: grid; place-content: center;
+    transition: background-color var(--otodor-dur-fast) var(--otodor-ease-out), border-color var(--otodor-dur-fast) var(--otodor-ease-out);
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__consent input::after {
+    content: ''; width: 0.35rem; height: 0.65rem; margin-top: -0.15rem;
+    border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg) scale(0);
+    transition: transform var(--otodor-dur-fast) var(--otodor-ease-spring);
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__consent input:checked { background: var(--lead-accent); border-color: var(--lead-accent); }
+  #otodor-lead-{{ section.id }} .otodor-lead__consent input:checked::after { transform: rotate(45deg) scale(1); }
+  #otodor-lead-{{ section.id }} .otodor-lead__consent input:focus-visible { outline: 2px solid var(--lead-accent); outline-offset: 2px; }
+
+  /* ─ Actions ─────────────────────────────────────────────────
+     One filled control on the row. WhatsApp was a saturated green slab
+     competing with the primary at equal weight (and carrying a *key* glyph);
+     it keeps its full size and the real mark, on a hairline instead of a fill.
+    ─────────────────────────────────────────────────────────── */
+  #otodor-lead-{{ section.id }} .otodor-lead__actions {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 0.6rem;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__submit,
   #otodor-lead-{{ section.id }} .otodor-lead__wa {
-    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-    padding: 0.85rem 1.2rem; border-radius: var(--otodor-radius-pill); text-decoration: none;
-    font-family: var(--otodor-font-display); font-weight: 600; font-size: 1.15rem;
-    background: #25D366; color: #05300f;
-    transition: transform var(--otodor-dur-fast) ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+    min-height: var(--otodor-control-h-lg); padding: 0.7rem 1.75rem;
+    border-radius: var(--otodor-radius-pill); text-decoration: none;
+    font-family: var(--otodor-font-display); font-weight: 600; font-size: var(--otodor-text-sm);
+    letter-spacing: var(--otodor-tracking-base);
+    transition: transform var(--otodor-dur-fast) var(--otodor-ease-out),
+                filter var(--otodor-dur-fast) var(--otodor-ease-out),
+                border-color var(--otodor-dur-fast) var(--otodor-ease-out);
   }
-  #otodor-lead-{{ section.id }} .otodor-lead__wa:hover { transform: translateY(-1px); }
-  #otodor-lead-{{ section.id }} .otodor-lead__wa svg { width: 17px; height: 17px; }
+  #otodor-lead-{{ section.id }} .otodor-lead__submit {
+    flex: 0 1 auto; border: 1px solid var(--lead-accent); cursor: pointer;
+    background: var(--lead-accent); color: #fff;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__submit:hover { transform: translateY(var(--otodor-lift-sm)); filter: brightness(1.06); }
+  #otodor-lead-{{ section.id }} .otodor-lead__submit svg { width: 1.15rem; height: 1.15rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__wa {
+    border: 1px solid var(--lead-line); background: transparent; color: inherit;
+  }
+  #otodor-lead-{{ section.id }} .otodor-lead__wa:hover { border-color: #25D366; transform: translateY(var(--otodor-lift-sm)); }
+  #otodor-lead-{{ section.id }} .otodor-lead__wa svg { width: 1.3rem; height: 1.3rem; color: #25D366; }
+  {%- comment -%}
+    Side by side the two pills don't fit a phone, and wrapped they sat at
+    their own content widths — 170px over 176px, a ragged left-aligned stack.
+    Below the same breakpoint the field row uses, each takes the full width.
+  {%- endcomment -%}
+  @media (max-width: 480px) {
+    #otodor-lead-{{ section.id }} .otodor-lead__submit,
+    #otodor-lead-{{ section.id }} .otodor-lead__wa { flex: 1 1 100%; }
+  }
 
   /* ─ Success + error states ────────────────────────────────── */
-  #otodor-lead-{{ section.id }} .otodor-lead__success {
-    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.75rem;
-    padding: clamp(1.5rem, 4vw, 3rem) 1rem;
+  {%- comment -%}
+    The success panel replaces the form in the same column, so it keeps the
+    column's left-aligned editorial register rather than becoming a centred
+    badge-and-title dialogue.
+  {%- endcomment -%}
+  #otodor-lead-{{ section.id }} .otodor-lead__success { display: grid; gap: 0.8rem; padding: 0.5rem 0 clamp(1rem, 3vw, 2rem); }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-label {
+    display: flex; align-items: center; gap: 0.55rem;
+    font-family: var(--otodor-font-display); font-size: var(--otodor-text-xs); font-weight: 600;
+    text-transform: uppercase; letter-spacing: var(--otodor-tracking-widest); color: var(--otodor-success);
   }
-  #otodor-lead-{{ section.id }} .otodor-lead__success-badge {
-    display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px;
-    border-radius: 50%; background: rgba(37,211,102,0.14); color: #25D366;
+  #otodor-lead-{{ section.id }} .otodor-lead__success-label svg { width: 1.25rem; height: 1.25rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-title {
+    font-family: var(--otodor-font-display); font-weight: 700; font-size: var(--otodor-text-2xl);
+    line-height: var(--otodor-leading-display); letter-spacing: var(--otodor-tracking-tight); margin: 0;
   }
-  #otodor-lead-{{ section.id }} .otodor-lead__success-badge svg { width: 26px; height: 26px; }
-  #otodor-lead-{{ section.id }} .otodor-lead__success-title { font-family: var(--otodor-font-display); font-weight: 700; font-size: 1.73rem; margin: 0; }
-  #otodor-lead-{{ section.id }} .otodor-lead__success-text { margin: 0; font-size: 1.22rem; line-height: 1.55; opacity: 0.66; max-width: 26rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__success-text { margin: 0; font-size: var(--otodor-text-base); line-height: 1.55; opacity: 0.6; max-width: 32rem; }
   #otodor-lead-{{ section.id }} .otodor-lead__errors {
-    margin: 0 0 0.5rem; padding: 0.75rem 0.9rem; border-radius: var(--otodor-radius-md);
-    background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.28); font-size: 1.09rem;
+    margin: 0; padding: 0.85rem 0 0.85rem 1rem; border-left: 2px solid #dc2626;
+    font-size: var(--otodor-text-sm); line-height: 1.5;
   }
-  #otodor-lead-{{ section.id }} .otodor-lead__errors ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
-  #otodor-lead-{{ section.id }} .otodor-lead__field-error { color: #dc2626; font-size: 1rem; }
+  #otodor-lead-{{ section.id }} .otodor-lead__errors ul { margin: 0.35rem 0 0; padding-left: 1.1rem; opacity: 0.75; }
+  #otodor-lead-{{ section.id }} .otodor-lead__field-error { color: #ef5350; font-size: var(--otodor-text-xs); margin-top: 0.3rem; }
+  #otodor-lead-{{ section.id }}.otodor-lead--light .otodor-lead__field-error { color: #dc2626; }
 
   @media (prefers-reduced-motion: reduce) {
     #otodor-lead-{{ section.id }} .otodor-lead__submit,
-    #otodor-lead-{{ section.id }} .otodor-lead__wa { transition: none; }
+    #otodor-lead-{{ section.id }} .otodor-lead__wa,
+    #otodor-lead-{{ section.id }} .otodor-lead__consent input::after { transition: none; }
     #otodor-lead-{{ section.id }} .otodor-lead__submit:hover,
     #otodor-lead-{{ section.id }} .otodor-lead__wa:hover { transform: none; }
   }
@@ -221,8 +445,14 @@
         <ul class="otodor-lead__reasons" role="list">
           {%- for block in reason_blocks -%}
             <li class="otodor-lead__reason" {{ block.shopify_attributes }}>
-              {%- if block.settings.icon != blank -%}
+              {%- comment -%}
+                The index column: a number in the ledger style, the block's own
+                glyph in the icon style. Never both — the column is one mark wide.
+              {%- endcomment -%}
+              {%- if section.settings.reason_style == 'icon' and block.settings.icon != blank -%}
                 <span class="otodor-lead__reason-icon" aria-hidden="true">{% render 'otodor-icon', name: block.settings.icon %}</span>
+              {%- else -%}
+                <span class="otodor-lead__reason-index" aria-hidden="true">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
               {%- endif -%}
               <span>
                 {%- if block.settings.title != blank -%}<span class="otodor-lead__reason-title">{{ block.settings.title | escape }}</span>{%- endif -%}
@@ -239,7 +469,10 @@
       {%- form 'contact', id: lead_form_id, class: 'otodor-lead__form' -%}
         {%- if form.posted_successfully? -%}
           <div class="otodor-lead__success" tabindex="-1" autofocus>
-            <span class="otodor-lead__success-badge" aria-hidden="true">{% render 'otodor-icon', name: 'warranty' %}</span>
+            <span class="otodor-lead__success-label">
+              <span aria-hidden="true">{% render 'otodor-icon', name: 'warranty' %}</span>
+              Confirmed
+            </span>
             <h3 class="otodor-lead__success-title">{{ section.settings.success_title | escape }}</h3>
             <p class="otodor-lead__success-text">{{ section.settings.success_text | escape }}</p>
           </div>
@@ -289,12 +522,15 @@
           {%- if interest_blocks.size > 0 -%}
             <div class="otodor-lead__field">
               <label class="otodor-lead__label" for="otodor-lead-interest-{{ section.id }}">{{ section.settings.label_interest | escape }}</label>
-              <select class="otodor-lead__select" id="otodor-lead-interest-{{ section.id }}" name="contact[Interest]" data-otodor-lead-interest>
-                <option value="">{{ section.settings.interest_placeholder | escape }}</option>
-                {%- for block in interest_blocks -%}
-                  <option value="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</option>
-                {%- endfor -%}
-              </select>
+              <span class="otodor-lead__select-wrap">
+                <select class="otodor-lead__select" id="otodor-lead-interest-{{ section.id }}" name="contact[Interest]" data-otodor-lead-interest>
+                  <option value="">{{ section.settings.interest_placeholder | escape }}</option>
+                  {%- for block in interest_blocks -%}
+                    <option value="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</option>
+                  {%- endfor -%}
+                </select>
+                <span class="otodor-lead__select-caret" aria-hidden="true">{% render 'otodor-icon', name: 'chevron-down' %}</span>
+              </span>
             </div>
           {%- endif -%}
 
@@ -328,7 +564,7 @@
                 data-l-email="{{ section.settings.label_email | escape }}"
                 data-l-interest="{{ section.settings.label_interest | escape }}"
                 data-l-message="{{ section.settings.label_message | escape }}">
-                <span aria-hidden="true">{% render 'otodor-icon', name: 'smart' %}</span>
+                <span aria-hidden="true">{% render 'otodor-icon', name: 'whatsapp' %}</span>
                 {{ section.settings.whatsapp_label | escape }}
               </a>
             {%- endif -%}
@@ -407,7 +643,7 @@
 {
   "name": "OTODOR Lead Form",
   "tag": "section",
-  "class": "shopify-section otodor-section",
+  "class": "shopify-section",
   "settings": [
     { "type": "paragraph", "content": "Native quote / consultation capture. Submissions arrive at your store's contact email (Settings → Notifications). Hidden fields auto-attach which product / collection / page the lead came from." },
     { "type": "text", "id": "anchor_id", "label": "Anchor id (for CTA deep-links)", "default": "otodor-lead", "info": "Link CTAs to this page with #otodor-lead to scroll straight to the form." },
@@ -419,6 +655,14 @@
     { "type": "text", "id": "heading", "label": "Heading", "default": "Request a" },
     { "type": "text", "id": "heading_accent", "label": "Heading accent (coloured)", "default": "custom quote." },
     { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Tell us about your door and we'll recommend the right OTODOR system, with a free site survey and installation assessment." },
+    {
+      "type": "select", "id": "reason_style", "label": "Trust reason style", "default": "ledger",
+      "info": "Ledger = hairline-ruled rows with a numbered index (recommended). Icon = the block's glyph instead of the number.",
+      "options": [
+        { "value": "ledger", "label": "Ledger (numbered rows)" },
+        { "value": "icon", "label": "Icon" }
+      ]
+    },
 
     { "type": "header", "content": "Form labels" },
     { "type": "text", "id": "label_name", "label": "Name label", "default": "Name" },
@@ -445,8 +689,8 @@
     { "type": "textarea", "id": "success_text", "label": "Success text", "default": "Thank you — an OTODOR specialist will call you within one business day to arrange your survey." },
 
     { "type": "header", "content": "Spacing" },
-    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 },
-    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 96 }
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 }
   ],
   "blocks": [
     {

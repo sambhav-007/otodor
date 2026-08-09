@@ -20,7 +20,7 @@
   /* Header: eyebrow, heading, the two friction-killers */
   .otodor-install__header {
     max-width: 900px;
-    margin-bottom: clamp(3rem, 7vw, 5.5rem);
+    margin-bottom: var(--otodor-header-mb);
   }
   .otodor-install__eyebrow {
     display: block;
@@ -30,13 +30,14 @@
     text-transform: uppercase;
     letter-spacing: var(--otodor-tracking-widest);
     color: var(--otodor-accent-on-light);
-    margin-bottom: 1.1rem;
+    margin-bottom: var(--otodor-header-gap);
   }
   .otodor-install__heading {
     font-family: var(--otodor-font-display);
-    font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+    /* One section-heading size across the page (was 40px against 50px). */
+    font-size: var(--otodor-text-4xl);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: var(--otodor-leading-display);
     letter-spacing: var(--otodor-tracking-tight);
     color: var(--otodor-ink);
     margin: 0;

@@ -1,3 +1,7 @@
+{%- liquid
+  assign feat_scheme = section.settings.color_scheme | default: 'dark'
+-%}
+
 {%- style -%}
   /* ─────────────────────────────────────────────────────────
      OTODOR Features — asymmetric "bento" grid.
@@ -8,7 +12,7 @@
   #shopify-section-{{ section.id }} {
     position: relative;
     z-index: 3;
-    background-color: transparent;
+    background-color: {% if feat_scheme == 'contrast' %}#000000{% elsif feat_scheme == 'light' %}#FFFFFF{% else %}transparent{% endif %};
   }
 
   .otodor-features {
@@ -21,10 +25,18 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--otodor-space-lg);
-    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+    margin-bottom: var(--otodor-header-mb);
   }
 
-  .otodor-features__header-text { max-width: 40ch; }
+  /* The eyebrow here sits in a plain div rather than .otodor-section-header,
+     so it stayed inline and the gap down to the heading measured 46px against
+     12px everywhere else. Same flex column, same token. */
+  .otodor-features__header-text {
+    max-width: 40ch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--otodor-header-gap);
+  }
 
   .otodor-features__subheading {
     font-family: var(--otodor-font-body);
@@ -51,7 +63,7 @@
     padding: clamp(1.4rem, 2.2vw, 2rem);
     display: flex;
     flex-direction: column;
-    border-radius: 20px;
+    border-radius: var(--otodor-radius-md);
     isolation: isolate;
   }
 
@@ -62,7 +74,7 @@
 
   /* BorderGlow wrapper: keep only the glow layers; the inner tile carries the frame */
   .otodor-feature-tile-glow.border-glow-card {
-    --border-radius: 20px;
+    --border-radius: var(--otodor-radius-md);
     background: transparent;
     border: none;
     box-shadow: none;
@@ -123,10 +135,11 @@
 
   /* Hover: lift + intensify motif */
   .otodor-feature-tile {
-    transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 400ms ease, box-shadow 400ms ease;
+    transition: transform var(--otodor-t-move),
+                border-color var(--otodor-t-tint),
+                box-shadow var(--otodor-t-tint);
   }
-  .otodor-feature-tile:hover { transform: translateY(-4px); }
+  .otodor-feature-tile:hover { transform: translateY(var(--otodor-lift)); }
   .otodor-feature-tile:hover .feat-motif { opacity: 0.9; }
 
   /* ─ Motif base ──────────────────────────────────────────── */
@@ -177,7 +190,7 @@
     padding-right: 8%;
   }
   .feat-phone {
-    width: 145px; height: 190px; border-radius: 22px;
+    width: 145px; height: 190px; border-radius: var(--otodor-radius-md);
     border: 1px solid rgba(255,255,255,0.14);
     background: linear-gradient(160deg, rgba(40,46,58,0.6), rgba(12,14,20,0.6));
     box-shadow: 0 18px 40px rgba(0,0,0,0.5); padding: 12px 10px;
@@ -251,7 +264,7 @@
     .otodor-feature-tile-glow--wide,
     .otodor-feature-tile-glow--small { grid-column: span 1; grid-row: auto; }
 
-    .otodor-feature-tile { padding: 0.9rem; border-radius: 16px; }
+    .otodor-feature-tile { padding: 0.9rem; border-radius: var(--otodor-radius-sm); }
     .otodor-feature-tile--large { padding: 1.25rem; }
 
     .otodor-feature-tile__icon {
@@ -324,6 +337,121 @@
     .feat-keypad__grid i.lit,
     .feat-log__row--active { animation: none !important; }
   }
+
+  {%- if feat_scheme == 'contrast' -%}
+  /* ─ Contrast scheme — white tiles on a pitch-black section ───
+     Each tile carries `.otodor-light`, so the design tokens inside
+     it flip on their own: title → ink, description → ink-soft,
+     --otodor-blue → the deeper #1A78D8 that holds up on white. Only
+     two kinds of rule are restated below:
+
+       1. the tile surface, because `.otodor-light` sets its own
+          off-white background-color that would otherwise win over
+          `.otodor-glass-card`;
+       2. the motifs, which were drawn in white-on-dark — every
+          rgba(255,255,255,…) hairline in them is invisible on a
+          white card, and every rgba(77,166,255,…) is washed out.
+
+     Everything outside the tiles (eyebrow, heading, subheading)
+     stays on the dark tokens: it sits on the black section.
+    ───────────────────────────────────────────────────────── */
+  #otodor-features-{{ section.id }} .otodor-feature-tile {
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 18px 42px rgba(0, 0, 0, 0.35);
+  }
+  #otodor-features-{{ section.id }} .otodor-feature-tile:hover {
+    background: #FFFFFF;
+    border-color: rgba(26, 120, 216, 0.28);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06), 0 26px 56px rgba(0, 0, 0, 0.45);
+  }
+  /* The glass card's diagonal top highlight is a dark-surface trick. */
+  #otodor-features-{{ section.id }} .otodor-feature-tile::before { background: none; }
+  /* BorderGlow paints its own card fill behind the tile; tell it white. */
+  #otodor-features-{{ section.id }} .border-glow-card { --card-bg: #FFFFFF; }
+
+  #otodor-features-{{ section.id }} .otodor-feature-tile__icon {
+    background: rgba(26, 120, 216, 0.08);
+    border-color: rgba(26, 120, 216, 0.20);
+  }
+
+  /* ── Motifs, restated for a white card ── */
+  #otodor-features-{{ section.id }} .feat-fingerprint { opacity: 0.5; }
+  #otodor-features-{{ section.id }} .feat-fingerprint::after {
+    background: linear-gradient(90deg, transparent, rgba(26, 120, 216, 0.85), transparent);
+    box-shadow: 0 0 10px rgba(26, 120, 216, 0.35);
+  }
+  #otodor-features-{{ section.id }} .otodor-feature-tile--large .otodor-feature-tile__render {
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.20));
+  }
+
+  #otodor-features-{{ section.id }} .feat-phone {
+    border-color: rgba(0, 0, 0, 0.10);
+    background: linear-gradient(160deg, #F3F5F9, #E3E7EE);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  }
+  #otodor-features-{{ section.id }} .feat-phone__pill {
+    background: rgba(26, 120, 216, 0.14);
+    border-color: rgba(26, 120, 216, 0.32);
+  }
+  #otodor-features-{{ section.id }} .feat-phone__pill::after {
+    background: #1A78D8;
+    box-shadow: 0 0 10px rgba(26, 120, 216, 0.5);
+  }
+  #otodor-features-{{ section.id }} .feat-phone__row { background: rgba(26, 26, 26, 0.12); }
+
+  #otodor-features-{{ section.id }} .feat-signal span { border-color: rgba(26, 120, 216, 0.55); }
+
+  #otodor-features-{{ section.id }} .feat-rfid__card,
+  #otodor-features-{{ section.id }} .feat-rfid__card::before { border-color: rgba(26, 120, 216, 0.55); }
+  #otodor-features-{{ section.id }} .feat-rfid__ripple { border-color: rgba(26, 120, 216, 0.42); }
+
+  #otodor-features-{{ section.id }} .feat-keypad__grid i { border-color: rgba(26, 26, 26, 0.16); }
+  #otodor-features-{{ section.id }} .feat-keypad__grid i.lit {
+    border-color: rgba(26, 120, 216, 0.7);
+    background: rgba(26, 120, 216, 0.16);
+    box-shadow: 0 0 10px rgba(26, 120, 216, 0.30);
+  }
+
+  #otodor-features-{{ section.id }} .feat-log__row b { background: rgba(26, 26, 26, 0.14); }
+  {%- endif -%}
+
+  {%- if feat_scheme == 'light' -%}
+  /* ─ Light scheme — black tiles on a white section ────────────
+     The exact inverse of `contrast`, and a much smaller change than
+     it looks, because a black tile is what this section was drawn
+     for: every motif is already white-on-dark, so none of them need
+     restating here. Only two things move.
+
+     1. The tiles need an explicit black surface. `.otodor-glass-card`
+        is translucent white over a dark page — on a white section
+        that resolves to almost nothing, so the colour is stated.
+
+     2. Only the header sits on the white, so only the header carries
+        `.otodor-light` (see the markup). Scoping the token flip to
+        the header rather than the section is what lets the tiles keep
+        the dark tokens — white titles, muted descriptions, bright
+        blue icons — with no re-darkening rules at all.
+    ───────────────────────────────────────────────────────── */
+  #otodor-features-{{ section.id }} .otodor-feature-tile {
+    background: var(--otodor-black, #0B0B0B);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 18px 42px rgba(0, 0, 0, 0.18);
+  }
+  #otodor-features-{{ section.id }} .otodor-feature-tile:hover {
+    background: #101010;
+    border-color: rgba(77, 166, 255, 0.30);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 26px 56px rgba(0, 0, 0, 0.26);
+  }
+  /* BorderGlow paints its own card fill behind the tile; tell it black. */
+  #otodor-features-{{ section.id }} .border-glow-card { --card-bg: #0B0B0B; }
+
+  /* `.otodor-light` paints its own off-white background — the header is
+     a text wrapper on an already-white section, so suppress it. */
+  #otodor-features-{{ section.id }} .otodor-features__header.otodor-light {
+    background-color: transparent;
+  }
+  {%- endif -%}
 {%- endstyle -%}
 
 {%- comment -%} Section lifecycle: auto-hide when no feature blocks exist. {%- endcomment -%}
@@ -335,7 +463,7 @@
   aria-labelledby="otodor-features-title-{{ section.id }}"
 >
   <div class="otodor-container">
-    <div class="otodor-features__header">
+    <div class="otodor-features__header{% if feat_scheme == 'light' %} otodor-light{% endif %}">
       <div class="otodor-features__header-text">
         <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
         <h2 class="otodor-heading-2" id="otodor-features-title-{{ section.id }}" data-otodor-reveal="fade-up">
@@ -354,7 +482,7 @@
           <span class="edge-light"></span>
           <div class="border-glow-inner">
         <div
-          class="otodor-feature-tile otodor-feature-tile--{{ size }} otodor-glass-card otodor-glass-card--raised"
+          class="otodor-feature-tile otodor-feature-tile--{{ size }} otodor-glass-card otodor-glass-card--raised{% if feat_scheme == 'contrast' %} otodor-light{% endif %}"
         >
           {%- comment -%} Motif layer {%- endcomment -%}
           {%- case block.settings.motif -%}
@@ -430,6 +558,17 @@
   "class": "shopify-section",
   "max_blocks": 9,
   "settings": [
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "dark",
+      "options": [
+        { "value": "dark", "label": "Dark (glass tiles)" },
+        { "value": "contrast", "label": "Pitch black (white tiles)" },
+        { "value": "light", "label": "White (black tiles)" }
+      ]
+    },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Core Technology" },
     { "type": "text", "id": "heading", "label": "Heading text", "default": "Smart security for modern " },
     { "type": "text", "id": "heading_accent", "label": "Heading accented text", "default": "homes." },

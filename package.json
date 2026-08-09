@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "shopify": "^4.5.2"
+  }
+}

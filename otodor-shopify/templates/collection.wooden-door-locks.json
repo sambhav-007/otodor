@@ -68,7 +68,21 @@
         "fallback_line": "Reinforced smart locks engineered for wooden main and internal doors — face, fingerprint, card, PIN and app access on a 45–100 mm door.",
         "show_count": true,
         "moment_line": "Your main door does the most work.",
-        "moment_sub": "So it gets the deepest bolt throw, the widest access set and the strongest motor in the range."
+        "moment_sub": "So it gets the deepest bolt throw, the widest access set and the strongest motor in the range.",
+        "cta_line": "Five models, one specification sheet — access methods, bolt throw, door thickness and battery, side by side.",
+        "cta_label": "Compare our range",
+        "cta_link": "#otodor-compare"
+      }
+    },
+    "serviceability": {
+      "type": "otodor-serviceability",
+      "settings": {
+        "color_scheme": "dark",
+        "only_collections": "wooden-door-locks",
+        "eyebrow": "Installation Coverage",
+        "heading": "Do we install at your address?",
+        "subheading": "Every OTODOR wooden-door lock is fitted by a certified technician, not couriered. Check your pincode before you choose a model.",
+        "note": "Installation is free and usually scheduled within 48 hours of delivery."
       }
     },
     "product-grid": {
@@ -85,6 +99,7 @@
     "comparison": {
       "type": "otodor-comparison",
       "settings": {
+        "anchor_id": "otodor-compare",
         "eyebrow": "Compare the range",
         "heading": "Every wooden-door model, ",
         "heading_accent": "side by side.",
@@ -186,6 +201,7 @@
   "order": [
     "promo-strip",
     "hero",
+    "serviceability",
     "product-grid",
     "comparison",
     "why",

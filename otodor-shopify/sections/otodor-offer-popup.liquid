@@ -107,103 +107,162 @@
       padding: clamp(1rem, 4vw, 2.5rem);
     }
     .otodor-pop[data-open="true"] { display: flex; }
+    {%- comment -%}
+      No `both` fill on either entry animation. With it, the first keyframe
+      (opacity 0) is held whenever the animation has not started — and an
+      animation does not advance while the document timeline is stalled: a
+      background tab, a throttled renderer, a headless/non-compositing
+      browser. The modal is then laid out, focused and hit-testable while
+      being completely invisible, which is indistinguishable from "the popup
+      is broken".
+
+      Without the fill, the resting state is the visible one and the
+      animation is pure decoration: if it never runs, the popup simply
+      appears without its fade. Visibility must never depend on motion.
+    {%- endcomment -%}
     .otodor-pop__backdrop {
       position: absolute; inset: 0;
-      background: rgba(11, 11, 11, 0.62);
-      -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
-      animation: otodor-pop-fade 240ms ease both;
+      background: rgba(6, 6, 6, 0.74);
+      -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+      animation: otodor-pop-fade 220ms ease;
     }
+
+    {%- comment -%}
+      Sized like a store's offer modal, not a landing page: one column of
+      content at a readable measure, the image as a supporting panel. The
+      scale below is deliberately a step down from the page's display type —
+      a modal that shouts reads as an ad, not as an offer.
+    {%- endcomment -%}
     .otodor-pop__dialog {
       position: relative;
-      width: min(46rem, 100%);
+      width: min({% if section.settings.image != blank %}59rem{% else %}34rem{% endif %}, 100%);
+      max-height: calc(100vh - 2rem);
       display: grid;
-      grid-template-columns: {% if section.settings.image != blank %}0.85fr 1fr{% else %}1fr{% endif %};
+      grid-template-columns: {% if section.settings.image != blank %}0.78fr 1fr{% else %}1fr{% endif %};
       overflow: hidden;
-      border-radius: var(--otodor-radius-lg, 12px);
-      background: var(--otodor-black, #0B0B0B);
+      border-radius: 14px;
+      background: #101010;
       color: var(--otodor-white, #fff);
-      box-shadow: 0 30px 90px rgba(0,0,0,0.45);
-      animation: otodor-pop-rise 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+      animation: otodor-pop-rise 300ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    @media (max-width: 700px) {
+    @media (max-width: 760px) {
       .otodor-pop__dialog { grid-template-columns: 1fr; width: min(30rem, 100%); }
       .otodor-pop__media { display: none; }
     }
-    .otodor-pop__media { position: relative; overflow: hidden; min-height: 100%; }
+    .otodor-pop__media { position: relative; overflow: hidden; background: #0B0B0B; }
     .otodor-pop__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .otodor-pop__body { padding: clamp(1.6rem, 3vw, 2.4rem); display: grid; gap: 0.9rem; align-content: center; }
+
+    .otodor-pop__body {
+      padding: clamp(1.8rem, 2.6vw, 2.4rem);
+      display: grid; gap: 0; align-content: center;
+      overflow-y: auto;
+    }
+
     .otodor-pop__eyebrow {
-      font-family: var(--otodor-font-display); font-size: 0.94rem; font-weight: 700;
-      letter-spacing: var(--otodor-tracking-widest, 0.14em); text-transform: uppercase;
-      color: var(--otodor-blue, #4DA6FF);
+      font-family: var(--otodor-font-display); font-size: 0.86rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
     }
     .otodor-pop__title {
-      font-family: var(--otodor-font-display); font-size: clamp(1.9rem, 3.4vw, 2.6rem);
-      font-weight: 700; line-height: 1.06; letter-spacing: var(--otodor-tracking-tight, -0.02em);
-      margin: 0; color: var(--otodor-white, #fff);
+      font-family: var(--otodor-font-display); font-size: clamp(1.85rem, 2.6vw, 2.15rem);
+      font-weight: 700; line-height: 1.14; letter-spacing: var(--otodor-tracking-tight, -0.02em);
+      margin: 0.7rem 0 0; color: var(--otodor-white, #fff);
     }
-    .otodor-pop__text { margin: 0; font-size: 1.22rem; line-height: 1.55; opacity: 0.72; }
+    .otodor-pop__text {
+      margin: 0.6rem 0 0; font-size: 1.12rem; line-height: 1.6;
+      color: rgba(255,255,255,0.58); max-width: 30rem;
+    }
+
+    {%- comment -%}
+      The coupon reads as one control: code on the left, a single copy
+      action on the right, divided by a hairline. Nothing about it is
+      decorative — a visitor's whole job here is to take the code away.
+    {%- endcomment -%}
     .otodor-pop__coupon {
-      display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
-      padding: 0.75rem 0.9rem; border-radius: var(--otodor-radius-md, 8px);
-      border: 1px dashed var(--otodor-blue, #4DA6FF);
-      background: rgba(77,166,255,0.08);
+      display: flex; align-items: stretch; margin-top: 1.6rem;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 8px; background: rgba(255,255,255,0.03);
+      overflow: hidden;
     }
     .otodor-pop__code {
-      font-family: var(--otodor-font-body); font-size: 1.45rem; font-weight: 700;
-      letter-spacing: 0.16em; text-transform: uppercase; color: var(--otodor-blue, #4DA6FF);
-      flex: 1 1 auto;
+      flex: 1 1 auto; display: inline-flex; align-items: center;
+      padding: 0.85rem 1rem; min-width: 0;
+      font-family: var(--otodor-font-body); font-size: 1.3rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--otodor-white, #fff);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .otodor-pop__copy {
-      display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
-      min-height: 44px; padding: 0.5rem 1.1rem; border: none;
-      border-radius: var(--otodor-radius-pill, 999px);
-      background: var(--otodor-blue, #4DA6FF); color: #04203a;
-      font-family: var(--otodor-font-display); font-size: 1.09rem; font-weight: 700;
-      transition: filter 160ms ease;
+      flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 0 1.35rem; border: none;
+      /* Holds its width when the label swaps to "Copied", so the coupon
+         field doesn't jump under the visitor's cursor. */
+      min-width: 7rem;
+      border-left: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.04); color: var(--otodor-blue, #4DA6FF);
+      font-family: var(--otodor-font-display); font-size: 1rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      transition: background 160ms ease, color 160ms ease;
     }
-    .otodor-pop__copy:hover { filter: brightness(1.08); }
-    .otodor-pop__copy[data-copied="true"] { background: #25D366; color: #05300f; }
+    .otodor-pop__copy:hover { background: rgba(77,166,255,0.12); }
+    .otodor-pop__copy[data-copied="true"] { color: #25D366; background: rgba(37,211,102,0.12); }
+
     .otodor-pop__value {
-      margin: -0.35rem 0 0; font-family: var(--otodor-font-display);
-      font-size: 1.22rem; font-weight: 600; color: var(--otodor-white, #fff);
+      margin: 0.7rem 0 0; font-size: 1.02rem; line-height: 1.5;
+      color: rgba(255,255,255,0.55);
     }
-    .otodor-pop__perks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; }
-    .otodor-pop__perk { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 1.02rem; opacity: 0.72; }
-    .otodor-pop__perk svg { width: 14px; height: 14px; color: var(--otodor-blue, #4DA6FF); }
-    .otodor-pop__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.2rem; }
+    .otodor-pop__value strong { color: var(--otodor-white, #fff); font-weight: 600; }
+
+    .otodor-pop__perks {
+      list-style: none; margin: 1.3rem 0 0; padding: 1.1rem 0 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex; flex-wrap: wrap; gap: 0.45rem 1.4rem;
+    }
+    .otodor-pop__perk {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-size: 0.98rem; color: rgba(255,255,255,0.55);
+    }
+    .otodor-pop__perk svg { width: 13px; height: 13px; color: rgba(255,255,255,0.35); }
+
+    .otodor-pop__actions { display: grid; gap: 0.55rem; margin-top: 1.5rem; }
     .otodor-pop__cta {
-      display: inline-flex; align-items: center; gap: 0.45rem; min-height: 44px;
-      padding: 0.7rem 1.4rem; border-radius: var(--otodor-radius-pill, 999px);
-      background: var(--otodor-white, #fff); color: var(--otodor-black, #0B0B0B);
-      font-family: var(--otodor-font-display); font-size: 1.15rem; font-weight: 600;
-      text-decoration: none; transition: transform 160ms ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      min-height: 46px; padding: 0.75rem 1.4rem;
+      border-radius: var(--otodor-radius-pill, 999px);
+      background: var(--otodor-white, #fff); color: #0B0B0B;
+      font-family: var(--otodor-font-display); font-size: 1.14rem; font-weight: 600;
+      text-decoration: none; transition: background 160ms ease;
     }
-    .otodor-pop__cta:hover { transform: translateY(-1px); }
-    .otodor-pop__cta svg { width: 15px; height: 15px; }
+    .otodor-pop__cta:hover { background: #E8E8E8; }
+    .otodor-pop__cta svg { width: 14px; height: 14px; }
     .otodor-pop__later {
-      background: none; border: none; cursor: pointer; padding: 0.7rem 0.4rem;
-      color: inherit; opacity: 0.5; font-size: 1.02rem; text-decoration: underline;
-      text-underline-offset: 0.25em; min-height: 44px;
+      background: none; border: none; cursor: pointer; padding: 0.5rem;
+      color: rgba(255,255,255,0.4); font-family: inherit; font-size: 1rem;
+      transition: color 160ms ease;
     }
-    .otodor-pop__later:hover { opacity: 0.8; }
-    .otodor-pop__fine { margin: 0; font-size: 0.94rem; line-height: 1.5; opacity: 0.42; }
+    .otodor-pop__later:hover { color: rgba(255,255,255,0.7); }
+    .otodor-pop__fine {
+      margin: 1.1rem 0 0; font-size: 0.9rem; line-height: 1.5;
+      color: rgba(255,255,255,0.3);
+    }
+
     .otodor-pop__close {
-      position: absolute; top: 0.6rem; right: 0.6rem; z-index: 2;
-      width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
-      border: none; border-radius: 50%; cursor: pointer;
-      background: rgba(255,255,255,0.08); color: var(--otodor-white, #fff);
-      font-size: 1.6rem; line-height: 1;
+      position: absolute; top: 0.85rem; right: 0.85rem; z-index: 2;
+      width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+      padding: 0; border: none; border-radius: 50%; cursor: pointer;
+      background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.7);
+      transition: background 160ms ease, color 160ms ease;
     }
-    .otodor-pop__close:hover { background: rgba(255,255,255,0.16); }
-    .otodor-pop :focus-visible { outline: 2px solid var(--otodor-blue, #4DA6FF); outline-offset: 3px; }
+    .otodor-pop__close svg { width: 13px; height: 13px; display: block; pointer-events: none; }
+    .otodor-pop__close:hover { background: rgba(255,255,255,0.16); color: #fff; }
+    .otodor-pop :focus-visible { outline: 2px solid var(--otodor-blue, #4DA6FF); outline-offset: 2px; }
 
     @keyframes otodor-pop-fade { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes otodor-pop-rise { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+    @keyframes otodor-pop-rise { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: none; } }
 
     @media (prefers-reduced-motion: reduce) {
       .otodor-pop__backdrop, .otodor-pop__dialog { animation: none; }
-      .otodor-pop__cta:hover { transform: none; }
     }
   {%- endstyle -%}
 
@@ -225,7 +284,11 @@
       aria-modal="true"
       aria-labelledby="otodor-pop-title-{{ section.id }}"
     >
-      <button type="button" class="otodor-pop__close" data-otodor-popup-close aria-label="Close">&times;</button>
+      <button type="button" class="otodor-pop__close" data-otodor-popup-close aria-label="Close">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <path d="M1.5 1.5 12.5 12.5M12.5 1.5 1.5 12.5" />
+        </svg>
+      </button>
 
       {%- if section.settings.image != blank -%}
         <div class="otodor-pop__media">
@@ -249,20 +312,25 @@
 
         <div class="otodor-pop__coupon">
           <span class="otodor-pop__code">{{ coupon_code | escape }}</span>
+          {%- comment -%}
+            Text-only on purpose: otodor-offer.js swaps this button's
+            textContent for the "copied" label, so any markup inside would be
+            thrown away on the first click.
+          {%- endcomment -%}
           <button type="button" class="otodor-pop__copy"
             data-otodor-copy="{{ coupon_code | escape }}"
-            data-copied-label="{{ section.settings.copied_label | default: 'Copied!' | escape }}">
-            {{ section.settings.copy_label | default: 'Copy code' | escape }}
-          </button>
+            data-copied-label="{{ section.settings.copied_label | default: 'Copied' | escape }}">{{ section.settings.copy_label | default: 'Copy' | escape }}</button>
         </div>
 
         {%- comment -%}
           The offer's value is generated, not typed — change the coupon in theme
           settings and this line follows, with no stale number left in the copy.
+          It sits under the code as a caption, the way a store states what a
+          voucher is worth and where it applies.
         {%- endcomment -%}
         {%- if coupon_amount > 0 -%}
           <p class="otodor-pop__value">
-            ₹{% render 'otodor-rupees', amount: coupon_amount %} off{% if settings.otodor_coupon_scope_label != blank %} — {{ settings.otodor_coupon_scope_label | escape }}{% endif %}
+            <strong>₹{% render 'otodor-rupees', amount: coupon_amount %} off</strong>{% if settings.otodor_coupon_scope_label != blank %} · {{ settings.otodor_coupon_scope_label | escape }}{% endif %}
           </p>
         {%- endif -%}
 
@@ -317,8 +385,8 @@
     { "type": "text", "id": "heading", "label": "Heading", "default": "Sale pricing, unlocked.", "info": "The coupon value and scope are printed for you from theme settings — no number to keep in step here." },
     { "type": "textarea", "id": "text", "label": "Text", "default": "Independence Day pricing on the OTODOR wooden-door range. Apply the code at checkout and the ZEAL lands at ₹6,200 including GST." },
     { "type": "text", "id": "code_override", "label": "Discount code override", "info": "Blank = the code from theme settings." },
-    { "type": "text", "id": "copy_label", "label": "Copy button label", "default": "Copy code" },
-    { "type": "text", "id": "copied_label", "label": "Copied confirmation", "default": "Copied!" },
+    { "type": "text", "id": "copy_label", "label": "Copy button label", "default": "Copy" },
+    { "type": "text", "id": "copied_label", "label": "Copied confirmation", "default": "Copied" },
     { "type": "text", "id": "emi_label", "label": "EMI line", "default": "EMI options available" },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "Shop wooden door locks" },
     { "type": "url", "id": "cta_link", "label": "Button link" },

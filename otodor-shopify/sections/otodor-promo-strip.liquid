@@ -110,6 +110,13 @@
         --strip-accent: var(--otodor-accent-on-light, #1A78D8);
         --strip-rule: rgba(0, 0, 0, 0.10);
       }
+    {%- when 'white' -%}
+      .otodor-strip-{{ section.id }} {
+        --strip-bg: #FFFFFF;
+        --strip-fg: #0B0B0B;
+        --strip-accent: var(--otodor-accent-on-light, #1A78D8);
+        --strip-rule: rgba(0, 0, 0, 0.12);
+      }
   {%- endcase -%}
 
   .otodor-strip {
@@ -364,7 +371,8 @@
       "options": [
         { "value": "dark", "label": "Dark (near-black)" },
         { "value": "accent", "label": "Accent (blue)" },
-        { "value": "light", "label": "Light (off-white)" }
+        { "value": "light", "label": "Light (off-white)" },
+        { "value": "white", "label": "White (black text)" }
       ]
     },
     {

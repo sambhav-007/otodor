@@ -73,7 +73,7 @@
         "campaign_link": "/collections/wooden-door-locks",
         "direction": "ltr",
         "speed": 30,
-        "color_scheme": "dark",
+        "color_scheme": "white",
         "pause_on_hover": true,
         "aria_label": "Current offers"
       }
@@ -226,6 +226,7 @@
         "cat_5"
       ],
       "settings": {
+        "color_scheme": "white",
         "eyebrow": "Browse Collections",
         "heading": "Shop by",
         "heading_accent": "category."
@@ -389,10 +390,72 @@
         "feat_6"
       ],
       "settings": {
+        "color_scheme": "light",
         "eyebrow": "Core Technology",
         "heading": "Smart security for modern",
         "heading_accent": "homes.",
         "subheading": "Every access point engineered with next-generation recognition and military-grade encryption."
+      }
+    },
+    "otodor_reels": {
+      "type": "otodor-reels",
+      "blocks": {
+        "reel_1": {
+          "type": "reel",
+          "settings": {
+            "cover": "shopify://shop_images/onyx_keypad.png",
+            "product": "onyx",
+            "caption": "One touch. Door open."
+          }
+        },
+        "reel_2": {
+          "type": "reel",
+          "settings": {
+            "cover": "shopify://shop_images/zion_B_front.png",
+            "product": "nexus",
+            "caption": "Fitted in under two hours."
+          }
+        },
+        "reel_3": {
+          "type": "reel",
+          "settings": {
+            "cover": "shopify://shop_images/cloud_front.png",
+            "product": "cloud",
+            "caption": "Keycards, for every room."
+          }
+        },
+        "reel_4": {
+          "type": "reel",
+          "settings": {
+            "cover": "shopify://shop_images/Sliding_gate_motor_45.png",
+            "product": "sliding-gate-motor",
+            "caption": "The gate that opens itself."
+          }
+        },
+        "reel_5": {
+          "type": "reel",
+          "settings": {
+            "cover": "shopify://shop_images/armour_front_2.png",
+            "product": "armour",
+            "caption": "Built for the Indian monsoon."
+          }
+        }
+      },
+      "block_order": [
+        "reel_1",
+        "reel_2",
+        "reel_3",
+        "reel_4",
+        "reel_5"
+      ],
+      "settings": {
+        "color_scheme": "light",
+        "eyebrow": "OTODOR in Action",
+        "heading": "See it in ",
+        "heading_accent": "real homes.",
+        "cta_label": "Shop the product",
+        "card_width": 26,
+        "autoplay": true
       }
     },
     "otodor_why": {
@@ -453,6 +516,22 @@
         "eyebrow": "Why OTODOR"
       }
     },
+    "otodor_projects": {
+      "type": "otodor-projects",
+      "settings": {
+        "source": "auto",
+        "limit": 6,
+        "columns_desktop": "3",
+        "color_scheme": "dark",
+        "eyebrow": "Our Projects",
+        "heading": "Doors we have",
+        "heading_accent": "already secured.",
+        "subheading": "Homes, offices and apartment towers across India — surveyed, fitted and supported by OTODOR technicians.",
+        "footer_note": "A short cut of recent work. The full gallery keeps growing.",
+        "view_all_label": "View all projects",
+        "view_all_link": "/pages/projects"
+      }
+    },
     "otodor_testimonials": {
       "type": "otodor-testimonials",
       "blocks": {
@@ -494,6 +573,57 @@
         "eyebrow": "Verified Trust",
         "heading": "What architects & builders",
         "heading_accent": "say."
+      }
+    },
+    "otodor_lead_form": {
+      "type": "otodor-lead-form",
+      "blocks": {
+        "warranty": {
+          "type": "reason",
+          "settings": { "icon": "warranty", "title": "3-year warranty", "text": "Every OTODOR lock is covered for three years (1-year battery)." }
+        },
+        "survey": {
+          "type": "reason",
+          "settings": { "icon": "installation", "title": "Free site survey", "text": "A certified technician assesses your door before you buy." }
+        },
+        "heritage": {
+          "type": "reason",
+          "settings": { "icon": "smart", "title": "16 years' heritage", "text": "Backed by NavKar's security-engineering track record and PAN-India support." }
+        },
+        "i-wooden": { "type": "interest", "settings": { "label": "Wooden door lock" } },
+        "i-glass": { "type": "interest", "settings": { "label": "Glass door lock" } },
+        "i-metal": { "type": "interest", "settings": { "label": "Metal gate lock" } },
+        "i-padlock": { "type": "interest", "settings": { "label": "Smart padlock" } },
+        "i-gate": { "type": "interest", "settings": { "label": "Gate automation" } },
+        "i-other": { "type": "interest", "settings": { "label": "Something bespoke / not sure" } }
+      },
+      "block_order": [
+        "warranty",
+        "survey",
+        "heritage",
+        "i-wooden",
+        "i-glass",
+        "i-metal",
+        "i-padlock",
+        "i-gate",
+        "i-other"
+      ],
+      "settings": {
+        "anchor_id": "otodor-lead",
+        "color_scheme": "dark",
+        "form_first": false,
+        "eyebrow": "Talk to a specialist",
+        "heading": "Request a",
+        "heading_accent": "custom quote.",
+        "subheading": "Tell us about your door and we'll recommend the right OTODOR system, with a free site survey and installation assessment.",
+        "show_consent": true,
+        "consent_required": false,
+        "show_whatsapp": true,
+        "whatsapp_label": "Chat on WhatsApp",
+        "success_title": "Request received.",
+        "success_text": "Thank you — an OTODOR specialist will call you within one business day to arrange your survey.",
+        "padding_top": 80,
+        "padding_bottom": 80
       }
     },
     "otodor_process": {
@@ -623,8 +753,11 @@
     "otodor_categories",
     "otodor_trust_bar",
     "otodor_features",
+    "otodor_reels",
     "otodor_why",
+    "otodor_projects",
     "otodor_testimonials",
+    "otodor_lead_form",
     "otodor_process",
     "otodor_ecosystem",
     "otodor_cta_banner"

@@ -11,12 +11,15 @@
   }
 
   .otodor-cta-banner {
-    padding-block: clamp(4rem, 12vw, 10rem);
+    padding-block: var(--otodor-section-py);
     position: relative;
     overflow: hidden;
-    border-radius: var(--otodor-radius-2xl);
+    border-radius: var(--otodor-radius-lg);
     border: 1px solid var(--otodor-glass-border);
-    margin-vertical: var(--otodor-space-xl);
+    /* was `margin-vertical`, which is not a CSS property — the declaration
+       was dropped by every browser, so this card never had the vertical
+       margin it was written to have. */
+    margin-block: var(--otodor-space-xl);
     background: var(--otodor-gradient-cta);
   }
 
@@ -68,9 +71,11 @@
 
   .otodor-cta-banner__title {
     font-family: var(--otodor-font-display);
-    font-size: clamp(2.2rem, 6vw, 4.2rem);
+    /* One section-heading size across the page — this was 52.5px against
+       the 50px used by categories, features and testimonials. */
+    font-size: var(--otodor-text-4xl);
     font-weight: 700;
-    line-height: var(--otodor-leading-tight);
+    line-height: var(--otodor-leading-display);
     letter-spacing: var(--otodor-tracking-tight);
     color: var(--otodor-white);
     margin: 0;

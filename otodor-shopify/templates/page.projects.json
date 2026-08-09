@@ -1,0 +1,73 @@
+/*
+ * ------------------------------------------------------------
+ * OTODOR Projects — the installed-work gallery.
+ *
+ * The page's own content (main) carries whatever intro the
+ * merchant writes; the gallery below reads a BLOG, so the same
+ * projects appear here and on the homepage from one upload. The
+ * homepage instance is the same section with a limit and a
+ * "View all" link — one section, two configurations.
+ *
+ * REQUIRES ADMIN (the page degrades to its own content until done):
+ *   1. Create a blog called "Projects" (Content -> Blog posts ->
+ *      Manage blogs -> Add blog).
+ *   2. Add one article per project: title = the project, featured
+ *      image = the cover photo, body = a sentence or two, first
+ *      tag = the location line.
+ *   3. Optional article metafields: custom.project_location
+ *      (single line text) and custom.project_video (file
+ *      reference -> a video uploaded in Content -> Files).
+ *   4. Create a page called "Our Projects" (handle `projects`),
+ *      assign this template, and pick the blog in the section's
+ *      "Projects blog" setting, here and on the homepage.
+ *   5. Add the page to a navigation menu.
+ *
+ * Until a blog is picked the gallery falls back to `project`
+ * blocks added in the theme editor, and with neither it renders
+ * nothing rather than an empty grid.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 40,
+        "padding_bottom": 8
+      }
+    },
+    "projects": {
+      "type": "otodor-projects",
+      "settings": {
+        "source": "auto",
+        "limit": 24,
+        "columns_desktop": "3",
+        "color_scheme": "light",
+        "eyebrow": "Our Projects",
+        "heading": "Doors we have",
+        "heading_accent": "already secured.",
+        "subheading": "Homes, offices and apartment towers across India — surveyed, fitted and supported by OTODOR technicians.",
+        "view_all_label": "",
+        "view_all_link": ""
+      }
+    },
+    "cta": {
+      "type": "otodor-cta-banner",
+      "settings": {
+        "light_background": false,
+        "heading": "Want your door on this",
+        "heading_accent": "page?",
+        "description": "A certified OTODOR technician surveys the door, recommends the model and installs it — usually in a single visit.",
+        "cta_primary_label": "Get a Custom Quote",
+        "cta_primary_link": "/pages/contact#otodor-lead",
+        "cta_secondary_label": "Talk to us",
+        "cta_secondary_link": "/pages/contact#otodor-lead"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "projects",
+    "cta"
+  ]
+}

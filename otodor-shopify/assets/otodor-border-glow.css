@@ -11,7 +11,9 @@
   --cursor-angle: 45deg;
   --edge-sensitivity: 30;
   --color-sensitivity: calc(var(--edge-sensitivity) + 20);
-  --border-radius: 28px;
+  /* Must track the radius of the card it wraps, or the glow ring traces a
+     corner the card doesn't have. Both now resolve from the same token. */
+  --border-radius: var(--otodor-radius-lg);
   --glow-padding: 40px;
   --cone-spread: 25;
   --fill-opacity: 0.5;

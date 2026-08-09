@@ -51,6 +51,12 @@
   assign max_products = section.settings.max_products | default: 4
   assign scheme = section.settings.color_scheme | default: 'dark'
 
+  # A stable link target. The section's own id is `otodor-comparison-<section.id>`,
+  # which on a JSON template is the template's key for this section — a name a
+  # CTA elsewhere would have to know and would silently break on rename. This
+  # anchor is merchant-set and identical on every template that uses one.
+  assign anchor = section.settings.anchor_id | default: 'otodor-compare' | handle
+
   # The published spec sheet, consulted only where a metafield is empty.
   # Defaults ON so the table is populated before admin data exists; turn it
   # off (or delete the snippet) once specs.* covers the catalogue.
@@ -197,6 +203,8 @@
   {%- style -%}
     #shopify-section-{{ section.id }} { position: relative; z-index: 3; background-color: transparent; }
     #shopify-section-{{ section.id }} .otodor-comparison { padding-block: var(--otodor-section-py); }
+    {%- comment -%} Clears the sticky header when a CTA jumps here. {%- endcomment -%}
+    #shopify-section-{{ section.id }} .otodor-comparison__anchor { display: block; scroll-margin-top: 90px; }
 
     /* Scheme is expressed once, as local custom properties, so the table
        markup below never repeats a colour. */
@@ -314,6 +322,7 @@
     data-otodor-section="comparison"
     aria-labelledby="otodor-comparison-title-{{ section.id }}"
   >
+    <span id="{{ anchor }}" class="otodor-comparison__anchor" aria-hidden="true"></span>
     <div class="otodor-container">
       <div class="otodor-comparison__header otodor-section-header otodor-section-header--center">
         <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
@@ -564,6 +573,7 @@
   "max_blocks": 5,
   "settings": [
     { "type": "paragraph", "content": "Rows are driven by the OTODOR specification registry (otodor-spec-registry) and read each product's specs.* metafields — no specs are configured here. Add columns below, or pick a collection; on a product page it auto-compares the product with its collection siblings." },
+    { "type": "text", "id": "anchor_id", "label": "Anchor id (for CTA deep-links)", "default": "otodor-compare", "info": "Link to this table from anywhere on the same page with #otodor-compare — e.g. the collection hero's button." },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "Compare Models" },
     { "type": "text", "id": "heading", "label": "Heading text", "default": "Choose the right fit for your " },
     { "type": "text", "id": "heading_accent", "label": "Heading accented text", "default": "door." },

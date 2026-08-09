@@ -22,7 +22,7 @@
   .otodor-eco__header {
     text-align: center;
     max-width: 800px;
-    margin: 0 auto clamp(3.5rem, 8vw, 6rem);
+    margin: 0 auto var(--otodor-header-mb);
   }
   .otodor-eco__eyebrow {
     display: block;
@@ -32,13 +32,14 @@
     text-transform: uppercase;
     letter-spacing: var(--otodor-tracking-widest);
     color: var(--otodor-blue);
-    margin-bottom: 1.1rem;
+    margin-bottom: var(--otodor-header-gap);
   }
   .otodor-eco__heading {
     font-family: var(--otodor-font-display);
-    font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+    /* One section-heading size across the page (was 40px against 50px). */
+    font-size: var(--otodor-text-4xl);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: var(--otodor-leading-display);
     letter-spacing: var(--otodor-tracking-tight);
     margin: 0;
   }
@@ -117,7 +118,7 @@
   }
   .otodor-eco__node:hover .otodor-eco__disc {
     border-color: rgba(77, 166, 255, 0.45);
-    transform: translateY(-4px);
+    transform: translateY(var(--otodor-lift));
   }
   .otodor-eco__disc img {
     width: 62%;

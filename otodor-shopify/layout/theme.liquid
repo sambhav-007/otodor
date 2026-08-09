@@ -10,6 +10,22 @@
     <meta name="theme-color" content="#0B0B0B">
     <link rel="canonical" href="{{ canonical_url }}">
 
+    {%- comment -%}
+      Google Search Console ownership verification. The sitemap itself is
+      Shopify's (/sitemap.xml, generated from live products/collections/pages/
+      blogs — the theme neither builds nor can override it); this tag is the
+      theme's only part of the job, and only for the HTML-tag method. Prefer
+      the DNS TXT method where the domain is under your control: it verifies
+      the whole domain rather than one origin, and survives a theme swap.
+
+      The value is the token, but merchants paste the whole <meta> tag as
+      often as not, so the token is extracted either way. Omitted when blank.
+    {%- endcomment -%}
+    {%- if settings.otodor_google_site_verification != blank -%}
+      {%- assign gsc_token = settings.otodor_google_site_verification | split: 'content="' | last | split: '"' | first | strip -%}
+      <meta name="google-site-verification" content="{{ gsc_token | escape }}">
+    {%- endif -%}
+
     {%- comment -%} SEO/perf: warm the connection to Shopify's asset CDN (LCP). Fonts are self-hosted. {%- endcomment -%}
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.shopify.com">

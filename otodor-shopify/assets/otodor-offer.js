@@ -38,6 +38,28 @@
     }
   }
 
+  /* ── 0. Preview mode ───────────────────────────────────────────────
+     The popup deliberately remembers that a visitor has dealt with it —
+     7 days after a dismissal, a year after they copy the code. Correct for
+     shoppers, miserable for everyone who has to LOOK at it: one click on
+     "Copy" and the popup is invisible on that browser until next year, with
+     no way back except clearing localStorage by hand. It reads exactly like
+     a broken popup, and it is the reason this block exists.
+
+     Two doors that skip the memory entirely — they neither read it nor
+     write to it, so previewing never costs you a real impression:
+
+       ?popup=preview   append to any URL — QA, or sharing the campaign
+       theme editor     Shopify design mode, so the merchant can actually
+                        see the section they are editing
+
+     Both are inert for shoppers: a visitor who never types the parameter
+     gets exactly the old behaviour. */
+  var params = new URLSearchParams(window.location.search);
+  var FORCED =
+    params.get('popup') === 'preview' ||
+    !!(window.Shopify && window.Shopify.designMode);
+
   /* ── 1. Copy-to-clipboard ──────────────────────────────────────────── */
   function copyText(text) {
     // The async API can exist and still refuse — an insecure context, a
@@ -85,9 +107,10 @@
         button.textContent = button.getAttribute('data-copied-label') || 'Copied';
         button.setAttribute('data-copied', 'true');
 
-        // A copied code is an accepted offer — stop asking.
+        // A copied code is an accepted offer — stop asking. Unless we are
+        // previewing, in which case copying must not burn the impression.
         var popup = document.querySelector('[data-otodor-popup]');
-        if (popup) {
+        if (popup && !FORCED) {
           writeStore('otodor:offer:' + popup.getAttribute('data-popup-key'), String(Date.now() + 365 * DAY));
         }
 
@@ -107,8 +130,10 @@
   if (!popup) return;
 
   var storeKey = 'otodor:offer:' + popup.getAttribute('data-popup-key');
-  var suppressedUntil = parseInt(readStore(storeKey) || '0', 10);
-  if (suppressedUntil && Date.now() < suppressedUntil) return;
+  if (!FORCED) {
+    var suppressedUntil = parseInt(readStore(storeKey) || '0', 10);
+    if (suppressedUntil && Date.now() < suppressedUntil) return;
+  }
 
   var dialog = popup.querySelector('[role="dialog"]');
   var rememberDays = parseInt(popup.getAttribute('data-remember-days') || '7', 10);
@@ -145,7 +170,7 @@
     document.documentElement.style.overflow = '';
     document.removeEventListener('keydown', onKeydown);
 
-    if (remember !== false) {
+    if (remember !== false && !FORCED) {
       writeStore(storeKey, String(Date.now() + rememberDays * DAY));
     }
     if (opener && typeof opener.focus === 'function') opener.focus();
@@ -194,11 +219,15 @@
   var cta = popup.querySelector('[data-otodor-popup-cta]');
   if (cta) {
     cta.addEventListener('click', function () {
-      writeStore(storeKey, String(Date.now() + rememberDays * DAY));
+      if (!FORCED) writeStore(storeKey, String(Date.now() + rememberDays * DAY));
     });
   }
 
-  timer = window.setTimeout(open, Math.max(0, delaySeconds) * 1000);
+  // Preview opens at once. The 6s delay is there to let a shopper land
+  // before being interrupted; someone who asked to see the popup has
+  // already landed, and six seconds of an apparently empty page is the
+  // other half of why this reads as "the popup is missing".
+  timer = window.setTimeout(open, FORCED ? 0 : Math.max(0, delaySeconds) * 1000);
   if (scrollPercent > 0) {
     window.addEventListener('scroll', onScroll, { passive: true });
   }

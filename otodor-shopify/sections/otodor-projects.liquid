@@ -1,0 +1,413 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Projects  (installed work — the proof photographs)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Show what OTODOR has actually fitted, in real doors, at
+                      real addresses. Testimonials are what people say; this
+                      is what the work looks like.
+  Primary source:     A Shopify BLOG, one article per project — because this
+                      content has to appear in two places at once (the
+                      Projects page and the homepage) and blocks live in a
+                      template, so a block-built gallery would have to be
+                      uploaded twice and would drift apart the first time one
+                      copy was edited. A blog is authored once and read by
+                      every placement.
+                        article.title           → project name
+                        article.image           → cover photo
+                        article.excerpt/content → the supporting line
+                        article.tags.first      → the meta line (or the
+                                                  metafield below)
+                        custom.project_location → the meta line   [optional]
+                        custom.project_video    → a video         [optional]
+  Fallback order:     blog → `project` blocks → hide. `source` forces either.
+  Visibility rule:    Renders only when at least one entry has a title. An
+                      empty gallery is worse than no gallery, so the section
+                      and its heading disappear together.
+  Merchant editable:  YES — source, blog, headings, count, columns, colour
+                      scheme, the "view all" action, every block field.
+  Required metafields: none.
+  Optional metafields: article `custom.project_location` (single line text),
+                       `custom.project_video` (file_reference → a video).
+                       Both optional: without them a project still renders
+                       from the article's own title, image and tags.
+  Dependencies:       snippets/otodor-project-card (the one card
+                      implementation), snippets/otodor-icon, base.css tokens.
+  Placement:          templates/page.projects.json (the full gallery) and
+                      index.json (a short cut of the same blog + View all).
+  Accessibility:      Each card is one article with a real heading; a linked
+                      card uses a stretched overlay link with an accessible
+                      name, so the whole tile is clickable without nesting
+                      interactive elements inside a link. The mobile rail is
+                      a labelled, keyboard-scrollable region.
+  Reusable for:       Homepage, Projects page, a collection landing
+                      ("wooden doors we have fitted"), an About page.
+
+  ONE SECTION, TWO CONFIGURATIONS — exactly like otodor-banner. The homepage
+  instance sets a limit and a View-all link; the Projects page shows the lot.
+  Neither holds the content, so neither can go stale.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign scheme = section.settings.color_scheme | default: 'light'
+  assign limit = section.settings.limit | default: 9
+  assign source = section.settings.source | default: 'auto'
+  assign cols = section.settings.columns_desktop | default: 3
+
+  # ── 1. READ ─────────────────────────────────────────────────────────
+  # `where` on a block list, then a blog, so `auto` prefers the shared
+  # source and falls back to whatever this template carries itself.
+  assign project_blocks = section.blocks | where: 'type', 'project'
+  assign articles = nil
+  if source != 'blocks' and section.settings.blog != blank
+    assign articles = section.settings.blog.articles
+  endif
+
+  assign use_blog = false
+  if articles != blank and articles.size > 0 and source != 'blocks'
+    assign use_blog = true
+  endif
+
+  # ── 2. VALIDATE ─────────────────────────────────────────────────────
+  # A block only counts once it has a title; an article always has one.
+  assign usable = 0
+  if use_blog
+    assign usable = articles.size
+  else
+    for block in project_blocks
+      if block.settings.title != blank
+        assign usable = usable | plus: 1
+      endif
+    endfor
+  endif
+-%}
+
+{%- if usable > 0 -%}
+
+{%- style -%}
+  #otodor-projects-{{ section.id }} {
+    padding-block: var(--otodor-section-py);
+  }
+  #otodor-projects-{{ section.id }}.otodor-projects--light {
+    background: var(--otodor-bg-light); color: var(--otodor-ink);
+    --pj-accent: var(--otodor-accent-on-light);
+    --pj-soft: var(--otodor-ink-soft);
+    --pj-rule: rgba(0, 0, 0, 0.12);
+    --pj-frame: var(--otodor-plinth);
+  }
+  #otodor-projects-{{ section.id }}.otodor-projects--dark {
+    background: var(--otodor-black); color: var(--otodor-white);
+    --pj-accent: var(--otodor-blue);
+    --pj-soft: rgba(255, 255, 255, 0.58);
+    --pj-rule: rgba(255, 255, 255, 0.14);
+    --pj-frame: var(--otodor-surface);
+  }
+
+  #otodor-projects-{{ section.id }} .otodor-projects__inner {
+    max-width: var(--otodor-container);
+    margin-inline: auto;
+  }
+  #otodor-projects-{{ section.id }} .otodor-projects__header {
+    margin-bottom: var(--otodor-header-mb);
+    max-width: 60rem;
+  }
+  #otodor-projects-{{ section.id }} .otodor-projects__eyebrow {
+    display: block; font-family: var(--otodor-font-display);
+    font-size: var(--otodor-text-xs); font-weight: 600; text-transform: uppercase;
+    letter-spacing: var(--otodor-tracking-widest); color: var(--pj-accent);
+    margin-bottom: var(--otodor-header-gap);
+  }
+  {%- comment -%}
+    Declared, not inherited: Dawn sets colour directly on h1–h6, and a
+    declared value always beats an inherited one — the bug that put a white
+    heading on a light band in STEP 12.
+  {%- endcomment -%}
+  #otodor-projects-{{ section.id }} .otodor-projects__heading {
+    font-family: var(--otodor-font-display); font-size: var(--otodor-text-4xl);
+    font-weight: 700; line-height: var(--otodor-leading-display);
+    letter-spacing: var(--otodor-tracking-tight); margin: 0;
+  }
+  #otodor-projects-{{ section.id }}.otodor-projects--light .otodor-projects__heading { color: var(--otodor-ink); }
+  #otodor-projects-{{ section.id }}.otodor-projects--dark .otodor-projects__heading { color: var(--otodor-white); }
+  #otodor-projects-{{ section.id }} .otodor-projects__heading .accent { color: var(--pj-accent); }
+  #otodor-projects-{{ section.id }} .otodor-projects__sub {
+    margin: 1.1rem 0 0; font-size: var(--otodor-text-md); line-height: 1.55;
+    color: var(--pj-soft); max-width: 46rem;
+  }
+
+  /* ─ Grid ────────────────────────────────────────────────────
+     Desktop is a real grid inside the container so the cards' outer edges
+     line up with every other section. Below 900px the same cards become a
+     swipe rail — a project photograph needs width, and two 160px thumbs of
+     a door tell you nothing. Same treatment as the testimonials. */
+  #otodor-projects-{{ section.id }} .otodor-projects__grid {
+    display: grid;
+    grid-template-columns: repeat({{ cols }}, minmax(0, 1fr));
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+  @media (max-width: 1099px) {
+    #otodor-projects-{{ section.id }} .otodor-projects__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 899px) {
+    #otodor-projects-{{ section.id }} .otodor-projects__rail {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      margin-inline: -1.5rem;
+      padding-inline: 1.5rem;
+      /* Without this the snapport is the padding box and the first card
+         snaps a gutter to the left of every other section. */
+      scroll-padding-inline: 1.5rem;
+    }
+    #otodor-projects-{{ section.id }} .otodor-projects__rail::-webkit-scrollbar { display: none; }
+    #otodor-projects-{{ section.id }} .otodor-projects__grid {
+      display: flex; width: max-content;
+    }
+    #otodor-projects-{{ section.id }} .otodor-project {
+      scroll-snap-align: start; width: min(80vw, 34rem);
+    }
+  }
+
+  /* ─ Card ────────────────────────────────────────────────────
+     No card chrome: the photograph is the card. A border and a raised panel
+     around a photo is two frames around one image. */
+  #otodor-projects-{{ section.id }} .otodor-project {
+    position: relative; display: flex; flex-direction: column;
+    gap: 1.1rem; min-width: 0;
+  }
+  #otodor-projects-{{ section.id }} .otodor-project__frame {
+    position: relative; overflow: hidden;
+    border-radius: var(--otodor-radius-md);
+    background: var(--pj-frame);
+    aspect-ratio: 4 / 3;
+  }
+  #otodor-projects-{{ section.id }} .otodor-project__media {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform var(--otodor-dur-slow) var(--otodor-ease-out);
+  }
+  {%- comment -%}
+    The lift is on the image inside a fixed frame, so neighbouring cards
+    never move and the grid row cannot reflow on hover.
+  {%- endcomment -%}
+  #otodor-projects-{{ section.id }} .otodor-project:hover .otodor-project__media { transform: scale(1.03); }
+  {%- comment -%} A <video> must not be scaled — the controls would be cropped by the frame. {%- endcomment -%}
+  #otodor-projects-{{ section.id }} .otodor-project--video:hover .otodor-project__media { transform: none; }
+  #otodor-projects-{{ section.id }} .otodor-project__badge {
+    position: absolute; top: 0.9rem; left: 0.9rem;
+    display: inline-flex; align-items: center;
+    padding: 0.3rem 0.7rem; border-radius: var(--otodor-radius-pill);
+    background: rgba(0, 0, 0, 0.62); color: #fff;
+    font-family: var(--otodor-font-display); font-size: var(--otodor-text-xs);
+    font-weight: 600; letter-spacing: var(--otodor-tracking-wide); text-transform: uppercase;
+  }
+  {%- comment -%}
+    The stretched link: the whole tile is clickable, but the link element
+    itself stays outside the heading and the media, so nothing interactive
+    is nested inside it — a <video>'s controls in particular stay usable.
+  {%- endcomment -%}
+  {%- comment -%}
+    `display: block` is load-bearing, not tidiness. Dawn's base.css carries
+    `a:empty { display: none }`, and a stretched overlay link is by definition
+    an empty <a> — without this the whole card is unclickable and every click
+    lands on the image behind it. Measured: 0 × 0 box, hit-test returning the
+    <img>. Any future overlay link in this theme needs the same line.
+  {%- endcomment -%}
+  #otodor-projects-{{ section.id }} .otodor-project__link {
+    display: block;
+    position: absolute; inset: 0; z-index: 2; border-radius: var(--otodor-radius-md);
+  }
+  #otodor-projects-{{ section.id }} .otodor-project__link:focus-visible {
+    outline: 2px solid var(--pj-accent); outline-offset: 3px;
+  }
+  {%- comment -%} Video cards link from the title instead — see the card snippet. {%- endcomment -%}
+  #otodor-projects-{{ section.id }} .otodor-project__title-link {
+    color: inherit; text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--otodor-dur-fast) var(--otodor-ease-out);
+  }
+  #otodor-projects-{{ section.id }} .otodor-project__title-link:hover { border-bottom-color: currentColor; }
+  #otodor-projects-{{ section.id }} .otodor-project__body { display: grid; gap: 0.3rem; }
+  #otodor-projects-{{ section.id }} .otodor-project__meta {
+    font-family: var(--otodor-font-display); font-size: var(--otodor-text-xs);
+    font-weight: 600; text-transform: uppercase;
+    letter-spacing: var(--otodor-tracking-wider); color: var(--pj-accent);
+  }
+  #otodor-projects-{{ section.id }} .otodor-project__title {
+    font-family: var(--otodor-font-display); font-size: var(--otodor-text-lg);
+    font-weight: 600; line-height: 1.25; letter-spacing: var(--otodor-tracking-base); margin: 0;
+  }
+  #otodor-projects-{{ section.id }}.otodor-projects--light .otodor-project__title { color: var(--otodor-ink); }
+  #otodor-projects-{{ section.id }}.otodor-projects--dark .otodor-project__title { color: var(--otodor-white); }
+  #otodor-projects-{{ section.id }} .otodor-project__text {
+    margin: 0; font-size: var(--otodor-text-sm); line-height: 1.55; color: var(--pj-soft);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  /* ─ View all ────────────────────────────────────────────── */
+  #otodor-projects-{{ section.id }} .otodor-projects__footer {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    padding-top: clamp(1.5rem, 3vw, 2.25rem);
+    border-top: 1px solid var(--pj-rule);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+  }
+  #otodor-projects-{{ section.id }} .otodor-projects__footer-note {
+    margin: 0; font-size: var(--otodor-text-sm); color: var(--pj-soft); flex: 1 1 16rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #otodor-projects-{{ section.id }} .otodor-project__media { transition: none; }
+    #otodor-projects-{{ section.id }} .otodor-project:hover .otodor-project__media { transform: none; }
+  }
+{%- endstyle -%}
+
+<section
+  id="otodor-projects-{{ section.id }}"
+  class="otodor-projects otodor-projects--{{ scheme }}"
+  data-otodor-section="projects"
+  aria-labelledby="otodor-projects-title-{{ section.id }}"
+>
+  <div class="otodor-projects__inner">
+    <div class="otodor-projects__header" data-otodor-reveal="fade-up">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="otodor-projects__eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {%- endif -%}
+      <h2 class="otodor-projects__heading" id="otodor-projects-title-{{ section.id }}">
+        {{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %} <span class="accent">{{ section.settings.heading_accent | escape }}</span>{% endif %}
+      </h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="otodor-projects__sub">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div
+      class="otodor-projects__rail"
+      role="region"
+      aria-labelledby="otodor-projects-title-{{ section.id }}"
+      tabindex="0"
+    >
+      <div class="otodor-projects__grid" data-otodor-reveal="fade-up">
+        {%- if use_blog -%}
+          {%- for article in articles limit: limit -%}
+            {%- liquid
+              assign pj_meta = article.metafields.custom.project_location
+              if pj_meta == blank
+                assign pj_meta = article.tags.first
+              endif
+              assign pj_video = article.metafields.custom.project_video.value
+            -%}
+            {%- render 'otodor-project-card',
+              title: article.title,
+              meta: pj_meta,
+              text: article.excerpt_or_content,
+              image: article.image,
+              video: pj_video,
+              link: article.url,
+              sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 80vw' -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in project_blocks limit: limit -%}
+            {%- if block.settings.title != blank -%}
+              {%- render 'otodor-project-card',
+                title: block.settings.title,
+                meta: block.settings.meta,
+                text: block.settings.text,
+                image: block.settings.image,
+                video: block.settings.video,
+                video_url: block.settings.video_url,
+                link: block.settings.link,
+                sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 80vw' -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if section.settings.view_all_label != blank -%}
+      <div class="otodor-projects__footer">
+        {%- if section.settings.footer_note != blank -%}
+          <p class="otodor-projects__footer-note">{{ section.settings.footer_note | escape }}</p>
+        {%- endif -%}
+        <a class="otodor-btn otodor-btn--{% if scheme == 'dark' %}ghost{% else %}outline{% endif %}"
+           href="{{ section.settings.view_all_link | default: '/pages/projects' }}">
+          {{ section.settings.view_all_label | escape }}
+          <span class="otodor-btn__icon" aria-hidden="true">{% render 'otodor-icon', name: 'arrow-right' %}</span>
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Projects",
+  "tag": "section",
+  "class": "shopify-section",
+  "settings": [
+    { "type": "paragraph", "content": "Installed work — photographs and films of real OTODOR jobs. Author each project once as an article in a blog and every placement (this page, the homepage) reads the same source. Blocks below are the fallback for a one-off gallery." },
+    {
+      "type": "select", "id": "source", "label": "Where projects come from", "default": "auto",
+      "options": [
+        { "value": "auto", "label": "Automatic — blog, then blocks" },
+        { "value": "blog", "label": "Blog only" },
+        { "value": "blocks", "label": "Blocks only" }
+      ]
+    },
+    { "type": "blog", "id": "blog", "label": "Projects blog", "info": "Create a blog (e.g. \"Projects\") and add one article per project. Article image = cover; first tag = the line above the name; optional article metafields custom.project_location and custom.project_video." },
+    { "type": "range", "id": "limit", "label": "Maximum projects shown", "min": 3, "max": 24, "step": 1, "default": 9 },
+    {
+      "type": "select", "id": "columns_desktop", "label": "Columns (desktop)", "default": "3",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ]
+    },
+    {
+      "type": "select", "id": "color_scheme", "label": "Colour scheme", "default": "light",
+      "options": [
+        { "value": "light", "label": "Light (off-white)" },
+        { "value": "dark", "label": "Dark" }
+      ]
+    },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our Projects" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Doors we have" },
+    { "type": "text", "id": "heading_accent", "label": "Heading accent (coloured)", "default": "already secured." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Homes, offices and apartment towers across India — surveyed, fitted and supported by OTODOR technicians." },
+
+    { "type": "header", "content": "View all" },
+    { "type": "text", "id": "footer_note", "label": "Note beside the button" },
+    { "type": "text", "id": "view_all_label", "label": "Button label", "info": "Leave blank to hide the button — do that on the Projects page itself." },
+    { "type": "url", "id": "view_all_link", "label": "Button link", "info": "Defaults to /pages/projects." }
+  ],
+  "blocks": [
+    {
+      "type": "project",
+      "name": "Project",
+      "settings": [
+        { "type": "paragraph", "content": "Media cascade: Video wins, then Video link, then Image. The image is also the poster frame for either video." },
+        { "type": "text", "id": "title", "label": "Project name", "info": "Required — a block without one is skipped." },
+        { "type": "text", "id": "meta", "label": "Line above the name", "info": "Location, door type, year — e.g. \"Bandra West, Mumbai\"." },
+        { "type": "textarea", "id": "text", "label": "Supporting line" },
+        { "type": "image_picker", "id": "image", "label": "1. Image" },
+        { "type": "video", "id": "video", "label": "2. Video", "info": "Upload in Content → Files. Plays inline, served by Shopify's CDN." },
+        { "type": "text", "id": "video_url", "label": "3. Video link", "info": "A direct .mp4 / .webm / .mov URL. Not a YouTube or Instagram page link." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Optional. Makes the whole card clickable." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Projects",
+      "blocks": [
+        { "type": "project" },
+        { "type": "project" },
+        { "type": "project" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,116 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Snippet: Project Card
+  ────────────────────────────────────────────────────────────────────────
+  ONE card implementation, two sources. `otodor-projects` can read its
+  entries from a Shopify blog (an article per project) or from section
+  blocks, and both hand their fields to this snippet — so a change to how a
+  project looks is made once, and the two sources can never drift apart.
+  That is the same arrangement `otodor-category-card` has with the three
+  sources of the category selector.
+
+  Parameters (all optional except title):
+    title      — project name.                                  [required]
+    meta       — the line under it: location, door type, year.
+    text       — one supporting sentence. Clamped to 3 lines.
+    image      — cover image. Also the poster frame for a video.
+    video      — a Shopify-hosted video (Content → Files).       [wins]
+    video_url  — a direct .mp4 / .webm / .mov URL.               [2nd]
+    link       — makes the whole card a link. Blank = static card.
+    sizes      — the `sizes` attribute for the cover image.
+
+  MEDIA CASCADE: video → video_url → image. A card with none of the three
+  still renders — a project with a name and a location is worth listing —
+  but the media frame collapses rather than leaving an empty grey box.
+
+  NOTHING AUTOPLAYS. A projects gallery is browsed, not scrolled past, and
+  a wall of self-playing installation films is a bandwidth bill and a
+  motion-sickness complaint. Videos carry real controls and `preload="none"`,
+  so a visitor who never presses play never downloads a frame.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign has_media = false
+  if video != blank or video_url != blank or image != blank
+    assign has_media = true
+  endif
+  assign is_video = false
+  if video != blank or video_url != blank
+    assign is_video = true
+  endif
+  assign card_sizes = sizes | default: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 80vw'
+-%}
+
+{%- comment -%}
+  A linked card is a stretched overlay link — EXCEPT when it holds a video,
+  where an overlay would sit on top of the player's own controls. There the
+  title becomes the link instead. Not a zero-size overlay: that leaves a
+  focusable element with no visible target, which is worse than no link.
+{%- endcomment -%}
+<article class="otodor-project{% if is_video %} otodor-project--video{% endif %}">
+  {%- if link != blank and is_video == false -%}
+    <a class="otodor-project__link" href="{{ link }}" aria-label="{{ title | escape }}"></a>
+  {%- endif -%}
+
+  {%- if has_media -%}
+    <div class="otodor-project__frame">
+      {%- if video != blank -%}
+        {{
+          video
+          | video_tag:
+            image_size: '1400x',
+            autoplay: false,
+            loop: false,
+            muted: true,
+            controls: true,
+            playsinline: true,
+            preload: 'none',
+            class: 'otodor-project__media'
+        }}
+      {%- elsif video_url != blank -%}
+        <video
+          class="otodor-project__media"
+          controls muted playsinline preload="none"
+          {% if image != blank %}poster="{{ image | image_url: width: 1400 }}"{% endif %}
+        >
+          <source src="{{ video_url }}">
+        </video>
+      {%- else -%}
+        {{
+          image
+          | image_url: width: 1400
+          | image_tag:
+            loading: 'lazy',
+            widths: '400, 700, 1000, 1400',
+            sizes: card_sizes,
+            class: 'otodor-project__media',
+            alt: title
+        }}
+      {%- endif -%}
+      {%- comment -%}
+        A video card says so before it is clicked, and says it in text as
+        well as in shape — the badge is not a play triangle alone.
+      {%- endcomment -%}
+      {%- if is_video -%}
+        <span class="otodor-project__badge">Video</span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="otodor-project__body">
+    {%- if meta != blank -%}
+      <span class="otodor-project__meta">{{ meta | escape }}</span>
+    {%- endif -%}
+    <h3 class="otodor-project__title">
+      {%- if link != blank and is_video -%}
+        <a class="otodor-project__title-link" href="{{ link }}">{{ title | escape }}</a>
+      {%- else -%}
+        {{ title | escape }}
+      {%- endif -%}
+    </h3>
+    {%- if text != blank -%}
+      <p class="otodor-project__text">{{ text | strip_html | truncate: 160 }}</p>
+    {%- endif -%}
+  </div>
+</article>

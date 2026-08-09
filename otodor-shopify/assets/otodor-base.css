@@ -139,6 +139,12 @@
   --otodor-leading-snug:   1.3;
   --otodor-leading-base:   1.6;
   --otodor-leading-loose:  1.8;
+  /* Display leading. A 50px section heading set at --leading-snug (1.3) opens
+     to a 65px line box — the loose, airy setting of a blog template. Premium
+     hardware brands set display type just above its cap height (1.02–1.10);
+     the words read as one object instead of a stack of lines. Reading sizes
+     keep --leading-base; this is for headings only. */
+  --otodor-leading-display: 1.06;
   --otodor-tracking-tight: -0.03em;
   --otodor-tracking-base:  -0.01em;
   --otodor-tracking-wide:   0.05em;
@@ -162,9 +168,31 @@
   --otodor-space-4xl:  8rem;      /* 100px */
   --otodor-space-5xl: 10rem;      /* 125px */
 
-  /* ─── Section Spacing ───────────────────────────────────── */
-  --otodor-section-py:     clamp(4rem, 10vw, 8rem);
-  --otodor-section-py-sm:  clamp(3rem, 7vw,  5rem);
+  /* ─── Section Spacing ─────────────────────────────────────
+     A rhythm, not a constant. Every section used to sit on the same 100px
+     band top and bottom, which reads as a stack of unrelated slabs rather
+     than a page: nothing is grouped, and the gaps are wide enough that a
+     section header floats away from the content it introduces.
+
+     Three steps instead. `-sm` closes up sections that belong to the one
+     above (a strip under a grid, a rail under its header); `py` is the
+     default band; `-lg` is reserved for a chapter break — the moment the
+     page changes subject. The default is ~19% tighter than the old 100px,
+     which is where most of the reclaimed vertical space comes from. */
+  --otodor-section-py:     clamp(3.5rem, 6.5vw, 6.5rem);   /* 44 → 81px */
+  --otodor-section-py-sm:  clamp(2.5rem, 4.5vw, 4.25rem);  /* 31 → 53px */
+  --otodor-section-py-lg:  clamp(4.5rem, 8.5vw, 8rem);     /* 56 → 100px */
+
+  /* ─── Section header rhythm ─────────────────────────────── */
+  --otodor-header-gap: 0.95rem;                    /* eyebrow → heading */
+  --otodor-header-mb:  clamp(2rem, 3.6vw, 3.5rem); /* header → content  */
+
+  /* ─── Control heights ─────────────────────────────────────
+     Four different button heights (40 / 44 / 45 / 58px) were measurable on
+     the homepage alone. Controls that share a row must share a height. */
+  --otodor-control-h:     44px;
+  --otodor-control-h-sm:  36px;
+  --otodor-control-h-lg:  52px;
   /* Containers are in px, so they do NOT follow the root scale — they are
      scaled by hand alongside it (1280/1440/960 x 1.25) so a section's
      column keeps its proportion to the type inside it. The gutter is rem
@@ -173,13 +201,23 @@
   --otodor-container-wide: min(1800px, calc(100% - 3rem));
   --otodor-container-sm:   min(1200px, calc(100% - 3rem));
 
-  /* ─── Border Radius ─────────────────────────────────────── */
-  --otodor-radius-xs:   5px;
-  --otodor-radius-sm:   10px;
-  --otodor-radius-md:   15px;
-  --otodor-radius-lg:   25px;
-  --otodor-radius-xl:   35px;
-  --otodor-radius-2xl:  50px;
+  /* ─── Border Radius ───────────────────────────────────────
+     Twelve distinct radii were measurable on the homepage (2, 4, 5, 15, 20,
+     22, 25, 28, 35, 50, 50%, 999). Nothing signals "template" faster than
+     corners that disagree with each other, and the large end (25–50px) is
+     the soft, bubbly look of a 2021 SaaS landing page — premium hardware
+     brands stay tight and consistent.
+
+     Four steps. The xl/2xl names are kept so nothing breaks, but they now
+     resolve to lg: a card and a big card should differ in size, not in
+     corner. Anything still hardcoding a radius is a bug to be fixed at the
+     source, not a reason to widen this scale. */
+  --otodor-radius-xs:   4px;    /* chips, code pills, hairline insets */
+  --otodor-radius-sm:   8px;    /* inputs, badges, small controls */
+  --otodor-radius-md:   12px;   /* cards, tiles, panels — the workhorse */
+  --otodor-radius-lg:   18px;   /* hero tiles, modals, large surfaces */
+  --otodor-radius-xl:   18px;   /* retired → lg */
+  --otodor-radius-2xl:  18px;   /* retired → lg */
   --otodor-radius-pill: 999px;
 
   /* ─── Shadows ────────────────────────────────────────────── */
@@ -195,7 +233,18 @@
 
   --otodor-shadow-inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
-  /* ─── Motion / Easing ───────────────────────────────────── */
+  /* ─── Motion / Easing ─────────────────────────────────────
+     Fourteen distinct duration+easing pairings were measurable on the
+     homepage. Motion is a brand signature: when every element settles
+     on its own curve the page feels assembled rather than designed.
+     Two curves and three speeds carry everything —
+
+       --dur-fast + --ease-out     colour, opacity, borders
+       --dur-base + --ease-spring  transforms (lift, slide, scale)
+       --dur-slow + --ease-spring  reveals and large motion
+
+     Composite shorthands for the two combinations used most, so a
+     section can state its intent instead of re-deriving the curve. */
   --otodor-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
   --otodor-ease-out:    cubic-bezier(0.00, 0, 0.2, 1);
   --otodor-ease-in:     cubic-bezier(0.55, 0, 1, 0.45);
@@ -207,6 +256,15 @@
   --otodor-dur-slow:    500ms;
   --otodor-dur-reveal:  800ms;
   --otodor-dur-long:   1200ms;
+
+  --otodor-t-tint:  var(--otodor-dur-fast) var(--otodor-ease-out);
+  --otodor-t-move:  var(--otodor-dur-base) var(--otodor-ease-spring);
+
+  /* One lift distance for every interactive surface. Cards were lifting
+     2px, 4px and 6px on the same page; a shared value is what makes the
+     whole grid feel like one material. */
+  --otodor-lift:     -3px;
+  --otodor-lift-sm:  -1px;
 
   /* ─── Z-Index Scale ─────────────────────────────────────── */
   --otodor-z-below:     -1;
@@ -250,7 +308,7 @@
   font-family: var(--otodor-font-display);
   font-size: var(--otodor-text-hero);
   font-weight: 700;
-  line-height: var(--otodor-leading-tight);
+  line-height: var(--otodor-leading-display);
   letter-spacing: var(--otodor-tracking-tight);
   color: var(--otodor-white);
   margin: 0;
@@ -260,7 +318,7 @@
   font-family: var(--otodor-font-display);
   font-size: var(--otodor-text-5xl);
   font-weight: 700;
-  line-height: var(--otodor-leading-tight);
+  line-height: var(--otodor-leading-display);
   letter-spacing: var(--otodor-tracking-tight);
   color: var(--otodor-white);
   margin: 0;
@@ -270,7 +328,7 @@
   font-family: var(--otodor-font-display);
   font-size: var(--otodor-text-4xl);
   font-weight: 700;
-  line-height: var(--otodor-leading-snug);
+  line-height: var(--otodor-leading-display);
   letter-spacing: var(--otodor-tracking-tight);
   color: var(--otodor-white);
   margin: 0;
@@ -280,7 +338,7 @@
   font-family: var(--otodor-font-display);
   font-size: var(--otodor-text-3xl);
   font-weight: 600;
-  line-height: var(--otodor-leading-snug);
+  line-height: var(--otodor-leading-display);
   letter-spacing: var(--otodor-tracking-tight);
   color: var(--otodor-white);
   margin: 0;
@@ -460,10 +518,19 @@
 }
 
 /* Section header block */
+/* ─── Section header rhythm ──────────────────────────────────
+   Measured across the homepage, the gap from eyebrow to heading ran
+   11 / 12 / 13 / 14 / 46px and the gap from a section header down to
+   its content ran 0 / 0 / 50 / 68.75 / 75px. Both are the same
+   relationship every time — a label, the heading it labels, and the
+   content the heading introduces — so both get one value.
+
+   The eyebrow sits close to its heading (it is a label on it, not a
+   sibling); the header then clears the content by a full step. */
 .otodor-section-header {
   display: flex;
   flex-direction: column;
-  gap: var(--otodor-space-md);
+  gap: var(--otodor-header-gap);
   max-width: 64ch;
 }
 
@@ -471,6 +538,12 @@
   align-items: center;
   text-align: center;
   margin-inline: auto;
+}
+
+/* Applied by sections that own their header wrapper, so the distance
+   from heading to content is the same everywhere. */
+.otodor-section-header--spaced {
+  margin-bottom: var(--otodor-header-mb);
 }
 
 /* Divider */
@@ -531,7 +604,7 @@
 }
 
 .otodor-glass-card--raised:hover {
-  transform: translateY(-4px);
+  transform: translateY(var(--otodor-lift));
   box-shadow: var(--otodor-shadow-inset-top), var(--otodor-shadow-lg), var(--otodor-shadow-blue-sm);
   border-color: rgba(77, 166, 255, 0.20);
 }
@@ -563,7 +636,7 @@
 .otodor-surface-card:hover {
   border-color: var(--otodor-hairline-mid);
   box-shadow: var(--otodor-shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(var(--otodor-lift));
 }
 
 
@@ -587,7 +660,7 @@
   white-space: nowrap;
   border-radius: var(--otodor-radius-pill);
   padding: 0.875rem 2rem;
-  min-height: 52px;
+  min-height: var(--otodor-control-h-lg);
   transition:
     background var(--otodor-dur-fast) var(--otodor-ease-out),
     border-color var(--otodor-dur-fast) var(--otodor-ease-out),
@@ -613,7 +686,7 @@
 
 .otodor-btn--primary:hover {
   box-shadow: var(--otodor-shadow-blue-md);
-  transform: translateY(-2px);
+  transform: translateY(var(--otodor-lift-sm));
   color: var(--otodor-white);
   text-decoration: none;
 }
@@ -648,7 +721,7 @@
 .otodor-btn--ghost:hover {
   background: var(--otodor-glass-mid);
   border-color: var(--otodor-glass-border-h);
-  transform: translateY(-2px);
+  transform: translateY(var(--otodor-lift-sm));
   color: var(--otodor-white);
   text-decoration: none;
 }
@@ -662,7 +735,7 @@
 
 .otodor-btn--outline:hover {
   background: var(--otodor-blue-glow);
-  transform: translateY(-2px);
+  transform: translateY(var(--otodor-lift-sm));
   box-shadow: var(--otodor-shadow-blue-sm);
   color: var(--otodor-blue);
   text-decoration: none;
@@ -672,13 +745,77 @@
 .otodor-btn--sm {
   font-size: var(--otodor-text-xs);
   padding: 0.6rem 1.25rem;
-  min-height: 40px;
+  min-height: var(--otodor-control-h-sm);
+}
+
+.otodor-btn--md {
+  padding: 0.7rem 1.6rem;
+  min-height: var(--otodor-control-h);
 }
 
 .otodor-btn--lg {
   font-size: var(--otodor-text-md);
   padding: 1.1rem 2.5rem;
-  min-height: 60px;
+  min-height: var(--otodor-control-h-lg);
+}
+
+/* ─── One focus ring ─────────────────────────────────────────
+   Focus styling was defined ad hoc per section (and in several places
+   not at all, leaving the browser default). Keyboard users see the
+   product's craft in this ring more than anywhere else, and it is
+   cheap to get right once: same colour, same offset, same radius
+   relationship, everywhere, on :focus-visible only so pointer users
+   never see it. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--otodor-blue);
+  outline-offset: 2px;
+  border-radius: var(--otodor-radius-xs);
+}
+
+/* Surfaces that already have a corner keep it under the ring. */
+:where(.otodor-btn, .button, .otodor-pcard, .otodor-glass-card):focus-visible {
+  border-radius: inherit;
+}
+
+/* ─── Dawn button harmonisation ──────────────────────────────
+   Dawn's bare `.button` still rendered its stock look wherever the
+   theme hadn't explicitly overridden it — cart, 404, customer
+   accounts, newsletter: 58px tall, square corners, weight 400 at
+   18.75px. Next to the pill-shaped 44–52px brand buttons that is the
+   single loudest "this is a Shopify theme" tell left on the site.
+
+   Matched to the brand control here rather than restyled per page,
+   so anything Dawn renders in future inherits it too. The product
+   and payment buttons above set their own values with !important and
+   are unaffected. */
+.button,
+.shopify-challenge__button,
+.customer button:not(.otodor-btn) {
+  min-height: var(--otodor-control-h-lg);
+  border-radius: var(--otodor-radius-pill);
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-sm);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.875rem 2rem;
+  transition:
+    background var(--otodor-dur-fast) var(--otodor-ease-out),
+    box-shadow var(--otodor-dur-fast) var(--otodor-ease-out),
+    transform var(--otodor-dur-fast) var(--otodor-ease-spring);
+}
+
+.button:hover,
+.shopify-challenge__button:hover,
+.customer button:not(.otodor-btn):hover {
+  transform: translateY(-1px);
+}
+
+/* Dawn draws its button outline with an ::after box-shadow, which
+   re-squares the corners we just rounded. */
+.button::after,
+.shopify-challenge__button::after {
+  box-shadow: none;
+  border-radius: var(--otodor-radius-pill);
 }
 
 /* Icon inside button */
@@ -1531,17 +1668,20 @@ body {
   color: #FFFFFF !important;
   border-radius: var(--otodor-radius-pill) !important;
   font-family: var(--otodor-font-body) !important;
+  /* Buy Now rendered at 18.75px next to a 14px Add to Cart — two buttons in
+     the same row, at the same weight, disagreeing about size. */
+  font-size: var(--otodor-text-sm) !important;
   font-weight: 700 !important;
   letter-spacing: 0.03em !important;
-  min-height: 52px !important;
-  transition: all var(--otodor-dur-fast) var(--otodor-ease-spring) !important;
+  min-height: var(--otodor-control-h-lg) !important;
+  transition: all var(--otodor-t-tint) !important;
 }
 
 .product-form__submit:hover,
 .shopify-payment-button__button:hover,
 .shopify-payment-button__button--unbranded:hover {
   box-shadow: var(--otodor-shadow-blue-md) !important;
-  transform: translateY(-1px) !important;
+  transform: translateY(var(--otodor-lift-sm)) !important;
 }
 
 /* Remove Dawn's default rectangular outline border pseudo-elements */
@@ -1560,6 +1700,9 @@ body {
   border-radius: var(--otodor-radius-pill) !important;
   background-color: rgba(255, 255, 255, 0.03) !important;
   overflow: hidden !important;
+  /* Sits in the same row as Add to Cart and was 58px against its 52px. */
+  min-height: var(--otodor-control-h-lg) !important;
+  height: var(--otodor-control-h-lg) !important;
 }
 
 .quantity__input,
@@ -1785,7 +1928,7 @@ body.otodor-light-page {
     box-shadow var(--otodor-dur-base) var(--otodor-ease-out);
 }
 .otodor-pcard:hover {
-  transform: translateY(-4px);
+  transform: translateY(var(--otodor-lift));
   border-color: rgba(26, 120, 216, 0.35);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 16px 40px rgba(0, 0, 0, 0.09);
 }
@@ -1874,10 +2017,43 @@ body.otodor-light-page {
   color: var(--otodor-accent-on-light);
   font-weight: 500;
 }
-.otodor-pcard__price s {
+/* The saving is the loudest thing on a discounted card, so it gets the
+   accent rather than the neutral ink used for "Sold out". */
+.otodor-pcard__badge--save {
+  background: var(--otodor-accent-on-light);
+  color: #FFFFFF;
+}
+
+.otodor-pcard__price-now {
+  color: var(--otodor-ink);
+  font-weight: 600;
+}
+
+/* The old price trails the new one, muted and struck. It used to sit first
+   with `margin-right`, which put the number the customer is NOT paying at
+   the front of the line. */
+.otodor-pcard__price-was {
   color: var(--otodor-ink-faint);
   font-weight: 400;
-  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+/* Delivery / EMI reassurance, dot-separated without typing the dots. */
+.otodor-pcard__perks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.55rem;
+  margin: 0.1rem 0 0;
+  font-family: var(--otodor-font-body);
+  font-size: var(--otodor-text-xs);
+  line-height: 1.4;
+  color: var(--otodor-ink-soft);
+}
+.otodor-pcard__perks span + span::before {
+  content: '·';
+  margin-right: 0.55rem;
+  color: var(--otodor-ink-faint);
 }
 
 /* Narrow-column treatment. The grid stays two-up on phones, so a card gets
@@ -1911,7 +2087,7 @@ body.otodor-light-page {
     font-size: var(--otodor-text-md);
     margin-top: 0.3rem;
   }
-  .otodor-pcard__price s { margin-right: 0.35rem; }
+  .otodor-pcard__price-was { margin-left: 0.35rem; }
   .otodor-pcard__badge { font-size: var(--otodor-text-xs); }
 }
 

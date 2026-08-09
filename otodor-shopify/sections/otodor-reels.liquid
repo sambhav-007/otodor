@@ -1,0 +1,630 @@
+{%- comment -%}
+  ════════════════════════════════════════════════════════════════════════
+  OTODOR Module: Reels  (vertical video rail — the brand's own product ads)
+  ────────────────────────────────────────────────────────────────────────
+  Purpose:            Put OTODOR's own short-form product films in front of a
+                      visitor the way the platforms they were cut for do —
+                      a swipeable rail of 9:16 cards that play on sight — and
+                      send every tap to the product being advertised.
+  Primary source:     `reel` blocks. Each block takes ONE of three sources,
+                      checked in this order:
+                        1. Video          — uploaded to Shopify (Content → Files
+                                            → Videos). Best: plays inline, no
+                                            third-party cookies, served by
+                                            Shopify's CDN.
+                        2. Video link     — paste a direct .mp4 / .webm / .mov
+                                            URL (a Shopify Files link works).
+                                            Also plays inline.
+                        3. Cover + link   — for a reel that lives on Instagram,
+                                            YouTube or TikTok and cannot be
+                                            embedded. Shows the cover image
+                                            with a play badge; the tap opens
+                                            the reel where it lives.
+  Fallback order:     video → video_url → cover image. A block with none of
+                      the three is skipped, not rendered empty.
+  Visibility rule:    The section renders nothing at all when no block has a
+                      usable source — an empty rail is worse than no rail.
+  Merchant editable:  YES — heading, caption, per-reel source, per-reel link,
+                      card width, colour scheme, autoplay.
+  Required metafields: none.
+  Optional metafields: none. Reads `product` only for a block's link target.
+  Dependencies:       snippets/otodor-icon (arrow-right); otodor-base.css
+                      tokens. Self-contained script — no GSAP, no libraries.
+  Placement:          Homepage, under Core Technology. Works on any template.
+  Accessibility:      Each card is one link with a real accessible name.
+                      Autoplay is muted, and `prefers-reduced-motion: reduce`
+                      turns it off entirely — the cover is shown instead, so
+                      nothing moves without being asked. A per-card sound
+                      button is the WCAG 2.2.2 pause mechanism and is a real
+                      <button> with aria-pressed.
+
+  ONE VIDEO PLAYS WITH SOUND AT A TIME. Unmuting a card mutes every other,
+  because a rail of five talking ads is a reason to leave the page.
+
+  BANDWIDTH IS NOT FREE. Cards only start playing once they scroll into view
+  and pause the moment they leave, so a visitor who never reaches this
+  section never downloads a frame of it.
+  ════════════════════════════════════════════════════════════════════════
+{%- endcomment -%}
+
+{%- liquid
+  assign scheme = section.settings.color_scheme | default: 'light'
+
+  # Lifecycle guard — a block only counts if it can actually show something.
+  assign usable = 0
+  for block in section.blocks
+    if block.settings.video != blank or block.settings.video_url != blank or block.settings.cover != blank
+      assign usable = usable | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if usable > 0 -%}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    {%- if scheme == 'light' -%}
+    background: var(--otodor-bg-light);
+    {%- elsif scheme == 'black' -%}
+    background: #000000;
+    {%- else -%}
+    background: transparent;
+    {%- endif -%}
+  }
+
+  .otodor-reels {
+    padding-block: var(--otodor-section-py);
+  }
+
+  .otodor-reels__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--otodor-space-lg);
+    margin-bottom: var(--otodor-header-mb);
+  }
+  .otodor-reels__header-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--otodor-header-gap);
+    max-width: 44ch;
+  }
+
+  {%- comment -%}
+    The arrows are a desktop affordance only. On touch the rail is already
+    swipeable and a pair of buttons would just cover two cards.
+  {%- endcomment -%}
+  .otodor-reels__nav { display: none; gap: 0.5rem; flex: 0 0 auto; }
+  @media (min-width: 900px) and (hover: hover) {
+    .otodor-reels__nav { display: flex; }
+  }
+  .otodor-reels__arrow {
+    width: var(--otodor-control-h);
+    height: var(--otodor-control-h);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    background: transparent;
+    color: inherit;
+    border: 1px solid var(--otodor-hairline-mid);
+    transition: background var(--otodor-t-tint), border-color var(--otodor-t-tint), opacity var(--otodor-t-tint);
+  }
+  .otodor-reels__arrow:hover { background: var(--otodor-glass); border-color: var(--otodor-blue); }
+  .otodor-reels__arrow[disabled] { opacity: 0.3; cursor: default; }
+  .otodor-reels__arrow svg { width: 16px; height: 16px; }
+  .otodor-reels__arrow--prev svg { transform: rotate(180deg); }
+
+  /* ─ The rail ──────────────────────────────────────────────
+     Same construction as the testimonials rail: bled to the viewport
+     edge by exactly the container gutter, with scroll-padding so the
+     first card still snaps onto the page's left rule instead of the
+     viewport edge. */
+  .otodor-reels__rail {
+    --reels-gutter: 1.5rem;
+    display: flex;
+    gap: var(--otodor-space-lg);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    margin-inline: calc(var(--reels-gutter) * -1);
+    padding-inline: var(--reels-gutter);
+    scroll-padding-inline: var(--reels-gutter);
+    /* The rail clips vertically too — leave the cards' shadows room. */
+    padding-block: 0.75rem;
+    margin-block: -0.75rem;
+  }
+  .otodor-reels__rail::-webkit-scrollbar { display: none; }
+
+  .otodor-reels__card {
+    position: relative;
+    flex: 0 0 auto;
+    width: clamp(232px, {{ section.settings.card_width | default: 26 }}vw, 330px);
+    scroll-snap-align: start;
+    border-radius: var(--otodor-radius-md);
+    overflow: hidden;
+    background: var(--otodor-plinth);
+    transition: transform var(--otodor-t-move), box-shadow var(--otodor-t-tint);
+  }
+  .otodor-reels__card:hover { transform: translateY(var(--otodor-lift)); }
+
+  {%- if scheme == 'light' -%}
+  .otodor-reels__card { box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 12px 30px rgba(0,0,0,0.10); }
+  .otodor-reels__card:hover { box-shadow: 0 2px 4px rgba(0,0,0,0.06), 0 20px 44px rgba(0,0,0,0.16); }
+  {%- else -%}
+  .otodor-reels__card { box-shadow: 0 12px 34px rgba(0,0,0,0.45); }
+  .otodor-reels__card:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+  {%- endif -%}
+
+  /* The whole card is the link; the sound button sits above it. */
+  .otodor-reels__link {
+    display: block;
+    position: relative;
+    aspect-ratio: 9 / 16;
+    text-decoration: none;
+    color: #FFFFFF;
+  }
+
+  .otodor-reels__media,
+  .otodor-reels__media video,
+  .otodor-reels__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .otodor-reels__card:hover .otodor-reels__media video,
+  .otodor-reels__card:hover .otodor-reels__media img {
+    transform: scale(1.03);
+  }
+  .otodor-reels__media video,
+  .otodor-reels__media img {
+    transition: transform var(--otodor-dur-slow) var(--otodor-ease-spring);
+  }
+
+  /* Copy sits on the film, so it needs its own floor to stand on. */
+  .otodor-reels__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 42%, transparent 68%);
+    pointer-events: none;
+  }
+
+  .otodor-reels__meta {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: 1.1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .otodor-reels__caption {
+    font-family: var(--otodor-font-display);
+    font-size: 1.28rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #FFFFFF;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.4);
+  }
+  .otodor-reels__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--otodor-font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.88);
+  }
+  .otodor-reels__cta svg { width: 13px; height: 13px; transition: transform var(--otodor-t-move); }
+  .otodor-reels__card:hover .otodor-reels__cta svg { transform: translateX(4px); }
+
+  /* Badge for reels that open off-site (Instagram, YouTube, TikTok). */
+  .otodor-reels__play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 54px; height: 54px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.42);
+    border: 1px solid rgba(255,255,255,0.5);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    transition: background var(--otodor-t-tint), transform var(--otodor-t-move);
+    pointer-events: none;
+  }
+  .otodor-reels__card:hover .otodor-reels__play {
+    background: rgba(0,0,0,0.58);
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+  .otodor-reels__play svg { width: 19px; height: 19px; margin-left: 3px; color: #FFFFFF; }
+
+  /* Sound toggle — also the pause mechanism for the autoplaying film. */
+  .otodor-reels__sound {
+    position: absolute;
+    top: 0.7rem; right: 0.7rem;
+    z-index: 3;
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.28);
+    background: rgba(0,0,0,0.42);
+    color: #FFFFFF;
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    transition: background var(--otodor-t-tint);
+  }
+  .otodor-reels__sound:hover { background: rgba(0,0,0,0.65); }
+  .otodor-reels__sound svg { width: 15px; height: 15px; pointer-events: none; }
+  .otodor-reels__sound .otodor-reels__icon-on { display: none; }
+  .otodor-reels__sound[aria-pressed="true"] .otodor-reels__icon-on { display: block; }
+  .otodor-reels__sound[aria-pressed="true"] .otodor-reels__icon-off { display: none; }
+
+  @media (max-width: 599px) {
+    .otodor-reels__card { width: min(74vw, 300px); }
+    .otodor-reels__header { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .otodor-reels__rail { scroll-behavior: auto; }
+    .otodor-reels__card:hover { transform: none; }
+    .otodor-reels__card:hover .otodor-reels__media video,
+    .otodor-reels__card:hover .otodor-reels__media img { transform: none; }
+  }
+{%- endstyle -%}
+
+<section
+  class="otodor-reels{% if scheme == 'light' %} otodor-light{% endif %}"
+  data-otodor-section="reels"
+  aria-labelledby="otodor-reels-title-{{ section.id }}"
+>
+  <div class="otodor-container">
+    <div class="otodor-reels__header">
+      <div class="otodor-reels__header-text">
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="otodor-eyebrow" data-otodor-reveal="fade-up">{{ section.settings.eyebrow | escape }}</span>
+        {%- endif -%}
+        <h2 class="otodor-heading-2" id="otodor-reels-title-{{ section.id }}" data-otodor-reveal="fade-up">
+          {{ section.settings.heading | escape }}{% if section.settings.heading_accent != blank %}<span class="otodor-accent">{{ section.settings.heading_accent | escape }}</span>{% endif %}
+        </h2>
+      </div>
+
+      <div class="otodor-reels__nav">
+        <button type="button" class="otodor-reels__arrow otodor-reels__arrow--prev" data-reels-prev aria-label="Previous reels">
+          {% render 'otodor-icon', name: 'arrow-right' %}
+        </button>
+        <button type="button" class="otodor-reels__arrow otodor-reels__arrow--next" data-reels-next aria-label="More reels">
+          {% render 'otodor-icon', name: 'arrow-right' %}
+        </button>
+      </div>
+    </div>
+
+    <div class="otodor-reels__rail" data-reels-rail>
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign has_video = false
+          if block.settings.video != blank or block.settings.video_url != blank
+            assign has_video = true
+          endif
+          # Skip a block that has nothing to show rather than render a hole.
+          unless has_video or block.settings.cover != blank
+            continue
+          endunless
+
+          # Link priority: explicit link → the product it advertises → nothing.
+          assign href = block.settings.link
+          if href == blank and block.settings.product != blank
+            assign href = block.settings.product.url
+          endif
+
+          assign caption = block.settings.caption
+          if caption == blank and block.settings.product != blank
+            assign caption = block.settings.product.title
+          endif
+
+          # Two different questions, previously conflated into one:
+          #
+          #   show_play   — no inline film on this card? Then the cover needs
+          #                 a play badge to read as a reel, not a photo.
+          #   is_external — does the link leave the store? Only then does it
+          #                 earn target="_blank" and the "(opens in a new
+          #                 tab)" warning. Shopify's internal links are
+          #                 root-relative (/products/onyx), so an absolute
+          #                 http(s) URL is the off-site signal.
+          #
+          # Treating "cover-only" as "external" put target="_blank" and a
+          # false new-tab announcement on every card pointing at our own
+          # product pages.
+          assign show_play = false
+          unless has_video
+            assign show_play = true
+          endunless
+
+          assign is_external = false
+          if href contains '://'
+            assign is_external = true
+          endif
+
+          assign label = caption | default: 'Watch the reel'
+        -%}
+
+        <article class="otodor-reels__card" {{ block.shopify_attributes }} data-reels-card>
+          <a
+            class="otodor-reels__link"
+            {% if href != blank %}href="{{ href }}"{% if is_external %} target="_blank" rel="noopener"{% endif %}{% endif %}
+            aria-label="{{ label | escape }}{% if is_external %} (opens in a new tab){% endif %}"
+          >
+            <span class="otodor-reels__media">
+              {%- if block.settings.video != blank -%}
+                {{
+                  block.settings.video
+                  | video_tag:
+                    image_size: '600x',
+                    autoplay: false,
+                    loop: true,
+                    muted: true,
+                    controls: false,
+                    playsinline: true,
+                    preload: 'none'
+                }}
+              {%- elsif block.settings.video_url != blank -%}
+                {%- comment -%}
+                  A pasted file URL. `preload="none"` keeps it off the wire
+                  until the card is actually scrolled to.
+                {%- endcomment -%}
+                <video
+                  loop muted playsinline preload="none"
+                  {% if block.settings.cover != blank %}poster="{{ block.settings.cover | image_url: width: 600 }}"{% endif %}
+                >
+                  <source src="{{ block.settings.video_url }}">
+                </video>
+              {%- else -%}
+                {{
+                  block.settings.cover
+                  | image_url: width: 700
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '350, 520, 700',
+                    sizes: '(min-width: 900px) 330px, 74vw',
+                    alt: label
+                }}
+              {%- endif -%}
+            </span>
+
+            <span class="otodor-reels__scrim" aria-hidden="true"></span>
+
+            {%- if show_play -%}
+              <span class="otodor-reels__play" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M8 5.5v13l11-6.5z"/></svg>
+              </span>
+            {%- endif -%}
+
+            {%- if caption != blank or href != blank -%}
+              <span class="otodor-reels__meta">
+                {%- if caption != blank -%}
+                  <span class="otodor-reels__caption">{{ caption | escape }}</span>
+                {%- endif -%}
+                {%- if href != blank and section.settings.cta_label != blank -%}
+                  <span class="otodor-reels__cta">
+                    {{ section.settings.cta_label | escape }}
+                    <span aria-hidden="true">{% render 'otodor-icon', name: 'arrow-right' %}</span>
+                  </span>
+                {%- endif -%}
+              </span>
+            {%- endif -%}
+          </a>
+
+          {%- if has_video -%}
+            <button
+              type="button"
+              class="otodor-reels__sound"
+              data-reels-sound
+              aria-pressed="false"
+              aria-label="{{ 'Turn sound on' | escape }}"
+            >
+              <svg class="otodor-reels__icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M11 5 6 9H3v6h3l5 4z"/><path d="m17 9 4 6M21 9l-4 6"/>
+              </svg>
+              <svg class="otodor-reels__icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M19 6.5a8 8 0 0 1 0 11"/>
+              </svg>
+            </button>
+          {%- endif -%}
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var root = document.currentScript && document.currentScript.previousElementSibling;
+    var section = document.querySelector('#shopify-section-{{ section.id }}') || root;
+    if (!section) return;
+
+    var rail = section.querySelector('[data-reels-rail]');
+    if (!rail) return;
+
+    var cards = Array.prototype.slice.call(section.querySelectorAll('[data-reels-card]'));
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var autoplay = {{ section.settings.autoplay | default: true | json }};
+
+    /* ── Play only what is on screen ──────────────────────────────────
+       A muted <video> that is never seen should never be fetched. The
+       source is attached on first intersection, not at parse time. */
+    function sourceOf(video) {
+      return video.getAttribute('src') || (video.querySelector('source') && video.querySelector('source').getAttribute('src'));
+    }
+
+    if (autoplay && !reduce && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target.querySelector('video');
+          if (!video) return;
+          if (entry.isIntersecting) {
+            if (video.preload === 'none') { video.preload = 'auto'; video.load(); }
+            var p = video.play();
+            if (p && p.catch) p.catch(function () { /* autoplay refused — the poster stands in */ });
+          } else {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.4 });
+      cards.forEach(function (c) { if (c.querySelector('video')) io.observe(c); });
+    }
+
+    /* ── Sound: exactly one card at a time ───────────────────────────── */
+    section.addEventListener('click', function (event) {
+      var btn = event.target.closest ? event.target.closest('[data-reels-sound]') : null;
+      if (!btn) return;
+      // The button sits on top of the card link — don't follow it.
+      event.preventDefault();
+      event.stopPropagation();
+
+      var card = btn.closest('[data-reels-card]');
+      var video = card && card.querySelector('video');
+      if (!video) return;
+
+      var turningOn = btn.getAttribute('aria-pressed') !== 'true';
+
+      // Mute every other card first, so two ads never talk over each other.
+      cards.forEach(function (other) {
+        if (other === card) return;
+        var v = other.querySelector('video');
+        var b = other.querySelector('[data-reels-sound]');
+        if (v) v.muted = true;
+        if (b) {
+          b.setAttribute('aria-pressed', 'false');
+          b.setAttribute('aria-label', 'Turn sound on');
+        }
+      });
+
+      video.muted = !turningOn;
+      btn.setAttribute('aria-pressed', String(turningOn));
+      btn.setAttribute('aria-label', turningOn ? 'Turn sound off' : 'Turn sound on');
+
+      if (turningOn) {
+        if (video.preload === 'none') { video.preload = 'auto'; video.load(); }
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {});
+      }
+    });
+
+    /* ── Arrows ──────────────────────────────────────────────────────── */
+    var prev = section.querySelector('[data-reels-prev]');
+    var next = section.querySelector('[data-reels-next]');
+
+    function step() {
+      var card = cards[0];
+      if (!card) return rail.clientWidth;
+      var styles = window.getComputedStyle(rail);
+      var gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    function syncArrows() {
+      if (!prev || !next) return;
+      var max = rail.scrollWidth - rail.clientWidth - 1;
+      prev.disabled = rail.scrollLeft <= 0;
+      next.disabled = rail.scrollLeft >= max;
+    }
+
+    if (prev) prev.addEventListener('click', function () { rail.scrollBy({ left: -step(), behavior: reduce ? 'auto' : 'smooth' }); });
+    if (next) next.addEventListener('click', function () { rail.scrollBy({ left: step(), behavior: reduce ? 'auto' : 'smooth' }); });
+    rail.addEventListener('scroll', syncArrows, { passive: true });
+    window.addEventListener('resize', syncArrows);
+    syncArrows();
+  })();
+</script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "OTODOR Reels",
+  "tag": "section",
+  "class": "shopify-section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "A swipeable rail of vertical (9:16) product films. Each reel takes ONE source: an uploaded Video, a pasted video file link, or a cover image that opens the reel on Instagram / YouTube / TikTok. Reels only start playing once scrolled into view."
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Colour scheme",
+      "default": "light",
+      "options": [
+        { "value": "light", "label": "Light (off-white)" },
+        { "value": "dark", "label": "Dark (page background)" },
+        { "value": "black", "label": "Pitch black" }
+      ]
+    },
+
+    { "type": "header", "content": "Heading" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "OTODOR in Action" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "See it in " },
+    { "type": "text", "id": "heading_accent", "label": "Heading accent (coloured)", "default": "real homes." },
+    { "type": "text", "id": "cta_label", "label": "Card link label", "default": "Shop the product", "info": "Shown on every reel that has a link. Leave blank to hide it." },
+
+    { "type": "header", "content": "Layout & playback" },
+    {
+      "type": "range", "id": "card_width", "label": "Card width", "min": 18, "max": 34, "step": 1, "unit": "vw", "default": 26,
+      "info": "Clamped between 232px and 330px, so this only changes how many cards land on screen at mid sizes."
+    },
+    {
+      "type": "checkbox", "id": "autoplay", "label": "Play reels on sight", "default": true,
+      "info": "Muted, looping, and only while the card is on screen. Always off for visitors who ask for reduced motion."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "reel",
+      "name": "Reel",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Fill in ONE source. Video wins, then Video link, then Cover image."
+        },
+        {
+          "type": "video", "id": "video", "label": "1. Video",
+          "info": "Upload in Content → Files. Best option: plays inline, served by Shopify's CDN, no third-party cookies."
+        },
+        {
+          "type": "text", "id": "video_url", "label": "2. Video link",
+          "info": "A direct .mp4 / .webm / .mov URL — a Shopify Files link works. Plays inline like an upload. Not a YouTube or Instagram page link."
+        },
+        {
+          "type": "image_picker", "id": "cover", "label": "3. Cover image",
+          "info": "Doubles as the poster frame for options 1 and 2. On its own it makes the card open the reel wherever it lives — use it for Instagram, YouTube Shorts or TikTok, with the link below."
+        },
+
+        { "type": "header", "content": "Where it goes" },
+        { "type": "product", "id": "product", "label": "Product advertised", "info": "The card links here, and borrows its title as the caption if you leave the caption blank." },
+        { "type": "url", "id": "link", "label": "Link override", "info": "Wins over the product. Put the Instagram / YouTube / TikTok reel URL here when using a cover image." },
+        { "type": "text", "id": "caption", "label": "Caption", "info": "Blank = the product's title." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OTODOR Reels",
+      "blocks": [
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" },
+        { "type": "reel" }
+      ]
+    }
+  ]
+}
+{% endschema %}
